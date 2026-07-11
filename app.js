@@ -12,7 +12,6 @@ import AppError from "./utils/appError.js";
 import globalErrorHandler from "./controllers/errorController.js";
 import cookieParser from "cookie-parser";
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -28,7 +27,6 @@ app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
 
-
 app.use("/", viewRouter);
 app.use("/api/v1/cars", carRouter);
 app.use("/api/v1/users", userRouter);
@@ -38,7 +36,7 @@ app.use("/api/v1/bookings", bookingRouter);
 app.all("/{*path}", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
-
+//using global error handling
 app.use(globalErrorHandler);
 
 export default app;
