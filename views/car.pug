@@ -1,0 +1,393 @@
+extends base
+include _mixins
+
+block head
+  //- Leaflet CSS
+  link(href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css' rel='stylesheet' crossorigin='')
+  style.
+    .pill-entry { animation: slideIn 0.4s ease-out forwards; opacity: 0; transform: translateY(10px); }
+    @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #c0c1ff; border-radius: 10px; }
+    .leaflet-popup-content-wrapper { background: var(--glass-bg) !important; backdrop-filter: blur(8px); border: 1px solid var(--glass-border); color: var(--color-on-surface) !important; border-radius: 8px !important; }
+    .leaflet-popup-tip { background: var(--glass-bg) !important; }
+    .leaflet-container { background: var(--color-surface-container-low) !important; }
+    .custom-marker { background: none; border: none; }
+    .marker-pulse { width: 40px; height: 40px; background: var(--color-primary); border-radius: 50%; position: absolute; opacity: 0.25; animation: pulse 2s infinite; }
+    .marker-dot { width: 14px; height: 14px; background: var(--color-primary); border: 2px solid white; border-radius: 50%; position: relative; z-index: 10; }
+    @keyframes pulse { 0% { transform: scale(1); opacity: 0.4; } 70% { transform: scale(1.6); opacity: 0; } 100% { transform: scale(1); opacity: 0; } }
+    .default-marker-icon { width: 24px; height: 24px; background: var(--color-primary); border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(0,0,0,0.3); }
+
+block content
+  main.pt-24.pb-xl.max-w-container-max.mx-auto.px-gutter
+    div(class="grid grid-cols-1 lg:grid-cols-12 gap-xl")
+
+      //- ===== LEFT COLUMN =====
+      div(class="lg:col-span-7 space-y-lg")
+
+        //- Gallery
+        section.space-y-md
+          .relative.group.aspect-video.rounded-xl.overflow-hidden.glass-panel.neon-rim
+            img#main-image.w-full.h-full.object-cover(
+              src=`/cars/${car.imageCover}`
+              alt=`${car.make} ${car.model}`
+              style='transition: opacity 0.2s ease;'
+            )
+            div(class="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent pointer-events-none")
+
+          if car.images && car.images.length
+            .grid.grid-cols-4.gap-md
+              each img, i in car.images
+                div(class="aspect-square rounded-lg overflow-hidden cursor-pointer hover:ring-2 ring-primary transition-all")(onclick=`swapImage('/cars/${img}')`)
+                  img.w-full.h-full.object-cover(src=`/cars/${img}` alt=`View ${i+1}`)
+              .aspect-square.rounded-lg.overflow-hidden.glass-panel.flex.items-center.justify-center
+                span.font-label-md.text-label-md.text-primary Gallery
+
+
+        //- Title & Header
+        header
+          .flex.items-center.gap-sm.mb-base
+            span(class="bg-tertiary/10 text-tertiary px-3 py-1 rounded-full text-label-sm font-label-sm border border-tertiary/20")= car.year
+            .flex.items-center.text-secondary
+              +stars(car.ratingAverage)
+              span.font-label-md.text-label-md.ml-2= `${car.ratingAverage} (${car.ratingsQuantity} Reviews)`
+          h1(class="font-headline-lg text-headline-lg md:text-display-lg-mobile text-on-surface font-black tracking-tight")= `${car.make} ${car.model}`
+          p.mt-base.font-body-md.text-body-md.text-on-surface-variant.max-w-2xl= `${car.type} · ${car.transmission} · Available: ${car.available ? 'Yes' : 'No'}`
+
+        //- Features
+        section.space-y-md
+          h2.font-headline-md.text-headline-md.text-on-surface Premium Features
+          .flex.flex-wrap.gap-sm
+            each feat in (car.features || [])
+              div(class="flex items-center gap-xs px-4 py-2 rounded-full glass-panel border border-outline-variant/30 hover:border-secondary transition-all group")
+                span(class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary") star
+                span.font-label-md.text-label-md= feat
+            div(class="flex items-center gap-xs px-4 py-2 rounded-full glass-panel border border-outline-variant/30 hover:border-secondary transition-all group")
+              span(class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary") bolt
+              span.font-label-md.text-label-md= car.transmission
+            div(class="flex items-center gap-xs px-4 py-2 rounded-full glass-panel border border-outline-variant/30 hover:border-secondary transition-all group")
+              span(class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary") directions_car
+              span.font-label-md.text-label-md= car.type
+
+        //- Map Section — always shown, defaults used when car lacks coordinates
+        section.space-y-md
+          .flex.flex-col.gap-xs
+            h2(class="font-headline-md text-[18px] text-on-surface font-bold") 📍 Pickup Location
+            if car.location && car.location.coordinates
+              p(class="text-[13px] text-on-surface-variant/70") This vehicle is available for pickup at the location shown below
+            else
+              p(class="text-[13px] text-on-surface-variant/70") Pickup location not specified — showing default location
+          div(class="relative w-full rounded-xl overflow-hidden glass-panel border border-white/10")
+            div#map(class="w-full h-[250px] md:h-[380px]"
+              data-lng=car.location && car.location.coordinates ? car.location.coordinates[0] : '-77.0369'
+              data-lat=car.location && car.location.coordinates ? car.location.coordinates[1] : '38.9072'
+              data-car-name=`${car.make} ${car.model}`
+              data-price=`${car.pricePerDay}`
+              data-available=`${car.available}`
+              data-has-location=car.location && car.location.coordinates ? 'true' : 'false'
+            )
+            //- Distance chip (hidden initially)
+            #distance-chip.absolute.top-4.left-4.transform.-translate-x-full.opacity-0.transition-all.duration-500.z-10
+              div(class="bg-surface-container-high/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-primary/30 flex items-center gap-2 shadow-xl")
+                span.material-symbols-outlined.text-primary(class="text-[16px]") my_location
+                span#distance-text.text-label-sm.font-medium.text-on-surface Calculating distance...
+          .flex.flex-col.gap-md
+            .flex.flex-wrap.items-center.gap-md
+              button#btn-nearby(class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-primary/50 text-primary font-label-md text-label-md hover:bg-primary/10 transition-all active:scale-95")
+                span#nearby-icon(class="material-symbols-outlined text-[20px]") near_me
+                span#nearby-spinner.hidden.animate-spin.h-4.w-4.border-2.border-primary.border-t-transparent.rounded-full
+                | Nearby Cars
+              button#btn-distance(class="text-label-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5 cursor-pointer")
+                span(class="material-symbols-outlined text-[16px]") location_searching
+                | Distance to Me
+            #nearby-list.flex.flex-wrap.gap-2
+
+        //- Reviews Section
+        section.space-y-md
+          .flex.justify-between.items-end
+            h2.font-headline-md.text-headline-md.text-on-surface Guest Reviews
+            if user
+              button(class="text-primary font-label-md text-label-md hover:underline decoration-primary underline-offset-4")(onclick='document.getElementById("review-form").classList.toggle("hidden")') Write a Review
+          
+          //- Write Review Form (hidden by default)
+          if user
+            form#review-form(class="hidden glass-panel p-md rounded-xl border border-outline-variant/20 space-y-md")(method='POST' action=`/api/v1/cars/${car._id}/reviews`)
+              h3.font-headline-md.text-headline-sm.text-on-surface Share Your Experience
+              .space-y-xs
+                label.font-label-sm.text-on-surface-variant Your Rating
+                .flex.gap-2
+                  each val in [1,2,3,4,5]
+                    button(class="text-on-surface-variant hover:text-tertiary transition-colors")(type='button' onclick=`setRating(${val})`)
+                      span.material-symbols-outlined.text-2xl(id=`star-${val}` style="font-variation-settings: 'FILL' 0") star
+                input#rating-input(type='hidden' name='rating' value='5')
+              .space-y-xs
+                label.font-label-sm.text-on-surface-variant Your Review
+                textarea(class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-4 text-on-surface resize-none focus:border-secondary focus:outline-none transition-all" name='review' rows='3' placeholder='Tell others about your experience...' required)
+              button(class="bg-primary text-on-primary px-6 py-3 rounded-xl font-label-md hover:bg-primary-container transition-all")(type='submit') Submit Review
+          
+          //- Review cards
+          div(class="grid grid-cols-1 md:grid-cols-2 gap-md")
+            if car.reviews && car.reviews.length
+              each review in car.reviews
+                .p-md.rounded-xl.glass-panel.border.transition-transform.duration-300(class="border-outline-variant/20 hover:translate-y-[-4px]")
+                  .flex.justify-between.mb-sm
+                    .flex.items-center.gap-sm
+                      div(class="w-10 h-10 rounded-full bg-primary-container/30 flex items-center justify-center text-primary font-bold text-lg")= review.user.name[0].toUpperCase()
+                      div
+                        p.font-label-md.text-label-md.text-on-surface= review.user.name
+                        p.font-label-sm.text-label-sm.text-on-surface-variant= new Date(review.createdAt).toLocaleDateString('en-US', {month: 'long', year: 'numeric'})
+                    +stars(review.rating)
+                  p.font-body-md.text-body-md.text-on-surface-variant.italic= `"${review.review}"`
+            else
+              div(class="md:col-span-2 text-center py-lg text-on-surface-variant") No reviews yet. Be the first to review!
+
+      //- ===== RIGHT COLUMN (Sticky Booking Widget) =====
+      div(class="lg:col-span-5")
+        aside.sticky.top-28.space-y-md
+
+          //- Availability badge
+          .inline-flex.items-center.gap-xs.px-4.py-2.rounded-full.w-full.justify-center(
+            class=car.available ? 'bg-tertiary/20 text-tertiary border border-tertiary/30' : 'bg-error-container/40 text-error border border-error/30'
+          )
+            span.relative.flex.h-3.w-3
+              span.animate-ping.absolute.inline-flex.h-full.w-full.rounded-full.opacity-75(class=car.available ? 'bg-tertiary' : 'bg-error')
+              span.relative.inline-flex.rounded-full.h-3.w-3(class=car.available ? 'bg-tertiary' : 'bg-error')
+            span.font-label-md.text-label-md.font-bold.uppercase.tracking-wider= car.available ? 'Available Now' : 'Currently Unavailable'
+
+          //- Quick Stats Grid
+          .grid.grid-cols-2.gap-sm
+            div(class="glass-panel p-md rounded-xl border border-outline-variant/20 flex flex-col items-center text-center")
+              span.material-symbols-outlined.text-secondary.mb-xs electric_car
+              p.font-label-sm.text-label-sm.text-on-surface-variant Make
+              p.font-label-md.text-label-md.text-on-surface= car.make
+            div(class="glass-panel p-md rounded-xl border border-outline-variant/20 flex flex-col items-center text-center")
+              span.material-symbols-outlined.text-secondary.mb-xs calendar_month
+              p.font-label-sm.text-label-sm.text-on-surface-variant Year
+              p.font-label-md.text-label-md.text-on-surface= car.year
+            div(class="glass-panel p-md rounded-xl border border-outline-variant/20 flex flex-col items-center text-center")
+              span.material-symbols-outlined.text-secondary.mb-xs settings_input_component
+              p.font-label-sm.text-label-sm.text-on-surface-variant Transmission
+              p.font-label-md.text-label-md.text-on-surface= car.transmission
+            div(class="glass-panel p-md rounded-xl border border-outline-variant/20 flex flex-col items-center text-center")
+              span.material-symbols-outlined.text-secondary.mb-xs diamond
+              p.font-label-sm.text-label-sm.text-on-surface-variant Class
+              p.font-label-md.text-label-md.text-on-surface= car.type
+
+          //- Booking Widget
+          .glass-panel.p-lg.rounded-2xl.neon-rim.shadow-2xl.relative.overflow-hidden
+            div(class="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none")
+            div(class="absolute -bottom-24 -left-24 w-48 h-48 bg-secondary/10 rounded-full blur-3xl pointer-events-none")
+            .flex.justify-between.items-end.mb-lg
+              div
+                p.font-label-sm.text-label-sm.text-on-surface-variant.uppercase.tracking-widest.mb-xs Daily Rate
+                h3.font-display-lg.text-headline-lg.text-on-surface.font-black
+                  = `$${car.pricePerDay}`
+                  span.text-headline-md.font-medium.text-on-surface-variant /day
+              .text-right
+                p.font-label-sm.text-label-sm.text-secondary.font-bold Best Value
+                p.font-body-md.text-body-md.text-on-surface-variant Includes insurance
+            
+            //- Date pickers
+            .space-y-md.mb-lg
+              .space-y-xs
+                label.font-label-sm.text-label-sm.text-on-surface-variant.ml-1 Pick-up Date
+                .relative
+                  input#start-date.w-full.bg-surface-container-lowest.border.border-outline-variant.rounded-xl.px-md.py-3(
+                    class="focus:outline-none focus:border-secondary transition-all text-on-surface"
+                    type='date' name='startDate' min=new Date().toISOString().split('T')[0]
+                  )
+              .space-y-xs
+                label.font-label-sm.text-label-sm.text-on-surface-variant.ml-1 Return Date
+                .relative
+                  input#end-date.w-full.bg-surface-container-lowest.border.border-outline-variant.rounded-xl.px-md.py-3(
+                    class="focus:outline-none focus:border-secondary transition-all text-on-surface"
+                    type='date' name='endDate'
+                  )
+            
+            //- Live Price Calculation
+            div(class="p-md bg-surface-container-low rounded-xl mb-lg border border-outline-variant/10")
+              .flex.justify-between.mb-sm
+                span#days-summary.font-body-md.text-body-md.text-on-surface-variant Select dates to see price
+                span#subtotal.font-body-md.text-body-md.text-on-surface —
+              div(class="border-t border-outline-variant/20 my-sm pt-sm flex justify-between")
+                span.font-label-md.text-label-md.text-on-surface.font-bold Total (USD)
+                span#total-price.font-headline-md.text-headline-md.text-secondary.font-black —
+            
+            if user
+              button#book-btn(class="w-full bg-primary text-on-primary py-4 rounded-xl font-headline-md text-headline-md font-bold shadow-[0_0_20px_rgba(128,131,255,0.4)] hover:brightness-110 active:scale-95 transition-all" data-car-id=`${car._id}` data-price=`${car.pricePerDay}`) Book Now
+            else
+              a(class="block w-full bg-primary text-on-primary py-4 rounded-xl font-headline-md text-headline-md font-bold text-center shadow-[0_0_20px_rgba(128,131,255,0.4)] hover:brightness-110 transition-all" href='/login') Sign In to Book
+            p.mt-md.text-center.font-label-sm.text-label-sm.text-on-surface-variant Free cancellation up to 48 hours before pick-up.
+
+block scripts
+  //- Leaflet JS
+  script(src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js' crossorigin='')
+  script.
+    // === Gallery ===
+    function swapImage(src) {
+      const mainImg = document.getElementById('main-image');
+      mainImg.style.opacity = '0';
+      setTimeout(() => { mainImg.src = src; mainImg.style.opacity = '1'; }, 150);
+    }
+
+    // === Live Price Calculation ===
+    const pricePerDay = #{car.pricePerDay};
+    const startInput = document.getElementById('start-date');
+    const endInput = document.getElementById('end-date');
+    const daysSummary = document.getElementById('days-summary');
+    const subtotal = document.getElementById('subtotal');
+    const totalPrice = document.getElementById('total-price');
+
+    function updatePrice() {
+      const start = new Date(startInput.value);
+      const end = new Date(endInput.value);
+      if (startInput.value && endInput.value && end > start) {
+        const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+        const total = days * pricePerDay;
+        daysSummary.textContent = `${days} day${days > 1 ? 's' : ''} × $${pricePerDay}`;
+        subtotal.textContent = `$${total.toFixed(2)}`;
+        totalPrice.textContent = `$${total.toFixed(2)}`;
+      }
+    }
+    startInput.addEventListener('change', () => { endInput.min = startInput.value; updatePrice(); });
+    endInput.addEventListener('change', updatePrice);
+
+    // === Booking ===
+    const bookBtn = document.getElementById('book-btn');
+    if (bookBtn) {
+      bookBtn.addEventListener('click', async () => {
+        if (!startInput.value || !endInput.value) return alert('Please select rental dates.');
+        bookBtn.textContent = 'Processing...';
+        bookBtn.disabled = true;
+        try {
+          const res = await fetch('/api/v1/bookings/checkout-session/' + bookBtn.dataset.carId + '?startDate=' + startInput.value + '&endDate=' + endInput.value);
+          const data = await res.json();
+          if (data.status === 'success') window.location.href = data.session.url;
+        } catch(e) {
+          bookBtn.textContent = 'Book Now';
+          bookBtn.disabled = false;
+        }
+      });
+    }
+
+    // === Star Rating ===
+    function setRating(val) {
+      document.getElementById('rating-input').value = val;
+      for(let i = 1; i <= 5; i++) {
+        document.getElementById('star-'+i).style.fontVariationSettings = i <= val ? "'FILL' 1" : "'FILL' 0";
+      }
+    }
+
+    // === Leaflet Map ===
+    const mapEl = document.getElementById('map');
+    if (mapEl) {
+      var lng = parseFloat(mapEl.dataset.lng);
+      var lat = parseFloat(mapEl.dataset.lat);
+      var carName = mapEl.dataset.carName;
+      var carPrice = mapEl.dataset.price;
+      var carAvailable = mapEl.dataset.available === 'true';
+      var hasLocation = mapEl.dataset.hasLocation === 'true';
+      var carId = '#{car._id}';
+
+      var map = L.map('map', {
+        center: [lat, lng],
+        zoom: hasLocation ? 14 : 3,
+        scrollWheelZoom: false,
+        zoomControl: true
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19
+      }).addTo(map);
+
+      var markerEl = document.createElement('div');
+      markerEl.className = 'custom-marker';
+      markerEl.innerHTML = '<div class="marker-pulse"></div><div class="marker-dot"></div>';
+
+      var popupHtml =
+        '<div style="font-family:Inter,sans-serif">' +
+          '<p style="font-weight:700;margin:0 0 4px">' + carName + '</p>' +
+          '<div style="display:flex;justify-content:space-between;align-items:center">' +
+            '<span style="color:var(--color-secondary);font-weight:700">$' + carPrice + '/day</span>' +
+            '<span style="background:' + (carAvailable ? 'rgba(78,222,163,0.15)' : 'rgba(255,180,171,0.15)') + ';color:' + (carAvailable ? '#4edea3' : '#ffb4ab') + ';font-size:10px;padding:2px 8px;border-radius:999px">' + (carAvailable ? 'Available' : 'Unavailable') + '</span>' +
+          '</div>' +
+        '</div>';
+
+      L.marker([lat, lng], { icon: L.divIcon({ className: 'custom-marker', html: markerEl.innerHTML, iconSize: [40, 40], iconAnchor: [20, 20] }) })
+        .addTo(map)
+        .bindPopup(popupHtml);
+
+      map.on('load', function() { mapEl.style.opacity = '0'; mapEl.style.transition = 'opacity 0.6s'; requestAnimationFrame(function() { mapEl.style.opacity = '1'; }); });
+
+      // Nearby cars button
+      const btnNearby = document.getElementById('btn-nearby');
+      const nearbyIcon = document.getElementById('nearby-icon');
+      const nearbySpinner = document.getElementById('nearby-spinner');
+      const nearbyList = document.getElementById('nearby-list');
+      if (btnNearby) {
+        btnNearby.addEventListener('click', async () => {
+          nearbyIcon.classList.add('hidden'); nearbySpinner.classList.remove('hidden');
+          nearbyList.innerHTML = '';
+          try {
+            const res = await fetch(`/api/v1/cars/cars-within/20/center/${lat},${lng}/unit/km`);
+            const data = await res.json();
+            nearbyIcon.classList.remove('hidden'); nearbySpinner.classList.add('hidden');
+            const cars = (data.data?.data || []).slice(0, 5);
+            if (cars.length === 0) { nearbyList.innerHTML = '<span class="text-label-sm text-on-surface-variant">No nearby cars found.</span>'; return; }
+            cars.forEach((car, i) => {
+              const pill = document.createElement('div');
+              pill.className = 'pill-entry bg-surface-container-low border border-outline-variant/30 px-3 py-1.5 rounded-full text-label-sm text-on-surface-variant flex items-center gap-2 hover:border-secondary transition-colors';
+              pill.style.animationDelay = `${i * 0.1}s`;
+              pill.innerHTML = `<span>🚗</span><span>${car.make} ${car.model}</span>`;
+              nearbyList.appendChild(pill);
+            });
+          } catch(e) { nearbyIcon.classList.remove('hidden'); nearbySpinner.classList.add('hidden'); }
+        });
+      }
+
+      // Distance to me button
+      const btnDistance = document.getElementById('btn-distance');
+      const distanceChip = document.getElementById('distance-chip');
+      const distanceText = document.getElementById('distance-text');
+      if (btnDistance) {
+        btnDistance.addEventListener('click', () => {
+          distanceChip.classList.remove('-translate-x-full', 'opacity-0');
+          distanceChip.classList.add('translate-x-0', 'opacity-100');
+          if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+              const userLat = pos.coords.latitude, userLng = pos.coords.longitude;
+              try {
+                const res = await fetch(`/api/v1/cars/distances/${userLat},${userLng}/unit/km`);
+                const data = await res.json();
+                const thisCar = (data.data?.data || []).find(c => c._id === carId);
+                if (thisCar) distanceText.textContent = `📍 You are ~${thisCar.distance.toFixed(1)} km away`;
+                else distanceText.textContent = '📍 Distance calculated';
+              } catch(e) { distanceText.textContent = '📍 Location found'; }
+            }, () => { distanceText.textContent = '📍 Location access denied'; });
+          }
+          setTimeout(() => { distanceChip.classList.add('-translate-x-full', 'opacity-0'); distanceChip.classList.remove('translate-x-0', 'opacity-100'); }, 6000);
+        });
+      }
+
+      // Review form submit — POST via fetch then redirect
+      var reviewForm = document.getElementById('review-form');
+      if (reviewForm) {
+        reviewForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          var fd = new FormData(this);
+          var action = this.getAttribute('action');
+          fetch(action, { method: 'POST', body: fd, credentials: 'include' }).then(function(res) {
+            if (res.ok || res.status === 201) {
+              window.location.reload();
+            } else {
+              res.json().then(function(data) {
+                alert(data.message || 'Failed to submit review.');
+              });
+            }
+          }).catch(function() {
+            alert('Network error. Please try again.');
+          });
+        });
+      }
+    }

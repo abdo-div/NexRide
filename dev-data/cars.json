@@ -1,0 +1,68 @@
+[
+  {
+    "make": "Chevrolet",
+    "model": "Cruze Luxe",
+    "year": 2024,
+    "type": "sedan",
+    "transmission": "automatic",
+    "pricePerDay": 45,
+    "available": true,
+    "features": ["Bluetooth", "Backup Camera", "Apple CarPlay"],
+    "images": ["car-1.jpg"]
+  },
+  {
+    "make": "Chevrolet",
+    "model": "Trailblazer",
+    "year": 2023,
+    "type": "suv",
+    "transmission": "automatic",
+    "pricePerDay": 75,
+    "available": true,
+    "features": ["All-Wheel Drive", "Heated Seats", "Lane Assist"],
+    "images": ["car-2.jpg"]
+  },
+  {
+    "make": "Tesla",
+    "model": "Model 3 Eco",
+    "year": 2024,
+    "type": "sedan",
+    "transmission": "automatic",
+    "pricePerDay": 90,
+    "available": true,
+    "features": ["Autopilot", "Panoramic Roof", "Keyless Entry"],
+    "images": ["car-3.jpg"]
+  },
+  {
+    "make": "Ford",
+    "model": "Mustang GT",
+    "year": 2023,
+    "type": "sedan",
+    "transmission": "manual",
+    "pricePerDay": 120,
+    "available": true,
+    "features": ["V8 Engine", "Sport Mode", "Leather Seats"],
+    "images": ["car-4.jpg"]
+  },
+  {
+    "make": "Ford",
+    "model": "F-150 Tough",
+    "year": 2022,
+    "type": "suv",
+    "transmission": "automatic",
+    "pricePerDay": 85,
+    "available": true,
+    "features": ["Towing Package", "4x4", "EcoBoost"],
+    "images": ["car-5.jpg"]
+  },
+  {
+    "make": "Honda",
+    "model": "Civic Pulse",
+    "year": 2024,
+    "type": "sedan",
+    "transmission": "automatic",
+    "pricePerDay": 40,
+    "available": true,
+    "features": ["Adaptive Cruise Control", "Sunroof"],
+    "images": ["car-6.jpg"]
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "name": "Admin User",
+    "email": "admin@example.com",
+    "password": "$2a$12$V3gR8O7y018XmNz8YFmYreC6bKxeRzWnBwFmX6d0G1H2i3J4k5L6m",
+    "role": "admin",
+    "phoneNumber": "+1234567890",
+    "active": true
+  },
+  {
+    "name": "Standard Test User",
+    "email": "user@example.com",
+    "password": "$2a$12$V3gR8O7y018XmNz8YFmYreC6bKxeRzWnBwFmX6d0G1H2i3J4k5L6m",
+    "role": "user",
+    "phoneNumber": "+9876543210",
+    "active": true
+  }
+]

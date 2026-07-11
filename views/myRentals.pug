@@ -1,0 +1,91 @@
+extends base
+include _mixins
+
+block content
+  style.
+    .glass-card { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); }
+    .neon-rim { box-shadow: inset 0 0 0 1px rgba(128, 131, 255, 0.1), 0 0 20px rgba(128, 131, 255, 0.05); }
+    #cursor-glow { pointer-events: none; }
+
+  //- Sidebar
+  aside(class="hidden lg:flex h-screen w-64 fixed left-0 top-0 z-40 bg-surface-container-lowest/90 dark:bg-surface-container-lowest/95 backdrop-blur-2xl border-r border-outline-variant/20 flex-col py-base pt-24 shadow-xl")
+    .px-6.mb-8
+      h2.font-display-lg.text-headline-sm.font-black.text-secondary NexRide Elite
+      p.text-on-surface-variant.font-body-sm.opacity-60 Verified Member
+    nav.flex-1.flex.flex-col.gap-1
+      a(class="bg-primary-container/20 text-primary border-r-4 border-primary px-6 py-3 flex items-center gap-3 transition-all")(href='/my-rentals')
+        span.material-symbols-outlined(style="font-variation-settings: 'FILL' 1;") calendar_today
+        span.font-label-md.text-label-md Bookings
+      a(class="text-on-surface-variant hover:bg-surface-variant/30 px-6 py-3 flex items-center gap-3 transition-all hover:translate-x-1 duration-200" href='/')
+        span.material-symbols-outlined directions_car
+        span.font-label-md.text-label-md Browse Fleet
+      a(class="text-on-surface-variant hover:bg-surface-variant/30 px-6 py-3 flex items-center gap-3 transition-all hover:translate-x-1 duration-200" href='/me')
+        span.material-symbols-outlined settings
+        span.font-label-md.text-label-md Settings
+    div(class="px-6 py-4 mt-auto border-t border-outline-variant/10")
+      a(class="text-on-surface-variant hover:bg-surface-variant/30 px-0 py-3 flex items-center gap-3 transition-all text-body-sm" href='/api/v1/users/logout')
+        span.material-symbols-outlined logout
+        | Logout
+
+  //- Main Content
+  main(class="lg:pl-64 pt-24 min-h-screen pb-12")
+    .max-w-container-max.mx-auto.px-gutter.py-md
+
+      //- Header
+      header.mb-12.flex.flex-col.justify-between.gap-6(class="md:flex-row md:items-end")
+        div
+          h1.font-headline-lg.text-headline-lg.text-on-surface.mb-2 My Rental History
+          p.text-on-surface-variant.font-body-md.text-body-md.opacity-80 Track your active reservations and past driving experiences.
+        .flex.gap-4
+          .glass-card.neon-rim.px-6.py-4.rounded-xl.flex.items-center.gap-4
+            div(class="h-10 w-10 rounded-full bg-tertiary-container/30 flex items-center justify-center text-tertiary")
+              span.material-symbols-outlined check_circle
+            div
+              p.text-label-sm.font-label-sm.uppercase.tracking-widest.opacity-60 Booked
+              p.text-headline-md.font-headline-md.text-on-surface= bookings ? bookings.filter(b => b.status === 'confirmed').length : 0
+          .glass-card.px-6.py-4.rounded-xl.flex.items-center.gap-4
+            div(class="h-10 w-10 rounded-full bg-surface-variant/50 flex items-center justify-center text-on-surface-variant")
+              span.material-symbols-outlined history
+            div
+              p.text-label-sm.font-label-sm.uppercase.tracking-widest.opacity-60 Total
+              p.text-headline-md.font-headline-md.text-on-surface= bookings ? bookings.length : 0
+
+      //- Rental Cards List
+      .space-y-4
+        if bookings && bookings.length
+          each booking in bookings
+            - const car = booking.car
+            .glass-card.transition-all.duration-300.rounded-2xl.p-4.flex.flex-col.gap-6.items-center(class="hover:bg-surface-container-high md:p-6 md:flex-row")
+              .w-full.rounded-xl.overflow-hidden.bg-surface-container-highest.relative(class="md:w-[180px] h-[120px]")
+                img.w-full.h-full.object-cover(src=`/cars/${car.imageCover}` alt=`${car.make} ${car.model}`)
+                span.absolute.top-2.left-2.px-3.py-1.bg-tertiary.text-on-tertiary.font-label-sm.text-label-sm.rounded-full.shadow-lg= booking.status
+              div(class="flex-1 text-center md:text-left")
+                h3.font-headline-md.text-headline-md.text-on-surface.mb-1= `${car.make} ${car.model}`
+                div(class="flex flex-wrap justify-center md:justify-start gap-4 text-on-surface-variant font-body-md text-body-md")
+                  .flex.items-center.gap-2
+                    span.material-symbols-outlined(class="text-[18px]") directions_car
+                    span= `${car.type} · ${car.year}`
+                  .flex.items-center.gap-2
+                    span.material-symbols-outlined(class="text-[18px]") calendar_today
+                    span= `${new Date(booking.startDate).toLocaleDateString()} — ${new Date(booking.endDate).toLocaleDateString()}`
+                  .flex.items-center.gap-2
+                    span.material-symbols-outlined(class="text-[18px]") payments
+                    span $#{booking.totalPrice}
+              div(class="flex gap-3 w-full md:w-auto")
+                a(class="flex-1 md:flex-none px-6 py-3 rounded-xl border border-primary/30 text-primary font-bold text-label-md hover:bg-primary/5 transition-all text-center" href=`/car/${car._id}`) View Car
+        else
+          .text-center.py-xl
+            span.material-symbols-outlined.text-8xl.text-on-surface-variant.block.mb-6 directions_car
+            h3.font-headline-md.text-on-surface.mb-3 No rentals yet
+            p.text-on-surface-variant.mb-8 You haven't booked any cars yet. Start your journey today!
+            a(class="bg-primary text-on-primary px-8 py-3 rounded-full font-label-md hover:bg-primary-container transition-all")(href='/') Browse Cars →
+
+  //- Cursor glow
+  div#cursor-glow.fixed.top-0.left-0.rounded-full.transition-transform.duration-300.ease-out(class="w-[500px] h-[500px] bg-primary/5 blur-[100px] z-[-1] -translate-x-1/2 -translate-y-1/2")
+
+block scripts
+  script.
+    const glow = document.getElementById('cursor-glow');
+    document.addEventListener('mousemove', (e) => {
+      glow.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+    });

@@ -1,0 +1,267 @@
+extends base
+
+block head
+  style.
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: var(--color-secondary);
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--color-secondary);
+    }
+    input[type="range"]::-moz-range-thumb {
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: var(--color-secondary);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 0 8px var(--color-secondary);
+    }
+
+block content
+  .max-w-container-max.mx-auto.px-gutter.py-lg(class="pt-[120px]")
+    header.mb-lg
+      h1.font-display-lg.text-display-lg-mobile.text-primary.mb-xs(class="md:text-display-lg") Explore the Fleet
+      .flex.flex-col.justify-between.gap-md(class="md:flex-row md:items-end")
+        p.font-body-lg.text-body-lg.text-on-surface-variant.max-w-2xl Discover premium performance for every journey. From silent electric luxury to raw high-octane power.
+        span#vehicleCount.font-label-md.text-label-md.text-secondary.tracking-widest.uppercase #{cars ? cars.length : 0} Vehicles Found
+    .flex.flex-col(class="lg:flex-row gap-gutter")
+      aside.w-full(class="lg:w-80 flex-shrink-0")
+        .glass-panel.p-md.rounded-xl.sticky(class="top-[100px]")
+          h2.font-headline-md.text-headline-md.text-primary.mb-md Refine Search
+          .space-y-lg
+            section
+              h3.font-label-md.text-label-md.text-on-surface.mb-sm CAR TYPE
+              .space-y-base
+                label.flex.items-center.gap-base.cursor-pointer.group
+                  input.filter-type(type="checkbox" value="sedan" class="w-5 h-5 rounded border-outline-variant bg-surface-container text-primary focus:ring-primary focus:ring-offset-background")
+                  span.font-body-md.text-body-md.text-on-surface-variant(class="group-hover:text-on-surface transition-colors") Sedan
+                label.flex.items-center.gap-base.cursor-pointer.group
+                  input.filter-type(type="checkbox" value="suv" checked class="w-5 h-5 rounded border-outline-variant bg-surface-container text-primary focus:ring-primary focus:ring-offset-background")
+                  span.font-body-md.text-body-md.text-on-surface-variant(class="group-hover:text-on-surface transition-colors") SUV
+                label.flex.items-center.gap-base.cursor-pointer.group
+                  input.filter-type(type="checkbox" value="sport" class="w-5 h-5 rounded border-outline-variant bg-surface-container text-primary focus:ring-primary focus:ring-offset-background")
+                  span.font-body-md.text-body-md.text-on-surface-variant(class="group-hover:text-on-surface transition-colors") Sport
+                label.flex.items-center.gap-base.cursor-pointer.group
+                  input.filter-type(type="checkbox" value="luxury" class="w-5 h-5 rounded border-outline-variant bg-surface-container text-primary focus:ring-primary focus:ring-offset-background")
+                  span.font-body-md.text-body-md.text-on-surface-variant(class="group-hover:text-on-surface transition-colors") Luxury
+                label.flex.items-center.gap-base.cursor-pointer.group
+                  input.filter-type(type="checkbox" value="hatchback" class="w-5 h-5 rounded border-outline-variant bg-surface-container text-primary focus:ring-primary focus:ring-offset-background")
+                  span.font-body-md.text-body-md.text-on-surface-variant(class="group-hover:text-on-surface transition-colors") Hatchback
+            section
+              h3.font-label-md.text-label-md.text-on-surface.mb-sm TRANSMISSION
+              .grid.grid-cols-3.gap-xs.bg-surface-container-low.p-xs.rounded-lg(class="border border-outline-variant/10")
+                button.filter-transmission.active-filter(data-value="" class="py-sm font-label-sm text-label-sm bg-primary text-on-primary rounded-lg") All
+                button.filter-transmission(data-value="automatic" class="py-sm font-label-sm text-label-sm text-on-surface-variant hover:bg-surface-variant/50 rounded-lg transition-colors") Auto
+                button.filter-transmission(data-value="manual" class="py-sm font-label-sm text-label-sm text-on-surface-variant hover:bg-surface-variant/50 rounded-lg transition-colors") Manual
+            section
+              .flex.justify-between.items-center.mb-sm
+                h3.font-label-md.text-label-md.text-on-surface MAX PRICE
+                span#priceDisplay.font-label-md.text-label-md.text-secondary $750
+              input#priceRange.w-full.h-1.bg-surface-variant.rounded-lg.appearance-none.cursor-pointer.accent-secondary(type="range" min="100" max="1000" step="50" value="750")
+            section.flex.items-center.justify-between
+              h3.font-label-md.text-label-md.text-on-surface SHOW AVAILABLE ONLY
+              button#availableToggle.relative.inline-flex.h-6.w-11.items-center.rounded-full.bg-surface-variant
+                span#availableKnob.inline-block.h-4.w-4.transform.rounded-full.bg-on-surface-variant.transition.duration-200(class="translate-x-0.5")
+            button#resetFilters.w-full.py-md.bg-primary-container.text-on-primary-container.font-label-md.text-label-md.rounded-xl(class="hover:brightness-110 active:scale-[0.98] transition-all") Reset Filters
+
+      .flex-1
+        if cars && cars.length
+          .grid.grid-cols-1(class="md:grid-cols-2 xl:grid-cols-3 gap-md")
+            each car in cars
+              .glass-panel.group.overflow-hidden.rounded-xl.neon-rim.transition-all.duration-300(data-car-type=`${car.type}` data-car-price=`${car.pricePerDay}` data-car-transmission=`${car.transmission}` data-car-available=`${car.available}` class=`${car.available ? '' : 'opacity-80 grayscale-[0.5]'}`)
+                .relative.h-64.overflow-hidden
+                  img.w-full.h-full.object-cover.transition-transform.duration-500(class="group-hover:scale-110" src=`/cars/${car.imageCover}` alt=`${car.make} ${car.model}`)
+                  if user && user.role === 'admin'
+                    button.delete-car-btn.absolute.top-sm.right-sm.bg-error.text-on-error.w-8.h-8.rounded-full.flex.items-center.justify-center.text-lg.transition-all(class="hover:brightness-110 active:scale-90 hover:shadow-[0_0_15px_rgba(186,26,26,0.4)] shadow-lg z-10" data-car-id=`${car._id}` title="Delete car")
+                      span.material-symbols-outlined delete
+                  .absolute.top-sm.left-sm.flex.gap-xs
+                    span.px-base.py-xs.rounded-full.font-label-sm.text-label-sm.backdrop-blur-md.border(class=`${car.available ? 'bg-tertiary/20 text-tertiary border-tertiary/30' : 'bg-error/20 text-error border-error/30'}`)= car.available ? 'Available' : 'Booked'
+                    span.px-base.py-xs.bg-surface.text-on-surface.rounded-full.font-label-sm.text-label-sm.backdrop-blur-md(class="border border-outline-variant/20")= car.type
+                .p-md.flex.flex-col(class="min-h-[160px]")
+                  .flex.justify-between.items-start
+                    div(class="min-w-0 flex-1")
+                      h4.font-headline-md.text-headline-md.text-on-surface.truncate.pr-2= `${car.make} ${car.model}`
+                      p.font-body-md.text-body-md.text-on-surface-variant.truncate.pr-2= `${car.year} &bull; ${car.transmission}${car.features && car.features.length ? ' &bull; ' + car.features.slice(0,1).join('') : ''}`
+                    .text-right.shrink-0
+                      span.block.font-headline-md.text-headline-md.text-secondary= `$${car.pricePerDay}`
+                      span.text-label-sm.text-on-surface-variant / day
+                  .flex.gap-sm.mt-auto.pt-md
+                    a.flex-1.py-sm.font-label-md.text-label-md.border.border-primary.text-primary.rounded-xl.text-center(class="hover:bg-primary/10 transition-colors" href=`/car/${car._id}`) Details
+                    if car.available
+                      a.flex-1.py-sm.font-label-md.text-label-md.rounded-xl.text-center(class="bg-[#494bd6] text-white dark:bg-[#c0c1ff] dark:text-[#1000a9] hover:brightness-110 dark:hover:brightness-90 active:scale-[0.98] hover:shadow-[0_0_20px_rgba(73,75,214,0.4)] transition-all" href=`/car/${car._id}`) Book Now
+                    else
+                      button.flex-1.py-sm.font-label-md.text-label-md.bg-outline-variant.text-on-surface-variant.rounded-xl.cursor-not-allowed(disabled) Unavailable
+
+        else
+          .text-center.py-xl
+            span.material-symbols-outlined.text-8xl.text-on-surface-variant.mb-6.block directions_car
+            p.text-on-surface-variant.text-body-lg.mb-6 No cars found in the fleet.
+            a.bg-primary.text-on-primary.px-8.py-3.rounded-full.font-label-md(class="hover:bg-primary-container transition-all" href='/') Back to Home
+
+    #deleteModal.fixed.inset-0.z-50.hidden.items-center.justify-center(class="bg-black/60 backdrop-blur-sm")
+      .glass-panel.max-w-sm.w-full.mx-4.rounded-xl.p-xl
+        .flex.flex-col.items-center.text-center.gap-md
+          .w-14.h-14.rounded-full.flex.items-center.justify-center(class="bg-error/15")
+            span.material-symbols-outlined.text-error.text-3xl delete_forever
+          h3.font-headline-md.text-headline-md.text-on-surface Delete Car
+          p.font-body-md.text-body-md.text-on-surface-variant Are you sure you want to permanently delete this car? This action cannot be undone.
+          .flex.gap-3.w-full
+            button#deleteConfirm.flex-1.py-sm.px-md.bg-error.text-on-error.font-label-md.text-label-md.rounded-xl(class="hover:brightness-110 active:scale-[0.98] transition-all") Delete
+            button#deleteCancel.flex-1.py-sm.px-md.border.border-outline-variant.text-on-surface.font-label-md.text-label-md.rounded-xl(class="hover:bg-surface-variant/30 active:scale-[0.98] transition-all") Cancel
+
+block scripts
+  script.
+    document.querySelectorAll('.glass-panel').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', x + 'px');
+        card.style.setProperty('--mouse-y', y + 'px');
+      });
+    });
+
+    var pendingDeleteId = null;
+    var pendingDeleteCard = null;
+    var modal = document.getElementById('deleteModal');
+
+    document.querySelectorAll('.delete-car-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        pendingDeleteId = this.getAttribute('data-car-id');
+        pendingDeleteCard = this.closest('.glass-panel');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      });
+    });
+
+    document.getElementById('deleteConfirm').addEventListener('click', function() {
+      if (!pendingDeleteId) return;
+      var id = pendingDeleteId;
+      var card = pendingDeleteCard;
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      pendingDeleteId = null;
+      pendingDeleteCard = null;
+      fetch('/api/v1/cars/' + id, { method: 'DELETE' }).then(function(res) {
+        if (res.ok) {
+          if (card) card.remove();
+        }
+      });
+    });
+
+    document.getElementById('deleteCancel').addEventListener('click', function() {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      pendingDeleteId = null;
+      pendingDeleteCard = null;
+    });
+
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        pendingDeleteId = null;
+        pendingDeleteCard = null;
+      }
+    });
+
+    // ── Fleet Filtering ──
+    var cards = document.querySelectorAll('.glass-panel[data-car-type]');
+    var typeChecks = document.querySelectorAll('.filter-type');
+    var transBtns = document.querySelectorAll('.filter-transmission');
+    var priceRange = document.getElementById('priceRange');
+    var priceDisplay = document.getElementById('priceDisplay');
+    var availableToggle = document.getElementById('availableToggle');
+    var availableKnob = document.getElementById('availableKnob');
+    var vehicleCount = document.getElementById('vehicleCount');
+    var resetBtn = document.getElementById('resetFilters');
+    var availableOnly = false;
+
+    function applyFilters() {
+      var selectedTypes = [];
+      typeChecks.forEach(function(cb) { if (cb.checked) selectedTypes.push(cb.value); });
+      var selectedTrans = document.querySelector('.filter-transmission.active-filter');
+      var transVal = selectedTrans ? selectedTrans.getAttribute('data-value') : '';
+      var maxPrice = priceRange ? parseFloat(priceRange.value) : 1000;
+      var visibleCount = 0;
+      cards.forEach(function(card) {
+        var type = card.getAttribute('data-car-type');
+        var price = parseFloat(card.getAttribute('data-car-price'));
+        var trans = card.getAttribute('data-car-transmission');
+        var avail = card.getAttribute('data-car-available') === 'true';
+        var match = true;
+        if (selectedTypes.length > 0 && !selectedTypes.includes(type)) match = false;
+        if (transVal !== '' && trans !== transVal) match = false;
+        if (price > maxPrice) match = false;
+        if (availableOnly && !avail) match = false;
+        if (match) { card.classList.remove('hidden'); visibleCount++; }
+        else { card.classList.add('hidden'); }
+      });
+      if (vehicleCount) vehicleCount.textContent = visibleCount + ' Vehicles Found';
+    }
+
+    typeChecks.forEach(function(cb) { cb.addEventListener('change', applyFilters); });
+
+    transBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        transBtns.forEach(function(b) {
+          b.classList.remove('active-filter', 'bg-primary', 'text-on-primary');
+          b.classList.add('text-on-surface-variant');
+        });
+        this.classList.add('active-filter', 'bg-primary', 'text-on-primary');
+        this.classList.remove('text-on-surface-variant');
+        applyFilters();
+      });
+    });
+
+    if (priceRange) {
+      priceRange.addEventListener('input', function() {
+        if (priceDisplay) priceDisplay.textContent = '$' + this.value;
+        applyFilters();
+      });
+    }
+
+    if (availableToggle) {
+      availableToggle.addEventListener('click', function() {
+        availableOnly = !availableOnly;
+        if (availableOnly) {
+          availableToggle.classList.remove('bg-surface-variant');
+          availableToggle.classList.add('bg-primary');
+          availableKnob.classList.remove('translate-x-0.5', 'bg-on-surface-variant');
+          availableKnob.classList.add('translate-x-5', 'bg-on-primary');
+        } else {
+          availableToggle.classList.remove('bg-primary');
+          availableToggle.classList.add('bg-surface-variant');
+          availableKnob.classList.remove('translate-x-5', 'bg-on-primary');
+          availableKnob.classList.add('translate-x-0.5', 'bg-on-surface-variant');
+        }
+        applyFilters();
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function() {
+        typeChecks.forEach(function(cb) { cb.checked = true; });
+        transBtns.forEach(function(b) {
+          b.classList.remove('active-filter', 'bg-primary', 'text-on-primary');
+          b.classList.add('text-on-surface-variant');
+        });
+        var allBtn = document.querySelector('.filter-transmission[data-value=""]');
+        if (allBtn) { allBtn.classList.add('active-filter', 'bg-primary', 'text-on-primary'); allBtn.classList.remove('text-on-surface-variant'); }
+        if (priceRange) priceRange.value = 750;
+        if (priceDisplay) priceDisplay.textContent = '$750';
+        availableOnly = false;
+        if (availableToggle) {
+          availableToggle.classList.remove('bg-primary');
+          availableToggle.classList.add('bg-surface-variant');
+          availableKnob.classList.remove('translate-x-5', 'bg-on-primary');
+          availableKnob.classList.add('translate-x-0.5', 'bg-on-surface-variant');
+        }
+        applyFilters();
+      });
+    }

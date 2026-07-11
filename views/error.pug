@@ -1,0 +1,48 @@
+extends base
+
+block content
+  style.
+    body { overflow: hidden; }
+    .neon-glow { text-shadow: 0 0 10px rgba(192,193,255,0.5), 0 0 20px rgba(192,193,255,0.3), 0 0 30px rgba(73,75,214,0.2); }
+    .glitch-effect { animation: glitch 3s infinite linear alternate-reverse; }
+    @keyframes glitch { 0% { transform: translate(0); } 20% { transform: translate(-2px, 2px); } 40% { transform: translate(-2px, -2px); } 60% { transform: translate(2px, 2px); } 80% { transform: translate(2px, -2px); } 100% { transform: translate(0); } }
+    .scanline { width: 100%; height: 2px; background: rgba(192,193,255,0.1); position: absolute; top: 0; left: 0; z-index: 10; animation: scanline 8s linear infinite; pointer-events: none; }
+    @keyframes scanline { 0% { top: 0; } 100% { top: 100%; } }
+    .glass-panel { backdrop-filter: blur(20px); background: var(--glass-bg); border: 1px solid var(--glass-border); }
+
+  .scanline
+  //- Background decorations
+  .absolute.inset-0.z-0.opacity-20
+    .absolute.bg-primary.rounded-full(class="top-[-10%] left-[-10%] w-[50%] h-[50%] blur-[120px]")
+    .absolute.bg-secondary-container.rounded-full(class="bottom-[-10%] right-[-10%] w-[50%] h-[50%] blur-[120px]")
+
+  main.relative.z-20.text-center.px-gutter.flex.flex-col.items-center.justify-center.max-w-2xl.mx-auto.min-h-screen
+    //- Animated error code
+    .relative.group
+      h1.font-display-lg.leading-none.tracking-tighter.text-primary.neon-glow.glitch-effect.select-none.font-black(class="text-[120px] md:text-[220px]")= statusCode || '404'
+      .absolute.inset-0.rounded-full.scale-110.-z-10.animate-pulse(class="bg-primary/10 blur-[60px]")
+
+    //- Message
+    .mt-base
+      h2.font-headline-lg.text-headline-lg.text-on-surface.mb-sm Oops! Something went wrong.
+      p.font-body-lg.text-body-lg.text-on-surface-variant.max-w-md.mx-auto.mb-xl.opacity-80= msg || "The road you're looking for doesn't exist in our current fleet directory."
+
+    //- Buttons
+    .flex.flex-col.items-center.gap-md.w-full(class="md:flex-row md:w-auto")
+      a.group.relative.px-xl.py-4.bg-primary.text-on-primary.font-label-md.text-label-md.rounded-full.transition-all.duration-300.flex.items-center.justify-center.gap-base(class="shadow-[0_0_20px_rgba(192,193,255,0.3)] hover:shadow-[0_0_30px_rgba(192,193,255,0.5)] active:scale-95" href='/')
+        span.material-symbols-outlined home
+        | Back to Home
+      a.group.px-xl.py-4.border.border-outline.text-on-surface.font-label-md.text-label-md.rounded-full.transition-all.duration-300.backdrop-blur-md.flex.items-center.justify-center.gap-base(class="hover:bg-surface-variant/30 hover:border-primary active:scale-95" href='/')
+        span.material-symbols-outlined directions_car
+        | Browse Cars
+
+    //- Utility links
+    .mt-xl.pt-lg.border-t.w-full(class="border-outline-variant/20")
+      .flex.flex-wrap.justify-center.gap-md
+        a.font-label-sm.text-label-sm.text-on-surface-variant.transition-colors(class="hover:text-primary" href='#') Help Center
+        a.font-label-sm.text-label-sm.text-on-surface-variant.transition-colors(class="hover:text-primary" href='#') Contact Support
+        a.font-label-sm.text-label-sm.text-on-surface-variant.transition-colors(class="hover:text-primary" href='/') Fleet Directory
+
+  //- Decorative car at bottom
+  .fixed.bottom-0.left-0.right-0.pointer-events-none.z-10.overflow-hidden.opacity-10(class="h-[200px]")
+    .absolute.text-9xl.select-none(class="bottom-[-50px] left-1/2 -translate-x-1/2") 🚗

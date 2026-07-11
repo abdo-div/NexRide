@@ -1,0 +1,50 @@
+//- ============================================================
+//- NEXRIDE MIXINS — Reusable Pug components
+//- ============================================================
+
+//- Car Card Mixin
+mixin carCard(car)
+  .glass-card.rounded-xl.overflow-hidden.car-card-hover.transition-all.duration-300.group.reveal
+    .relative.h-48.overflow-hidden
+      img.w-full.h-full.object-cover(class="group-hover:scale-110 transition-transform duration-700" src=`/cars/${car.imageCover}` alt=`${car.make} ${car.model}`)
+
+      span(class=`absolute top-4 left-4 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter backdrop-blur-md ${car.available ? 'bg-tertiary/20 text-tertiary' : 'bg-error-container/40 text-error'}`)
+        = car.available ? 'Available' : 'Unavailable'
+      span.absolute.top-4.right-4.backdrop-blur-md.text-on-surface-variant.px-2.py-1.rounded-full.uppercase.tracking-tighter(class="bg-surface-container/80 text-[10px]")= car.type
+    .p-5
+      h3.font-headline-md.text-headline-md.text-on-surface.mb-1= `${car.make} ${car.model}`
+      p.text-on-surface-variant.text-label-sm.mb-3= car.year
+      //- Rating
+      .flex.items-center.gap-1.mb-4
+        each i in [1,2,3,4,5]
+          span.material-symbols-outlined.text-tertiary(class="text-[14px]" style=`font-variation-settings: 'FILL' ${i <= Math.round(car.ratingAverage) ? 1 : 0}`) star
+        span.text-on-surface-variant.text-label-sm.ml-1= `(${car.ratingsQuantity})`
+      //- Feature chips
+      .flex.flex-wrap.gap-2.mb-4
+          span.text-on-surface-variant.px-3.py-1.rounded-full.flex.items-center.gap-1(class="bg-surface-container-low text-[11px]")
+          span.material-symbols-outlined.text-sm bolt
+          = car.transmission
+          if car.features && car.features.length
+            each feat in car.features.slice(0,2)
+              span.text-on-surface-variant.px-3.py-1.rounded-full(class="bg-surface-container-low text-[11px]")= feat
+      //- Price + Buttons
+      .flex.items-center.justify-between
+        div
+          span.text-secondary.font-headline-md= `$${car.pricePerDay}`
+          span.text-on-surface-variant.text-sm /day
+        .flex.gap-2
+          a.p-2.border.border-outline-variant.text-secondary.rounded-lg.transition-colors(class="hover:border-secondary" href=`/car/${car._id}`)
+            span.material-symbols-outlined visibility
+          a.bg-primary.text-on-primary.px-4.py-2.rounded-lg.font-label-md.text-label-md(class="hover:bg-primary-container transition-colors" href=`/car/${car._id}`) Book
+
+//- Star rating display mixin
+mixin stars(rating)
+  div(class="flex items-center gap-0.5")
+    each i in [1,2,3,4,5]
+      span.material-symbols-outlined.text-tertiary(class="text-[16px]" style=`font-variation-settings: 'FILL' ${i <= Math.round(rating) ? 1 : 0}`) star
+
+//- Status badge mixin
+mixin statusBadge(status)
+  - const statusMap = { pending: ['bg-amber-500/20 text-amber-400', 'Pending'], confirmed: ['bg-blue-500/20 text-blue-300', 'Confirmed'], active: ['bg-tertiary/20 text-tertiary', 'Active'], completed: ['bg-outline-variant text-on-background', 'Completed'], cancelled: ['bg-error-container/40 text-error', 'Cancelled'] }
+  - const [cls, label] = statusMap[status] || statusMap['pending']
+  span(class=`px-3 py-1 rounded-full text-label-sm font-bold ${cls}`)= label

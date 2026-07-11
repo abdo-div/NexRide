@@ -1,0 +1,147 @@
+extends base
+include _mixins
+
+block head
+  style.
+    .deep-glass {
+      background: var(--glass-deep-bg);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      border: 1px solid var(--glass-deep-border);
+    }
+    .hero-text-shadow {
+      text-shadow: 0 0 30px color-mix(in srgb, var(--color-primary) 40%, transparent);
+    }
+    .cyber-gradient {
+      background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 50%, var(--color-tertiary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+
+block content
+  //- Hero Section
+  section.relative.flex.items-center.justify-center.overflow-hidden(class="h-[110vh]")
+    //- Full-bleed background
+    .absolute.inset-0.z-0
+      img.w-full.h-full.object-cover(alt="Cinematic luxury car background" class="scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBC1s0sJebx6Bdo6AF7Z-tB4ZEmI1ppuNwwUygh2BA_A9rKPeVpf9pPfLZFXOa6u5X43msEsASz1YRHtMk0PrPrAHiO55LYbsz1J5NPybTwoUAfC0Z66doGEJYd_5e-f6eCxiRFkIGdHOjMApsUeAEThtznVA5SL-13lXJziarTXzZcIsyUbFW7PPnyoDaoNH9qf1XhCW6xgu3TbHIzZ5Rx0BhrSNPOO_nQViIDjrDokP58s786D0lJZlkG6u5jVlb2zRE3LUsI4L4")
+      .absolute.inset-0(class="bg-gradient-to-t from-black/90 via-black/40 to-transparent")
+      .absolute.inset-0(class="bg-gradient-to-r from-black/60 via-transparent to-black/20")
+
+    .relative.z-10.text-center.max-w-5xl.px-gutter.reveal.active
+      .inline-flex.items-center.gap-2.px-5.py-2.mb-8.rounded-full.deep-glass.text-secondary.font-label-sm.text-label-sm.uppercase(class="tracking-[0.2em] border-secondary/30")
+        span.w-2.h-2.rounded-full.bg-secondary.animate-pulse
+        | Next Gen Automotive Excellence
+      h1.font-display-lg.text-display-lg-mobile.text-white.mb-8.leading-none.hero-text-shadow(class="md:text-display-lg")
+        | DRIVE BEYOND
+        br
+        span.cyber-gradient LIMITS
+      p.font-body-lg.text-body-lg.mb-xl.max-w-2xl.mx-auto.leading-relaxed(class="text-white/80 backdrop-blur-sm bg-black/10 rounded-lg p-2")
+        | Premium electric fleet, ultra-fast booking. Experience the peak of mobility with our exclusive, tech-driven collection.
+
+      //- CTA Buttons
+      .flex.flex-col(class="sm:flex-row items-center justify-center gap-6")
+        button.font-black.text-label-md.px-12.py-5.rounded-full.transition-all(class="bg-[#494bd6] text-white dark:bg-[#c0c1ff] dark:text-[#1000a9] hover:brightness-110 dark:hover:brightness-90 hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(192,193,255,0.4)] flex items-center gap-2")
+          span.material-symbols-outlined bolt
+          | INITIATE EXPERIENCE
+        button.text-white.font-label-md.text-label-md.tracking-widest.transition-all.border-b.border-white(class="hover:text-secondary hover:border-secondary flex items-center gap-2 group")
+          | EXPLORE FLEET
+          span.material-symbols-outlined.text-lg(class="group-hover:translate-x-1 transition-transform") arrow_forward_ios
+
+    //- Decorative elements
+    .absolute.bottom-32.flex.items-center.gap-6.px-6.py-2.rounded-full.bg-black.backdrop-blur-xl.border.border-white.z-10.text-white(class="text-[10px] font-bold tracking-widest uppercase whitespace-nowrap left-1/2 -translate-x-1/2" style="background-color: rgba(0,0,0,0.4);")
+      .flex.items-center.gap-2
+        span.rounded-full.bg-tertiary.animate-pulse(class="w-1.5 h-1.5")
+        | LIVE FLEET: #{availableCount} AVAILABLE
+      .h-3(class="w-[1px] bg-white/20")
+      .text-secondary NEXT DROP: 02:45:12
+
+
+  //- Featured Cars
+  section.py-xl.max-w-container-max.mx-auto.px-gutter.relative
+    .flex.flex-col(class="md:flex-row justify-between items-end mb-lg reveal")
+      div
+        .flex.items-center.gap-3.mb-2
+          .h-px.w-12.bg-secondary
+          span.text-secondary.font-label-sm.uppercase.tracking-widest Premium Selection
+        h2.font-headline-lg.text-headline-lg.text-on-surface THE ULTIMATE COLLECTION
+      a.text-secondary.font-label-md.flex.items-center.gap-2(class="hover:gap-4 transition-all group pb-2 border-b border-secondary/20 hover:border-secondary" href='/fleet')
+        | VIEW ALL VEHICLES
+        span.material-symbols-outlined.text-lg(class="group-hover:translate-x-1 transition-transform") arrow_forward_ios
+
+    if cars && cars.length
+      div.grid.grid-cols-1(class="sm:grid-cols-2 lg:grid-cols-4 gap-md")
+        each car in cars
+          .deep-glass.rounded-2xl.overflow-hidden.transition-all.duration-500.group.reveal(class="car-card-hover")
+            .relative.h-64.overflow-hidden(class="border-b border-secondary/10")
+              img.w-full.h-full.object-cover(class="group-hover:scale-110 transition-transform duration-1000" src=`/cars/${car.imageCover}` alt=`${car.make} ${car.model}`)
+              .absolute.inset-0(class="bg-gradient-to-t from-black/80 to-transparent opacity-60")
+              span.absolute.top-4.right-4.font-black.px-3.py-1.rounded-full.uppercase.tracking-widest.shadow-lg(class=`text-[10px] ${car.available ? 'bg-tertiary text-on-tertiary' : 'bg-error text-on-error'}`)
+                = car.available ? 'READY' : 'LIMITED'
+            .p-6
+              h3.font-headline-md.text-headline-md.text-on-surface.mb-4(class="group-hover:text-secondary transition-colors")= `${car.make} ${car.model}`
+              .flex.flex-wrap.gap-2.mb-8
+                span(class="bg-white/5 border border-white/10 text-on-surface-variant text-[11px] px-3 py-1.5 rounded-lg flex items-center gap-2")
+                  span.material-symbols-outlined.text-sm.text-secondary bolt
+                  = car.transmission
+                if car.features && car.features.length
+                  each feat in car.features.slice(0, 2)
+                    span(class="bg-white/5 border border-white/10 text-on-surface-variant text-[11px] px-3 py-1.5 rounded-lg flex items-center gap-2")
+                      span.material-symbols-outlined.text-sm.text-secondary verified
+                      = feat
+              .flex.items-center.justify-between(class="border-t border-white/5 pt-6")
+                div
+                  span.text-secondary.font-black.text-2xl= `$${car.pricePerDay}`
+                  span.text-on-surface-variant.text-xs.font-bold.uppercase.tracking-widest  / Day
+                a.px-6.rounded-lg.font-black.uppercase.tracking-widest.transition-all(class="py-2.5 text-[11px] bg-[#494bd6] text-white dark:bg-[#c0c1ff] dark:text-[#1000a9] hover:brightness-110 dark:hover:brightness-90 shadow-[0_0_10px_rgba(192,193,255,0.2)]" href=`/car/${car._id}`) Book
+    else
+      .text-center.py-xl
+        span.material-symbols-outlined.text-8xl.text-on-surface-variant.mb-6.block directions_car
+        p.text-on-surface-variant.text-body-lg.mb-6 No cars found matching your search.
+        a.bg-primary.text-on-primary.px-8.py-3.rounded-full.font-label-md(class="hover:bg-primary-container transition-all" href='/') Clear Filters
+
+  //- Stats Bar
+  section.py-xl.reveal(class="bg-surface-container-low border-y border-white/5")
+    div(class="max-w-container-max mx-auto px-gutter grid grid-cols-2 md:grid-cols-4 gap-lg text-center")
+      div.group
+        h4.font-display-lg.text-headline-lg.text-on-surface.mb-2(class="group-hover:text-secondary transition-colors") 500+
+        p.font-label-md.text-on-surface-variant.uppercase.tracking-widest(class="text-[11px]") Elite Platforms
+      div.group
+        h4.font-display-lg.text-headline-lg.text-on-surface.mb-2(class="group-hover:text-secondary transition-colors") 10k+
+        p.font-label-md.text-on-surface-variant.uppercase.tracking-widest(class="text-[11px]") Active Drivers
+      div.group
+        h4.font-display-lg.text-headline-lg.text-on-surface.mb-2(class="group-hover:text-secondary transition-colors") 24/7
+        p.font-label-md.text-on-surface-variant.uppercase.tracking-widest(class="text-[11px]") Core Response
+      div.group
+        h4.font-display-lg.text-headline-lg.text-on-surface.mb-2(class="group-hover:text-secondary transition-colors") 4.9
+        p.font-label-md.text-on-surface-variant.uppercase.tracking-widest(class="text-[11px]") System Integrity
+
+  //- How It Works
+  section.py-xl.max-w-container-max.mx-auto.px-gutter
+    .text-center.mb-xl.reveal
+      .flex.justify-center.items-center.gap-3.mb-4
+        .h-px.w-8(class="bg-secondary/30")
+        span.text-secondary.font-label-sm.uppercase.tracking-widest The Protocol
+        .h-px.w-8(class="bg-secondary/30")
+      h2.font-headline-lg.text-headline-lg.text-on-surface.mb-6 REDEFINE YOUR JOURNEY
+      p.text-on-surface-variant.max-w-2xl.mx-auto.text-body-lg A seamless integration of luxury and technology in three precise stages.
+
+    div.grid.grid-cols-1(class="md:grid-cols-3 gap-md")
+      .text-center.p-md.deep-glass.rounded-2xl.transition-all.reveal(class="hover:border-primary")
+        .w-20.h-20.rounded-2xl.flex.items-center.justify-center.mx-auto.mb-8.floating(class="bg-primary/10 text-primary shadow-[0_0_30px_rgba(192,193,255,0.1)] border border-primary/20")
+          span.material-symbols-outlined.text-4xl travel_explore
+        h3.font-headline-md.text-headline-md.text-on-surface.mb-4 01. SCAN
+        p.text-on-surface-variant.text-body-md.leading-relaxed Filter through a curated database of high-spec vehicles designed for the modern elite.
+
+      .text-center.p-md.deep-glass.rounded-2xl.transition-all.reveal(class="hover:border-secondary")
+        .w-20.h-20.rounded-2xl.flex.items-center.justify-center.mx-auto.mb-8.floating(class="bg-secondary/10 text-secondary shadow-[0_0_30px_rgba(93,230,255,0.1)] border border-secondary/20" style='animation-delay: 0.5s;')
+          span.material-symbols-outlined.text-4xl event_available
+        h3.font-headline-md.text-headline-md.text-on-surface.mb-4 02. SECURE
+        p.text-on-surface-variant.text-body-md.leading-relaxed Instant verification and encrypted booking. No friction, just pure performance access.
+
+      .text-center.p-md.deep-glass.rounded-2xl.transition-all.reveal(class="hover:border-tertiary")
+        .w-20.h-20.rounded-2xl.flex.items-center.justify-center.mx-auto.mb-8.floating(class="bg-tertiary/10 text-tertiary shadow-[0_0_30px_rgba(78,222,163,0.1)] border border-tertiary/20" style='animation-delay: 1s;')
+          span.material-symbols-outlined.text-4xl key
+        h3.font-headline-md.text-headline-md.text-on-surface.mb-4 03. EXECUTE
+        p.text-on-surface-variant.text-body-md.leading-relaxed Unlock your vehicle via digital key and dominate the urban landscape with precision.

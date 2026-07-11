@@ -1,0 +1,254 @@
+extends base
+
+block head
+  style.
+    .neon-border-focus:focus-within {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 15px color-mix(in srgb, var(--color-primary) 15%, transparent);
+    }
+    .step-active {
+      color: var(--color-primary);
+      text-shadow: 0 0 8px color-mix(in srgb, var(--color-primary) 50%, transparent);
+    }
+
+block content
+  main.flex-grow.relative.overflow-hidden.flex.items-center.justify-center.py-xl.px-gutter(class="pt-[120px]")
+    .w-full.glass-panel.rounded-xl.p-lg.shadow-2xl(class="md:p-xl max-w-[800px]")
+      .flex.items-center.justify-between.mb-xl.px-md
+        .flex.flex-col.items-center.gap-2
+          .w-10.h-10.rounded-full.flex.items-center.justify-center.bg-primary.text-on-primary.font-bold 1
+          span.font-label-md.text-label-md.step-active Vehicle Info
+        .flex-grow.h-px(class="mx-4 mt-[-24px] bg-outline-variant/30")
+        .flex.flex-col.items-center.gap-2
+          .w-10.h-10.rounded-full.flex.items-center.justify-center.border.border-outline-variant.text-on-surface-variant.font-bold 2
+          span.font-label-md.text-label-md.text-on-surface-variant Pricing & Terms
+        .flex-grow.h-px(class="mx-4 mt-[-24px] bg-outline-variant/30")
+        .flex.flex-col.items-center.gap-2
+          .w-10.h-10.rounded-full.flex.items-center.justify-center.border.border-outline-variant.text-on-surface-variant.font-bold 3
+          span.font-label-md.text-label-md.text-on-surface-variant Media
+
+      form.space-y-xl(method="POST" action="/api/v1/cars" enctype="multipart/form-data")
+        section
+          h2.font-headline-md.text-headline-md.text-on-surface.mb-md.flex.items-center.gap-2
+            span.material-symbols-outlined.text-primary directions_car
+            | Vehicle Information
+          .grid.grid-cols-1.gap-md(class="md:grid-cols-2")
+            .flex.flex-col.gap-base
+              label.font-label-md.text-label-md.text-on-surface-variant Make
+              select.bg-surface-container-lowest.border.border-outline-variant.rounded-lg.p-md.text-on-surface(name="make")
+                option(value="" disabled selected) Select Brand
+                option(value="Tesla") Tesla
+                option(value="Porsche") Porsche
+                option(value="Lucid") Lucid
+                option(value="Rivian") Rivian
+                option(value="BMW") BMW
+                option(value="Mercedes") Mercedes-Benz
+                option(value="Audi") Audi
+                option(value="Lamborghini") Lamborghini
+                option(value="Ferrari") Ferrari
+            .flex.flex-col.gap-base
+              label.font-label-md.text-label-md.text-on-surface-variant Model
+              input.bg-surface-container-lowest.border.border-outline-variant.rounded-lg.p-md.text-on-surface(name="model" placeholder="e.g. Model S Plaid" type="text" class="placeholder:text-outline")
+            .flex.flex-col.gap-base
+              label.font-label-md.text-label-md.text-on-surface-variant Year
+              select.bg-surface-container-lowest.border.border-outline-variant.rounded-lg.p-md.text-on-surface(name="year")
+                option(value="2026") 2026
+                option(value="2025") 2025
+                option(value="2024") 2024
+                option(value="2023") 2023
+                option(value="2022") 2022
+                option(value="2021") 2021
+                option(value="2020") 2020
+            .flex.flex-col.gap-base
+              label.font-label-md.text-label-md.text-on-surface-variant Car Type
+              select.bg-surface-container-lowest.border.border-outline-variant.rounded-lg.p-md.text-on-surface(name="type")
+                option(value="sedan") Sedan
+                option(value="suv") SUV
+                option(value="sport") Sport
+                option(value="luxury") Luxury
+                option(value="hatchback") Hatchback
+            .flex.flex-col.gap-base
+              label.font-label-md.text-label-md.text-on-surface-variant Transmission
+              select.bg-surface-container-lowest.border.border-outline-variant.rounded-lg.p-md.text-on-surface(name="transmission")
+                option(value="automatic") Automatic
+                option(value="manual") Manual
+
+        section
+          h2.font-headline-md.text-headline-md.text-on-surface.mb-md.flex.items-center.gap-2
+            span.material-symbols-outlined.text-primary auto_awesome
+            | Features & Specs
+          .grid.grid-cols-2.gap-md.mb-lg(class="md:grid-cols-3")
+            label.flex.items-center.gap-sm.cursor-pointer.group
+              input.w-5.h-5.rounded.border-outline-variant.bg-surface.text-primary(type="checkbox" class="focus:ring-primary/50" name="features" value="Autopilot")
+              span.font-body-md.text-body-md.text-on-surface-variant(class="group-hover:text-on-surface transition-colors") Autopilot
+            label.flex.items-center.gap-sm.cursor-pointer.group
+              input.w-5.h-5.rounded.border-outline-variant.bg-surface.text-primary(type="checkbox" class="focus:ring-primary/50" name="features" value="Premium Audio")
+              span.font-body-md.text-body-md.text-on-surface-variant(class="group-hover:text-on-surface transition-colors") Premium Audio
+            label.flex.items-center.gap-sm.cursor-pointer.group
+              input.w-5.h-5.rounded.border-outline-variant.bg-surface.text-primary(type="checkbox" class="focus:ring-primary/50" name="features" value="Nappa Leather")
+              span.font-body-md.text-body-md.text-on-surface-variant(class="group-hover:text-on-surface transition-colors") Nappa Leather
+            label.flex.items-center.gap-sm.cursor-pointer.group
+              input.w-5.h-5.rounded.border-outline-variant.bg-surface.text-primary(type="checkbox" class="focus:ring-primary/50" name="features" value="Panoramic Roof")
+              span.font-body-md.text-body-md.text-on-surface-variant(class="group-hover:text-on-surface transition-colors") Panoramic Roof
+            label.flex.items-center.gap-sm.cursor-pointer.group
+              input.w-5.h-5.rounded.border-outline-variant.bg-surface.text-primary(type="checkbox" class="focus:ring-primary/50" name="features" value="Heated Seats")
+              span.font-body-md.text-body-md.text-on-surface-variant(class="group-hover:text-on-surface transition-colors") Heated Seats
+            label.flex.items-center.gap-sm.cursor-pointer.group
+              input.w-5.h-5.rounded.border-outline-variant.bg-surface.text-primary(type="checkbox" class="focus:ring-primary/50" name="features" value="Self Parking")
+              span.font-body-md.text-body-md.text-on-surface-variant(class="group-hover:text-on-surface transition-colors") Self Parking
+
+        section
+          h2.font-headline-md.text-headline-md.text-on-surface.mb-md.flex.items-center.gap-2
+            span.material-symbols-outlined.text-primary payments
+            | Pricing & Availability
+          .grid.grid-cols-1.gap-md(class="md:grid-cols-2")
+            .flex.flex-col.gap-base
+              label.font-label-md.text-label-md.text-on-surface-variant Daily Rental Price
+              .relative
+                span.absolute.left-md.text-primary.font-bold(class="top-1/2 -translate-y-1/2") $
+                input.w-full.bg-surface-container-lowest.border.border-outline-variant.rounded-lg.p-md.text-on-surface(class="pl-xl" name="pricePerDay" placeholder="0.00" type="number" step="0.01")
+            .flex.flex-col.gap-base
+              label.font-label-md.text-label-md.text-on-surface-variant Available
+              select.bg-surface-container-lowest.border.border-outline-variant.rounded-lg.p-md.text-on-surface(name="available")
+                option(value="true") Yes — Ready for Rent
+                option(value="false") No — Under Maintenance
+
+        section
+          h2.font-headline-md.text-headline-md.text-on-surface.mb-md.flex.items-center.gap-2
+            span.material-symbols-outlined.text-primary location_on
+            | Location (Optional)
+          .grid.grid-cols-1.gap-md(class="md:grid-cols-2")
+            .flex.flex-col.gap-base
+              label.font-label-md.text-label-md.text-on-surface-variant Longitude
+              input.bg-surface-container-lowest.border.border-outline-variant.rounded-lg.p-md.text-on-surface(name="lng" placeholder="e.g. -73.9857" type="number" step="any" class="placeholder:text-outline")
+            .flex.flex-col.gap-base
+              label.font-label-md.text-label-md.text-on-surface-variant Latitude
+              input.bg-surface-container-lowest.border.border-outline-variant.rounded-lg.p-md.text-on-surface(name="lat" placeholder="e.g. 40.7484" type="number" step="any" class="placeholder:text-outline")
+
+        section
+          h2.font-headline-md.text-headline-md.text-on-surface.mb-md.flex.items-center.gap-2
+            span.material-symbols-outlined.text-primary photo_camera
+            | Media Upload
+          .border-2.border-dashed.border-outline-variant.rounded-xl.p-xl.transition-all.flex.flex-col.items-center.gap-md.overflow-visible(class="bg-surface-container-lowest/50 hover:bg-surface-container-lowest/80")
+            #uploadPlaceholder.flex.flex-col.items-center.justify-center.gap-md
+              .w-16.h-16.rounded-full.flex.items-center.justify-center.text-primary(class="bg-primary/10")
+                span.material-symbols-outlined.text-4xl cloud_upload
+              .text-center
+                p.font-headline-md.text-headline-md.text-on-surface Upload high-resolution cinematic photos
+                p.font-label-sm.text-label-sm.text-on-surface-variant.mt-2 Recommended: 4K resolution, landscape. Max 10 files.
+            #previewGrid.flex.flex-wrap.gap-3.w-full.items-start
+            .flex.gap-4.flex-wrap.justify-center
+              label.px-lg.py-sm.bg-primary.text-on-primary.font-label-md.text-label-md.rounded-full.transition-all.cursor-pointer(class="hover:brightness-110 active:scale-95 shadow-[0_0_20px_rgba(128,131,255,0.3)]" for="imageCover")
+                | Add Cover Photo
+              label.px-lg.py-sm.bg-surface-container-high.text-on-surface.font-label-md.text-label-md.rounded-full.transition-all.cursor-pointer.border.border-outline-variant(class="hover:brightness-110 active:scale-95" for="images")
+                | Add Gallery Photos
+            input#imageCover.hidden(type="file" name="imageCover" accept="image/*")
+            input#images.hidden(type="file" name="images" accept="image/*" multiple)
+
+        .flex.flex-col.items-center.justify-end.gap-md.pt-lg(class="md:flex-row border-t border-outline-variant/20")
+          button#cancelBtn.w-full.px-xl.py-md.text-on-surface-variant.font-label-md.text-label-md.transition-all(type="button" class="hover:text-on-surface md:w-auto") Cancel
+          button.w-full.flex.items-center.justify-center.gap-sm.px-xl.py-md.bg-primary.text-on-primary.font-headline-md.text-headline-md.rounded-lg.transition-all(type="submit" class="md:w-auto hover:brightness-110 active:scale-[0.98] shadow-xl")
+            span.material-symbols-outlined bolt
+            | Publish Listing
+
+block scripts
+  script.
+    let accumulatedGallery = [];
+
+    function renderAllPreviews() {
+      const grid = document.getElementById("previewGrid");
+      const placeholder = document.getElementById("uploadPlaceholder");
+      const coverInput = document.getElementById("imageCover");
+      if (!grid || !placeholder) return;
+      grid.innerHTML = "";
+      const allFiles = [];
+      if (coverInput && coverInput.files && coverInput.files[0]) {
+        allFiles.push({ file: coverInput.files[0], isCover: true });
+      }
+      for (const f of accumulatedGallery) {
+        allFiles.push({ file: f, isCover: false });
+      }
+      if (allFiles.length === 0) {
+        grid.classList.add("hidden");
+        placeholder.classList.remove("hidden");
+        return;
+      }
+      placeholder.classList.add("hidden");
+      grid.classList.remove("hidden");
+      for (const entry of allFiles) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const div = document.createElement("div");
+          div.className = "relative rounded-xl overflow-hidden group w-28 shrink-0";
+          div.innerHTML =
+            '<img src="' + e.target.result + '" class="w-full h-24 object-cover rounded-xl"/>' +
+            '<div class="absolute inset-0 rounded-xl ring-1 ring-inset ' + (entry.isCover ? "ring-primary ring-2" : "ring-white/10") + '"></div>' +
+            (entry.isCover ? '<span class="absolute top-2 left-2 bg-primary text-on-primary text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Cover</span>' : "");
+          grid.appendChild(div);
+        };
+        reader.readAsDataURL(entry.file);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll("input, select, textarea").forEach(function (el) {
+        el.addEventListener("focus", function () {
+          var parent = el.closest(".flex");
+          if (parent) parent.classList.add("neon-border-focus");
+        });
+        el.addEventListener("blur", function () {
+          var parent = el.closest(".flex");
+          if (parent) parent.classList.remove("neon-border-focus");
+        });
+      });
+
+      var coverInput = document.getElementById("imageCover");
+      if (coverInput) coverInput.addEventListener("change", renderAllPreviews);
+
+      var galleryInput = document.getElementById("images");
+      if (galleryInput) {
+        galleryInput.addEventListener("change", function () {
+          for (var i = 0; i < this.files.length; i++) {
+            var f = this.files[i];
+            var dup = false;
+            for (var j = 0; j < accumulatedGallery.length; j++) {
+              var x = accumulatedGallery[j];
+              if (x.name === f.name && x.size === f.size && x.lastModified === f.lastModified) {
+                dup = true;
+                break;
+              }
+            }
+            if (!dup) accumulatedGallery.push(f);
+          }
+          renderAllPreviews();
+        });
+      }
+
+      var cancelBtn = document.getElementById("cancelBtn");
+      if (cancelBtn) {
+        cancelBtn.addEventListener("click", function () {
+          var form = document.querySelector("form");
+          if (form) form.reset();
+          accumulatedGallery = [];
+          renderAllPreviews();
+        });
+      }
+
+      var form = document.querySelector("form");
+      if (form) {
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          var fd = new FormData(this);
+          fd.delete("images");
+          for (var i = 0; i < accumulatedGallery.length; i++) {
+            fd.append("images", accumulatedGallery[i]);
+          }
+          fetch(this.action, { method: "POST", body: fd }).then(function (res) {
+            if (res.redirected) window.location.href = res.url;
+            else window.location.href = "/fleet";
+          }).catch(function () {
+            alert("Upload failed. Please try again.");
+          });
+        });
+      }
+    });

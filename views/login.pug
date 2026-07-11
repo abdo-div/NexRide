@@ -1,0 +1,159 @@
+extends base
+
+block content
+  style.
+    body { overflow: hidden; }
+    .glass-card { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); }
+    .neon-glow { box-shadow: 0 0 15px rgba(128, 131, 255, 0.3); }
+    .input-minimal { background: var(--color-surface-container-low); border: none; border-bottom: 1px solid var(--color-outline-variant); border-radius: 0; transition: all 0.3s ease; color: var(--color-on-surface); }
+    .input-minimal:focus { border-bottom-color: var(--color-secondary); box-shadow: none; outline: none; }
+    .tab-active { color: var(--color-secondary); position: relative; }
+    .tab-active::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 100%; height: 2px; background: var(--color-secondary); box-shadow: 0 0 8px var(--color-secondary); }
+    .bokeh-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 20% 30%, rgba(73, 75, 214, 0.12) 0%, transparent 40%), radial-gradient(circle at 80% 70%, rgba(93, 230, 255, 0.08) 0%, transparent 40%), var(--color-surface-container-lowest); }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--color-outline-variant); border-radius: 10px; }
+
+  .bokeh-bg
+  .absolute.inset-0.z-0.overflow-hidden.opacity-40
+    .absolute.rounded-full.animate-pulse(class="top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-container/20 blur-[120px]")
+    .absolute.rounded-full.animate-pulse(class="bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-secondary-container/10 blur-[150px]" style='animation-delay: 2s;')
+
+  main.relative.z-10.w-full.px-gutter.mx-auto.flex.items-center.min-h-screen(class="max-w-[420px] z-10")
+    .glass-card.rounded-xl.p-xl.flex.flex-col.gap-lg.w-full
+      //- Brand Logo
+      .flex.flex-col.items-center.gap-xs
+        span.font-display-lg.text-headline-md.font-extrabold.tracking-tighter.text-primary-fixed-dim NexRide
+        span.font-label-sm.text-on-surface-variant.tracking-widest.uppercase Elite Mobility
+
+      //- Tab Switcher
+      div(class="flex justify-center gap-md border-b border-outline-variant/20 pb-base")
+        button#loginTabBtn.font-label-md.transition-all.tab-active(onclick="switchTab('login')") LOGIN
+        button#signupTabBtn.font-label-md.text-on-surface-variant(class="hover:text-on-surface transition-all" onclick="switchTab('signup')") SIGN UP
+
+      //- Login View
+      #loginView.flex.flex-col.gap-md
+        .flex.flex-col.gap-sm
+          .flex.flex-col.gap-xs
+            label.font-label-sm.text-on-surface-variant Email Address
+            input#email.input-minimal.w-full.py-base.font-body-md.text-on-surface(
+              type='email' placeholder='driver@nexride.com' required
+            )
+          .flex.flex-col.gap-xs
+            .flex.justify-between.items-center
+              label.font-label-sm.text-on-surface-variant Password
+              a.font-label-sm.text-secondary(class="hover:text-secondary-fixed transition-colors" href='/forgot-password') Forgot Password?
+            input#password.input-minimal.w-full.py-base.font-body-md.text-on-surface(
+              type='password' placeholder='••••••••' required
+            )
+        .flex.flex-col.gap-sm
+          button#login-btn.bg-primary.text-on-primary.font-label-md.py-base.rounded-lg.transition-all.neon-glow(class="hover:bg-primary-container active:scale-[0.98]" type='button') Sign In
+          .flex.items-center.gap-base.py-base
+            div(class="h-px flex-grow bg-outline-variant/30")
+            span.font-label-sm.text-outline OR
+            div(class="h-px flex-grow bg-outline-variant/30")
+          button.flex.items-center.justify-center.gap-base.border.transition-all.py-base.rounded-lg.font-label-md.text-on-surface(class="border-outline-variant/30 hover:bg-surface-variant/30" type='button')
+            span.material-symbols-outlined(class="text-[18px]") account_circle
+            | Continue with Google
+
+      //- Sign Up View (hidden by default)
+      #signupView.hidden.flex.flex-col.gap-md
+        div.flex.flex-col.gap-sm.overflow-y-auto.pr-xs.custom-scrollbar(class="max-h-[350px]")
+          .flex.flex-col.gap-xs
+            label.font-label-sm.text-on-surface-variant Full Name
+            input#name.input-minimal.w-full.py-base.font-body-md.text-on-surface(type='text' placeholder='Alex Rivera' required)
+          .flex.flex-col.gap-xs.mt-sm
+            label.font-label-sm.text-on-surface-variant Email Address
+            input#signup-email.input-minimal.w-full.py-base.font-body-md.text-on-surface(type='email' placeholder='alex@example.com' required)
+          .flex.flex-col.gap-xs.mt-sm
+            label.font-label-sm.text-on-surface-variant Phone Number
+            input#phone.input-minimal.w-full.py-base.font-body-md.text-on-surface(type='tel' placeholder='+1 (555) 000-0000' required)
+          .flex.flex-col.gap-xs.mt-sm
+            label.font-label-sm.text-on-surface-variant Password
+            input#signup-password.input-minimal.w-full.py-base.font-body-md.text-on-surface(type='password' placeholder='Create a strong password' required)
+          .flex.flex-col.gap-xs.mt-sm
+            label.font-label-sm.text-on-surface-variant Confirm Password
+            input#password-confirm.input-minimal.w-full.py-base.font-body-md.text-on-surface(type='password' placeholder='Verify password' required)
+        .flex.flex-col.gap-sm
+          button#signup-btn.bg-secondary.text-on-secondary.font-label-md.py-base.rounded-lg.transition-all(class="hover:bg-secondary-container active:scale-[0.98] shadow-[0_0_15px_rgba(93,230,255,0.2)]" type='button') Create Account
+          p.font-label-sm.text-outline.text-center
+            | By signing up, you agree to our 
+            a.text-on-surface(class="hover:underline" href='#') Terms of Service
+
+      .text-center
+        span.font-label-sm.text-outline.italic.opacity-60 "Experience the future of elite driving."
+
+  .fixed.top-gutter.left-gutter.flex.items-center.gap-sm.opacity-50
+    .w-2.h-2.rounded-full.bg-tertiary.animate-pulse
+    span.font-label-sm.text-tertiary-fixed-dim.uppercase.tracking-tighter System Online
+
+block scripts
+  script.
+    function switchTab(tab) {
+      const loginBtn = document.getElementById('loginTabBtn');
+      const signupBtn = document.getElementById('signupTabBtn');
+      const loginView = document.getElementById('loginView');
+      const signupView = document.getElementById('signupView');
+      if (tab === 'login') {
+        loginBtn.classList.add('tab-active', 'text-on-surface');
+        loginBtn.classList.remove('text-on-surface-variant');
+        signupBtn.classList.remove('tab-active', 'text-on-surface');
+        signupBtn.classList.add('text-on-surface-variant');
+        loginView.classList.remove('hidden');
+        signupView.classList.add('hidden');
+      } else {
+        signupBtn.classList.add('tab-active', 'text-on-surface');
+        signupBtn.classList.remove('text-on-surface-variant');
+        loginBtn.classList.remove('tab-active', 'text-on-surface');
+        loginBtn.classList.add('text-on-surface-variant');
+        signupView.classList.remove('hidden');
+        loginView.classList.add('hidden');
+      }
+    }
+
+    // Mouse follow bokeh
+    document.addEventListener('mousemove', (e) => {
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      const bg = getComputedStyle(document.documentElement).getPropertyValue('--color-surface-container-lowest').trim();
+      document.querySelector('.bokeh-bg').style.background = `
+        radial-gradient(circle at ${x * 100}% ${y * 100}%, rgba(73, 75, 214, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at ${80 - (x * 20)}% ${70 - (y * 20)}%, rgba(93, 230, 255, 0.1) 0%, transparent 40%),
+        ${bg}`;
+    });
+
+    // Login via axios
+    document.getElementById('login-btn').addEventListener('click', async () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      try {
+        const res = await fetch('/api/v1/users/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (data.status === 'success') window.location.assign('/');
+        else alert(data.message);
+      } catch(e) { alert('Something went wrong. Please try again.'); }
+    });
+
+    // Signup via axios
+    document.getElementById('signup-btn').addEventListener('click', async () => {
+      const body = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('signup-email').value,
+        phoneNumber: document.getElementById('phone').value,
+        password: document.getElementById('signup-password').value,
+        passwordConfirm: document.getElementById('password-confirm').value
+      };
+      try {
+        const res = await fetch('/api/v1/users/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (data.status === 'success') window.location.assign('/');
+        else alert(data.message);
+      } catch(e) { alert('Something went wrong. Please try again.'); }
+    });

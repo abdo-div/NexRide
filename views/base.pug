@@ -1,0 +1,366 @@
+doctype html
+html(lang='en')
+  //- Anti-FOUC: Apply saved theme IMMEDIATELY before page paint
+  script.
+    (function() {
+      try {
+        var saved = localStorage.getItem('nexride-theme');
+        if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch(e) {}
+    })();
+  head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title NexRide | #{title}
+    script(src='https://cdn.tailwindcss.com?plugins=forms,container-queries')
+    link(href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap' rel='stylesheet')
+    link(href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap' rel='stylesheet')
+    block head
+    script(id='tailwind-config').
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+              "surface-dim": "var(--color-surface-dim)",
+              "inverse-on-surface": "var(--color-inverse-on-surface)",
+              "tertiary": "var(--color-tertiary)",
+              "tertiary-fixed-dim": "var(--color-tertiary-fixed-dim)",
+              "primary-container": "var(--color-primary-container)",
+              "secondary-fixed-dim": "var(--color-secondary-fixed-dim)",
+              "on-tertiary-fixed-variant": "var(--color-on-tertiary-fixed-variant)",
+              "surface-container-lowest": "var(--color-surface-container-lowest)",
+              "on-surface-variant": "var(--color-on-surface-variant)",
+              "outline-variant": "var(--color-outline-variant)",
+              "on-background": "var(--color-on-background)",
+              "on-tertiary-fixed": "var(--color-on-tertiary-fixed)",
+              "surface": "var(--color-surface)",
+              "inverse-surface": "var(--color-inverse-surface)",
+              "surface-container-low": "var(--color-surface-container-low)",
+              "surface-container-high": "var(--color-surface-container-high)",
+              "surface-variant": "var(--color-surface-variant)",
+              "background": "var(--color-background)",
+              "error-container": "var(--color-error-container)",
+              "on-secondary-fixed": "var(--color-on-secondary-fixed)",
+              "primary-fixed-dim": "var(--color-primary-fixed-dim)",
+              "on-primary-fixed": "var(--color-on-primary-fixed)",
+              "on-primary-container": "var(--color-on-primary-container)",
+              "on-primary": "var(--color-on-primary)",
+              "tertiary-container": "var(--color-tertiary-container)",
+              "on-tertiary-container": "var(--color-on-tertiary-container)",
+              "primary-fixed": "var(--color-primary-fixed)",
+              "secondary": "var(--color-secondary)",
+              "tertiary-fixed": "var(--color-tertiary-fixed)",
+              "error": "var(--color-error)",
+              "on-secondary": "var(--color-on-secondary)",
+              "on-error-container": "var(--color-on-error-container)",
+              "surface-container-highest": "var(--color-surface-container-highest)",
+              "on-surface": "var(--color-on-surface)",
+              "surface-tint": "var(--color-surface-tint)",
+              "on-tertiary": "var(--color-on-tertiary)",
+              "surface-container": "var(--color-surface-container)",
+              "on-secondary-fixed-variant": "var(--color-on-secondary-fixed-variant)",
+              "surface-bright": "var(--color-surface-bright)",
+              "outline": "var(--color-outline)",
+              "on-secondary-container": "var(--color-on-secondary-container)",
+              "secondary-container": "var(--color-secondary-container)",
+              "primary": "var(--color-primary)",
+              "inverse-primary": "var(--color-inverse-primary)",
+              "secondary-fixed": "var(--color-secondary-fixed)",
+              "on-error": "var(--color-on-error)",
+              "on-primary-fixed-variant": "var(--color-on-primary-fixed-variant)"
+            },
+            "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+            "spacing": { "xl": "80px", "gutter": "24px", "base": "8px", "xs": "4px", "container-max": "1280px", "lg": "48px", "sm": "12px", "md": "24px" },
+            "fontFamily": { "headline-lg": ["Inter"], "body-lg": ["Inter"], "label-md": ["Inter"], "headline-md": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "display-lg-mobile": ["Inter"], "display-lg": ["Inter"] },
+            "fontSize": {
+              "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+              "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+              "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+              "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+              "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+              "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+              "display-lg-mobile": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+              "display-lg": ["72px", {"lineHeight": "80px", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+            }
+          }
+        }
+      }
+    style.
+      :root {
+        --color-background: #fcfcff;
+        --color-on-background: #1a1b21;
+        --color-surface: #fcfcff;
+        --color-surface-dim: #dadddf;
+        --color-surface-bright: #fcfcff;
+        --color-surface-container-lowest: #ffffff;
+        --color-surface-container-low: #f4f3f7;
+        --color-surface-container: #eeeef1;
+        --color-surface-container-high: #e8e8eb;
+        --color-surface-container-highest: #e2e2e6;
+        --color-on-surface: #1a1b21;
+        --color-surface-variant: #e1e2ec;
+        --color-on-surface-variant: #44474f;
+        --color-inverse-surface: #2f3036;
+        --color-inverse-on-surface: #f1f0f4;
+        
+        --color-primary: #494bd6;
+        --color-on-primary: #ffffff;
+        --color-primary-container: #e1e0ff;
+        --color-on-primary-container: #0d0096;
+        --color-inverse-primary: #c0c1ff;
+        --color-primary-fixed: #e1e0ff;
+        --color-primary-fixed-dim: #c0c1ff;
+        --color-on-primary-fixed: #07006c;
+        --color-on-primary-fixed-variant: #2f2ebe;
+        --color-surface-tint: #494bd6;
+        
+        --color-secondary: #006874;
+        --color-on-secondary: #ffffff;
+        --color-secondary-container: #a2eeff;
+        --color-on-secondary-container: #001f25;
+        --color-secondary-fixed: #a2eeff;
+        --color-secondary-fixed-dim: #2fd9f4;
+        --color-on-secondary-fixed: #001f25;
+        --color-on-secondary-fixed-variant: #004e5a;
+
+        --color-tertiary: #006c48;
+        --color-on-tertiary: #ffffff;
+        --color-tertiary-container: #6ffbbe;
+        --color-on-tertiary-container: #002113;
+        --color-tertiary-fixed: #6ffbbe;
+        --color-tertiary-fixed-dim: #4edea3;
+        --color-on-tertiary-fixed: #002113;
+        --color-on-tertiary-fixed-variant: #005236;
+
+        --color-error: #ba1a1a;
+        --color-on-error: #ffffff;
+        --color-error-container: #ffdad6;
+        --color-on-error-container: #410002;
+        
+        --color-outline: #74777f;
+        --color-outline-variant: #c4c6d0;
+        
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: rgba(0, 0, 0, 0.1);
+        --glass-deep-bg: rgba(255, 255, 255, 0.85);
+        --glass-deep-border: rgba(73, 75, 214, 0.15);
+      }
+
+      .dark {
+        --color-background: #131318;
+        --color-on-background: #e4e1e9;
+        --color-surface: #131318;
+        --color-surface-dim: #131318;
+        --color-surface-bright: #39383e;
+        --color-surface-container-lowest: #0e0e13;
+        --color-surface-container-low: #1b1b20;
+        --color-surface-container: #1f1f25;
+        --color-surface-container-high: #2a292f;
+        --color-surface-container-highest: #35343a;
+        --color-on-surface: #e4e1e9;
+        --color-surface-variant: #35343a;
+        --color-on-surface-variant: #c7c4d7;
+        --color-inverse-surface: #e4e1e9;
+        --color-inverse-on-surface: #303036;
+
+        --color-primary: #c0c1ff;
+        --color-on-primary: #1000a9;
+        --color-primary-container: #8083ff;
+        --color-on-primary-container: #0d0096;
+        --color-inverse-primary: #494bd6;
+        --color-primary-fixed: #e1e0ff;
+        --color-primary-fixed-dim: #c0c1ff;
+        --color-on-primary-fixed: #07006c;
+        --color-on-primary-fixed-variant: #2f2ebe;
+        --color-surface-tint: #c0c1ff;
+        
+        --color-secondary: #5de6ff;
+        --color-on-secondary: #00363e;
+        --color-secondary-container: #00cbe6;
+        --color-on-secondary-container: #00515d;
+        --color-secondary-fixed: #a2eeff;
+        --color-secondary-fixed-dim: #2fd9f4;
+        --color-on-secondary-fixed: #001f25;
+        --color-on-secondary-fixed-variant: #004e5a;
+
+        --color-tertiary: #4edea3;
+        --color-on-tertiary: #003824;
+        --color-tertiary-container: #00885d;
+        --color-on-tertiary-container: #000703;
+        --color-tertiary-fixed: #6ffbbe;
+        --color-tertiary-fixed-dim: #4edea3;
+        --color-on-tertiary-fixed: #002113;
+        --color-on-tertiary-fixed-variant: #005236;
+
+        --color-error: #ffb4ab;
+        --color-on-error: #690005;
+        --color-error-container: #93000a;
+        --color-on-error-container: #ffdad6;
+        
+        --color-outline: #908fa0;
+        --color-outline-variant: #464554;
+        
+        --glass-bg: rgba(19, 19, 24, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-deep-bg: rgba(13, 13, 18, 0.85);
+        --glass-deep-border: rgba(128, 131, 255, 0.25);
+      }
+      
+      body { font-family: 'Inter', sans-serif; background-color: var(--color-background); color: var(--color-on-background); overflow-x: hidden; }
+
+      /* Glass effects — adapt to theme */
+      .glass-card { background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); }
+      .glass-panel { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); }
+      .deep-glass { background: var(--glass-deep-bg); backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px); border: 1px solid var(--glass-deep-border); }
+
+      /* Neon effects — subtle in both themes */
+      .neon-glow { box-shadow: 0 0 20px rgba(73, 75, 214, 0.12); }
+      .neon-glow:hover { box-shadow: 0 0 30px rgba(73, 75, 214, 0.2); }
+      .dark .neon-glow { box-shadow: 0 0 20px rgba(128, 131, 255, 0.15); }
+      .dark .neon-glow:hover { box-shadow: 0 0 30px rgba(93, 230, 255, 0.25); }
+      .neon-rim { border: 1px solid rgba(73, 75, 214, 0.15); box-shadow: 0 0 20px rgba(73, 75, 214, 0.06); }
+      .neon-rim:hover { border: 1px solid rgba(73, 75, 214, 0.35); box-shadow: 0 0 30px rgba(73, 75, 214, 0.12); }
+      .dark .neon-rim { border: 1px solid rgba(192, 193, 255, 0.2); box-shadow: 0 0 20px rgba(73, 75, 214, 0.1); }
+      .dark .neon-rim:hover { border: 1px solid rgba(93, 230, 255, 0.4); box-shadow: 0 0 30px rgba(93, 230, 255, 0.15); }
+
+      /* Animations */
+      .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s ease-out; }
+      .reveal.active { opacity: 1; transform: translateY(0); }
+      .car-card-hover:hover { transform: translateY(-8px); border-color: var(--color-secondary); }
+      @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+      .floating { animation: float 4s ease-in-out infinite; }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: var(--color-background); }
+      ::-webkit-scrollbar-thumb { background: var(--color-surface-variant); border-radius: 10px; }
+      ::-webkit-scrollbar-thumb:hover { background: var(--color-outline-variant); }
+
+      /* Light mode specific overrides */
+      :root .car-card-hover { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+      :root .car-card-hover:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+      
+      /* Nav bar light mode */
+      :root nav#main-nav { background: rgba(252, 252, 255, 0.85) !important; border-bottom-color: rgba(0,0,0,0.08) !important; }
+      .dark nav#main-nav { background: rgba(19, 19, 24, 0.85) !important; }
+
+      /* Footer light mode */
+      :root footer { background: var(--color-surface-container-low) !important; }
+
+      /* Input fields */
+      select, input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="tel"], textarea {
+        color: var(--color-on-surface);
+        background-color: var(--color-surface-container-low);
+      }
+
+      /* Smooth theme transitions — apply AFTER initial load to avoid FOUC */
+      .theme-ready *, .theme-ready *::before, .theme-ready *::after { transition: background-color 0.3s ease, border-color 0.3s ease, color 0.2s ease, box-shadow 0.3s ease; }
+      .theme-ready button, .theme-ready a { transition: all 0.2s ease; }
+
+  body.bg-background(class="selection:bg-secondary/30")
+
+    //- Alert Banner
+    if alert
+      .fixed.top-20.z-50.max-w-xl.w-full.px-4(id='alert-banner' class="left-1/2 -translate-x-1/2")
+        .glass-card.border.text-tertiary.px-6.py-4.rounded-xl.flex.items-center.justify-between.gap-4.shadow-2xl(class="border-tertiary/30")
+          span.font-body-md.text-body-md= alert
+          button.text-tertiary.transition-colors(class="hover:text-on-surface" onclick='document.getElementById("alert-banner").remove()')
+            span.material-symbols-outlined close
+
+    //- Navbar
+    nav#main-nav.fixed.top-0.w-full.z-50.transition-all.duration-500(class="bg-surface/70 dark:bg-surface-dim/80 backdrop-blur-xl border-b border-white/10 backdrop-saturate-150 shadow-[0_4px_30px_rgba(0,0,0,0.1)]")
+      .flex.justify-between.items-center.w-full.px-gutter.py-3.max-w-container-max.mx-auto
+        //- Logo
+        a.flex.items-center.gap-2(href='/')
+          span.material-symbols-outlined.text-primary-fixed-dim.text-3xl(style="font-variation-settings: 'FILL' 1;") bolt
+          span(class="font-display-lg text-headline-md font-extrabold tracking-tighter text-primary-fixed-dim dark:text-primary") NexRide
+        //- Nav links (desktop)
+        .hidden.items-center.gap-8(class="md:flex")
+          a.text-on-surface-variant.font-label-md.text-label-md(class="hover:text-primary transition-colors" href='/') Home
+          a.text-on-surface-variant.font-label-md.text-label-md(class="hover:text-primary transition-colors" href='/#browse') Browse
+          a.text-on-surface-variant.font-label-md.text-label-md(class="hover:text-primary transition-colors" href='/#how-it-works') How it Works
+          if user && user.role === 'admin'
+            a.text-secondary.font-label-md.text-label-md.flex.items-center.gap-1.border.rounded-full.px-4.py-1(class="border-secondary/30 hover:bg-secondary/10 transition-colors" href='/admin/create-car-offer')
+              span.material-symbols-outlined(class="text-[16px]") add_circle
+              | Create Offer
+        //- Auth area
+        .flex.items-center.gap-3
+          //- Theme Toggle Button
+          button#theme-toggle.w-9.h-9.rounded-full.flex.items-center.justify-center.transition-all.border(class="border-outline-variant/40 hover:border-primary hover:bg-primary/10 text-on-surface-variant hover:text-primary" onclick='toggleTheme()' aria-label='Toggle theme')
+            span#theme-icon.material-symbols-outlined(class="text-[18px] leading-none") dark_mode
+          if user
+            //- Logged in: show avatar dropdown
+            .relative(x-data='{ open: false }')
+              button.flex.items-center.gap-2.p-1.rounded-full.border.border-outline-variant.transition-all(class="hover:border-primary" onclick='this.nextElementSibling.classList.toggle("hidden")')
+                img.w-9.h-9.rounded-full.object-cover(src=`/users/${user.photo}` alt=user.name)
+              .hidden.absolute.right-0.mt-2.w-48.glass-card.rounded-xl.border.shadow-2xl.py-2(class="border-outline-variant/30")
+                a.flex.items-center.gap-3.px-4.py-2.transition-all.text-label-sm(class="text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30" href='/me')
+                  span.material-symbols-outlined(class="text-[16px]") person
+                  | My Account
+                a.flex.items-center.gap-3.px-4.py-2.transition-all.text-label-sm(class="text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30" href='/my-rentals')
+                  span.material-symbols-outlined(class="text-[16px]") directions_car
+                  | My Rentals
+                hr.my-1(class="border-outline-variant/20")
+                a.flex.items-center.gap-3.px-4.py-2.text-error.transition-all.text-label-sm(class="hover:bg-error-container/10" href='/api/v1/users/logout')
+                  span.material-symbols-outlined(class="text-[16px]") logout
+                  | Logout
+          else
+            //- Not logged in
+            a.text-on-surface-variant.font-label-md.text-label-md.px-4.py-2.transition-all(class="hover:text-on-surface" href='/login') Sign In
+            a.bg-primary.text-on-primary.font-label-md.text-label-md.px-6.rounded-full.transition-all.shadow-lg(class="hover:bg-primary-container py-2.5 active:scale-95" href='/login') Rent Now
+
+    block content
+
+    //- Footer
+    footer.bg-surface-dim.border-t.w-full.relative.bottom-0(class="dark:bg-surface-container-lowest border-outline-variant/30")
+      .max-w-container-max.mx-auto.px-gutter.py-lg.flex.flex-col.justify-between.items-start.gap-md(class="md:flex-row md:items-center")
+        .flex.flex-col.gap-4
+          .flex.items-center.gap-2
+            span.material-symbols-outlined.text-primary.text-3xl(style="font-variation-settings: 'FILL' 1;") bolt
+            span.font-headline-md.text-headline-md.text-primary NexRide
+          p.text-on-surface-variant.text-body-md.max-w-sm Redefining the luxury rental experience with tech-driven precision and cinematic quality.
+          .flex.gap-4.mt-2
+            a.w-10.h-10.rounded-full.flex.items-center.justify-center.transition-all(class="bg-surface-container-high text-on-surface-variant hover:bg-primary hover:text-on-primary" href='#')
+              svg.w-5.h-5.fill-current(viewBox='0 0 24 24')
+                path(d='M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z')
+            a.w-10.h-10.rounded-full.flex.items-center.justify-center.transition-all(class="bg-surface-container-high text-on-surface-variant hover:bg-primary hover:text-on-primary" href='#')
+              svg.w-5.h-5.fill-current(viewBox='0 0 24 24')
+                path(d='M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z')
+        .flex.gap-xl(class="md:gap-xl")
+          .flex.flex-col.gap-4
+            span.text-on-surface.font-label-md Company
+            a.text-on-surface-variant.transition-colors.text-label-sm(class="hover:text-on-surface" href='#') About Us
+            a.text-on-surface-variant.transition-colors.text-label-sm(class="hover:text-on-surface" href='#') Fleet Directory
+            a.text-on-surface-variant.transition-colors.text-label-sm(class="hover:text-on-surface" href='#') Investors
+          .flex.flex-col.gap-4
+            span.text-on-surface.font-label-md Support
+            a.text-on-surface-variant.transition-colors.text-label-sm(class="hover:text-on-surface" href='#') Privacy Policy
+            a.text-on-surface-variant.transition-colors.text-label-sm(class="hover:text-on-surface" href='#') Terms of Service
+            a.text-on-surface-variant.transition-colors.text-label-sm(class="hover:text-on-surface" href='#') Help Center
+      .max-w-container-max.mx-auto.px-gutter.py-base.text-center(class="border-t border-white/5")
+        span.text-on-surface-variant.opacity-60.text-label-sm © 2025 NexRide Premium. All rights reserved.
+
+    block scripts
+    script(src='/js/theme.js')
+    script.
+      // Navbar scroll effect — fixed size, only shadow changes
+      const nav = document.getElementById('main-nav');
+      if(nav) {
+        window.addEventListener('scroll', () => {
+          if (window.scrollY > 50) { nav.classList.add('shadow-xl'); nav.classList.remove('shadow-md'); }
+          else { nav.classList.add('shadow-md'); nav.classList.remove('shadow-xl'); }
+        });
+      }
+      // Reveal on scroll
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+      }, { threshold: 0.1 });
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+      // Auto-dismiss alert
+      const alertBanner = document.getElementById('alert-banner');
+      if(alertBanner) setTimeout(() => alertBanner.remove(), 7000);

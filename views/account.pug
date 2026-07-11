@@ -1,0 +1,190 @@
+extends base
+
+block content
+  style.
+    .glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); }
+    .neon-rim { box-shadow: inset 0 0 0 1px rgba(128, 131, 255, 0.1), 0 0 20px rgba(128, 131, 255, 0.05); }
+    .input-focus-cyan:focus { outline: none; border-bottom-color: var(--color-secondary); box-shadow: 0 4px 12px -4px rgba(47, 217, 244, 0.3); }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--color-outline-variant); border-radius: 10px; }
+
+  //- Background shader
+  .fixed.inset-0.z-0.pointer-events-none
+
+  //- Top nav override for account page
+  header.backdrop-blur-xl.border-b.backdrop-saturate-150(class="fixed top-0 w-full z-50 bg-surface/70 dark:bg-surface-dim/80 border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)]")
+    .flex.justify-between.items-center.w-full.px-gutter.py-4.max-w-container-max.mx-auto
+      .flex.items-center.gap-base
+        span.material-symbols-outlined.text-secondary.text-3xl(style="font-variation-settings: 'FILL' 1;") bolt
+        a(class="font-display-lg text-headline-md font-extrabold tracking-tighter text-primary-fixed-dim dark:text-primary")(href='/') NexRide
+      nav(class="hidden md:flex gap-md items-center")
+        a(class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors")(href='/') Marketplace
+        a(class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors")(href='/') Fleet
+        div(class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30")
+          img.w-full.h-full.object-cover(src=`/users/${user.photo}` alt=user.name)
+      div.flex.items-center.gap-3(class="md:gap-3")
+        //- Theme toggle
+        button#theme-toggle.w-9.h-9.rounded-full.flex.items-center.justify-center.transition-all.border(class="border-outline-variant/40 hover:border-primary hover:bg-primary/10 text-on-surface-variant hover:text-primary" onclick='toggleTheme()' aria-label='Toggle theme')
+          span#theme-icon.material-symbols-outlined(class="text-[18px] leading-none") dark_mode
+        div(class="md:hidden")
+          span.material-symbols-outlined.text-on-surface menu
+
+  main(class="relative z-10 pt-xl flex flex-col md:flex-row min-h-screen max-w-container-max mx-auto")
+
+    //- Sidebar
+    aside.glass-panel.border-r.flex.flex-col.h-auto.py-base(class="w-full md:w-64 border-outline-variant/20 md:h-[calc(100vh-80px)] md:sticky md:top-20")
+      div(class="px-6 py-8 flex flex-col items-center border-b border-outline-variant/10 mb-4")
+        .relative.group
+          div(class="w-20 h-20 rounded-full border-2 border-primary-container/30 p-1 mb-4")
+            img.w-full.h-full.object-cover.rounded-full(src=`/users/${user.photo}` alt=user.name id='avatar-preview')
+          .absolute.-bottom-1.-right-1.bg-tertiary.text-on-tertiary.p-1.rounded-full.font-bold(class="text-[10px]")= user.role.toUpperCase()
+        h3.font-headline-md.text-headline-sm.font-black.text-secondary= user.name
+        p(class="font-body-sm text-body-sm text-on-surface-variant/60") Verified Member
+      nav.flex-1.space-y-1
+        a(class="bg-primary-container/20 text-primary border-r-4 border-primary px-6 py-3 flex items-center gap-3 transition-all")(href='/me')
+          span.material-symbols-outlined(style="font-variation-settings: 'FILL' 1;") reset_settings
+          span.font-label-md.text-label-md Profile Settings
+        a(class="text-on-surface-variant hover:bg-surface-variant/30 px-6 py-3 flex items-center gap-3 transition-all hover:translate-x-1" href='#' onclick='document.getElementById("pwd-section").classList.toggle("hidden"); return false;')
+          span.material-symbols-outlined lock_reset
+          span.font-label-md.text-label-md Password
+        a(class="text-on-surface-variant hover:bg-surface-variant/30 px-6 py-3 flex items-center gap-3 transition-all hover:translate-x-1" href='/my-rentals')
+          span.material-symbols-outlined directions_car
+          span.font-label-md.text-label-md My Rentals
+        a(class="text-on-surface-variant hover:bg-surface-variant/30 px-6 py-3 flex items-center gap-3 transition-all hover:translate-x-1" href='#')
+          span.material-symbols-outlined notifications
+          span.font-label-md.text-label-md Notifications
+      div(class="mt-auto px-6 py-8 border-t border-outline-variant/10")
+        a(class="text-error hover:bg-error-container/10 px-0 py-3 flex items-center gap-3 transition-all group" href='/api/v1/users/logout')
+          span(class="material-symbols-outlined group-hover:translate-x-1 transition-transform") logout
+          span.font-label-md.text-label-md.font-bold.uppercase.tracking-wider Logout
+
+    //- Main Panel
+    section(class="flex-1 px-gutter py-xl md:py-md overflow-y-auto custom-scrollbar")
+      .max-w-3xl.mx-auto.space-y-md
+        .space-y-xs
+          h2.font-headline-lg.text-headline-lg.text-primary-fixed Account Identity
+          p(class="font-body-md text-body-md text-on-surface-variant/70") Manage your public profile and driver verification details.
+
+        //- Profile Bento Grid
+        div(class="grid grid-cols-1 md:grid-cols-12 gap-md pt-base")
+          //- Avatar Upload Card
+          div(class="md:col-span-4 glass-panel p-md flex flex-col items-center justify-center text-center gap-md neon-rim")
+            div(class="relative w-32 h-32 rounded-full overflow-hidden border-2 border-dashed border-secondary/40 flex items-center justify-center bg-surface-container-low group cursor-pointer transition-all hover:border-secondary" onclick='document.getElementById("photo-upload").click()')
+              img#avatar-display.w-full.h-full.object-cover(src=`/users/${user.photo}` alt=user.name)
+              div(class="absolute inset-0 bg-surface-dim/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center")
+
+                span.material-symbols-outlined.text-white.text-3xl photo_camera
+            .space-y-xs
+              h4.font-label-md.text-label-md.text-on-surface Driver Image
+              p(class="font-label-sm text-label-sm text-on-surface-variant/50") JPG or PNG. Max 5MB.
+            input#photo-upload.hidden(type='file' name='photo' accept='image/*')
+            label(class="w-full py-base bg-surface-variant text-secondary font-label-md rounded-lg border border-secondary/20 hover:bg-secondary/10 transition-all duration-300 text-center cursor-pointer" for='photo-upload') Upload New Photo
+
+          //- Details Form
+          div(class="md:col-span-8 glass-panel p-md neon-rim space-y-lg")
+            form#update-profile-form(class="grid grid-cols-1 md:grid-cols-2 gap-md")(method='POST' action='/submit-user-data' enctype='multipart/form-data')
+              .space-y-xs
+                label.font-label-sm.text-label-sm.text-secondary.tracking-widest.uppercase.opacity-70 Full Name
+                input.w-full.bg-transparent.border-0.border-b-2.border-outline-variant.text-on-surface.py-3.px-0.font-body-md.input-focus-cyan.transition-all(
+                  type='text' name='name' value=user.name required
+                )
+              .space-y-xs
+                label.font-label-sm.text-label-sm.text-secondary.tracking-widest.uppercase.opacity-70 Email Address
+                input.w-full.bg-transparent.border-0.border-b-2.border-outline-variant.text-on-surface.py-3.px-0.font-body-md.input-focus-cyan.transition-all(
+                  type='email' name='email' value=user.email required
+                )
+              div(class="space-y-xs md:col-span-2")
+                label.font-label-sm.text-label-sm.text-secondary.tracking-widest.uppercase.opacity-70 Phone Number
+                .flex.items-center.gap-base
+                  input.w-full.bg-transparent.border-0.border-b-2.border-outline-variant.text-on-surface.py-3.px-0.font-body-md.input-focus-cyan.transition-all(
+                    type='tel' name='phoneNumber' value=(user.phoneNumber || '')
+                  )
+              //- Action Bar
+              .flex.flex-col.items-center.justify-between.gap-md.pt-base.border-t(class="md:col-span-2 md:flex-row border-outline-variant/10")
+                .flex.items-center.gap-xs.text-tertiary
+                  span.material-symbols-outlined.text-sm(style="font-variation-settings: 'FILL' 1;") verified
+                  span.font-label-sm.text-label-sm Profile identity verified
+                button.px-lg.py-3.bg-primary-container.text-on-primary-container.font-label-md.rounded-xl.transition-all.duration-300(class="w-full md:w-auto shadow-[0_0_20px_rgba(128,131,255,0.3)] hover:shadow-[0_0_30px_rgba(128,131,255,0.5)] hover:scale-105 active:scale-95" type='submit') Save Changes
+
+        //- Password Section (hidden by default)
+        #pwd-section.hidden.glass-panel.p-md.neon-rim.space-y-md
+          h3.font-headline-md.text-headline-sm.text-on-surface Change Password
+          .space-y-md
+            .space-y-xs
+              label.font-label-sm.text-label-sm.text-secondary.uppercase.opacity-70 Current Password
+              input#current-pwd.w-full.bg-transparent.border-0.border-b-2.border-outline-variant.text-on-surface.py-3.px-0.font-body-md.input-focus-cyan.transition-all(type='password')
+            .space-y-xs
+              label.font-label-sm.text-label-sm.text-secondary.uppercase.opacity-70 New Password
+              input#new-pwd.w-full.bg-transparent.border-0.border-b-2.border-outline-variant.text-on-surface.py-3.px-0.font-body-md.input-focus-cyan.transition-all(type='password')
+            .space-y-xs
+              label.font-label-sm.text-label-sm.text-secondary.uppercase.opacity-70 Confirm New Password
+              input#confirm-pwd.w-full.bg-transparent.border-0.border-b-2.border-outline-variant.text-on-surface.py-3.px-0.font-body-md.input-focus-cyan.transition-all(type='password')
+            button#update-pwd-btn.px-lg.py-3.bg-primary.text-on-primary.rounded-xl.font-label-md.transition-all(class="hover:bg-primary-container active:scale-95" type='button') Update Password
+
+        //- Extra cards
+        div(class="grid grid-cols-1 md:grid-cols-2 gap-md")
+          div(class="glass-panel p-md neon-rim group cursor-pointer hover:bg-surface-container-high transition-colors")
+            .flex.items-center.justify-between.mb-base
+              div(class="p-2 bg-secondary/10 rounded-lg text-secondary")
+                span.material-symbols-outlined security
+              span.material-symbols-outlined.text-on-surface-variant chevron_right
+            h4.font-headline-md.text-headline-sm.text-on-surface Two-Factor Auth
+            p(class="font-body-md text-body-md text-on-surface-variant/60") Add an extra layer of security to your account.
+          div(class="glass-panel p-md neon-rim group cursor-pointer hover:bg-surface-container-high transition-colors")
+            .flex.items-center.justify-between.mb-base
+              div(class="p-2 bg-tertiary/10 rounded-lg text-tertiary")
+                span.material-symbols-outlined payments
+              span.material-symbols-outlined.text-on-surface-variant chevron_right
+            h4.font-headline-md.text-headline-sm.text-on-surface Billing Method
+            p(class="font-body-md text-body-md text-on-surface-variant/60") Manage your payment methods.
+
+block scripts
+  script.
+    // Photo preview
+    document.getElementById('photo-upload').addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          document.getElementById('avatar-preview').src = e.target.result;
+          document.getElementById('avatar-display').src = e.target.result;
+        };
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+
+    // Photo upload via PATCH /api/v1/users/updateMe
+    document.getElementById('update-profile-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = new FormData(e.target);
+      const photoFile = document.getElementById('photo-upload').files[0];
+      if (photoFile) form.append('photo', photoFile);
+      try {
+        const res = await fetch('/api/v1/users/updateMe', { method: 'PATCH', body: form });
+        const data = await res.json();
+        if (data.status === 'success') { alert('Profile updated!'); window.location.reload(); }
+        else alert(data.message);
+      } catch(e) { alert('Update failed.'); }
+    });
+
+    // Password update
+    document.getElementById('update-pwd-btn').addEventListener('click', async () => {
+      const body = {
+        passwordCurrent: document.getElementById('current-pwd').value,
+        password: document.getElementById('new-pwd').value,
+        passwordConfirm: document.getElementById('confirm-pwd').value
+      };
+      try {
+        const res = await fetch('/api/v1/users/updateMyPassword', {
+          method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (data.status === 'success') alert('Password updated successfully!');
+        else alert(data.message);
+      } catch(e) { alert('Password update failed.'); }
+    });
+
+    // Input label focus effect
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('focus', () => { if(input.previousElementSibling) input.previousElementSibling.style.opacity = '1'; });
+      input.addEventListener('blur', () => { if(input.previousElementSibling) input.previousElementSibling.style.opacity = '0.7'; });
+    });
