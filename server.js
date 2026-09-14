@@ -2,10 +2,9 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import app from "./app.js";
 
-dotenv.config({ path: "./config.env" });
+dotenv.config();
 
-// Use DATABASE directly — local MongoDB URI has no password placeholder
-const DB = process.env.DATABASE;
+const DB = process.env.DATABASE_URL;
 
 mongoose
   .connect(DB)

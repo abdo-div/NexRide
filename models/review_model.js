@@ -1,44 +1,86 @@
 import mongoose from "mongoose";
 
-const reviewSchema = new mongoose.Schema({
-  review: { type: String, required: [true, "reviw text cannot be empty"] },
-  rating: {
-    type: Number,
-    min: 1,
-    max: 5,
-    required: true,
-  },
-  car: {
-    type: mongoose.Schema.ObjectId,
-    ref: "Car",
-    required: [true, "Review must belong to a car"],
-  },
-  user: {
-    type: mongoose.Schema.ObjectId,
-    ref: "User",
-    required: [true, "Review must belong to a user."],
-  },
-  createdAt: { type: Date, default: Date.now },
-});
+const reviewSchema = new mongoose.Schema(
+  {
+    // -------------------------------------------------------------------------
+    // Core Relationships & Marketplace Verification
+    // -------------------------------------------------------------------------
+    bookingId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Booking",
+      required: [true, "A review must be linked to a verified completed booking"],
+      unique: true, // Guarantees 1 review per completed booking
+      index: true,
+    },
+    vehicleId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Vehicle",
+      required: [true, "A review must belong to a vehicle"],
+      index: true,
+    },
+    companyId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
+      required: [true, "A review must be linked to a rental company"],
+      index: true,
+    },
+    customerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "A review must belong to a customer"],
+      index: true,
+    },
 
-// Prevent duplicate reviews: Ensure a user can only review a specific car once
-reviewSchema.index({ car: 1, user: 1 }, { unique: true });
+    // -------------------------------------------------------------------------
+    // Review Content
+    // -------------------------------------------------------------------------
+    rating: {
+      type: Number,
+      required: [true, "Please provide a rating between 1 and 5"],
+      min: [1, "Rating must be at least 1"],
+      max: [5, "Rating cannot exceed 5"],
+    },
+    review: {
+      type: String,
+      required: [true, "Review text cannot be empty"],
+      trim: true,
+      maxlength: [1000, "Review text cannot exceed 1000 characters"],
+    },
+  },
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    autoIndex: process.env.NODE_ENV !== "production",
+  }
+);
 
-// PRE-FIND MIDDLEWARE: Populate reviewer name
-reviewSchema.pre(/^find/, function () {
+// Prevent duplicate reviews: Ensure a customer can only review a specific vehicle once per user account
+reviewSchema.index({ vehicleId: 1, customerId: 1 }, { unique: true });
+
+// -----------------------------------------------------------------------------
+// Hooks & Middleware
+// -----------------------------------------------------------------------------
+
+// Populate customer details on find queries
+reviewSchema.pre(/^find/, function (next) {
   this.populate({
-    path: "user",
-    select: "name",
+    path: "customerId",
+    select: "name photo",
   });
+  next();
 });
 
-// STATIC METHOD: Compute and update average rating on the Car document
-reviewSchema.statics.calcAverageRatings = async function (carId) {
+// -----------------------------------------------------------------------------
+// Static Methods: Average Rating Aggregation
+// -----------------------------------------------------------------------------
+
+reviewSchema.statics.calcAverageRatings = async function (vehicleId) {
   const stats = await this.aggregate([
-    { $match: { car: carId } },
+    { $match: { vehicleId } },
     {
       $group: {
-        _id: "$car",
+        _id: "$vehicleId",
         nRating: { $sum: 1 },
         avgRating: { $avg: "$rating" },
       },
@@ -46,24 +88,37 @@ reviewSchema.statics.calcAverageRatings = async function (carId) {
   ]);
 
   if (stats.length > 0) {
-    await mongoose.model("Car").findByIdAndUpdate(carId, {
+    await mongoose.model("Vehicle").findByIdAndUpdate(vehicleId, {
       ratingsQuantity: stats[0].nRating,
-      ratingsAverage: stats[0].avgRating,
+      ratingsAverage: Math.round(stats[0].avgRating * 10) / 10,
     });
   } else {
-    await mongoose.model("Car").findByIdAndUpdate(carId, {
+    await mongoose.model("Vehicle").findByIdAndUpdate(vehicleId, {
       ratingsQuantity: 0,
       ratingsAverage: 4.5,
     });
   }
 };
 
-// POST-SAVE HOOK: Call calculation method after a new review is saved
+// Recalculate ratings after saving a new review
 reviewSchema.post("save", function () {
-  this.constructor.calcAverageRatings(this.car).catch((err) =>
-    console.error("Failed to update ratings:", err)
+  this.constructor.calcAverageRatings(this.vehicleId).catch((err) =>
+    console.error("Failed to update vehicle ratings:", err)
   );
 });
 
+// Recalculate ratings when a review is updated or deleted
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  this.r = await this.clone().findOne();
+  next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function () {
+  if (this.r) {
+    await this.r.constructor.calcAverageRatings(this.r.vehicleId);
+  }
+});
+
 const Review = mongoose.models.Review || mongoose.model("Review", reviewSchema);
+
 export default Review;

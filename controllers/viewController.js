@@ -16,12 +16,9 @@ export const alerts = (req, res, next) => {
 // 🚗 2. RENDER OVERVIEW MARKETPLACE
 // Fixed parameter order: changed (res, req, next) -> (req, res, next)
 export const getOverview = catchAsync(async (req, res, next) => {
-  const cars = await Car.aggregate([
-    { $match: { available: true } },
-    { $sort: { createdAt: -1 } },
-    { $group: { _id: "$type", car: { $first: "$$ROOT" } } },
-    { $replaceRoot: { newRoot: "$car" } },
-  ]);
+  const cars = await Car.find({ available: true })
+    .sort({ createdAt: -1 })
+    .limit(4);
   const availableCount = await Car.countDocuments({ available: true });
 
   res.status(200).render("overview", {

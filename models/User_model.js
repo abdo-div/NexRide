@@ -3,101 +3,146 @@ import validator from "validator";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "please tell us your name "],
-    trim: true,
-  },
-  email: {
-    type: String,
-    required: [true, "please provide your email"],
-    unique: true,
-    validate: [validator.isEmail, "please provide a valid email address"],
-  },
-  role: {
-    type: String,
-    enum: ["user", "employee", "admin"],
-    default: "user",
-  },
-  active: {
-    type: Boolean,
-    default: true,
-    select: false,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  phoneNumber: {
-    type: String,
-    required: [true, "a phone number is required for rental confirmations"],
-  },
-  photo: {
-    type: String,
-    default: "default.jpg", // Falls back to this if they haven't uploaded one yet
-  },
-  password: {
-    type: String,
-    required: [true, "please provide a password"],
-    minlength: 8,
-    select: false,
-  },
-  passwordConfirm: {
-    type: String,
-    required: [true, "please confirm your password"],
-    validate: {
-      validator: function (el) {
-        return el === this.password;
+const userSchema = new mongoose.Schema(
+  {
+    // -------------------------------------------------------------------------
+    // Core Identity
+    // -------------------------------------------------------------------------
+    name: {
+      type: String,
+      required: [true, "Please tell us your name"],
+      trim: true,
+      maxlength: [100, "Name cannot exceed 100 characters"],
+    },
+    email: {
+      type: String,
+      required: [true, "Please provide your email address"],
+      unique: true,
+      lowercase: true,
+      trim: true,
+      validate: [validator.isEmail, "Please provide a valid email address"],
+    },
+    phoneNumber: {
+      type: String,
+      required: [true, "A phone number is required for rental confirmations"],
+      trim: true,
+    },
+    photo: {
+      type: String,
+      default: "default.jpg",
+    },
+
+    // -------------------------------------------------------------------------
+    // Role-Based Access Control (RBAC) & Multi-Tenancy
+    // -------------------------------------------------------------------------
+    role: {
+      type: String,
+      enum: {
+        values: ["customer", "company", "admin"],
+        message: "Role must be customer, company, or admin",
       },
-      message: "password are not the same",
+      default: "customer", // Fixed: Default must match one of the enum values
+      index: true,
+    },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
+      default: null,
+      index: true,
+    },
+
+    // -------------------------------------------------------------------------
+    // Security & Passwords
+    // -------------------------------------------------------------------------
+    password: {
+      type: String,
+      required: [true, "Please provide a password"],
+      minlength: [8, "Password must be at least 8 characters long"],
+      select: false,
+    },
+    passwordConfirm: {
+      type: String,
+      required: [true, "Please confirm your password"],
+      validate: {
+        validator: function (el) {
+          return el === this.password;
+        },
+        message: "Passwords do not match",
+      },
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
+
+    // -------------------------------------------------------------------------
+    // Operational Flags
+    // -------------------------------------------------------------------------
+    active: {
+      type: Boolean,
+      default: true,
+      select: false,
     },
   },
-  passwordChangedAt: Date,
-  passwordResetToken: String,
-  passwordResetExpires: Date,
-});
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    autoIndex: process.env.NODE_ENV !== "production",
+  }
+);
+
+// -----------------------------------------------------------------------------
+// Indexes
+// -----------------------------------------------------------------------------
+userSchema.index({ role: 1, active: 1 });
+
+// -----------------------------------------------------------------------------
+// Hooks & Middleware
+// -----------------------------------------------------------------------------
+
 // 1. Password Encryption Hook
-userSchema.pre("save", async function () {
-  if (!this.isModified("password")) return;
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
   this.password = await bcrypt.hash(this.password, 12);
   this.passwordConfirm = undefined;
+  next();
 });
+
 // 2. Update Password Timestamp Hook
-userSchema.pre("save", async function () {
-  // If the password hasn't changed, or if this is a brand new user, skip this hook
-  if (!this.isModified("password") || this.isNew) return;
+userSchema.pre("save", function (next) {
+  if (!this.isModified("password") || this.isNew) return next();
 
-  // Update the timestamp
+  // Subtract 1 second to ensure JWT issued right after password change remains valid
   this.passwordChangedAt = Date.now() - 1000;
-
-  // NO NEXT() NEEDED! Mongoose handles it automatically because of 'async'
+  next();
 });
-// 3. Query Hook to hide inactive accounts
 
-userSchema.pre(/^find/, async function () {
-  // 'this' points to the current query
+// 3. Query Hook: Hide soft-deleted/inactive users automatically
+userSchema.pre(/^find/, function (next) {
   this.find({ active: { $ne: false } });
+  next();
 });
 
-userSchema.methods.correctPassword = async function (
-  candidatePassword,
-  userPassword,
-) {
+// -----------------------------------------------------------------------------
+// Instance Methods
+// -----------------------------------------------------------------------------
+
+// Password Verification
+userSchema.methods.correctPassword = async function (candidatePassword, userPassword) {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
+// Check if Password Was Changed After JWT Token Issuance
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
-    const changedTimestamp = parseInt(
-      this.passwordChangedAt.getTime() / 1000,
-      10,
-    );
+    const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
     return JWTTimestamp < changedTimestamp;
   }
   return false;
 };
 
+// Generate Password Reset Token
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString("hex");
 
@@ -106,7 +151,7 @@ userSchema.methods.createPasswordResetToken = function () {
     .update(resetToken)
     .digest("hex");
 
-  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // Token expires in 10 minutes
   return resetToken;
 };
 
