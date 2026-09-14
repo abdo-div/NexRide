@@ -1,42 +1,81 @@
 import express from "express";
-import * as userController from "./../controllers/userController.js";
-import * as authController from "./../controllers/authController.js";
+import {
+  signup,
+  login,
+  logout,
+  refreshToken,
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
+  updatePassword,
+  protect,
+  restrictTo,
+} from "../controllers/authController.js";
+import {
+  getMe,
+  getUserById,
+  getAllUsers,
+  updateMe,
+  deleteMe,
+  updateUserStatus,
+  deleteUser,
+  uploadUserPhoto,
+  resizeUserPhoto,
+} from "../controllers/userController.js";
 
 const router = express.Router();
 
-router.post("/signup", authController.signup);
-router.post("/login", authController.login);
-router.get("/logout", authController.logout);
+// -----------------------------------------------------------------------------
+// PUBLIC AUTHENTICATION & ACCOUNT RECOVERY ROUTES
+// -----------------------------------------------------------------------------
 
-router.post("/forgotPassword", authController.forgotPassword);
-router.patch("/resetPassword/:token", authController.resetPassword);
+// Account creation & session authentication
+router.post("/signup", signup);
+router.post("/login", login);
+router.post("/logout", logout);
+router.post("/refresh-token", refreshToken);
 
-//protect all routes after this middleware
+// Account verification & password recovery lifecycle
+router.get("/verify-email/:token", verifyEmail);
+router.post("/forgot-password", forgotPassword);
+router.patch("/reset-password/:token", resetPassword);
 
-router.use(authController.protect);
+// -----------------------------------------------------------------------------
+// PROTECTED USER SELF-SERVICE ROUTES (Authenticated Users)
+// -----------------------------------------------------------------------------
 
-router.patch("/updateMyPassword", authController.updatePassword);
-router.get("/me", userController.getMe, userController.getUser);
-router.patch(
-  "/updateMe",
-  userController.uploadUserPhoto,
-  userController.resizeUserPhoto,
-  userController.updateMe,
-);
+// Global Authentication Guard: All routes defined below require a valid JWT access token
+router.use(protect);
 
-router.delete("/deleteMe", userController.deleteMe);
+// Password modification for active authenticated sessions
+router.patch("/update-my-password", updatePassword);
 
-router.use(authController.restrictTo("admin"));
+// Current user profile management
+router.get("/me", getMe, getUserById);
 
+// Profile updates (avatar upload, personal details, contact preferences)
+router.patch("/update-me", uploadUserPhoto, resizeUserPhoto, updateMe);
+
+// Account self-deactivation (Soft-delete: sets active state to false without destroying historical transaction records)
+router.delete("/delete-me", deleteMe);
+
+// -----------------------------------------------------------------------------
+// PLATFORM ADMIN & GOVERNANCE ROUTES (Super-Admin Portal)
+// -----------------------------------------------------------------------------
+
+// Restrict all administrative identity management routes to system admins
+router.use(restrictTo("admin"));
+
+// User lifecycle management endpoints
 router
   .route("/")
-  .get(userController.getAllUsers)
-  .post(userController.createUser);
+  .get(getAllUsers) // Supports query filtering by role (customer, company, admin) and account status
+  .post(signup); // Admin provisioned account creation
 
-router
-  .route("/:id")
-  .get(userController.getUser)
-  .patch(userController.updateUser)
-  .delete(userController.deleteUser);
+// Granular account status toggle (SUSPENDED, ACTIVE, BAN)
+router.patch("/:id/status", updateUserStatus);
+
+// Direct account lookup and administrative mutations
+router.route("/:id").get(getUserById).patch(updateUser).delete(deleteUser); // Hard-delete or permanent administrative purge
 
 export default router;

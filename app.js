@@ -6,6 +6,9 @@ import carRouter from "./routes/carRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 import reviewRouter from "./routes/reviewRoutes.js";
 import bookingRouter from "./routes/bookingRoutes.js";
+import companyRouter from "./routes/companyRoutes.js";
+import paymentRouter from "./routes/paymentRoutes.js";
+import vehicleRouter from "./routes/vehicleRoutes.js";
 import viewRouter from "./routes/viewRoutes.js";
 
 import AppError from "./utils/appError.js";
@@ -32,6 +35,9 @@ app.use("/api/v1/cars", carRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/bookings", bookingRouter);
+app.use("/api/v1/companies", companyRouter);
+app.use("/api/v1/payments", paymentRouter);
+app.use("/api/v1/vehicles", vehicleRouter);
 
 app.all("/{*path}", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

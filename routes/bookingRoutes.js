@@ -1,36 +1,79 @@
 import express from "express";
-
-import * as bookingController from "./../controllers/bookingController.js";
-import * as authController from "./../controllers/authController.js";
+import {
+  createBooking,
+  getAllBookings,
+  getBookingById,
+  getMyBookings,
+  getCompanyBookings,
+  cancelBooking,
+  updateBookingStatus,
+  checkVehicleAvailability,
+  getCheckoutSession,
+} from "../controllers/bookingController.js";
+import {
+  protect,
+  restrictTo,
+  verifyTenantAccess,
+} from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// All booking routes require authentication
-router.use(authController.protect);
+// -----------------------------------------------------------------------------
+// GLOBAL AUTH GUARD
+// -----------------------------------------------------------------------------
+// All booking interactions require valid JWT authentication
+router.use(protect);
 
-// ── USER ROUTES (any authenticated user) ────────────────────────────────────
+// -----------------------------------------------------------------------------
+// CUSTOMER & SEARCH ROUTES
+// -----------------------------------------------------------------------------
 
-// GET  /api/v1/bookings/my-bookings   → list logged-in user's bookings
-router.get("/my-bookings", bookingController.getMyBookings);
+// Pre-booking concurrency check (validates dates against existing reservations before checkout)
+router.get("/check-availability", checkVehicleAvailability);
 
-// POST /api/v1/bookings/book          → create a booking (user auto-attached from JWT)
-router.post("/book", bookingController.createMyBooking);
+// Customer self-service: Fetch bookings made by the logged-in customer
+router.get("/my-bookings", restrictTo("customer"), getMyBookings);
 
-// GET  /api/v1/bookings/checkout-session/:carId  → get Stripe checkout session
-router.get("/checkout-session/:carId", bookingController.getCheckoutSession);
+// Create new reservation (executes atomic overlap check & server-side price calculation)
+router.post("/book", restrictTo("customer"), createBooking);
 
-// ── ADMIN ONLY ROUTES ────────────────────────────────────────────────────────
-router.use(authController.restrictTo("admin"));
+// Initialize online payment checkout session (Stripe / Local Payment Gateways)
+router.get(
+  "/checkout-session/:vehicleId",
+  restrictTo("customer"),
+  getCheckoutSession,
+);
 
-router
-  .route("/")
-  .get(bookingController.getAllBookings)   // GET  /api/v1/bookings
-  .post(bookingController.createBooking); // POST /api/v1/bookings  (admin: supply user id manually)
+// Customer or Admin cancellation route (applies cancellation business rules & refund windows)
+router.patch("/:id/cancel", verifyTenantAccess("Booking"), cancelBooking);
 
-router
-  .route("/:id")
-  .get(bookingController.getBooking)        // GET    /api/v1/bookings/:id
-  .patch(bookingController.updateBooking)   // PATCH  /api/v1/bookings/:id
-  .delete(bookingController.deleteBooking); // DELETE /api/v1/bookings/:id
+// -----------------------------------------------------------------------------
+// TENANT FLEET MANAGEMENT ROUTES (Rental Company Dashboard)
+// -----------------------------------------------------------------------------
+
+// Fetch bookings belonging strictly to the logged-in company's fleet
+router.get(
+  "/tenant/fleet-bookings",
+  restrictTo("company", "admin"),
+  getCompanyBookings,
+);
+
+// Update booking lifecycle state (CONFIRMED -> ACTIVE -> COMPLETED)
+router.patch(
+  "/:id/status",
+  restrictTo("company", "admin"),
+  verifyTenantAccess("Booking"),
+  updateBookingStatus,
+);
+
+// -----------------------------------------------------------------------------
+// ADMINISTRATIVE & GENERAL LOOKUP ROUTES
+// -----------------------------------------------------------------------------
+
+// Fetch single booking details (guarded by tenant access verification)
+router.get("/:id", verifyTenantAccess("Booking"), getBookingById);
+
+// Platform Super-Admin: Query all bookings across all marketplace companies
+router.get("/", restrictTo("admin"), getAllBookings);
 
 export default router;
