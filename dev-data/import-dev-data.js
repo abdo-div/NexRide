@@ -5,9 +5,9 @@ import User from "../models/User_model.js";
 import Car from "../models/Car_model.js";
 import Review from "../models/Review_model.js"; // Double check your file name match!
 
-dotenv.config({ path: "./config.env" });
+dotenv.config();
 
-const DB = process.env.DATABASE;
+const DB = process.env.DATABASE_URL;
 
 mongoose
   .connect(DB)
@@ -30,10 +30,21 @@ const importData = async () => {
   try {
     console.log("⏳ Uploading Users and Cars...");
     // 1. Insert Users and Cars first to generate real DB IDs
-    const createdUsers = await User.create(users, {
-      validateBeforeSave: false,
-    });
-    const createdCars = await Car.create(cars);
+    const existingUsers = await User.find();
+    const createdUsers = existingUsers.length
+      ? existingUsers
+      : await User.create(users, { validateBeforeSave: false });
+    const carsWithCoverImages = cars.map((car) => ({
+      ...car,
+      imageCover: (car.imageCover || car.images?.[0])?.replace(
+        /^car-(\d+)\.jpg$/,
+        "car$1.jpg",
+      ),
+    }));
+    const existingCars = await Car.find();
+    const createdCars = existingCars.length
+      ? existingCars
+      : await Car.create(carsWithCoverImages);
 
     console.log("🔗 Dynamically linking reviews to generated ObjectIds...");
 
