@@ -1,7 +1,7 @@
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
 import * as paymentService from "../services/paymentService.js";
-
+import { generateInvoicePDF } from "../utils/pdfGenerator.js";
 export const processPayment = catchAsync(async (req, res, next) => {
   const payment = await paymentService.executePaymentProcessing(
     req.body,
@@ -73,15 +73,23 @@ export const downloadInvoicePDF = catchAsync(async (req, res, next) => {
   const payment = req.payment;
 
   if (!payment) {
-    return next(new AppError("Payment details not found for invoice generation", 404));
+    return next(
+      new AppError("Payment details not found for invoice generation", 404)
+    );
   }
 
-  res.setHeader("Content-Type", "application/pdf");
-  res.setHeader(
-    "Content-Disposition",
-    `attachment; filename=invoice-${payment._id}.pdf`
-  );
+  // Fetch populated booking details (user, vehicle, company context)
+  const booking = await Booking.findById(payment.booking)
+    .populate("user", "name email phoneNumber")
+    .populate("vehicle", "make model licensePlate")
+    .populate("company", "name");
 
-  // Example placeholder for streaming generated PDF document
-  res.status(200).send(`Invoice PDF binary buffer for Transaction ${payment._id}`);
+  if (!booking) {
+    return next(
+      new AppError("No booking reservation associated with this payment", 404)
+    );
+  }
+
+  // Stream PDF binary response directly via PDFKit
+  generateInvoicePDF(res, booking);
 });
