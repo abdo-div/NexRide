@@ -24,22 +24,20 @@ export default class Email {
    */
   _createTransport() {
     if (process.env.NODE_ENV === "production") {
-      // Production SMTP Transporter (SendGrid, AWS SES, or custom SMTP)
       return nodemailer.createTransport({
         host: process.env.SMTP_HOST || "smtp.sendgrid.net",
         port: Number(process.env.SMTP_PORT) || 587,
-        secure: process.env.SMTP_SECURE === "true", // true for 465, false for other ports
+        secure: process.env.SMTP_SECURE === "true",
         auth: {
           user: process.env.SMTP_USERNAME,
           pass: process.env.SMTP_PASSWORD,
         },
-        pool: true, // Reuse pooled SMTP connections
+        pool: true,
         maxConnections: 5,
         maxMessages: 100,
       });
     }
 
-    // Local Development Sandbox Transporter (Mailtrap / Mailhog)
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST || "127.0.0.1",
       port: Number(process.env.EMAIL_PORT) || 1025,
@@ -100,15 +98,15 @@ export default class Email {
    * Generates specific HTML body content by template identifier
    * @private
    */
-  _renderTemplate(template) {
+  _renderTemplate(template, extraData = {}) {
     if (template === "passwordReset") {
       const content = `
         <h2 style="color:#1a1a2e;margin:0 0 16px;font-size:22px;">Password Reset Request</h2>
         <p style="color:#4a5568;line-height:1.7;margin:0 0 16px;">Hello <strong>${this.firstName}</strong>,</p>
         <p style="color:#4a5568;line-height:1.7;margin:0 0 24px;">
-          We received a request to reset the password for your NexRide account. Send a <strong>PATCH</strong> request containing your new 
+          We received a request to reset your NexRide account password. Send a <strong>PATCH</strong> request containing your new 
           <code style="background:#f0f4f8;padding:2px 6px;border-radius:4px;">password</code> and 
-          <code style="background:#f0f4f8;padding:2px 6px;border-radius:4px;">passwordConfirm</code> payload to the endpoint below:
+          <code style="background:#f0f4f8;padding:2px 6px;border-radius:4px;">passwordConfirm</code> payload to:
         </p>
         <div style="background:#f0f4f8;border-left:4px solid #e94560;border-radius:4px;padding:16px;margin:0 0 24px;word-break:break-all;">
           <p style="margin:0;font-size:13px;color:#2d3748;font-family:monospace;">${this.url}</p>
@@ -123,12 +121,32 @@ export default class Email {
       return this._getLayout("NexRide — Password Reset", content);
     }
 
+    if (template === "bookingConfirmation") {
+      const { vehicleName, startDate, endDate, totalPrice } = extraData;
+      const content = `
+        <h2 style="color:#1a1a2e;margin:0 0 16px;font-size:22px;">Booking Confirmed! 🚗</h2>
+        <p style="color:#4a5568;line-height:1.7;margin:0 0 16px;">Hello <strong>${this.firstName}</strong>,</p>
+        <p style="color:#4a5568;line-height:1.7;margin:0 0 20px;">
+          Your vehicle reservation has been successfully confirmed. Below are your booking details:
+        </p>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:20px;margin:0 0 24px;">
+          <p style="margin:0 0 8px;color:#334155;"><strong>Vehicle:</strong> ${vehicleName || "Vehicle Listing"}</p>
+          <p style="margin:0 0 8px;color:#334155;"><strong>Dates:</strong> ${startDate} to ${endDate}</p>
+          <p style="margin:0;color:#334155;"><strong>Total Charged:</strong> $${totalPrice ? totalPrice.toFixed(2) : "0.00"}</p>
+        </div>
+        <a href="${this.url}" style="display:inline-block;background:linear-gradient(135deg,#e94560,#c0392b);color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px;">
+          View Booking Details &rarr;
+        </a>
+      `;
+      return this._getLayout("Booking Confirmation — NexRide", content);
+    }
+
     // Default Welcome Template
     const content = `
       <h2 style="color:#1a1a2e;margin:0 0 16px;font-size:22px;">Welcome Aboard 🏎️</h2>
       <p style="color:#4a5568;line-height:1.7;margin:0 0 16px;">Hello <strong>${this.firstName}</strong>,</p>
       <p style="color:#4a5568;line-height:1.7;margin:0 0 24px;">
-        Welcome to NexRide. Your corporate user account has been successfully initialized. You can now access our fleet reservation portal and platform APIs.
+        Welcome to NexRide. Your account has been successfully initialized. You can now access our vehicle catalog and manage your corporate reservations.
       </p>
       <a href="${this.url}" style="display:inline-block;background:linear-gradient(135deg,#e94560,#c0392b);color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px;">
         Access Account Dashboard &rarr;
@@ -141,10 +159,11 @@ export default class Email {
    * Dispatch engine using configured transport channel
    * @param {string} template - Name of template to render
    * @param {string} subject - Email subject line
+   * @param {Object} extraData - Optional template parameters
    */
-  async send(template, subject) {
+  async send(template, subject, extraData = {}) {
     try {
-      const html = this._renderTemplate(template);
+      const html = this._renderTemplate(template, extraData);
 
       const mailOptions = {
         from: this.from,
@@ -173,6 +192,14 @@ export default class Email {
     await this.send(
       "passwordReset",
       "NexRide Security: Password Reset Request"
+    );
+  }
+
+  async sendBookingConfirmation(bookingData) {
+    await this.send(
+      "bookingConfirmation",
+      "Your NexRide Reservation Confirmation",
+      bookingData
     );
   }
 }

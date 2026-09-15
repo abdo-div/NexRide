@@ -3,9 +3,29 @@ import Booking from "../models/booking_model.js";
 import Car from "../models/car_model.js";
 import AppError from "../utils/appError.js";
 import * as factory from "./serviceFactory.js";
+import Email from "../utils/email.js";
 
 export const getAllBookings = factory.getAll(Booking);
 export const getBookingById = factory.getOne(Booking);
+
+/**
+ * Sends a transactional email notification when a booking is confirmed
+ */
+export const confirmBookingAndNotify = async (booking, user) => {
+  const bookingURL = `${process.env.CLIENT_URL || "https://nexride.com"}/my-bookings/${booking._id}`;
+
+  // Non-blocking email delivery
+  new Email(user, bookingURL)
+    .sendBookingConfirmation({
+      vehicleName: booking.car ? `${booking.car.make} ${booking.car.model}` : "Vehicle Rental",
+      startDate: new Date(booking.startDate).toLocaleDateString(),
+      endDate: new Date(booking.endDate).toLocaleDateString(),
+      totalPrice: booking.totalPrice,
+    })
+    .catch((err) => {
+      console.error("Failed to send booking confirmation email:", err.message);
+    });
+};
 
 /**
  * Validates date ranges to prevent overlapping reservations
@@ -36,7 +56,7 @@ export const checkAvailability = async (vehicleId, startDate, endDate) => {
 /**
  * Creates a customer booking with server-side price calculation & overlap safety
  */
-export const createCustomerBooking = async (userId, bookingData) => {
+export const createCustomerBooking = async (userId, bookingData, user) => {
   const { car: vehicleId, startDate, endDate } = bookingData;
 
   const availability = await checkAvailability(vehicleId, startDate, endDate);
@@ -61,6 +81,14 @@ export const createCustomerBooking = async (userId, bookingData) => {
     totalPrice,
     status: "confirmed",
   });
+
+  // Attach populated car data for the email template
+  newBooking.car = car;
+
+  // Trigger confirmation email if user context is passed
+  if (user) {
+    await confirmBookingAndNotify(newBooking, user);
+  }
 
   return newBooking;
 };
