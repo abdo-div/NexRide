@@ -39,6 +39,10 @@ const reviewSchema = new mongoose.Schema(
       required: [true, "Please provide a rating between 1 and 5"],
       min: [1, "Rating must be at least 1"],
       max: [5, "Rating cannot exceed 5"],
+      validate: {
+        validator: Number.isInteger,
+        message: "Rating must be a whole number from 1 to 5",
+      },
     },
     review: {
       type: String,
@@ -63,6 +67,29 @@ reviewSchema.index({ vehicleId: 1, customerId: 1 }, { unique: true });
 // -----------------------------------------------------------------------------
 
 // Populate customer details on find queries
+reviewSchema.pre("validate", async function (next) {
+  if (!this.isNew && !this.isModified("bookingId")) return next();
+
+  const booking = await mongoose
+    .model("Booking")
+    .findById(this.bookingId)
+    .select("bookingStatus customerId vehicleId companyId");
+
+  if (!booking) return next(new Error("A review must reference an existing booking"));
+  if (booking.bookingStatus !== "COMPLETED") {
+    return next(new Error("Only completed bookings can be reviewed"));
+  }
+  if (
+    booking.customerId.toString() !== this.customerId.toString() ||
+    booking.vehicleId.toString() !== this.vehicleId.toString() ||
+    booking.companyId.toString() !== this.companyId.toString()
+  ) {
+    return next(new Error("Review relationships must match the booking"));
+  }
+
+  next();
+});
+
 reviewSchema.pre(/^find/, function (next) {
   this.populate({
     path: "customerId",

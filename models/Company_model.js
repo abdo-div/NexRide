@@ -32,6 +32,7 @@ const companySchema = new mongoose.Schema(
     // URL-friendly slug for path-based storefronts
     slug: {
       type: String,
+      required: [true, "Company slug is required"],
       unique: true,
       lowercase: true,
       trim: true,
@@ -87,11 +88,19 @@ const companySchema = new mongoose.Schema(
       type: {
         type: String,
         enum: ["Point"],
-        default: "Point",
       },
       coordinates: {
         type: [Number], // [longitude, latitude]
-        default: [13.1913, 32.8872], // Default coordinates (Tripoli, Libya)
+        validate: {
+          validator: (value) =>
+            !value ||
+            (value.length === 2 &&
+              value[0] >= -180 &&
+              value[0] <= 180 &&
+              value[1] >= -90 &&
+              value[1] <= 90),
+          message: "Location coordinates must be [longitude, latitude]",
+        },
       },
     },
 
@@ -171,14 +180,13 @@ companySchema.virtual("activeBookingsCount", {
 // -----------------------------------------------------------------------------
 
 // 1. Pre-save Slug Generator (Transforms "Tripoli Cars" -> "tripoli-cars")
-companySchema.pre("save", function (next) {
+companySchema.pre("validate", function () {
   if (this.isModified("name")) {
     this.slug = this.name
       .toLowerCase()
       .replace(/[^\w ]+/g, "")
       .replace(/ +/g, "-");
   }
-  next();
 });
 
 // 2. Query Hook: Exclude soft-deleted companies automatically

@@ -1,51 +1,78 @@
 import express from "express";
 import reviewRouter from "./review_routes.js";
-import { restrictTo } from "../controllers/authController.js";
+import {
+  getAllVehicles,
+  getVehicleById,
+  getCompanyVehicles,
+  createVehicle,
+  updateVehicle,
+  updateVehicleStatus,
+  deleteVehicle,
+  uploadVehicleImages,
+  resizeVehicleImages,
+} from "../controllers/vehicleController.js";
+import {
+  protect,
+  restrictTo,
+  verifyTenantAccess,
+} from "../middleware/authMiddleware.js";
+
 const router = express.Router();
 
 // -----------------------------------------------------------------------------
 // NESTED ROUTE DELEGATION
 // -----------------------------------------------------------------------------
-// Redirects /api/v1/vehicles/:vehicleId/reviews directly to the Review Router
 router.use("/:vehicleId/reviews", reviewRouter);
 
+// -----------------------------------------------------------------------------
+// PUBLIC MARKETPLACE ROUTES
+// -----------------------------------------------------------------------------
 router.get("/", getAllVehicles);
-
 router.get("/:id", getVehicleById);
 
+// -----------------------------------------------------------------------------
+// AUTHENTICATED TENANT & FLEET MANAGEMENT ROUTES
+// -----------------------------------------------------------------------------
 router.use(protect);
 
 router.get(
   "/tenant/my-fleet",
   restrictTo("company", "admin"),
-  getCompanyVehicles,
+  getCompanyVehicles
 );
 
-//add new vehicle to company inventory
+// Add new vehicle to fleet with image multipart handling
+router.post(
+  "/",
+  restrictTo("company", "admin"),
+  uploadVehicleImages,
+  createVehicle
+);
 
-router.post("/", restrictTo("company", "admin"), createVehicle);
-
+// Update vehicle metadata
 router.patch(
   "/:id",
   restrictTo("company", "admin"),
   verifyTenantAccess("Vehicle"),
-  updateVehicle,
+  uploadVehicleImages,
+  resizeVehicleImages,
+  updateVehicle
 );
 
-// Dedicated endpoint for operational & listing status toggles (AVAILABLE, MAINTENANCE, PUBLISHED, etc.)
+// Operational status toggle (AVAILABLE, MAINTENANCE, PUBLISHED)
 router.patch(
   "/:id/status",
   restrictTo("company", "admin"),
   verifyTenantAccess("Vehicle"),
-  updateVehicleStatus,
+  updateVehicleStatus
 );
 
-// Soft delete vehicle (preserves historical booking integrity)
+// Soft delete vehicle listing
 router.delete(
   "/:id",
   restrictTo("company", "admin"),
   verifyTenantAccess("Vehicle"),
-  deleteVehicle,
+  deleteVehicle
 );
 
 export default router;
