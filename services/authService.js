@@ -16,7 +16,7 @@ export const signToken = (id) => {
 /**
  * Register a new user
  */
-export const registerUser = async (userData) => {
+export const registerUser = async (userData, reqHost, reqProtocol) => {
   const newUser = await User.create({
     name: userData.name,
     email: userData.email,
@@ -24,6 +24,12 @@ export const registerUser = async (userData) => {
     passwordConfirm: userData.passwordConfirm,
     phoneNumber: userData.phoneNumber,
     role: userData.role || "customer",
+  });
+
+  // Non-blocking welcome email dispatch
+  const dashboardURL = `${reqProtocol}://${reqHost}/dashboard`;
+  new Email(newUser, dashboardURL).sendWelcome().catch((err) => {
+    console.error("Non-critical background welcome email error:", err.message);
   });
 
   return newUser;

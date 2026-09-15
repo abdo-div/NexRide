@@ -28,16 +28,21 @@ export const checkVehicleAvailability = catchAsync(async (req, res, next) => {
  * Customer booking creation
  */
 export const createBooking = catchAsync(async (req, res, next) => {
-  const booking = await bookingService.createCustomerBooking(
+  // Pass req.user as the 3rd parameter to trigger email notifications
+  const newBooking = await bookingService.createCustomerBooking(
     req.user.id,
-    req.body
+    req.body,
+    req.user
   );
 
   res.status(201).json({
     status: "success",
-    data: { booking },
+    data: {
+      booking: newBooking,
+    },
   });
 });
+
 
 /**
  * Initialize Stripe payment
