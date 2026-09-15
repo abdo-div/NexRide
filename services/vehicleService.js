@@ -5,9 +5,13 @@ import APIFeatures from "../utils/APIFeatures.js";
 
 /**
  * Fetch all vehicles matching search/filter/pagination criteria
+ * Automatically enforces tenant isolation when req.tenantId is provided
  */
-export const fetchAllVehicles = async (queryParams) => {
-  const features = new APIFeatures(Vehicle.find(), queryParams)
+export const fetchAllVehicles = async (queryParams, tenantId = null) => {
+  // Inject tenant filter if request originates from a company subdomain
+  const filter = tenantId ? { company: tenantId } : {};
+
+  const features = new APIFeatures(Vehicle.find(filter), queryParams)
     .filter()
     .sort()
     .limitFields()
@@ -20,14 +24,21 @@ export const fetchAllVehicles = async (queryParams) => {
 /**
  * Fetch single vehicle by ID and populate user reviews
  */
-export const fetchVehicleById = async (vehicleId) => {
-  const vehicle = await Vehicle.findById(vehicleId).populate({
+export const fetchVehicleById = async (vehicleId, tenantId = null) => {
+  const filter = { _id: vehicleId };
+
+  // Guard against accessing another company's vehicle directly by ID via URL
+  if (tenantId) {
+    filter.company = tenantId;
+  }
+
+  const vehicle = await Vehicle.findOne(filter).populate({
     path: "reviews",
     select: "review rating user -vehicle",
   });
 
   if (!vehicle) {
-    throw new AppError("No vehicle found with that ID", 404);
+    throw new AppError("No vehicle found with that ID for this company.", 404);
   }
 
   return vehicle;
@@ -61,7 +72,7 @@ export const createVehicleListing = async (bodyData, files, tenantCompanyId) => 
     };
   }
 
-  // Attach owner company tenant ID if passed from auth session
+  // Attach owner company tenant ID if passed from auth session or request scope
   if (tenantCompanyId) {
     vehicleData.company = tenantCompanyId;
   }
