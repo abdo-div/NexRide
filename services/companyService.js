@@ -1,4 +1,4 @@
-import Company from "../models/company_model.js";
+import Company from "../models/Company_model.js";
 import AppError from "../utils/appError.js";
 import APIFeatures from "../utils/APIFeatures.js";
 
