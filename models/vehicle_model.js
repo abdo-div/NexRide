@@ -71,10 +71,11 @@ const vehicleSchema = new mongoose.Schema({
     },
     photos:{
         type:[String],
-        validate:[(val)=>val.length>0,"at least one photo is required"],
+        default:[],
+        validate:[(val)=>val.length<=20,"A vehicle cannot have more than 20 photos"],
     },
     dailyPrice:{
-        type:String,
+        type:Number,
         required:[true,"daily rental price is required in LYD"],
         min:[0,"daily rental price cannot be negative"],
         index:true,
@@ -82,7 +83,8 @@ const vehicleSchema = new mongoose.Schema({
     },
     weeklyPrice:{
         type:Number,
-        default:null
+        default:null,
+        min:[0,"weekly rental price cannot be negative"]
     },
     operationalStatus:{
         type:String,
@@ -96,7 +98,7 @@ const vehicleSchema = new mongoose.Schema({
     listingStatus:{
         type:String,
         enum:{
-          valuse:["DRAFT","PUBLISHED","SUSPENDED"],
+          values:["DRAFT","PUBLISHED","SUSPENDED"],
           message:"listing status must be DRAFT ,PUBLISHED or SUSPENDED"  
         },
         default :"PUBLISHED",
@@ -114,15 +116,39 @@ const vehicleSchema = new mongoose.Schema({
         required:[true,"specific pickup address or branch is required"],
         trim:true
     },
-    deleteAt:{
+    deletedAt:{
         type:Date,
         default:null,
         select:false
     },
-
+    ratingsAverage:{
+        type:Number,
+        default:4.5,
+        min:[1,"Average rating cannot be below 1"],
+        max:[5,"Average rating cannot exceed 5"],
+        set:(value)=>Math.round(value*10)/10
+    },
+    ratingsQuantity:{
+        type:Number,
+        default:0,
+        min:[0,"Rating count cannot be negative"]
+    },
+    location:{
+        type:{
+            type:String,
+            enum:["Point"]
+        },
+        coordinates:{
+            type:[Number],
+            validate:{
+                validator:(value)=>!value || (value.length===2 && value[0]>=-180 && value[0]<=180 && value[1]>=-90 && value[1]<=90),
+                message:"Location coordinates must be [longitude, latitude]"
+            }
+        }
+    },
 
 },{
-    timestamps:truek,
+    timestamps:true,
     toJSON:{virtuals:true},
     toObject:{virtuals:true},
     autoIndex:process.env.NODE_ENV !=="production",
@@ -139,6 +165,7 @@ vehicleSchema.index({
 });
 
 vehicleSchema.index({ companyId: 1, listingStatus: 1 });
+vehicleSchema.index({ location: "2dsphere" }, { sparse: true });
 
 // -----------------------------------------------------------------------------
 // Middleware & Hooks
@@ -146,7 +173,7 @@ vehicleSchema.index({ companyId: 1, listingStatus: 1 });
 
 // Exclude soft-deleted vehicles automatically from queries
 vehicleSchema.pre(/^find/, function (next) {
-  if (!this.getOptions().withDeleted) {
+    if (!this.getOptions().withDeleted) {
     this.where({ deletedAt: null });
   }
   next();

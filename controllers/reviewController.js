@@ -1,26 +1,26 @@
-import Review from "./../models/review_model.js";
 import catchAsync from "../utils/catchAsync.js";
-import Booking from "../models/booking_model.js";
-// 🔗 1. NESTED ROUTE PREP MIDDLEWARE
-// Automatically grabs the Car ID from the URL and User ID from the login session if missing
-export const setCarUserIds = (req, res, next) => {
-  // If the car wasn't specified in the request body, look for it in the nested URL parameters
-  if (!req.body.car) req.body.car = req.params.carId;
+import AppError from "../utils/appError.js";
+import * as reviewService from "../services/reviewService.js";
 
-  // The user ID always comes directly from the protected login session token
-  if (!req.body.user) req.body.user = req.user.id;
-
+/**
+ * Auto-injects vehicleId from nested params and customer ID from req.user
+ */
+export const setVehicleAndCustomerIds = (req, res, next) => {
+  if (!req.body.vehicle) req.body.vehicle = req.params.vehicleId;
+  if (!req.body.customer) req.body.customer = req.user.id;
   next();
 };
 
-// 📝 2. CORE CRUD CONTROLLERS
+/**
+ * Verifies customer completed a booking before posting
+ */
+export const verifyCompletedBooking = catchAsync(async (req, res, next) => {
+  await reviewService.verifyBookingCompletion(req.user.id, req.body.vehicle);
+  next();
+});
 
 export const getAllReviews = catchAsync(async (req, res, next) => {
-  let filter = {};
-
-  if (req.params.carId) filter = { car: req.params.carId };
-
-  const reviews = await Review.find(filter);
+  const reviews = await reviewService.fetchAllReviews(req.params.vehicleId);
 
   res.status(200).json({
     status: "success",
@@ -29,25 +29,8 @@ export const getAllReviews = catchAsync(async (req, res, next) => {
   });
 });
 
-export const createReview = catchAsync(async (req, res, next) => {
-  const newReview = await Review.create(req.body);
-
-  res.status(201).json({
-    status: "success",
-    data: { newReview },
-  });
-});
-// Fetch an individual single review by its personal ID
-
-export const getReview = catchAsync(async (req, res, next) => {
-  const review = await Review.findById(req.params.id);
-
-  if (!review) {
-    return res.status(404).json({
-      status: "fail",
-      message: "no review found with that id",
-    });
-  }
+export const getReviewById = catchAsync(async (req, res, next) => {
+  const review = await reviewService.fetchReviewById(req.params.id);
 
   res.status(200).json({
     status: "success",
@@ -55,20 +38,21 @@ export const getReview = catchAsync(async (req, res, next) => {
   });
 });
 
-export const updateReview = catchAsync(async (req, res, next) => {
-  const review = await Review.findById(req.params.id);
-  if (!review) {
-    return res.status(404).json({
-      status: "fail",
-      message: "no review found with that id",
-    });
-  }
-  if (review.user.toString() !== req.user.id && req.user.role !== "admin") {
-    return next(new AppError("You can only update your own reviews.", 403));
-  }
+export const createReview = catchAsync(async (req, res, next) => {
+  const newReview = await reviewService.createNewReview(req.body);
 
-  Object.assign(review, req.body);
-  await review.save();
+  res.status(201).json({
+    status: "success",
+    data: { review: newReview },
+  });
+});
+
+export const updateReview = catchAsync(async (req, res, next) => {
+  const review = await reviewService.updateCustomerReview(
+    req.params.id,
+    req.body,
+    req.user
+  );
 
   res.status(200).json({
     status: "success",
@@ -77,21 +61,35 @@ export const updateReview = catchAsync(async (req, res, next) => {
 });
 
 export const deleteReview = catchAsync(async (req, res, next) => {
-  const review = await Review.findById(req.params.id);
-  if (!review) {
-    return res.status(404).json({
-      status: "fail",
-      message: "no review found with that id",
-    });
-  }
-  if (review.user.toString() !== req.user.id && req.user.role !== "admin") {
-    return next(new AppError("You can only delete your own reviews.", 403));
-  }
-
-  await Review.findByIdAndDelete(req.params.id);
+  await reviewService.deleteCustomerReview(req.params.id, req.user);
 
   res.status(204).json({
     status: "success",
     data: null,
+  });
+});
+
+export const getCompanyReviews = catchAsync(async (req, res, next) => {
+  const companyId = req.tenantId || req.user.company;
+  const reviews = await reviewService.fetchCompanyFleetReviews(companyId);
+
+  res.status(200).json({
+    status: "success",
+    results: reviews.length,
+    data: { reviews },
+  });
+});
+
+export const addCompanyResponse = catchAsync(async (req, res, next) => {
+  const companyId = req.tenantId || req.user.company;
+  const review = await reviewService.addCompanyResponseToReview(
+    req.params.id,
+    req.body.response,
+    companyId
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: { review },
   });
 });

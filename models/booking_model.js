@@ -30,6 +30,10 @@ const bookingSchema = new mongoose.Schema(
     startDate: {
       type: Date,
       required: [true, "Pickup date is required"],
+      validate: {
+        validator: (value) => value instanceof Date && !Number.isNaN(value.getTime()),
+        message: "Pickup date must be a valid date",
+      },
     },
     endDate: {
       type: Date,
@@ -50,6 +54,7 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: [true, "Pickup location address or branch name is required"],
       trim: true,
+      maxlength: [300, "Pickup location cannot exceed 300 characters"],
     },
 
     // -------------------------------------------------------------------------
@@ -64,6 +69,10 @@ const bookingSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: [1, "Total days must be at least 1"],
+      validate: {
+        validator: Number.isInteger,
+        message: "Total days must be a whole number",
+      },
     },
     rentalPrice: {
       type: Number,
@@ -161,6 +170,7 @@ const bookingSchema = new mongoose.Schema(
 bookingSchema.index({ vehicleId: 1, startDate: 1, endDate: 1, bookingStatus: 1 });
 bookingSchema.index({ companyId: 1, bookingStatus: 1 });
 bookingSchema.index({ customerId: 1, createdAt: -1 });
+bookingSchema.index({ vehicleId: 1, startDate: 1, bookingStatus: 1 });
 
 // -----------------------------------------------------------------------------
 // Hooks & Middleware
@@ -169,12 +179,19 @@ bookingSchema.index({ customerId: 1, createdAt: -1 });
 // Server-side Financial Calculation Engine Hook
 bookingSchema.pre("validate", async function (next) {
   // Only calculate on initial creation or when dates change
-  if (!this.isNew && !this.isModified("startDate") && !this.isModified("endDate")) {
+  if (
+    !this.isNew &&
+    !this.isModified("startDate") &&
+    !this.isModified("endDate") &&
+    !this.isModified("vehicleId") &&
+    !this.isModified("companyId") &&
+    !this.isModified("discountAmount")
+  ) {
     return next();
   }
 
   try {
-    const vehicle = await mongoose.model("Vehicle").findById(this.vehicleId);
+    const vehicle = await mongoose.model("Vehicle").findById(this.vehicleId).select("dailyPrice companyId");
     if (!vehicle) {
       return next(new Error("Selected vehicle does not exist"));
     }
@@ -182,6 +199,9 @@ bookingSchema.pre("validate", async function (next) {
     const company = await mongoose.model("Company").findById(this.companyId);
     if (!company) {
       return next(new Error("Selected rental company does not exist"));
+    }
+    if (vehicle.companyId.toString() !== this.companyId.toString()) {
+      return next(new Error("Vehicle does not belong to the selected company"));
     }
 
     // 1. Snapshot vehicle daily price & company commission rate
@@ -210,7 +230,7 @@ bookingSchema.pre("validate", async function (next) {
 bookingSchema.pre(/^find/, function (next) {
   this.populate({
     path: "customerId",
-    select: "name email phone",
+    select: "name email phoneNumber",
   })
     .populate({
       path: "vehicleId",

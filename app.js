@@ -12,7 +12,9 @@ import vehicleRouter from "./routes/vehicleRoutes.js";
 import viewRouter from "./routes/viewRoutes.js";
 
 import AppError from "./utils/appError.js";
-import globalErrorHandler from "./controllers/errorController.js";
+import globalErrorHandler from "./middlewares/errorMiddleware.js";
+import { apiLimiter, authLimiter } from "./middlewares/rateLimitMiddleware.js";
+import { resolveTenant } from "./middlewares/tenantMiddleware.js";
 import cookieParser from "cookie-parser";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +31,17 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
+
+app.use("/api/v1", apiLimiter, resolveTenant);
+app.use(
+  [
+    "/api/v1/users/signup",
+    "/api/v1/users/login",
+    "/api/v1/users/forgot-password",
+    "/api/v1/users/reset-password",
+  ],
+  authLimiter,
+);
 
 app.use("/", viewRouter);
 app.use("/api/v1/cars", carRouter);

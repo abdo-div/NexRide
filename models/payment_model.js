@@ -36,11 +36,19 @@ const paymentSchema = new mongoose.Schema(
       type: String,
       default: "LYD",
       uppercase: true,
+      match: [/^[A-Z]{3}$/, "Currency must be a three-letter ISO code"],
     },
     commissionAmount: {
       type: Number,
       required: true,
       default: 0,
+    },
+    commissionRate: {
+      type: Number,
+      required: true,
+      default: 8,
+      min: [0, "Commission cannot be negative"],
+      max: [100, "Commission cannot exceed 100%"],
     },
     companyShare: {
       type: Number,
@@ -62,6 +70,7 @@ const paymentSchema = new mongoose.Schema(
     transactionId: {
       type: String,
       default: null,
+      trim: true,
       index: true,
     },
     paymentGateway: {
@@ -107,15 +116,20 @@ const paymentSchema = new mongoose.Schema(
 
 // Auto-calculate payout split before saving
 paymentSchema.pre("save", async function (next) {
-  if (this.isModified("amount") || this.isNew) {
-    const company = await mongoose.model("Company").findById(this.companyId);
-    const rate = company?.customCommissionRate ?? 8;
-
-    this.commissionAmount = Number(((this.amount * rate) / 100).toFixed(2));
+  if (this.isModified("amount") || this.isModified("companyId") || this.isNew) {
+    const company = await mongoose.model("Company").findById(this.companyId).select("customCommissionRate");
+    this.commissionRate = company?.customCommissionRate ?? 8;
+    this.commissionAmount = Number(((this.amount * this.commissionRate) / 100).toFixed(2));
     this.companyShare = Number((this.amount - this.commissionAmount).toFixed(2));
+  }
+  if (this.isModified("status")) {
+    this.paidAt = this.status === "COMPLETED" ? this.paidAt || new Date() : null;
   }
   next();
 });
+
+paymentSchema.index({ bookingId: 1, status: 1 });
+paymentSchema.index({ transactionId: 1 }, { unique: true, sparse: true });
 
 const Payment = mongoose.models.Payment || mongoose.model("Payment", paymentSchema);
 
