@@ -1,4 +1,3 @@
-import sharp from "sharp";
 import Vehicle from "../models/vehicle_model.js";
 import AppError from "../utils/appError.js";
 import APIFeatures from "../utils/APIFeatures.js";
@@ -9,7 +8,7 @@ import APIFeatures from "../utils/APIFeatures.js";
  */
 export const fetchAllVehicles = async (queryParams, tenantId = null) => {
   // Inject tenant filter if request originates from a company subdomain
-  const filter = tenantId ? { company: tenantId } : {};
+  const filter = tenantId ? { companyId: tenantId } : {};
 
   const features = new APIFeatures(Vehicle.find(filter), queryParams)
     .filter()
@@ -29,12 +28,12 @@ export const fetchVehicleById = async (vehicleId, tenantId = null) => {
 
   // Guard against accessing another company's vehicle directly by ID via URL
   if (tenantId) {
-    filter.company = tenantId;
+    filter.companyId = tenantId;
   }
 
   const vehicle = await Vehicle.findOne(filter).populate({
     path: "reviews",
-    select: "review rating user -vehicle",
+    select: "review rating customerId",
   });
 
   if (!vehicle) {
@@ -48,7 +47,7 @@ export const fetchVehicleById = async (vehicleId, tenantId = null) => {
  * Fetch fleet vehicles scoped strictly to a company tenant
  */
 export const fetchCompanyVehicles = async (companyId, queryParams) => {
-  const filter = companyId ? { company: companyId } : {};
+  const filter = companyId ? { companyId } : {};
   const features = new APIFeatures(Vehicle.find(filter), queryParams)
     .filter()
     .sort()
@@ -59,7 +58,7 @@ export const fetchCompanyVehicles = async (companyId, queryParams) => {
 };
 
 /**
- * Create a new vehicle listing with GeoJSON conversion and file processing
+ * Create a new vehicle listing
  */
 export const createVehicleListing = async (bodyData, files, tenantCompanyId) => {
   const { lng, lat, ...vehicleData } = bodyData;
@@ -72,47 +71,47 @@ export const createVehicleListing = async (bodyData, files, tenantCompanyId) => 
     };
   }
 
-  // Attach owner company tenant ID if passed from auth session or request scope
+  // Attach owner company tenant ID
   if (tenantCompanyId) {
-    vehicleData.company = tenantCompanyId;
+    vehicleData.companyId = tenantCompanyId;
   }
 
-  if (vehicleData.features && !Array.isArray(vehicleData.features)) {
-    vehicleData.features = [vehicleData.features];
-  }
-
-  vehicleData.imageCover = vehicleData.imageCover || "temp-cover.jpeg";
   const newVehicle = await Vehicle.create(vehicleData);
 
-  // File processing via sharp
-  if (files && files.imageCover) {
-    const filename = `vehicle-${newVehicle._id}-${Date.now()}-cover.jpeg`;
-    await sharp(files.imageCover[0].buffer)
-      .resize(2000, 1333)
-      .toFormat("jpeg")
-      .jpeg({ quality: 90 })
-      .toFile(`public/vehicles/${filename}`);
-
-    newVehicle.imageCover = filename;
-  }
-
-  if (files && files.images) {
-    const gallery = await Promise.all(
-      files.images.map(async (file, i) => {
-        const filename = `vehicle-${newVehicle._id}-${Date.now()}-${i + 1}.jpeg`;
-        await sharp(file.buffer)
-          .resize(2000, 1333)
-          .toFormat("jpeg")
-          .jpeg({ quality: 85 })
-          .toFile(`public/vehicles/${filename}`);
-        return filename;
-      })
-    );
-    newVehicle.images = gallery;
-  }
-
+  // File processing via sharp (if photos are uploaded)
   if (files && (files.imageCover || files.images)) {
-    await newVehicle.save({ validateBeforeSave: false });
+    const sharp = (await import("sharp")).default;
+    const photoFilenames = [];
+
+    if (files.imageCover) {
+      const filename = `vehicle-${newVehicle._id}-${Date.now()}-cover.jpeg`;
+      await sharp(files.imageCover[0].buffer)
+        .resize(2000, 1333)
+        .toFormat("jpeg")
+        .jpeg({ quality: 90 })
+        .toFile(`public/vehicles/${filename}`);
+      photoFilenames.push(filename);
+    }
+
+    if (files.images) {
+      const gallery = await Promise.all(
+        files.images.map(async (file, i) => {
+          const filename = `vehicle-${newVehicle._id}-${Date.now()}-${i + 1}.jpeg`;
+          await sharp(file.buffer)
+            .resize(2000, 1333)
+            .toFormat("jpeg")
+            .jpeg({ quality: 85 })
+            .toFile(`public/vehicles/${filename}`);
+          return filename;
+        })
+      );
+      photoFilenames.push(...gallery);
+    }
+
+    if (photoFilenames.length > 0) {
+      newVehicle.photos = photoFilenames;
+      await newVehicle.save({ validateBeforeSave: false });
+    }
   }
 
   return newVehicle;
@@ -135,19 +134,30 @@ export const updateVehicleRecord = async (vehicleId, updateData) => {
 };
 
 /**
- * Update vehicle operational/listing status
+ * Update vehicle operational or listing status
  */
-export const updateVehicleStatusById = async (vehicleId, status) => {
-  const allowedStatuses = ["AVAILABLE", "MAINTENANCE", "RENTED", "PUBLISHED", "UNPUBLISHED"];
-  if (!status || !allowedStatuses.includes(status.toUpperCase())) {
-    throw new AppError("Invalid vehicle status value provided", 400);
+export const updateVehicleStatusById = async (vehicleId, statusType, status) => {
+  const operationalStatuses = ["AVAILABLE", "MAINTENANCE", "UNAVAILABLE"];
+  const listingStatuses = ["DRAFT", "PUBLISHED", "SUSPENDED"];
+
+  const upperStatus = status ? status.toUpperCase() : "";
+
+  let updateField = {};
+  if (operationalStatuses.includes(upperStatus)) {
+    updateField = { operationalStatus: upperStatus };
+  } else if (listingStatuses.includes(upperStatus)) {
+    updateField = { listingStatus: upperStatus };
+  } else {
+    throw new AppError(
+      `Invalid vehicle status. Operational: ${operationalStatuses.join(", ")}. Listing: ${listingStatuses.join(", ")}`,
+      400,
+    );
   }
 
-  const vehicle = await Vehicle.findByIdAndUpdate(
-    vehicleId,
-    { status: status.toUpperCase() },
-    { new: true, runValidators: true }
-  );
+  const vehicle = await Vehicle.findByIdAndUpdate(vehicleId, updateField, {
+    new: true,
+    runValidators: true,
+  });
 
   if (!vehicle) {
     throw new AppError("No vehicle found with that ID", 404);
@@ -162,7 +172,7 @@ export const updateVehicleStatusById = async (vehicleId, status) => {
 export const softDeleteVehicleById = async (vehicleId) => {
   const vehicle = await Vehicle.findByIdAndUpdate(
     vehicleId,
-    { active: false, isDeleted: true },
+    { deletedAt: new Date() },
     { new: true }
   );
 

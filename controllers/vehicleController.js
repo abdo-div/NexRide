@@ -77,8 +77,22 @@ export const getVehicleById = catchAsync(async (req, res, next) => {
 });
 
 export const getCompanyVehicles = catchAsync(async (req, res, next) => {
-  const companyId = req.tenantId || req.user.company;
-  const vehicles = await vehicleService.fetchCompanyVehicles(companyId, req.query);
+  let companyId = req.tenantId || req.user.company;
+  if (!companyId && req.user?.id) {
+    const mongoose = (await import("mongoose")).default;
+    const ownedCompany = await mongoose
+      .model("Company")
+      .findOne({ ownerId: req.user.id });
+    if (ownedCompany) companyId = ownedCompany._id;
+  }
+  if (!companyId && req.query.companyId) {
+    companyId = req.query.companyId;
+  }
+
+  const vehicles = await vehicleService.fetchCompanyVehicles(
+    companyId,
+    req.query,
+  );
 
   res.status(200).json({
     status: "success",
@@ -88,11 +102,22 @@ export const getCompanyVehicles = catchAsync(async (req, res, next) => {
 });
 
 export const createVehicle = catchAsync(async (req, res, next) => {
-  const companyId = req.tenantId || req.user?.company;
+  let companyId = req.tenantId || req.user?.company;
+  if (!companyId && req.body.companyId) {
+    companyId = req.body.companyId;
+  }
+  if (!companyId && req.user?.id) {
+    const mongoose = (await import("mongoose")).default;
+    const ownedCompany = await mongoose
+      .model("Company")
+      .findOne({ ownerId: req.user.id });
+    if (ownedCompany) companyId = ownedCompany._id;
+  }
+
   const vehicle = await vehicleService.createVehicleListing(
     req.body,
     req.files,
-    companyId
+    companyId,
   );
 
   res.status(201).json({
@@ -113,6 +138,7 @@ export const updateVehicle = catchAsync(async (req, res, next) => {
 export const updateVehicleStatus = catchAsync(async (req, res, next) => {
   const vehicle = await vehicleService.updateVehicleStatusById(
     req.params.id,
+    req.body.statusType, // "operational" or "listing"
     req.body.status
   );
 

@@ -4,11 +4,15 @@ import AppError from "../utils/appError.js";
 /**
  * Global rate limiter for standard API routes
  */
+/**
+ * Global rate limiter for standard API routes
+ */
 export const apiLimiter = rateLimit({
-  max: 100, // Max requests per window
+  max: 100, // Max requests per window in production
   windowMs: 60 * 60 * 1000, // 1 hour window
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => process.env.NODE_ENV === "development",
   handler: (req, res, next) => {
     next(
       new AppError(
@@ -23,10 +27,11 @@ export const apiLimiter = rateLimit({
  * Strict rate limiter targeting sensitive authentication endpoints
  */
 export const authLimiter = rateLimit({
-  max: 10, // Max 10 login/signup attempts per hour per IP
+  max: 10, // Max 10 login/signup attempts per hour in production
   windowMs: 60 * 60 * 1000,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => process.env.NODE_ENV === "development",
   handler: (req, res, next) => {
     next(
       new AppError(

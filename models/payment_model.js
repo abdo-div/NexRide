@@ -71,7 +71,6 @@ const paymentSchema = new mongoose.Schema(
       type: String,
       default: null,
       trim: true,
-      index: true,
     },
     paymentGateway: {
       type: String,
@@ -111,26 +110,34 @@ const paymentSchema = new mongoose.Schema(
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
     autoIndex: process.env.NODE_ENV !== "production",
-  }
+  },
 );
 
 // Auto-calculate payout split before saving
-paymentSchema.pre("save", async function (next) {
+paymentSchema.pre("save", async function () {
   if (this.isModified("amount") || this.isModified("companyId") || this.isNew) {
-    const company = await mongoose.model("Company").findById(this.companyId).select("customCommissionRate");
+    const company = await mongoose
+      .model("Company")
+      .findById(this.companyId)
+      .select("customCommissionRate");
     this.commissionRate = company?.customCommissionRate ?? 8;
-    this.commissionAmount = Number(((this.amount * this.commissionRate) / 100).toFixed(2));
-    this.companyShare = Number((this.amount - this.commissionAmount).toFixed(2));
+    this.commissionAmount = Number(
+      ((this.amount * this.commissionRate) / 100).toFixed(2),
+    );
+    this.companyShare = Number(
+      (this.amount - this.commissionAmount).toFixed(2),
+    );
   }
   if (this.isModified("status")) {
-    this.paidAt = this.status === "COMPLETED" ? this.paidAt || new Date() : null;
+    this.paidAt =
+      this.status === "COMPLETED" ? this.paidAt || new Date() : null;
   }
-  next();
 });
 
 paymentSchema.index({ bookingId: 1, status: 1 });
 paymentSchema.index({ transactionId: 1 }, { unique: true, sparse: true });
 
-const Payment = mongoose.models.Payment || mongoose.model("Payment", paymentSchema);
+const Payment =
+  mongoose.models.Payment || mongoose.model("Payment", paymentSchema);
 
 export default Payment;

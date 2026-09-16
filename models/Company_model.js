@@ -1,6 +1,15 @@
 import mongoose from "mongoose";
 import validator from "validator";
 
+const RESERVED_SUBDOMAINS = [
+  "admin",
+  "api",
+  "www",
+  "app",
+  "billing",
+  "support",
+];
+
 const companySchema = new mongoose.Schema(
   {
     // -------------------------------------------------------------------------
@@ -9,7 +18,10 @@ const companySchema = new mongoose.Schema(
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: [true, "A rental company must be linked to an owner user account"],
+      required: [
+        true,
+        "A rental company must be linked to an owner user account",
+      ],
       unique: true, // Guarantees 1 user owns at most 1 company
       index: true,
     },
@@ -26,8 +38,20 @@ const companySchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/^[a-z0-9-]+$/, "Subdomain can only contain lowercase letters, numbers, and hyphens"],
+      match: [
+        /^[a-z0-9-]+$/,
+        "Subdomain can only contain lowercase letters, numbers, and hyphens",
+      ],
       index: true,
+      validate: {
+        validator: function (val) {
+          // Allows only lowercase letters, numbers, and hyphens (3-30 chars)
+          const isValidFormat = /^[a-z0-9-]{3,30}$/.test(val);
+          const isNotReserved = !RESERVED_SUBDOMAINS.includes(val);
+          return isValidFormat && isNotReserved;
+        },
+        message: "Invalid or reserved subdomain format.",
+      },
     },
     // URL-friendly slug for path-based storefronts
     slug: {
@@ -74,7 +98,10 @@ const companySchema = new mongoose.Schema(
     // -------------------------------------------------------------------------
     city: {
       type: String,
-      required: [true, "Main company city is required (e.g., Tripoli, Benghazi)"],
+      required: [
+        true,
+        "Main company city is required (e.g., Tripoli, Benghazi)",
+      ],
       trim: true,
       index: true,
     },
@@ -149,7 +176,7 @@ const companySchema = new mongoose.Schema(
     toObject: { virtuals: true },
     // Prevent automated indexing performance bottlenecks on high-volume production deployments
     autoIndex: process.env.NODE_ENV !== "production",
-  }
+  },
 );
 
 // -----------------------------------------------------------------------------
@@ -190,15 +217,14 @@ companySchema.pre("validate", function () {
 });
 
 // 2. Query Hook: Exclude soft-deleted companies automatically
-companySchema.pre(/^find/, function (next) {
+companySchema.pre(/^find/, function () {
   if (!this.getOptions().withDeleted) {
     this.where({ deletedAt: null });
   }
-  next();
 });
 
 // 3. Status Transition Timestamp Auditor
-companySchema.pre("save", function (next) {
+companySchema.pre("save", function () {
   if (this.isModified("status")) {
     if (this.status === "APPROVED" && !this.approvedAt) {
       this.approvedAt = new Date();
@@ -206,7 +232,6 @@ companySchema.pre("save", function (next) {
       this.suspendedAt = new Date();
     }
   }
-  next();
 });
 
 // -----------------------------------------------------------------------------

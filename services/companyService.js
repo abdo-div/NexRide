@@ -93,7 +93,7 @@ export const updateCompanyCommissionRate = async (companyId, commissionRate) => 
 
   const company = await Company.findByIdAndUpdate(
     companyId,
-    { commissionRate },
+    { customCommissionRate: commissionRate },
     { new: true, runValidators: true }
   );
 
@@ -126,7 +126,7 @@ export const toggleVerificationStatus = async (companyId, isVerified) => {
 export const softDeleteCompanyById = async (companyId) => {
   const company = await Company.findByIdAndUpdate(
     companyId,
-    { active: false },
+    { deletedAt: new Date(), status: "SUSPENDED" },
     { new: true }
   );
 

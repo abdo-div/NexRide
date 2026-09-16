@@ -46,6 +46,18 @@ export const protect = catchAsync(async (req, res, next) => {
 
   req.user = currentUser;
   req.tenantId = currentUser.company ? currentUser.company.toString() : null;
+
+  // If tenantId is not yet set but user is a company owner, resolve company
+  if (!req.tenantId && currentUser.role === "company") {
+    const ownedCompany = await mongoose
+      .model("Company")
+      .findOne({ ownerId: currentUser._id });
+    if (ownedCompany) {
+      req.tenantId = ownedCompany._id.toString();
+      req.user.company = ownedCompany._id;
+    }
+  }
+
   res.locals.user = currentUser;
 
   next();
@@ -93,7 +105,7 @@ export const isLoggedIn = async (req, res, next) => {
 /**
  * 4. VERIFY TENANT ACCESS: Prevents cross-tenant data leaks
  */
-export const verifyTenantAccess = (modelName, tenantKey = "company") => {
+export const verifyTenantAccess = (modelName, tenantKey = "companyId") => {
   return catchAsync(async (req, res, next) => {
     if (req.user.role === "admin") return next();
 
@@ -112,11 +124,44 @@ export const verifyTenantAccess = (modelName, tenantKey = "company") => {
       return next(new AppError(`${modelName} resource not found.`, 404));
     }
 
-    const resourceCompanyId = resource[tenantKey]
-      ? resource[tenantKey].toString()
+    // Allow customers to access their own bookings/payments (handles populated customerId)
+    if (req.user.role === "customer") {
+      const customerVal = resource.customerId || resource.customer;
+      const customerIdStr = customerVal?._id
+        ? customerVal._id.toString()
+        : customerVal
+        ? customerVal.toString()
+        : null;
+
+      if (customerIdStr && customerIdStr === req.user.id.toString()) {
+        req.resource = resource;
+        return next();
+      }
+    }
+
+    // Extract company ID from resource (handles populated object or raw ObjectId)
+    const companyVal = resource[tenantKey];
+    const resourceCompanyId = companyVal?._id
+      ? companyVal._id.toString()
+      : companyVal
+      ? companyVal.toString()
       : null;
 
-    if (!req.tenantId || resourceCompanyId !== req.tenantId) {
+    // Resolve user's company tenant ID
+    let userTenantId =
+      req.tenantId || (req.user?.company ? req.user.company.toString() : null);
+    if (!userTenantId && req.user?.id) {
+      const ownedCompany = await mongoose
+        .model("Company")
+        .findOne({ ownerId: req.user.id });
+      if (ownedCompany) {
+        userTenantId = ownedCompany._id.toString();
+        req.tenantId = userTenantId;
+        req.user.company = ownedCompany._id;
+      }
+    }
+
+    if (!userTenantId || resourceCompanyId !== userTenantId) {
       return next(
         new AppError(
           "Access Denied. You do not own this tenant resource.",

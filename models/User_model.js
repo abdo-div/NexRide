@@ -88,7 +88,7 @@ const userSchema = new mongoose.Schema(
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
     autoIndex: process.env.NODE_ENV !== "production",
-  }
+  },
 );
 
 // -----------------------------------------------------------------------------
@@ -101,27 +101,24 @@ userSchema.index({ role: 1, active: 1 });
 // -----------------------------------------------------------------------------
 
 // 1. Password Encryption Hook
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
   this.password = await bcrypt.hash(this.password, 12);
   this.passwordConfirm = undefined;
-  next();
 });
 
 // 2. Update Password Timestamp Hook
-userSchema.pre("save", function (next) {
-  if (!this.isModified("password") || this.isNew) return next();
+userSchema.pre("save", function () {
+  if (!this.isModified("password") || this.isNew) return;
 
   // Subtract 1 second to ensure JWT issued right after password change remains valid
   this.passwordChangedAt = Date.now() - 1000;
-  next();
 });
 
 // 3. Query Hook: Hide soft-deleted/inactive users automatically
-userSchema.pre(/^find/, function (next) {
+userSchema.pre(/^find/, function () {
   this.find({ active: { $ne: false } });
-  next();
 });
 
 // -----------------------------------------------------------------------------
@@ -129,14 +126,20 @@ userSchema.pre(/^find/, function (next) {
 // -----------------------------------------------------------------------------
 
 // Password Verification
-userSchema.methods.correctPassword = async function (candidatePassword, userPassword) {
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword,
+) {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
 // Check if Password Was Changed After JWT Token Issuance
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
-    const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10,
+    );
     return JWTTimestamp < changedTimestamp;
   }
   return false;

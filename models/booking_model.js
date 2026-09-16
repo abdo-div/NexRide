@@ -31,7 +31,8 @@ const bookingSchema = new mongoose.Schema(
       type: Date,
       required: [true, "Pickup date is required"],
       validate: {
-        validator: (value) => value instanceof Date && !Number.isNaN(value.getTime()),
+        validator: (value) =>
+          value instanceof Date && !Number.isNaN(value.getTime()),
         message: "Pickup date must be a valid date",
       },
     },
@@ -160,14 +161,19 @@ const bookingSchema = new mongoose.Schema(
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
     autoIndex: process.env.NODE_ENV !== "production",
-  }
+  },
 );
 
 // -----------------------------------------------------------------------------
 // Indexes for Fast Availability Lookup & Tenant Filtering
 // -----------------------------------------------------------------------------
 // Prevents overlap queries from taking up excessive DB CPU
-bookingSchema.index({ vehicleId: 1, startDate: 1, endDate: 1, bookingStatus: 1 });
+bookingSchema.index({
+  vehicleId: 1,
+  startDate: 1,
+  endDate: 1,
+  bookingStatus: 1,
+});
 bookingSchema.index({ companyId: 1, bookingStatus: 1 });
 bookingSchema.index({ customerId: 1, createdAt: -1 });
 bookingSchema.index({ vehicleId: 1, startDate: 1, bookingStatus: 1 });
@@ -177,7 +183,7 @@ bookingSchema.index({ vehicleId: 1, startDate: 1, bookingStatus: 1 });
 // -----------------------------------------------------------------------------
 
 // Server-side Financial Calculation Engine Hook
-bookingSchema.pre("validate", async function (next) {
+bookingSchema.pre("validate", async function () {
   // Only calculate on initial creation or when dates change
   if (
     !this.isNew &&
@@ -187,47 +193,48 @@ bookingSchema.pre("validate", async function (next) {
     !this.isModified("companyId") &&
     !this.isModified("discountAmount")
   ) {
-    return next();
+    return;
   }
 
-  try {
-    const vehicle = await mongoose.model("Vehicle").findById(this.vehicleId).select("dailyPrice companyId");
-    if (!vehicle) {
-      return next(new Error("Selected vehicle does not exist"));
-    }
-
-    const company = await mongoose.model("Company").findById(this.companyId);
-    if (!company) {
-      return next(new Error("Selected rental company does not exist"));
-    }
-    if (vehicle.companyId.toString() !== this.companyId.toString()) {
-      return next(new Error("Vehicle does not belong to the selected company"));
-    }
-
-    // 1. Snapshot vehicle daily price & company commission rate
-    this.dailyRate = vehicle.dailyPrice;
-    this.commissionRate = company.customCommissionRate ?? 8;
-
-    // 2. Calculate rental duration (minimum 1 day)
-    const timeDiff = Math.abs(this.endDate - this.startDate);
-    this.totalDays = Math.max(1, Math.ceil(timeDiff / (1000 * 60 * 60 * 24)));
-
-    // 3. Compute base amounts
-    this.rentalPrice = this.totalDays * this.dailyRate;
-    this.totalAmount = Math.max(0, this.rentalPrice - this.discountAmount);
-
-    // 4. Compute immutable NexRide commission & Company Payout split
-    this.commissionAmount = Number(((this.totalAmount * this.commissionRate) / 100).toFixed(2));
-    this.companyShare = Number((this.totalAmount - this.commissionAmount).toFixed(2));
-
-    next();
-  } catch (err) {
-    next(err);
+  const vehicle = await mongoose
+    .model("Vehicle")
+    .findById(this.vehicleId)
+    .select("dailyPrice companyId");
+  if (!vehicle) {
+    throw new Error("Selected vehicle does not exist");
   }
+
+  const company = await mongoose.model("Company").findById(this.companyId);
+  if (!company) {
+    throw new Error("Selected rental company does not exist");
+  }
+  if (vehicle.companyId.toString() !== this.companyId.toString()) {
+    throw new Error("Vehicle does not belong to the selected company");
+  }
+
+  // 1. Snapshot vehicle daily price & company commission rate
+  this.dailyRate = vehicle.dailyPrice;
+  this.commissionRate = company.customCommissionRate ?? 8;
+
+  // 2. Calculate rental duration (minimum 1 day)
+  const timeDiff = Math.abs(this.endDate - this.startDate);
+  this.totalDays = Math.max(1, Math.ceil(timeDiff / (1000 * 60 * 60 * 24)));
+
+  // 3. Compute base amounts
+  this.rentalPrice = this.totalDays * this.dailyRate;
+  this.totalAmount = Math.max(0, this.rentalPrice - this.discountAmount);
+
+  // 4. Compute immutable NexRide commission & Company Payout split
+  this.commissionAmount = Number(
+    ((this.totalAmount * this.commissionRate) / 100).toFixed(2),
+  );
+  this.companyShare = Number(
+    (this.totalAmount - this.commissionAmount).toFixed(2),
+  );
 });
 
 // Auto-populate query hook
-bookingSchema.pre(/^find/, function (next) {
+bookingSchema.pre(/^find/, function () {
   this.populate({
     path: "customerId",
     select: "name email phoneNumber",
@@ -240,8 +247,6 @@ bookingSchema.pre(/^find/, function (next) {
       path: "companyId",
       select: "name phone city whatsapp logo",
     });
-
-  next();
 });
 
 const Booking = mongoose.model("Booking", bookingSchema);

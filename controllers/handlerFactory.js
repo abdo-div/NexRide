@@ -17,7 +17,7 @@ export const updateOne=(Model)=>catchAsync(async(req,res,next)=>{
         req.body
     );
 
-    req.status(200).json({
+    res.status(200).json({
         status:'success',
         data:{
             data:doc
@@ -39,7 +39,7 @@ export const createOne=(Model)=>catchAsync(async(req,res,next )=>{
 
 
 export const getOne=(Model,popOptions)=>catchAsync(async(req,res,next)=>{
-    const doc=await serviceFactory.getOne(Model)(req.params.id);
+    const doc=await serviceFactory.getOne(Model, popOptions)(req.params.id);
     res.status(200).json({
         status:'success',
         data:{
@@ -50,11 +50,11 @@ export const getOne=(Model,popOptions)=>catchAsync(async(req,res,next)=>{
 
 
 export const getAll=(Model)=>catchAsync(async(req,res,next)=>{
-    const {result,data}=await serviceFactory.getAll(Model)(req.query);
+    const {results,data}=await serviceFactory.getAll(Model)(req.query);
 
     res.status(200).json({
         status:'success',
-        result,
+        results,
         data:{
             data
         }

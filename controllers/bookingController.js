@@ -78,11 +78,21 @@ export const getMyBookings = catchAsync(async (req, res, next) => {
  * Fetch tenant company bookings
  */
 export const getCompanyBookings = catchAsync(async (req, res, next) => {
-  // Uses req.tenantId or req.user.company set by tenant middleware
-  const companyId = req.tenantId || req.user.company;
+  let companyId = req.tenantId || req.user.company;
+  if (!companyId && req.user?.id) {
+    const mongoose = (await import("mongoose")).default;
+    const ownedCompany = await mongoose
+      .model("Company")
+      .findOne({ ownerId: req.user.id });
+    if (ownedCompany) companyId = ownedCompany._id;
+  }
+  if (!companyId && req.query.companyId) {
+    companyId = req.query.companyId;
+  }
+
   const bookings = await bookingService.fetchCompanyFleetBookings(
     companyId,
-    req.query
+    req.query,
   );
 
   res.status(200).json({

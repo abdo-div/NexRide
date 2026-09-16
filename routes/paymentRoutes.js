@@ -12,17 +12,17 @@ import {
   protect,
   restrictTo,
   verifyTenantAccess,
-} from "../middleware/authMiddleware.js";
+} from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 // -----------------------------------------------------------------------------
-// WEBHOOK ROUTES
+// WEBHOOK ROUTES (must be before protect middleware, no auth required)
 // -----------------------------------------------------------------------------
 router.post(
   "/webhook/stripe",
   express.raw({ type: "application/json" }),
-  handleStripeWebhook
+  handleStripeWebhook,
 );
 
 // -----------------------------------------------------------------------------
@@ -32,28 +32,31 @@ router.use(protect);
 
 router.post("/process", restrictTo("customer"), processPayment);
 
+// -----------------------------------------------------------------------------
+// TENANT & ADMIN FINANCIAL REPORTING
+// -----------------------------------------------------------------------------
+
+// IMPORTANT: static/specific routes MUST come before /:id parameterized routes
+router.get("/", restrictTo("company", "admin"), getAllPayments);
+
 router.get(
-  "/:id/invoice",
-  getPaymentById,
-  downloadInvoicePDF
+  ["/tenant/payout-summary", "/tenant/payoutSummary"],
+  restrictTo("company", "admin"),
+  getCompanyPayoutSummary,
 );
+
+// Parameterized routes come last
+router.get("/:id/invoice", getPaymentById, downloadInvoicePDF);
 
 router.get("/:id", verifyTenantAccess("Payment"), getPaymentById);
 
 // -----------------------------------------------------------------------------
-// TENANT & ADMIN FINANCIAL REPORTING
-// -----------------------------------------------------------------------------
-router.get("/", restrictTo("company", "admin"), getAllPayments);
-
-router.get(
-  "/tenant/payout-summary",
-  restrictTo("company", "admin"),
-  getCompanyPayoutSummary
-);
-
-// -----------------------------------------------------------------------------
 // PLATFORM ADMIN ONLY ROUTES
 // -----------------------------------------------------------------------------
-router.patch("/:id/settle-payout", restrictTo("admin"), settleCompanyPayout);
+router.patch(
+  ["/:id/settle-payout", "/:id/settlePayout"],
+  restrictTo("admin"),
+  settleCompanyPayout,
+);
 
 export default router;

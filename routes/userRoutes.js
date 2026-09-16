@@ -3,14 +3,11 @@ import {
   signup,
   login,
   logout,
-  refreshToken,
-  verifyEmail,
   forgotPassword,
   resetPassword,
   updatePassword,
-  protect,
-  restrictTo,
 } from "../controllers/authController.js";
+import { protect, restrictTo } from "../middlewares/authMiddleware.js";
 import {
   getMe,
   getUserById,
@@ -32,11 +29,11 @@ const router = express.Router();
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/logout", logout);
-router.post("/refresh-token", refreshToken);
 
-router.get("/verify-email/:token", verifyEmail);
 router.post("/forgot-password", forgotPassword);
+router.post("/forgotPassword", forgotPassword);
 router.patch("/reset-password/:token", resetPassword);
+router.patch("/resetPassword/:token", resetPassword);
 
 // -----------------------------------------------------------------------------
 // PROTECTED USER SELF-SERVICE ROUTES (Authenticated Users)
@@ -44,26 +41,23 @@ router.patch("/reset-password/:token", resetPassword);
 router.use(protect);
 
 router.patch("/update-my-password", updatePassword);
+router.patch("/updateMyPassword", updatePassword);
+router.patch("/updatePassword", updatePassword);
 router.get("/me", getMe, getUserById);
 router.patch("/update-me", uploadUserPhoto, resizeUserPhoto, updateMe);
+router.patch("/updateMe", uploadUserPhoto, resizeUserPhoto, updateMe);
 router.delete("/delete-me", deleteMe);
+router.delete("/deleteMe", deleteMe);
 
 // -----------------------------------------------------------------------------
 // PLATFORM ADMIN & GOVERNANCE ROUTES (Super-Admin Portal)
 // -----------------------------------------------------------------------------
 router.use(restrictTo("admin"));
 
-router
-  .route("/")
-  .get(getAllUsers)
-  .post(signup);
+router.route("/").get(getAllUsers).post(signup);
 
 router.patch("/:id/status", updateUserStatus);
 
-router
-  .route("/:id")
-  .get(getUserById)
-  .patch(updateUser)
-  .delete(deleteUser);
+router.route("/:id").get(getUserById).patch(updateUser).delete(deleteUser);
 
 export default router;
