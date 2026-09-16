@@ -1,5 +1,5 @@
 import express from "express";
-import reviewRouter from "./review_routes.js";
+import reviewRouter from "./reviewRoutes.js";
 import {
   getAllVehicles,
   getVehicleById,
@@ -15,7 +15,7 @@ import {
   protect,
   restrictTo,
   verifyTenantAccess,
-} from "../middleware/authMiddleware.js";
+} from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -26,6 +26,7 @@ router.use("/:vehicleId/reviews", reviewRouter);
 
 // -----------------------------------------------------------------------------
 // PUBLIC MARKETPLACE ROUTES
+// NOTE: Static routes MUST come before parameterized /:id routes
 // -----------------------------------------------------------------------------
 router.get("/", getAllVehicles);
 router.get("/:id", getVehicleById);
@@ -35,10 +36,11 @@ router.get("/:id", getVehicleById);
 // -----------------------------------------------------------------------------
 router.use(protect);
 
+// Static fleet management route — must be declared before any other /:id routes under protect
 router.get(
-  "/tenant/my-fleet",
+  ["/tenant/my-fleet", "/tenant/myFleet"],
   restrictTo("company", "admin"),
-  getCompanyVehicles
+  getCompanyVehicles,
 );
 
 // Add new vehicle to fleet with image multipart handling
@@ -46,7 +48,7 @@ router.post(
   "/",
   restrictTo("company", "admin"),
   uploadVehicleImages,
-  createVehicle
+  createVehicle,
 );
 
 // Update vehicle metadata
@@ -56,15 +58,15 @@ router.patch(
   verifyTenantAccess("Vehicle"),
   uploadVehicleImages,
   resizeVehicleImages,
-  updateVehicle
+  updateVehicle,
 );
 
-// Operational status toggle (AVAILABLE, MAINTENANCE, PUBLISHED)
+// Operational status toggle (AVAILABLE, MAINTENANCE, PUBLISHED, SUSPENDED, etc.)
 router.patch(
   "/:id/status",
   restrictTo("company", "admin"),
   verifyTenantAccess("Vehicle"),
-  updateVehicleStatus
+  updateVehicleStatus,
 );
 
 // Soft delete vehicle listing
@@ -72,7 +74,7 @@ router.delete(
   "/:id",
   restrictTo("company", "admin"),
   verifyTenantAccess("Vehicle"),
-  deleteVehicle
+  deleteVehicle,
 );
 
 export default router;

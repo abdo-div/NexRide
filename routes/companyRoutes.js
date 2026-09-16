@@ -9,8 +9,8 @@ import {
   toggleCompanyVerification,
   deleteCompany,
 } from "../controllers/companyController.js";
-import { protect, restrictTo } from "../middleware/authMiddleware.js";
-import { validateSubdomain } from "../middleware/subdomainValidator.js";
+import { protect, restrictTo } from "../middlewares/authMiddleware.js";
+import { validateSubdomain } from "../middlewares/subdomainValidator.js";
 
 const router = express.Router();
 
@@ -30,14 +30,14 @@ router.post(
   "/",
   restrictTo("company", "admin"),
   validateSubdomain,
-  createCompany
+  createCompany,
 );
 
 router.patch(
-  "/update-my-company",
+  ["/update-my-company", "/updateMyCompany"],
   restrictTo("company"),
   validateSubdomain,
-  updateMyCompany
+  updateMyCompany,
 );
 
 // -----------------------------------------------------------------------------

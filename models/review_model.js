@@ -8,7 +8,10 @@ const reviewSchema = new mongoose.Schema(
     bookingId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Booking",
-      required: [true, "A review must be linked to a verified completed booking"],
+      required: [
+        true,
+        "A review must be linked to a verified completed booking",
+      ],
       unique: true, // Guarantees 1 review per completed booking
       index: true,
     },
@@ -56,7 +59,7 @@ const reviewSchema = new mongoose.Schema(
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
     autoIndex: process.env.NODE_ENV !== "production",
-  }
+  },
 );
 
 // Prevent duplicate reviews: Ensure a customer can only review a specific vehicle once per user account
@@ -67,35 +70,52 @@ reviewSchema.index({ vehicleId: 1, customerId: 1 }, { unique: true });
 // -----------------------------------------------------------------------------
 
 // Populate customer details on find queries
-reviewSchema.pre("validate", async function (next) {
-  if (!this.isNew && !this.isModified("bookingId")) return next();
+reviewSchema.pre("validate", async function () {
+  if (!this.isNew && !this.isModified("bookingId")) return;
 
   const booking = await mongoose
     .model("Booking")
-    .findById(this.bookingId)
-    .select("bookingStatus customerId vehicleId companyId");
+    .findById(this.bookingId);
 
-  if (!booking) return next(new Error("A review must reference an existing booking"));
+  if (!booking) throw new Error("A review must reference an existing booking");
   if (booking.bookingStatus !== "COMPLETED") {
-    return next(new Error("Only completed bookings can be reviewed"));
-  }
-  if (
-    booking.customerId.toString() !== this.customerId.toString() ||
-    booking.vehicleId.toString() !== this.vehicleId.toString() ||
-    booking.companyId.toString() !== this.companyId.toString()
-  ) {
-    return next(new Error("Review relationships must match the booking"));
+    throw new Error("Only completed bookings can be reviewed");
   }
 
-  next();
+  const bookingCustId = booking.customerId?._id
+    ? booking.customerId._id.toString()
+    : booking.customerId?.toString();
+  const bookingVehId = booking.vehicleId?._id
+    ? booking.vehicleId._id.toString()
+    : booking.vehicleId?.toString();
+  const bookingCompId = booking.companyId?._id
+    ? booking.companyId._id.toString()
+    : booking.companyId?.toString();
+
+  const thisCustId = this.customerId?._id
+    ? this.customerId._id.toString()
+    : this.customerId?.toString();
+  const thisVehId = this.vehicleId?._id
+    ? this.vehicleId._id.toString()
+    : this.vehicleId?.toString();
+  const thisCompId = this.companyId?._id
+    ? this.companyId._id.toString()
+    : this.companyId?.toString();
+
+  if (
+    bookingCustId !== thisCustId ||
+    bookingVehId !== thisVehId ||
+    bookingCompId !== thisCompId
+  ) {
+    throw new Error("Review relationships must match the booking");
+  }
 });
 
-reviewSchema.pre(/^find/, function (next) {
+reviewSchema.pre(/^find/, function () {
   this.populate({
     path: "customerId",
     select: "name photo",
   });
-  next();
 });
 
 // -----------------------------------------------------------------------------
@@ -129,15 +149,14 @@ reviewSchema.statics.calcAverageRatings = async function (vehicleId) {
 
 // Recalculate ratings after saving a new review
 reviewSchema.post("save", function () {
-  this.constructor.calcAverageRatings(this.vehicleId).catch((err) =>
-    console.error("Failed to update vehicle ratings:", err)
-  );
+  this.constructor
+    .calcAverageRatings(this.vehicleId)
+    .catch((err) => console.error("Failed to update vehicle ratings:", err));
 });
 
 // Recalculate ratings when a review is updated or deleted
-reviewSchema.pre(/^findOneAnd/, async function (next) {
+reviewSchema.pre(/^findOneAnd/, async function () {
   this.r = await this.clone().findOne();
-  next();
 });
 
 reviewSchema.post(/^findOneAnd/, async function () {

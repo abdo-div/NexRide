@@ -6,13 +6,15 @@ import Vehicle from "../models/vehicle_model.js";
 import AppError from "../utils/appError.js";
 import APIFeatures from "../utils/APIFeatures.js";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY)
+  : null;
 
 /**
  * Execute payment intent inside a Mongoose ACID Transaction
  */
 export const executePaymentProcessing = async (paymentData, customerId) => {
-  const { bookingId, paymentMethodId } = paymentData;
+  const { bookingId, paymentMethod } = paymentData;
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -23,45 +25,39 @@ export const executePaymentProcessing = async (paymentData, customerId) => {
       throw new AppError("No booking found with that ID", 404);
     }
 
-    if (booking.status !== "pending") {
-      throw new AppError("This booking has already been processed or cancelled", 400);
+    if (booking.bookingStatus !== "PENDING_PAYMENT") {
+      throw new AppError(
+        "This booking has already been processed or cancelled",
+        400,
+      );
     }
-
-    // Process payment via Stripe
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(booking.totalPrice * 100), // convert to cents
-      currency: "usd",
-      payment_method: paymentMethodId,
-      confirm: true,
-      automatic_payment_methods: { enabled: true, allow_redirects: "never" },
-      metadata: { bookingId: booking._id.toString(), customerId },
-    });
 
     // Create payment ledger record
     const payment = await Payment.create(
       [
         {
-          booking: booking._id,
-          customer: customerId,
-          company: booking.company,
-          amount: booking.totalPrice,
-          paymentIntentId: paymentIntent.id,
-          status: paymentIntent.status === "succeeded" ? "completed" : "pending",
-          payoutStatus: "unsettled",
+          bookingId: booking._id,
+          customerId,
+          companyId: booking.companyId,
+          amount: booking.totalAmount,
+          paymentMethod: paymentMethod || "CASH_ON_DELIVERY",
+          status: "COMPLETED",
+          payoutStatus: "UNSETTLED",
+          paidAt: new Date(),
         },
       ],
-      { session }
+      { session },
     );
 
-    // Atomically update Booking & Vehicle status
-    booking.status = "confirmed";
-    booking.paymentStatus = "paid";
-    await booking.save({ session });
+    // Atomically update Booking status
+    booking.bookingStatus = "PAID";
+    booking.paymentStatus = "PAID";
+    await booking.save({ session, validateBeforeSave: false });
 
     await Vehicle.findByIdAndUpdate(
-      booking.vehicle,
-      { isAvailable: false },
-      { session }
+      booking.vehicleId,
+      { operationalStatus: "UNAVAILABLE" },
+      { session },
     );
 
     await session.commitTransaction();
@@ -80,9 +76,9 @@ export const executePaymentProcessing = async (paymentData, customerId) => {
  */
 export const fetchPaymentById = async (paymentId) => {
   const payment = await Payment.findById(paymentId)
-    .populate("customer", "name email")
-    .populate("booking")
-    .populate("company", "name");
+    .populate("customerId", "name email")
+    .populate("bookingId")
+    .populate("companyId", "name");
 
   if (!payment) {
     throw new AppError("No payment record found with that ID", 404);
@@ -99,7 +95,7 @@ export const fetchAllPayments = async (queryParams, user) => {
 
   // If role is company, restrict strictly to their own revenue ledger
   if (user.role === "company") {
-    filter.company = user.company;
+    filter.companyId = user.company;
   }
 
   const features = new APIFeatures(Payment.find(filter), queryParams)
@@ -115,10 +111,12 @@ export const fetchAllPayments = async (queryParams, user) => {
  * Calculate company payout summary & platform splits
  */
 export const calculateCompanyPayoutSummary = async (companyId) => {
-  const matchQuery = companyId ? { company: new mongoose.Types.ObjectId(companyId) } : {};
+  const matchQuery = companyId
+    ? { companyId: new mongoose.Types.ObjectId(companyId) }
+    : {};
 
   const stats = await Payment.aggregate([
-    { $match: { ...matchQuery, status: "completed" } },
+    { $match: { ...matchQuery, status: "COMPLETED" } },
     {
       $group: {
         _id: "$payoutStatus",
@@ -134,8 +132,8 @@ export const calculateCompanyPayoutSummary = async (companyId) => {
 
   stats.forEach((stat) => {
     totalRevenue += stat.totalAmount;
-    if (stat._id === "unsettled") pendingPayouts = stat.totalAmount;
-    if (stat._id === "settled") settledPayouts = stat.totalAmount;
+    if (stat._id === "UNSETTLED") pendingPayouts = stat.totalAmount;
+    if (stat._id === "SETTLED") settledPayouts = stat.totalAmount;
   });
 
   return {
@@ -154,10 +152,10 @@ export const settlePaymentPayout = async (paymentId) => {
   const payment = await Payment.findByIdAndUpdate(
     paymentId,
     {
-      payoutStatus: "settled",
-      settledAt: new Date(),
+      payoutStatus: "SETTLED",
+      payoutSettledAt: new Date(),
     },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   );
 
   if (!payment) {
@@ -171,24 +169,34 @@ export const settlePaymentPayout = async (paymentId) => {
  * Process raw Stripe webhook signatures
  */
 export const processStripeWebhookEvent = async (rawBody, signature) => {
+  if (!stripe) {
+    throw new AppError(
+      "Payment processing is not configured. Add STRIPE_SECRET_KEY.",
+      500,
+    );
+  }
+
   let event;
 
   try {
     event = stripe.webhooks.constructEvent(
       rawBody,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET
+      process.env.STRIPE_WEBHOOK_SECRET,
     );
   } catch (err) {
-    throw new AppError(`Webhook Signature Verification Failed: ${err.message}`, 400);
+    throw new AppError(
+      `Webhook Signature Verification Failed: ${err.message}`,
+      400,
+    );
   }
 
   if (event.type === "payment_intent.succeeded") {
     const paymentIntent = event.data.object;
 
     await Payment.findOneAndUpdate(
-      { paymentIntentId: paymentIntent.id },
-      { status: "completed" }
+      { transactionId: paymentIntent.id },
+      { status: "COMPLETED" },
     );
   }
 

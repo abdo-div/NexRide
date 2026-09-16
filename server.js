@@ -1,20 +1,27 @@
-import mongoose from "mongoose";
+import dns from "node:dns";
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
+
 import dotenv from "dotenv";
-import app from "./app.js";
+dotenv.config({ path: "./config.env" });
 
-dotenv.config();
+const { default: app } = await import("./app.js");
+const { default: connectDB } = await import("./config/db.js");
+await import("./config/redis.js");
+const { default: logger } = await import("./utils/logger.js");
 
-const DB = process.env.DATABASE_URL;
+// Connect to Database
+connectDB();
 
-mongoose
-  .connect(DB)
-  .then(async () => {
-    console.log("DB connection successful! 🎉");
-  })
-  .catch((err) => console.error("💥 DB connection error:", err.message));
+const PORT = process.env.PORT || 5000;
+const server = app.listen(PORT, () => {
+  logger.success(
+    `NexRide API running in ${process.env.NODE_ENV} mode on port ${PORT} 🚀`,
+  );
+});
 
-const port = process.env.PORT || 3000;
-
-app.listen(port, () => {
-  console.log(`Application is running smoothly on port ${port}... 🚀`);
+process.on("unhandledRejection", (err) => {
+  logger.error(`UNHANDLED REJECTION! 💥 Shutting down... ${err.message}`);
+  server.close(() => {
+    process.exit(1);
+  });
 });

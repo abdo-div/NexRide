@@ -18,16 +18,40 @@ export const generateInvoicePDF = (res, booking) => {
   // Pipe PDF stream directly into response output
   doc.pipe(res);
 
+  const companyName =
+    booking.company?.name || booking.companyId?.name || "NexRide Marketplace";
+  const customerName =
+    booking.user?.name || booking.customerId?.name || "Customer";
+  const customerEmail =
+    booking.user?.email || booking.customerId?.email || "N/A";
+  const customerPhone =
+    booking.user?.phoneNumber || booking.customerId?.phoneNumber || "N/A";
+  const vehicleMake =
+    booking.vehicle?.make || booking.vehicleId?.make || "Rental";
+  const vehicleModel =
+    booking.vehicle?.model || booking.vehicleId?.model || "Vehicle";
+  const startDateStr = booking.startDate
+    ? new Date(booking.startDate).toLocaleDateString()
+    : "N/A";
+  const endDateStr = booking.endDate
+    ? new Date(booking.endDate).toLocaleDateString()
+    : "N/A";
+  const totalAmount = booking.totalAmount ?? booking.totalPrice ?? 0;
+
   // --- HEADER SECTION ---
   doc
     .fillColor("#1e293b")
     .fontSize(22)
-    .text(booking.company?.name || "NexRide Marketplace", 50, 45)
+    .text(companyName, 50, 45)
     .fontSize(10)
     .fillColor("#64748b")
     .text("Official Rental Invoice & Receipt", 50, 75)
     .text(`Invoice ID: ${booking._id}`, 50, 90)
-    .text(`Date: ${new Date(booking.createdAt || Date.now()).toLocaleDateString()}`, 50, 105)
+    .text(
+      `Date: ${new Date(booking.createdAt || Date.now()).toLocaleDateString()}`,
+      50,
+      105,
+    )
     .moveDown();
 
   // Divider Line
@@ -45,9 +69,9 @@ export const generateInvoicePDF = (res, booking) => {
     .text("Customer Details:", 50, 140)
     .fontSize(10)
     .fillColor("#475569")
-    .text(`Name: ${booking.user?.name || "N/A"}`, 50, 160)
-    .text(`Email: ${booking.user?.email || "N/A"}`, 50, 175)
-    .text(`Phone: ${booking.user?.phoneNumber || "N/A"}`, 50, 190);
+    .text(`Name: ${customerName}`, 50, 160)
+    .text(`Email: ${customerEmail}`, 50, 175)
+    .text(`Phone: ${customerPhone}`, 50, 190);
 
   doc
     .fontSize(12)
@@ -55,16 +79,17 @@ export const generateInvoicePDF = (res, booking) => {
     .text("Vehicle Info:", 300, 140)
     .fontSize(10)
     .fillColor("#475569")
-    .text(`Vehicle: ${booking.vehicle?.make || ""} ${booking.vehicle?.model || "Car Rental"}`, 300, 160)
-    .text(`License Plate: ${booking.vehicle?.licensePlate || "N/A"}`, 300, 175)
-    .text(`Duration: ${booking.startDate} to ${booking.endDate}`, 300, 190);
+    .text(`Vehicle: ${vehicleMake} ${vehicleModel}`, 300, 160)
+    .text(
+      `Pickup Location: ${booking.pickupLocation || "Branch Pickup"}`,
+      300,
+      175,
+    )
+    .text(`Duration: ${startDateStr} to ${endDateStr}`, 300, 190);
 
   // --- SUMMARY TABLE ---
   const tableTop = 230;
-  doc
-    .fillColor("#f1f5f9")
-    .rect(50, tableTop, 495, 25)
-    .fill();
+  doc.fillColor("#f1f5f9").rect(50, tableTop, 495, 25).fill();
 
   doc
     .fillColor("#0f172a")
@@ -74,8 +99,12 @@ export const generateInvoicePDF = (res, booking) => {
 
   doc
     .fillColor("#334155")
-    .text(`Vehicle Rental Reservation (${booking.totalDays || 1} Days)`, 60, tableTop + 35)
-    .text(`$${booking.totalPrice?.toFixed(2) || "0.00"}`, 450, tableTop + 35, {
+    .text(
+      `Vehicle Rental Reservation (${booking.totalDays || 1} Days)`,
+      60,
+      tableTop + 35,
+    )
+    .text(`$${Number(totalAmount).toFixed(2)}`, 450, tableTop + 35, {
       width: 90,
       align: "right",
     });

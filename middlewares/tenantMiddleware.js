@@ -22,7 +22,11 @@ export const resolveTenant = catchAsync(async (req, res, next) => {
   const subdomain = hostParts[0].toLowerCase();
 
   // Search DB for company matching subdomain
-  const company = await Company.findOne({ subdomain, active: true });
+  const company = await Company.findOne({
+    subdomain,
+    deletedAt: null,
+    status: "APPROVED",
+  });
 
   if (!company) {
     return next(

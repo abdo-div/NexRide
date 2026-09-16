@@ -2,6 +2,8 @@ import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
 import * as paymentService from "../services/paymentService.js";
 import { generateInvoicePDF } from "../utils/pdfGenerator.js";
+import Booking from "../models/booking_model.js";
+
 export const processPayment = catchAsync(async (req, res, next) => {
   const payment = await paymentService.executePaymentProcessing(
     req.body,
@@ -20,8 +22,8 @@ export const getPaymentById = catchAsync(async (req, res, next) => {
   // Attach to req object for downstream middleware (e.g., downloadInvoicePDF)
   req.payment = payment;
 
-  // If called directly via endpoint GET /:id
-  if (!req.route.path.includes("invoice")) {
+  // If called directly via endpoint GET /:id (not chained from invoice route)
+  if (!req.route || !req.route.path.includes("invoice")) {
     return res.status(200).json({
       status: "success",
       data: { payment },
@@ -42,7 +44,10 @@ export const getAllPayments = catchAsync(async (req, res, next) => {
 });
 
 export const getCompanyPayoutSummary = catchAsync(async (req, res, next) => {
-  const companyId = req.user.role === "company" ? (req.tenantId || req.user.company) : req.query.companyId;
+  const companyId =
+    req.user.role === "company"
+      ? req.tenantId || req.user.company
+      : req.query.companyId;
 
   const summary = await paymentService.calculateCompanyPayoutSummary(companyId);
 
@@ -79,10 +84,10 @@ export const downloadInvoicePDF = catchAsync(async (req, res, next) => {
   }
 
   // Fetch populated booking details (user, vehicle, company context)
-  const booking = await Booking.findById(payment.booking)
-    .populate("user", "name email phoneNumber")
-    .populate("vehicle", "make model licensePlate")
-    .populate("company", "name");
+  const booking = await Booking.findById(payment.bookingId)
+    .populate("customerId", "name email phoneNumber")
+    .populate("vehicleId", "make model")
+    .populate("companyId", "name");
 
   if (!booking) {
     return next(

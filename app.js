@@ -1,8 +1,7 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-
-import carRouter from "./routes/carRoutes.js";
+import morgan from "morgan";
 import userRouter from "./routes/userRoutes.js";
 import reviewRouter from "./routes/reviewRoutes.js";
 import bookingRouter from "./routes/bookingRoutes.js";
@@ -17,7 +16,6 @@ import { apiLimiter, authLimiter } from "./middlewares/rateLimitMiddleware.js";
 import { resolveTenant } from "./middlewares/tenantMiddleware.js";
 import cookieParser from "cookie-parser";
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -25,7 +23,9 @@ const app = express();
 
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
-
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
 // Serving static files
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -45,7 +45,7 @@ app.use(
 );
 
 app.use("/", viewRouter);
-app.use("/api/v1/cars", carRouter);
+app.use("/api/v1/cars", vehicleRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/bookings", bookingRouter);

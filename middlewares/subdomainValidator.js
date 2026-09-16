@@ -1,5 +1,5 @@
 import AppError from "../utils/appError.js";
-
+import Company from "../models/Company_model.js";
 // System reserved subdomains and platform paths that cannot be claimed by tenants
 const RESERVED_SUBDOMAINS = new Set([
   "admin",
@@ -53,8 +53,8 @@ export const validateSubdomain = (req, res, next) => {
     return next(
       new AppError(
         "Subdomain must be between 3 and 30 characters in length.",
-        400
-      )
+        400,
+      ),
     );
   }
 
@@ -64,8 +64,8 @@ export const validateSubdomain = (req, res, next) => {
     return next(
       new AppError(
         "Invalid subdomain format. Use lowercase letters, numbers, and single hyphens only (e.g., 'tripoli-rentals').",
-        400
-      )
+        400,
+      ),
     );
   }
 
@@ -74,8 +74,8 @@ export const validateSubdomain = (req, res, next) => {
     return next(
       new AppError(
         `The subdomain '${formattedSubdomain}' is reserved for platform operations and cannot be used.`,
-        400
-      )
+        400,
+      ),
     );
   }
 

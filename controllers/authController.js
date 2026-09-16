@@ -26,7 +26,11 @@ const createSendToken = (user, statusCode, req, res) => {
 };
 
 export const signup = catchAsync(async (req, res, next) => {
-  const newUser = await authService.registerUser(req.body);
+  const newUser = await authService.registerUser(
+    req.body,
+    req.get("host"),
+    req.protocol
+  );
   createSendToken(newUser, 201, req, res);
 });
 
