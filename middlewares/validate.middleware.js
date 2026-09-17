@@ -1,17 +1,16 @@
-import { Query } from "mongoose";
 import { ZodError } from "zod";
 
-export const validate = (schema) => async (req, resizeBy, next) => {
+export const validate = (schema) => async (req, res, next) => {
   try {
-    const parsed = await schema.parseAcync({
+    const parsed = await schema.parseAsync({
       body: req.body,
       query: req.query,
       params: req.params,
     });
     // Assign validated and sanitized data back to request
-    req.body = parsed.body;
-    req.query = parsed.query;
-    req.params = parsed.params;
+    req.body = parsed.body ?? req.body;
+    req.query = parsed.query ?? req.query;
+    req.params = parsed.params ?? req.params;
     next();
   } catch (error) {
     if (error instanceof ZodError) {
@@ -22,10 +21,11 @@ export const validate = (schema) => async (req, resizeBy, next) => {
 
       return res.status(400).json({
         status: "fail",
-        message: "invalid request data",
+        message: "Invalid request data",
         errors: formattedErrors,
       });
     }
     next(error);
   }
 };
+

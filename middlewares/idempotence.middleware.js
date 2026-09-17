@@ -1,4 +1,4 @@
-import { redisClient } from "../config/redis.config.js";
+import { redisClient } from "../config/redis.js";
 
 /**
  * Ensures repeated API requests with the same Idempotency-Key header return identical responses without re-executing business logic.

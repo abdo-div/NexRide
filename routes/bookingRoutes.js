@@ -15,6 +15,8 @@ import {
   restrictTo,
   verifyTenantAccess,
 } from "../middlewares/authMiddleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import { createBookingSchema } from "../validations/booking.validation.js";
 
 const router = express.Router();
 
@@ -42,7 +44,7 @@ router.get(
 );
 
 // Create new reservation (executes atomic overlap check & server-side price calculation)
-router.post(["/", "/book"], restrictTo("customer"), createBooking);
+router.post(["/", "/book"], restrictTo("customer"), validate(createBookingSchema), createBooking);
 
 // Initialize online payment checkout session (Stripe / Local Payment Gateways)
 router.get(

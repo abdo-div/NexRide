@@ -1,4 +1,4 @@
-import { redisClient } from "../config/redis.config.js";
+import { redisClient } from "../config/redis.js";
 
 /**
  * Tenant Subdomain Resolution Cache (1 Hour TTL)

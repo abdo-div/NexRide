@@ -1,8 +1,9 @@
 import { Queue } from "bullmq";
-import { redisClient } from "../config/redis.config.js";
+import { bullmqConnection } from "../config/redis.js";
 
 export const emailQueue = new Queue("email-queue", {
-  connection: redisClient,
+  connection: bullmqConnection,
+  prefix: "nexride",
   defaultJobOptions: {
     attempts: 5,
     backoff: {
