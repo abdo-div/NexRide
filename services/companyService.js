@@ -121,6 +121,23 @@ export const toggleVerificationStatus = async (companyId, isVerified) => {
 };
 
 /**
+ * Update company status (PENDING -> APPROVED / SUSPENDED / REJECTED, Platform Admin)
+ * Uses document.save() so the pre-save hook stamps approvedAt / suspendedAt.
+ */
+export const updateCompanyStatus = async (companyId, status) => {
+  const company = await Company.findById(companyId);
+
+  if (!company) {
+    throw new AppError("No company found with that ID", 404);
+  }
+
+  company.status = status;
+  await company.save({ validateBeforeSave: false });
+
+  return company;
+};
+
+/**
  * Soft delete company profile (Platform Admin)
  */
 export const softDeleteCompanyById = async (companyId) => {

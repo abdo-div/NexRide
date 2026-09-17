@@ -16,6 +16,13 @@ import {
   restrictTo,
   verifyTenantAccess,
 } from "../middlewares/authMiddleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import {
+  createVehicleSchema,
+  updateVehicleSchema,
+  updateVehicleStatusSchema,
+  vehicleIdParamSchema,
+} from "../validations/vehicle.validation.js";
 
 const router = express.Router();
 
@@ -29,7 +36,7 @@ router.use("/:vehicleId/reviews", reviewRouter);
 // NOTE: Static routes MUST come before parameterized /:id routes
 // -----------------------------------------------------------------------------
 router.get("/", getAllVehicles);
-router.get("/:id", getVehicleById);
+router.get("/:id", validate(vehicleIdParamSchema), getVehicleById);
 
 // -----------------------------------------------------------------------------
 // AUTHENTICATED TENANT & FLEET MANAGEMENT ROUTES
@@ -48,6 +55,7 @@ router.post(
   "/",
   restrictTo("company", "admin"),
   uploadVehicleImages,
+  validate(createVehicleSchema),
   createVehicle,
 );
 
@@ -58,6 +66,7 @@ router.patch(
   verifyTenantAccess("Vehicle"),
   uploadVehicleImages,
   resizeVehicleImages,
+  validate(updateVehicleSchema),
   updateVehicle,
 );
 
@@ -66,6 +75,7 @@ router.patch(
   "/:id/status",
   restrictTo("company", "admin"),
   verifyTenantAccess("Vehicle"),
+  validate(updateVehicleStatusSchema),
   updateVehicleStatus,
 );
 
@@ -74,6 +84,7 @@ router.delete(
   "/:id",
   restrictTo("company", "admin"),
   verifyTenantAccess("Vehicle"),
+  validate(vehicleIdParamSchema),
   deleteVehicle,
 );
 

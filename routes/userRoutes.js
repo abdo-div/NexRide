@@ -8,6 +8,20 @@ import {
   updatePassword,
 } from "../controllers/authController.js";
 import { protect, restrictTo } from "../middlewares/authMiddleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import {
+  signupSchema,
+  loginSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  updatePasswordSchema,
+} from "../validations/auth.validation.js";
+import {
+  updateMeSchema,
+  adminUpdateUserSchema,
+  updateUserStatusSchema,
+} from "../validations/user.validation.js";
+import { idParamSchema } from "../validations/common.validation.js";
 import {
   getMe,
   getUserById,
@@ -26,26 +40,54 @@ const router = express.Router();
 // -----------------------------------------------------------------------------
 // PUBLIC AUTHENTICATION & ACCOUNT RECOVERY ROUTES
 // -----------------------------------------------------------------------------
-router.post("/signup", signup);
-router.post("/login", login);
+router.post("/signup", validate(signupSchema), signup);
+router.post("/login", validate(loginSchema), login);
 router.post("/logout", logout);
 
-router.post("/forgot-password", forgotPassword);
-router.post("/forgotPassword", forgotPassword);
-router.patch("/reset-password/:token", resetPassword);
-router.patch("/resetPassword/:token", resetPassword);
+router.post("/forgot-password", validate(forgotPasswordSchema), forgotPassword);
+router.post("/forgotPassword", validate(forgotPasswordSchema), forgotPassword);
+router.patch(
+  "/reset-password/:token",
+  validate(resetPasswordSchema),
+  resetPassword,
+);
+router.patch(
+  "/resetPassword/:token",
+  validate(resetPasswordSchema),
+  resetPassword,
+);
 
 // -----------------------------------------------------------------------------
 // PROTECTED USER SELF-SERVICE ROUTES (Authenticated Users)
 // -----------------------------------------------------------------------------
 router.use(protect);
 
-router.patch("/update-my-password", updatePassword);
-router.patch("/updateMyPassword", updatePassword);
-router.patch("/updatePassword", updatePassword);
+router.patch(
+  "/update-my-password",
+  validate(updatePasswordSchema),
+  updatePassword,
+);
+router.patch(
+  "/updateMyPassword",
+  validate(updatePasswordSchema),
+  updatePassword,
+);
+router.patch("/updatePassword", validate(updatePasswordSchema), updatePassword);
 router.get("/me", getMe, getUserById);
-router.patch("/update-me", uploadUserPhoto, resizeUserPhoto, updateMe);
-router.patch("/updateMe", uploadUserPhoto, resizeUserPhoto, updateMe);
+router.patch(
+  "/update-me",
+  uploadUserPhoto,
+  resizeUserPhoto,
+  validate(updateMeSchema),
+  updateMe,
+);
+router.patch(
+  "/updateMe",
+  uploadUserPhoto,
+  resizeUserPhoto,
+  validate(updateMeSchema),
+  updateMe,
+);
 router.delete("/delete-me", deleteMe);
 router.delete("/deleteMe", deleteMe);
 
@@ -54,10 +96,18 @@ router.delete("/deleteMe", deleteMe);
 // -----------------------------------------------------------------------------
 router.use(restrictTo("admin"));
 
-router.route("/").get(getAllUsers).post(signup);
+router.route("/").get(getAllUsers).post(validate(signupSchema), signup);
 
-router.patch("/:id/status", updateUserStatus);
+router.patch(
+  "/:id/status",
+  validate(updateUserStatusSchema),
+  updateUserStatus,
+);
 
-router.route("/:id").get(getUserById).patch(updateUser).delete(deleteUser);
+router
+  .route("/:id")
+  .get(validate(idParamSchema()), getUserById)
+  .patch(validate(adminUpdateUserSchema), updateUser)
+  .delete(validate(idParamSchema()), deleteUser);
 
 export default router;

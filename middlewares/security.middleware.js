@@ -35,7 +35,22 @@ export const securityCors = cors({
 // Helmet Security Headers
 export const securityHeaders = helmet();
 // Prevent NoSQL Injection Queries ($gt, $ne, etc.)
-export const sanitizeNoSQL = mongoSanitize();
+// Express 5 defines req.query as a getter-only prototype property, so the
+// package's default middleware (which reassigns req.query) throws. We reuse its
+// pure `sanitize` fn and attach results without reassigning getters.
+export const sanitizeNoSQL = (req, res, next) => {
+  if (req.body) req.body = mongoSanitize.sanitize(req.body);
+  if (req.params) req.params = mongoSanitize.sanitize(req.params);
+  if (req.query) {
+    Object.defineProperty(req, "query", {
+      value: mongoSanitize.sanitize(req.query),
+      writable: true,
+      enumerable: true,
+      configurable: true,
+    });
+  }
+  next();
+};
 
 //global API rate limiter
 

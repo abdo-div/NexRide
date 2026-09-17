@@ -11,6 +11,12 @@ import {
   getCompanyReviews,
 } from "../controllers/reviewController.js";
 import { protect, restrictTo } from "../middlewares/authMiddleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import {
+  createReviewSchema,
+  updateReviewSchema,
+  companyResponseSchema,
+} from "../validations/review.validation.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -35,6 +41,7 @@ router.get(
 router.post(
   "/",
   restrictTo("customer"),
+  validate(createReviewSchema),
   setVehicleAndCustomerIds,
   verifyCompletedBooking,
   createReview,
@@ -42,8 +49,18 @@ router.post(
 
 // Parameterized routes
 router.get("/:id", getReviewById);
-router.patch("/:id", restrictTo("customer"), updateReview);
+router.patch(
+  "/:id",
+  restrictTo("customer"),
+  validate(updateReviewSchema),
+  updateReview,
+);
 router.delete("/:id", restrictTo("customer", "admin"), deleteReview);
-router.post("/:id/reply", restrictTo("company"), addCompanyResponse);
+router.post(
+  "/:id/reply",
+  restrictTo("company"),
+  validate(companyResponseSchema),
+  addCompanyResponse,
+);
 
 export default router;

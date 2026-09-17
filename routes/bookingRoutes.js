@@ -16,7 +16,11 @@ import {
   verifyTenantAccess,
 } from "../middlewares/authMiddleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
-import { createBookingSchema } from "../validations/booking.validation.js";
+import {
+  createBookingSchema,
+  checkAvailabilitySchema,
+  checkoutSessionSchema,
+} from "../validations/booking.validation.js";
 
 const router = express.Router();
 
@@ -33,6 +37,7 @@ router.use(protect);
 // Pre-booking concurrency check (validates dates against existing reservations before checkout)
 router.get(
   ["/check-availability", "/checkAvailability"],
+  validate(checkAvailabilitySchema),
   checkVehicleAvailability,
 );
 
@@ -44,12 +49,18 @@ router.get(
 );
 
 // Create new reservation (executes atomic overlap check & server-side price calculation)
-router.post(["/", "/book"], restrictTo("customer"), validate(createBookingSchema), createBooking);
+router.post(
+  ["/", "/book"],
+  restrictTo("customer"),
+  validate(createBookingSchema),
+  createBooking,
+);
 
 // Initialize online payment checkout session (Stripe / Local Payment Gateways)
 router.get(
   "/checkout-session/:vehicleId",
   restrictTo("customer"),
+  validate(checkoutSessionSchema),
   getCheckoutSession,
 );
 

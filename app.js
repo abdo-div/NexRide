@@ -16,6 +16,7 @@ import companyRouter from "./routes/companyRoutes.js";
 import paymentRouter from "./routes/paymentRoutes.js";
 import vehicleRouter from "./routes/vehicleRoutes.js";
 import viewRouter from "./routes/viewRoutes.js";
+import adminRouter from "./routes/admin.routes.js";
 
 // ============================================
 // SECURITY
@@ -178,6 +179,8 @@ app.use("/api/v1/bookings", bookingRouter);
 app.use("/api/v1/companies", companyRouter);
 app.use("/api/v1/payments", paymentRouter);
 app.use("/api/v1/vehicles", vehicleRouter);
+
+app.use("/api/v1/admin", adminRouter);
 
 // ============================================
 // 14. 404 - ROUTE NOT FOUND

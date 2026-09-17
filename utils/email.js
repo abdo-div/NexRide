@@ -23,29 +23,7 @@ export default class Email {
    * @private
    */
   _createTransport() {
-    if (process.env.NODE_ENV === "production") {
-      return nodemailer.createTransport({
-        host: process.env.SMTP_HOST || "smtp.sendgrid.net",
-        port: Number(process.env.SMTP_PORT) || 587,
-        secure: process.env.SMTP_SECURE === "true",
-        auth: {
-          user: process.env.SMTP_USERNAME,
-          pass: process.env.SMTP_PASSWORD,
-        },
-        pool: true,
-        maxConnections: 5,
-        maxMessages: 100,
-      });
-    }
-
-    return nodemailer.createTransport({
-      host: process.env.EMAIL_HOST || "127.0.0.1",
-      port: Number(process.env.EMAIL_PORT) || 1025,
-      auth: {
-        user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
+    return createTransport();
   }
 
   /**
@@ -203,3 +181,58 @@ export default class Email {
     );
   }
 }
+
+/**
+ * Builds a pooled SMTP transport using the active environment configuration.
+ * @returns {import("nodemailer").Transporter}
+ */
+export function createTransport() {
+  if (process.env.NODE_ENV === "production") {
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST || "smtp.sendgrid.net",
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: process.env.SMTP_SECURE === "true",
+      auth: {
+        user: process.env.SMTP_USERNAME,
+        pass: process.env.SMTP_PASSWORD,
+      },
+      pool: true,
+      maxConnections: 5,
+      maxMessages: 100,
+    });
+  }
+
+  return nodemailer.createTransport({
+    host: process.env.EMAIL_HOST || "127.0.0.1",
+    port: Number(process.env.EMAIL_PORT) || 1025,
+    auth: {
+      user: process.env.EMAIL_USERNAME,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+}
+
+/**
+ * Imperative email dispatcher used by background queue workers.
+ * @param {{ to: string, subject: string, html?: string, text?: string }} message
+ */
+export const sendEmail = async ({ to, subject, html, text } = {}) => {
+  const transporter = createTransport();
+
+  await transporter.sendMail({
+    from: `${process.env.EMAIL_FROM_NAME || "NexRide Support"} <${
+      process.env.EMAIL_FROM || "support@nexride.com"
+    }>`,
+    to,
+    subject,
+    html,
+    text:
+      text ||
+      (html
+        ? htmlToText(html, {
+            wordwrap: 120,
+            selectors: [{ selector: "a", options: { ignoreHref: false } }],
+          })
+        : undefined),
+  });
+};

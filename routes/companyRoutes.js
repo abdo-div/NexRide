@@ -9,8 +9,16 @@ import {
   toggleCompanyVerification,
   deleteCompany,
 } from "../controllers/companyController.js";
+import { registerCompanyOwner } from "../controllers/companyRegistrationController.js";
 import { protect, restrictTo } from "../middlewares/authMiddleware.js";
 import { validateSubdomain } from "../middlewares/subdomainValidator.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import {
+  createCompanySchema,
+  updateCompanySchema,
+  updateCommissionSchema,
+  toggleVerificationSchema,
+} from "../validations/company.validation.js";
 
 const router = express.Router();
 
@@ -26,10 +34,15 @@ router.get("/:id", getCompanyById);
 // -----------------------------------------------------------------------------
 router.use(protect);
 
+// Self-service company onboarding. Any authenticated user (incl. customers)
+// may request an account upgrade; no restrictTo here so roles can self-register.
+router.post("/register", registerCompanyOwner);
+
 router.post(
   "/",
   restrictTo("company", "admin"),
   validateSubdomain,
+  validate(createCompanySchema),
   createCompany,
 );
 
@@ -37,14 +50,25 @@ router.patch(
   ["/update-my-company", "/updateMyCompany"],
   restrictTo("company"),
   validateSubdomain,
+  validate(updateCompanySchema),
   updateMyCompany,
 );
 
 // -----------------------------------------------------------------------------
 // PLATFORM ADMIN ONLY ROUTES
 // -----------------------------------------------------------------------------
-router.patch("/:id/commission", restrictTo("admin"), updateCompanyCommission);
-router.patch("/:id/verify", restrictTo("admin"), toggleCompanyVerification);
+router.patch(
+  "/:id/commission",
+  restrictTo("admin"),
+  validate(updateCommissionSchema),
+  updateCompanyCommission,
+);
+router.patch(
+  "/:id/verify",
+  restrictTo("admin"),
+  validate(toggleVerificationSchema),
+  toggleCompanyVerification,
+);
 router.delete("/:id", restrictTo("admin"), deleteCompany);
 
 export default router;
