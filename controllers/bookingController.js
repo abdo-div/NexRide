@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Booking from "../models/booking_model.js";
 import Vehicle from "../models/vehicle_model.js";
 import * as bookingService from "../services/bookingService.js";
@@ -80,12 +81,15 @@ export const createBooking = catchAsync(async (req, res, next) => {
     const [booking] = await Booking.create(
       [
         {
-          customer: req.user.id,
-          company: vehicle.company,
-          vehicle: vehicleId,
+          customerId: req.user.id,
+          companyId: vehicle.companyId,
+          vehicleId,
           startDate: start,
           endDate: end,
           pickupLocation: pickupLocation || vehicle.pickupLocation,
+          dailyRate: vehicle.dailyPrice,
+          totalDays: rentalDays,
+          rentalPrice: totalAmount,
           totalAmount,
           commissionRate: 0.08,
           commissionAmount,

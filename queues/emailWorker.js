@@ -1,7 +1,7 @@
 import { Worker } from "bullmq";
-import { redisClient } from "../config/redis.config.js";
+import { bullmqConnection } from "../config/redis.js";
 import { logger } from "../utils/logger.js";
-import consoleLogger from "../utils/chalkLogger.js";
+import Email from "../utils/email.js";
 
 export const emailWorker = new Worker(
   "email-queue",
@@ -10,34 +10,40 @@ export const emailWorker = new Worker(
       { jobId: job.id, type: job.name },
       "Processing background email job",
     );
-    consoleLogger.info(`Processing background job ${job.id} (${job.name})`);
+
+    const { user, url, bookingData } = job.data;
 
     switch (job.name) {
       case "BOOKING_CONFIRMATION":
-        consoleLogger.success(
-          `Booking confirmation sent for booking ${job.data.bookingId}`,
+        await new Email(user, url).sendBookingConfirmation(bookingData);
+        logger.info(
+          { jobId: job.id, userId: user?.email },
+          "Booking confirmation email sent",
         );
         break;
 
       case "WELCOME_EMAIL":
-        consoleLogger.success(`Welcome email sent to user ${job.data.userId}`);
+        await new Email(user, url).sendWelcome();
+        logger.info(
+          { jobId: job.id, userId: user?.email },
+          "Welcome email sent",
+        );
         break;
 
       default:
-        consoleLogger.warn(`Unknown job type: ${job.name}`);
+        logger.warn({ jobId: job.id, type: job.name }, "Unknown email job type — skipping");
     }
   },
-  { connection: redisClient },
+  { connection: bullmqConnection, prefix: "nexride" },
 );
 
 emailWorker.on("completed", (job) => {
-  logger.info({ jobId: job.id }, "Background job completed successfully");
+  logger.info({ jobId: job.id }, "Email job completed successfully");
 });
 
 emailWorker.on("failed", (job, err) => {
   logger.error(
-    { jobId: job?.id, error: err.message },
-    "Background job execution failed",
+    { jobId: job?.id, type: job?.name, error: err.message },
+    "Email job failed",
   );
-  consoleLogger.error(`Job ${job?.id} failed: ${err.message}`);
 });

@@ -43,7 +43,7 @@ import { resolveTenant } from "./middlewares/tenantMiddleware.js";
 // IDEMPOTENCY
 // ============================================
 
-import { idempotency } from "./middlewares/idempotency.middleware.js";
+import { idempotency } from "./middlewares/idempotence.middleware.js";
 
 // ============================================
 // LOGGING

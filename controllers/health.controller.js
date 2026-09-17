@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { redisClient } from "../config/redis.config.js";
+import { redisClient } from "../config/redis.js";
 
 export const getLiveness = (req, res) => {
   res.status(200).json({ status: "ok", uptime: process.uptime() });
