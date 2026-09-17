@@ -135,6 +135,18 @@ export const toggleCompanyVerification = catchAsync(async (req, res, next) => {
   });
 });
 
+export const updateCompanyStatus = catchAsync(async (req, res, next) => {
+  const company = await companyService.updateCompanyStatus(
+    req.params.id,
+    req.body.status,
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: { company },
+  });
+});
+
 export const deleteCompany = catchAsync(async (req, res, next) => {
   await companyService.softDeleteCompanyById(req.params.id);
 

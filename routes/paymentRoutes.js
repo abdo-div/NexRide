@@ -13,6 +13,9 @@ import {
   restrictTo,
   verifyTenantAccess,
 } from "../middlewares/authMiddleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import { processPaymentSchema } from "../validations/payment.validation.js";
+import { idParamSchema } from "../validations/common.validation.js";
 
 const router = express.Router();
 
@@ -30,7 +33,12 @@ router.post(
 // -----------------------------------------------------------------------------
 router.use(protect);
 
-router.post("/process", restrictTo("customer"), processPayment);
+router.post(
+  "/process",
+  restrictTo("customer"),
+  validate(processPaymentSchema),
+  processPayment,
+);
 
 // -----------------------------------------------------------------------------
 // TENANT & ADMIN FINANCIAL REPORTING
@@ -46,9 +54,19 @@ router.get(
 );
 
 // Parameterized routes come last
-router.get("/:id/invoice", getPaymentById, downloadInvoicePDF);
+router.get(
+  "/:id/invoice",
+  validate(idParamSchema()),
+  getPaymentById,
+  downloadInvoicePDF,
+);
 
-router.get("/:id", verifyTenantAccess("Payment"), getPaymentById);
+router.get(
+  "/:id",
+  validate(idParamSchema()),
+  verifyTenantAccess("Payment"),
+  getPaymentById,
+);
 
 // -----------------------------------------------------------------------------
 // PLATFORM ADMIN ONLY ROUTES
@@ -56,6 +74,7 @@ router.get("/:id", verifyTenantAccess("Payment"), getPaymentById);
 router.patch(
   ["/:id/settle-payout", "/:id/settlePayout"],
   restrictTo("admin"),
+  validate(idParamSchema()),
   settleCompanyPayout,
 );
 

@@ -5,6 +5,8 @@ import Booking from "../models/booking_model.js";
 import Vehicle from "../models/vehicle_model.js";
 import AppError from "../utils/appError.js";
 import APIFeatures from "../utils/APIFeatures.js";
+import { releaseVehicleHold } from "./reservationHold.service.js";
+import { addEmailToQueue } from "../queues/emailQueue.js";
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY)
@@ -62,6 +64,21 @@ export const executePaymentProcessing = async (paymentData, customerId) => {
 
     await session.commitTransaction();
     session.endSession();
+
+    // Checkout concluded — free the vehicle reservation hold.
+    await releaseVehicleHold(booking.vehicleId);
+
+    // Enqueue the booking confirmation email for the background worker.
+    // booking.customerId / vehicleId are auto-populated by the Booking model.
+    const customer = booking.customerId;
+    const vehicle = booking.vehicleId;
+    if (customer?.email) {
+      await addEmailToQueue("BOOKING_CONFIRMATION", {
+        email: customer.email,
+        bookingId: booking._id.toString(),
+        vehicleName: vehicle ? `${vehicle.make} ${vehicle.model}` : "Your vehicle",
+      });
+    }
 
     return payment[0];
   } catch (error) {

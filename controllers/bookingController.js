@@ -6,6 +6,10 @@ import catchAsync from "../utils/catchAsync.js";
 import * as factory from "./handlerFactory.js";
 import AppError from "../utils/appError.js";
 import { acquireVehicleLock } from "../utils/redisLock.js";
+import {
+  holdVehicleForCheckout,
+  releaseVehicleHold,
+} from "../services/reservationHold.service.js";
 // Administrative & General Lookup
 export const getAllBookings = factory.getAll(Booking);
 export const getBookingById = factory.getOne(Booking);
@@ -35,11 +39,19 @@ export const createBooking = catchAsync(async (req, res, next) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
 
+  // 0. Reserve the vehicle for this checkout session (10-minute hold, NX key).
+  //    409 if another user is already in checkout for this vehicle.
+  const hold = await holdVehicleForCheckout(vehicleId, req.user.id);
+  if (!hold.success) {
+    return next(new AppError(hold.message, 409));
+  }
+
   // 1. Acquire Redis Distributed Lock for the specific vehicle
   let lock;
   try {
     lock = await acquireVehicleLock(vehicleId, 10000);
   } catch (err) {
+    await releaseVehicleHold(vehicleId);
     return next(
       new AppError(
         "Vehicle is currently processing another checkout attempt. Please retry in a few seconds.",
@@ -115,8 +127,9 @@ export const createBooking = catchAsync(async (req, res, next) => {
     await session.abortTransaction();
     session.endSession();
 
-    // Always release lock on failure
+    // Always release lock and checkout hold on failure
     if (lock) await lock.release();
+    await releaseVehicleHold(vehicleId);
     next(error);
   }
 });
