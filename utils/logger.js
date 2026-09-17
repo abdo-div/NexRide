@@ -1,14 +1,19 @@
-import chalk from "chalk";
+import pino from "pino";
+import chalkLogger from "./chalkLogger.js"; // Adjust path if needed
 
-const logger = {
-  success: (msg) => console.log(chalk.bold.green("✔  ") + chalk.green(msg)),
-  info: (msg) => console.log(chalk.bold.cyan("ℹ  ") + chalk.cyan(msg)),
-  warn: (msg) => console.log(chalk.bold.yellow("⚠️  ") + chalk.yellow(msg)),
-  error: (msg) => console.log(chalk.bold.red("💥 ") + chalk.red(msg)),
-  database: (msg) =>
-    console.log(chalk.bold.magenta("🍃 [MongoDB] ") + chalk.white(msg)),
-  redis: (msg) =>
-    console.log(chalk.bold.redBright("🔴 [Redis] ") + chalk.white(msg)),
+// Standard Pino structured logger for production & service logs
+export const logger = pino({
+  level: process.env.LOG_LEVEL || "info",
+  formatters: {
+    level: (label) => ({ level: label }),
+  },
+  timestamp: pino.stdTimeFunctions.isoTime,
+});
+
+// Custom dev/console logger wrapper combining Pino with your Chalk logger
+export const devLogger = {
+  ...chalkLogger,
+  pino: logger,
 };
 
 export default logger;

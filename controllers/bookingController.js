@@ -1,8 +1,10 @@
 import Booking from "../models/booking_model.js";
+import Vehicle from "../models/vehicle_model.js";
 import * as bookingService from "../services/bookingService.js";
 import catchAsync from "../utils/catchAsync.js";
 import * as factory from "./handlerFactory.js";
-
+import AppError from "../utils/appError.js";
+import { acquireVehicleLock } from "../utils/redisLock.js";
 // Administrative & General Lookup
 export const getAllBookings = factory.getAll(Booking);
 export const getBookingById = factory.getOne(Booking);
@@ -15,7 +17,7 @@ export const checkVehicleAvailability = catchAsync(async (req, res, next) => {
   const result = await bookingService.checkAvailability(
     vehicleId,
     startDate,
-    endDate
+    endDate,
   );
 
   res.status(200).json({
@@ -28,21 +30,92 @@ export const checkVehicleAvailability = catchAsync(async (req, res, next) => {
  * Customer booking creation
  */
 export const createBooking = catchAsync(async (req, res, next) => {
-  // Pass req.user as the 3rd parameter to trigger email notifications
-  const newBooking = await bookingService.createCustomerBooking(
-    req.user.id,
-    req.body,
-    req.user
-  );
+  const { vehicleId, startDate, endDate, pickupLocation } = req.body;
+  const start = new Date(startDate);
+  const end = new Date(endDate);
 
-  res.status(201).json({
-    status: "success",
-    data: {
-      booking: newBooking,
-    },
-  });
+  // 1. Acquire Redis Distributed Lock for the specific vehicle
+  let lock;
+  try {
+    lock = await acquireVehicleLock(vehicleId, 10000);
+  } catch (err) {
+    return next(
+      new AppError(
+        "Vehicle is currently processing another checkout attempt. Please retry in a few seconds.",
+        429,
+      ),
+    );
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const vehicle = await Vehicle.findOne({
+      _id: vehicleId,
+      listingStatus: "PUBLISHED",
+      operationalStatus: "AVAILABLE",
+    }).session(session);
+
+    if (!vehicle) {
+      throw new AppError("Vehicle is not available for rental.", 404);
+    }
+
+    // 2. Double-booking collision check within database transaction session
+    const existingCollision = await Booking.findOne({
+      vehicle: vehicleId,
+      bookingStatus: { $in: ["PAID", "CONFIRMED", "ACTIVE"] },
+      $or: [{ startDate: { $lt: end }, endDate: { $gt: start } }],
+    }).session(session);
+
+    if (existingCollision) {
+      throw new AppError("Vehicle is already booked during these dates.", 409);
+    }
+
+    const rentalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    const totalAmount = rentalDays * vehicle.dailyPrice;
+    const commissionAmount = totalAmount * 0.08;
+    const companyShare = totalAmount - commissionAmount;
+
+    const [booking] = await Booking.create(
+      [
+        {
+          customer: req.user.id,
+          company: vehicle.company,
+          vehicle: vehicleId,
+          startDate: start,
+          endDate: end,
+          pickupLocation: pickupLocation || vehicle.pickupLocation,
+          totalAmount,
+          commissionRate: 0.08,
+          commissionAmount,
+          companyShare,
+          bookingStatus: "PENDING_PAYMENT",
+          paymentStatus: "UNPAID",
+        },
+      ],
+      { session },
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    // Release lock upon successful creation
+    await lock.release();
+
+    res.status(201).json({
+      status: "success",
+      data: { booking },
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
+    // Always release lock on failure
+    if (lock) await lock.release();
+    next(error);
+  }
 });
-
 
 /**
  * Initialize Stripe payment
@@ -108,7 +181,7 @@ export const getCompanyBookings = catchAsync(async (req, res, next) => {
 export const cancelBooking = catchAsync(async (req, res, next) => {
   const booking = await bookingService.cancelBookingById(
     req.params.id,
-    req.user
+    req.user,
   );
 
   res.status(200).json({
@@ -123,7 +196,7 @@ export const cancelBooking = catchAsync(async (req, res, next) => {
 export const updateBookingStatus = catchAsync(async (req, res, next) => {
   const booking = await bookingService.updateLifecycleStatus(
     req.params.id,
-    req.body.status
+    req.body.status,
   );
 
   res.status(200).json({
