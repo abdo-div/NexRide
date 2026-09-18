@@ -98,12 +98,6 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
     month: initial.getMonth(),
   });
 
-  useEffect(() => {
-    if (open && value) {
-      setView({ year: value.getFullYear(), month: value.getMonth() });
-    }
-  }, [open, value]);
-
   const minDay = min ?? today;
   const prev = () =>
     setView((v) => (v.month === 0 ? { year: v.year - 1, month: 11 } : { ...v, month: v.month - 1 }));
@@ -120,7 +114,10 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
 
   const quick = (offset: number) => {
     const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + offset);
-    if (d >= minDay) onPick(d, time);
+    if (d >= minDay) {
+      setView({ year: d.getFullYear(), month: d.getMonth() });
+      onPick(d, time);
+    }
   };
 
   return (
@@ -302,10 +299,6 @@ const LocationField: React.FC<LocationFieldProps> = ({
   const [query, setQuery] = useState("");
   const [mapMode, setMapMode] = useState(false);
 
-  useEffect(() => {
-    if (!open) setQuery("");
-  }, [open]);
-
   const q = query.trim().toLowerCase();
   const cityList = LOCATIONS.cities.filter(
     (c) => filterKind !== "airport" && (!q || c.toLowerCase().includes(q)),
@@ -486,12 +479,15 @@ export const SearchConsole: React.FC = () => {
   const fromRef = useRef<HTMLDivElement>(null);
   const toRef = useRef<HTMLDivElement>(null);
 
-  const pickRefs: Record<string, React.RefObject<HTMLDivElement | null>> = {
-    pickup: pickupRef,
-    return: returnRef,
-    from: fromRef,
-    to: toRef,
-  };
+  const pickRefs = React.useMemo<Record<string, React.RefObject<HTMLDivElement | null>>>(
+    () => ({
+      pickup: pickupRef,
+      return: returnRef,
+      from: fromRef,
+      to: toRef,
+    }),
+    [],
+  );
 
   // Close any open picker when clicking outside
   useEffect(() => {
@@ -511,7 +507,7 @@ export const SearchConsole: React.FC = () => {
       document.removeEventListener("mousedown", onDocClick);
       document.removeEventListener("keydown", onKey);
     };
-  }, [openPicker]);
+  }, [openPicker, pickRefs]);
 
   const clampReturn = (toDate: Date) => {
     const base = pickupDate ?? today;
@@ -595,6 +591,7 @@ export const SearchConsole: React.FC = () => {
               {fromValue}
             </button>
             <CalendarPopup
+              key={openPicker === "from" ? "from-open" : "from-closed"}
               open={openPicker === "from"}
               chip="Pick-up"
               value={pickupDate}
@@ -616,6 +613,7 @@ export const SearchConsole: React.FC = () => {
               {toValue}
             </button>
             <CalendarPopup
+              key={openPicker === "to" ? "to-open" : "to-closed"}
               open={openPicker === "to"}
               chip="Return"
               value={returnDate}
