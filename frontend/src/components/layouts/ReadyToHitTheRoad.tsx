@@ -12,7 +12,7 @@ export const ReadyToHitTheRoad: React.FC = () => {
           <span>UNLOCK LIBYA&apos;S PREMIER ROADS</span>
         </div>
 
-        <h2 className="text-4xl sm:text-6xl font-black tracking-tight uppercase leading-[1.05] mb-6 text-white">
+        <h2 className="text-4xl sm:text-6xl font-black tracking-tight uppercase leading-[1.05] mb-6">
           READY TO HIT THE ROAD?
         </h2>
 
