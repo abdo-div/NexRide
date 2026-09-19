@@ -1,6 +1,7 @@
 import React from "react";
 import { ArrowRight, ShieldCheck, Car, Tag } from "lucide-react";
 
+import { Link } from "react-router";
 export const HeroHeader: React.FC = () => {
   return (
     <div className="max-w-2xl flex flex-col items-start relative z-10">
@@ -19,13 +20,13 @@ export const HeroHeader: React.FC = () => {
 
       {/* CTA Buttons */}
       <div className="mt-6 flex flex-wrap items-center gap-3">
-        <a
-          href="#featured-fleet"
+        <Link
+          to="/FleetPage"
           className="px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center gap-2"
         >
           <span>Browse Cars</span>
           <ArrowRight className="w-4 h-4" />
-        </a>
+        </Link>
         <a
           href="#list-fleet"
           className="px-6 py-3 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold text-sm shadow-xs transition-all"

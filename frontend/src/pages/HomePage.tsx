@@ -6,6 +6,7 @@ import { HowItWorks } from "../components/home/HowItWorks";
 import { PartnerSection } from "../components/home/PartnerSection";
 import { TrustedOperators } from "../components/home/trustedOperators";
 import { UncompromisingStandards } from "../components/home/UncompromisingStandards";
+import { ReadyToHitTheRoad } from "../components/layouts/ReadyToHitTheRoad";
 
 export const HomePage: React.FC = () => {
   return (
@@ -18,6 +19,7 @@ export const HomePage: React.FC = () => {
       <PartnerSection />
       <TrustedOperators />
       <UncompromisingStandards />
+      <ReadyToHitTheRoad />
     </>
   );
 };
