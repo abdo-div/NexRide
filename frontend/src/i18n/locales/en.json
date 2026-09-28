@@ -1,0 +1,995 @@
+{
+  "lang": {
+    "ar": "العربية",
+    "en": "English"
+  },
+  "nav": {
+    "home": "Home",
+    "browseCars": "Browse Cars",
+    "howItWorks": "How It Works",
+    "fleetPartners": "Fleet Partners",
+    "locations": "Locations",
+    "contact": "Contact",
+    "signIn": "Sign In",
+    "listFleet": "List Your Fleet",
+    "saved": "Saved",
+    "libya": "LIBYA"
+  },
+  "footer": {
+    "brandName": "NexRide Luxury Mobility",
+    "hqTag": "Tripoli HQ",
+    "brandDesc": "Libya's premier executive transport and bespoke chauffeur service. Providing unmatched reliability, prestige fleets, and white-glove automotive solutions across Tripoli and international travel hubs.",
+    "fullyInsuredFleet": "Fully Insured Fleet",
+    "operations247": "24/7 Operations",
+    "explore": "EXPLORE",
+    "exploreLinks": {
+      "fleetInventory": "Fleet Inventory",
+      "luxuryArmored": "Luxury & Armored",
+      "libyanLocations": "Libyan Locations",
+      "airportDeals": "Instant Airport Deals",
+      "diplomaticChauffeur": "Diplomatic Chauffeur"
+    },
+    "forPartners": "FOR PARTNERS",
+    "partnerLinks": {
+      "fleetSaaS": "Fleet SaaS OS",
+      "partnerPortal": "Partner Portal Login",
+      "agencyGuidelines": "Agency Guidelines",
+      "gpsApi": "GPS & Telematics API",
+      "escrowTerms": "Escrow & Payout Terms"
+    },
+    "vipNewsletter": "VIP CONCIERGE & ALERTS",
+    "vipDesc": "Stay updated on VIP arrivals, luxury catalog drops, and airport fleet allocations.",
+    "subscribePlaceholder": "Enter your business email",
+    "subscribe": "Subscribe",
+    "emergencyLine": "24/7 Libyan Emergency Line",
+    "active": "Active",
+    "rights": "© 2026 NexRide Libya Mobility Technologies",
+    "systemsOperational": "All Systems Operational",
+    "currency": "LYD (د.ل)"
+  },
+  "cta": {
+    "badge": "UNLOCK LIBYA'S PREMIER ROADS",
+    "heading": "READY TO HIT THE ROAD?",
+    "subtitle": "Join thousands of executives, travelers, and local drivers renting with complete peace of mind.",
+    "exploreVehicles": "Explore All Vehicles",
+    "contactConcierge": "Contact VIP Concierge"
+  },
+  "auth": {
+    "breadcrumb": {
+      "home": "Home",
+      "title": "Client Authentication",
+      "status": "Libyan Central Bank & Moamalat Encrypted Session"
+    },
+    "panel": {
+      "badge": "Portal Access",
+      "signinTitle": "Welcome back to NexRide",
+      "signinSubtitle": "Access your executive reservations, tailored chauffeur dispatches, and corporate fleet accounts across Tripoli & Benghazi.",
+      "signupTitle": "Join the NexRide Network",
+      "signupSubtitle": "Register for corporate-grade vehicle dispatch, diplomatic security vehicles, and airport VIP greeting across Libya."
+    },
+    "tabs": {
+      "signIn": "Sign In",
+      "createAccount": "Create Account"
+    },
+    "signin": {
+      "identifierLabel": "Corporate Email or Libyan Mobile",
+      "identifierHint": "e.g. +218 (91/92/94)",
+      "identifierPlaceholder": "name@company.ly or 91 000 0000",
+      "passwordLabel": "Secret Passcode",
+      "forgotPassword": "Forgot Password?",
+      "passwordPlaceholder": "Enter your high-security passcode",
+      "trustDevice": "Trust this device for 30 days",
+      "tls": "TLS 1.3 Certified",
+      "submit": "Sign In to NexRide",
+      "divider": "Or authenticate via verified channels",
+      "libyanPassport": "Libyan Digital Passport",
+      "googleWorkspace": "Google Workspace",
+      "contactFleetDesk": "Corporate partner needing bulk API authentication?",
+      "contactFleetDeskLink": "Contact Fleet Desk"
+    },
+    "signup": {
+      "client": "Executive Client",
+      "corporate": "Corporate / Diplomatic",
+      "fullName": "Full Legal Name",
+      "fullNamePlaceholder": "e.g. Tariq Ben-Ali",
+      "officialEmail": "Official Email",
+      "emailPlaceholder": "executive@company.ly",
+      "mobile": "Libyan Mobile (SMS)",
+      "mobilePlaceholder": "91 234 5678",
+      "createPassword": "Create Passcode",
+      "minChars": "Min. 8 characters",
+      "confirmPassword": "Confirm Passcode",
+      "confirmPlaceholder": "Repeat passcode",
+      "terms": "I agree to the",
+      "termsLink": "NexRide Executive Service Terms",
+      "termsRest": ", Libyan Data Privacy Standards, and Chauffeur Safety Charter.",
+      "submit": "Create Verified NexRide Account"
+    },
+    "forgot": {
+      "title": "Reset Account Security",
+      "desc": "Enter your registered corporate email address or Libyan mobile phone (+218). Our automated security gateway will immediately transmit an encrypted 6-digit OTP passcode.",
+      "placeholder": "Enter email or mobile (+218 9X XXX XXXX)",
+      "dispatch": "Dispatch SMS / WhatsApp OTP",
+      "cancel": "Cancel",
+      "sent": "Encrypted OTP code transmitted successfully to the provided channel. Please check your messages."
+    },
+    "showcase": {
+      "badge": "Executive Mobility Experience",
+      "rating": "rating",
+      "reviews": "(1.4k+ reviews)",
+      "heading": "Bespoke travel, engineered for Tripoli's elite.",
+      "subtitle": "Command an immaculate fleet of armored luxury sedans, VIP Mercedes-Maybach shuttles, and premier Range Rovers with white-glove security personnel.",
+      "perks": {
+        "escrow": {
+          "title": "Instant Escrow Security",
+          "desc": "Zero deposit lockups. Transparent settlement via Central Bank of Libya certified gateways and Moamalat rails."
+        },
+        "tarmac": {
+          "title": "VIP Mitiga & Benina Tarmac Meet",
+          "desc": "Direct gate greeting, luggage management, and diplomatic route escorts straight to Tripoli Corniche or your embassy enclave."
+        },
+        "vin": {
+          "title": "Guaranteed Exact VIN Model",
+          "desc": "Never a generic substitution. The Mercedes S-580, G63, or Range Rover Autobiography you select is precisely what arrives."
+        }
+      },
+      "terminal": "Tripoli Corniche Terminal",
+      "terminalSub": "That El Emad Tower Station • Active Ready Dispatch",
+      "liveEscort": "Live Escort",
+      "concierge": "24/7 Executive Concierge",
+      "trustedBy": "Trusted by",
+      "enterprises": "140+ Libyan enterprises & diplomatic delegations."
+    },
+    "badges": {
+      "identity": "Verified Identity",
+      "identitySub": "National ID & Passport",
+      "encrypted": "Encrypted Auth",
+      "encryptedSub": "256-bit AES end-to-end",
+      "protocol": "Diplomatic Protocol",
+      "protocolSub": "Confidential manifest logs",
+      "dispatch": "Dedicated Dispatch",
+      "dispatchSub": "Immediate priority line"
+    }
+  },
+  "home": {
+    "hero": {
+      "line1": "Find Your",
+      "line2": "Perfect Car.",
+      "line3": "Drive Your",
+      "line4": "Dreams.",
+      "subtitle": "Explore thousands of verified cars from trusted Libyan sellers. Best prices. Easy financing. Drive with confidence across Tripoli, Benghazi, Misrata, and Sabha.",
+      "browseCars": "Browse Cars",
+      "sellYourCar": "Sell Your Car",
+      "carsListed": "Cars Listed",
+      "trustedSellers": "Trusted Sellers",
+      "verifiedReviewed": "Verified & Reviewed",
+      "bestPrices": "Best Prices",
+      "marketCompetitive": "Market Competitive"
+    },
+    "featured": {
+      "eyebrow": "Explore Collection",
+      "title": "Featured Rental Vehicles",
+      "subtitle": "Choose from our top-rated, fully insured local fleet ready for immediate pickup across major Libyan cities.",
+      "viewAll": "View All Vehicles",
+      "startingFrom": "Starting from",
+      "categories": {
+        "all": "All",
+        "sedan": "Sedan",
+        "suv": "SUV",
+        "luxury": "Luxury",
+        "sports": "Sports"
+      },
+      "moreFilters": "More Filters"
+    },
+    "trending": {
+      "eyebrow": "HANDPICKED EXCELLENCE",
+      "title": "TRENDING RENTALS IN LIBYA",
+      "dailyTariff": "Daily Tariff",
+      "reserveRide": "Reserve Ride",
+      "exploreAll": "Explore All 450+ Available Vehicles",
+      "badges": {
+        "instantBook": "Instant Book",
+        "zeroDeposit": "Zero Deposit",
+        "circuitSpec": "Circuit Spec",
+        "fiveRating": "5.0 Rating",
+        "saharaReady": "Sahara Ready",
+        "satelliteGps": "Satellite GPS"
+      },
+      "categories": {
+        "allFleet": "All Fleet",
+        "luxurySUV": "Luxury SUVs",
+        "sportsCoupe": "Sports & Coupe",
+        "desert4x4": "Desert 4x4"
+      }
+    },
+    "categories": {
+      "eyebrow": "DISTINCTION & FLEET SPEC",
+      "title": "EXPLORE BY VEHICLE CATEGORY",
+      "subtitle": "Curated luxury, rugged desert expedition, and efficient city cruisers across Libya.",
+      "available": "Available",
+      "startingFrom": "STARTING FROM",
+      "explore": "Explore"
+    },
+    "nationwide": {
+      "eyebrow": "NATIONWIDE FLEET PRESENCE",
+      "title": "COVERING ALL MAJOR REGIONS IN LIBYA",
+      "subtitle": "Seamless pickup and VIP airport tarmac handovers across Libya's primary commercial corridors.",
+      "vehiclesAvailable": "Vehicles Available"
+    },
+    "howItWorks": {
+      "eyebrow": "FRICTIONLESS AUTOMOTIVE MOBILITY",
+      "title": "RENT IN 4 SIMPLE STEPS",
+      "subtitle": "Say goodbye to informal phone reservations, untracked cash deposits, and unpredictable vehicle condition."
+    },
+    "partners": {
+      "badge": "FOR CAR RENTAL AGENCIES & FLEET OWNERS",
+      "title": "GROW YOUR RENTAL BUSINESS WITH NEXRIDE",
+      "description": "Manage your vehicles, receive verified bookings, and eliminate non-paying clients with digital escrow protection. Connect directly to domestic executives, international travelers, and diplomatic missions.",
+      "listYourFleet": "List Your Fleet Today",
+      "partnerGuidelines": "Partner Guidelines",
+      "dashboard": {
+        "osTitle": "NexRide Partner OS v3.2",
+        "liveTelemetry": "LIVE TELEMETRY",
+        "monthlyPayouts": "Monthly Payouts",
+        "vsLastMonth": "↑ +28% vs last month",
+        "utilization": "Active Fleet Utilization",
+        "vehiclesOnRoad": "{{count}} of 51 Vehicles on Road",
+        "bookingsFeed": "Real-time Bookings Feed",
+        "newToday": "+{{count}} New Today"
+      }
+    },
+    "operators": {
+      "eyebrow": "VERIFIED OPERATORS",
+      "title": "TRUSTED FLEET OPERATORS",
+      "subtitle": "Vetted local car rental businesses powering NexRide's verified network across Libya.",
+      "verifiedPartner": "Verified Partner",
+      "reviews": "({{count}} reviews)",
+      "fleetSize": "Fleet Size:",
+      "vehiclesActive": "{{count}} Vehicles Active",
+      "specialty": "Specialty:",
+      "viewFleet": "View Agency Fleet"
+    },
+    "standards": {
+      "eyebrow": "UNCOMPROMISING STANDARDS",
+      "title": "BUILT FOR CERTAINTY ACROSS LIBYA",
+      "subtitle": "Enterprise-grade protections engineered for business travelers and fleet operators alike."
+    },
+    "search": {
+      "pickup": "Pick-up",
+      "return": "Return",
+      "choosePickup": "Choose pick-up location",
+      "chooseReturn": "Choose return location",
+      "pickupDateTime": "Pick-up date & time",
+      "returnDateTime": "Return date & time",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "plusWeek": "+ 1 Week",
+      "time": "time",
+      "selectDateTime": "Select date & time",
+      "close": "Close",
+      "all": "All",
+      "cities": "Cities",
+      "airports": "Airports",
+      "searchLocation": "Search for a city or airport…",
+      "noLocations": "No locations match \"{{query}}\".",
+      "mapOffers": "Rental offers on the map",
+      "search": "Search",
+      "differentReturn": "Return car at a different location",
+      "freeCancellation": "Free cancellation · No prepayment required",
+      "popular": "Popular:",
+      "returnLocation": "Return location",
+      "months": "January February March April May June July August September October November December",
+      "weekdayHeads": "Su Mo Tu We Th Fr Sa"
+    }
+  },
+  "data": {
+    "common": {
+      "automatic": "Automatic",
+      "manual": "Manual",
+      "gasoline": "Gasoline",
+      "diesel": "Diesel",
+      "hybrid": "Hybrid",
+      "electric": "Electric",
+      "seats": "Seats",
+      "day": "day",
+      "week": "week",
+      "rentNow": "Rent Now",
+      "bookNow": "Book Now",
+      "saveCar": "Save car"
+    },
+    "categories": {
+      "economy": {
+        "badge": "5.8L / 100km",
+        "title": "ECONOMY",
+        "description": "Kia Cerato, Hyundai Elantra, Toyota Corolla for city transit."
+      },
+      "executiveSuv": {
+        "badge": "Full 4WD Equipped",
+        "title": "EXECUTIVE SUV",
+        "description": "Range Rover Velar, BMW X5, Mercedes GLE with prestige comfort."
+      },
+      "ultraLuxury": {
+        "badge": "VIP Diplomatic Ready",
+        "title": "ULTRA LUXURY",
+        "description": "Mercedes-Maybach, G63 AMG, S-Class with optional security escort."
+      },
+      "desert4x4": {
+        "badge": "SaharaTrail Certified",
+        "title": "DESERT 4x4",
+        "description": "Land Cruiser 300 VXR, Nissan Patrol, Hilux GR auxiliary fuel equipped."
+      },
+      "electricHybrid": {
+        "badge": "Clean Motion",
+        "title": "ELECTRIC & HYBRID",
+        "description": "Porsche Taycan, Camry Hybrid, Lexus ES for silent luxury touring."
+      }
+    },
+    "steps": {
+      "search": {
+        "title": "SEARCH",
+        "description": "Real-time inventories from licensed Libyan agencies with transparent daily rates in LYD. Filter by city, class, and tarmac delivery.",
+        "footerText": "Verified Fleet Database"
+      },
+      "compare": {
+        "title": "COMPARE",
+        "description": "Compare technical specs, rental rules, insurance escrows, and verified customer ratings before locking your booking.",
+        "footerText": "Side-by-Side Clarity"
+      },
+      "reserve": {
+        "title": "RESERVE",
+        "description": "Lock in vehicle instantly in 60s with digital booking token recognized across commercial checkpoints with escrow security.",
+        "footerText": "60-Second Escrow Lock"
+      },
+      "drive": {
+        "title": "DRIVE",
+        "description": "Tarmac handover at Mitiga or Benina, or direct concierge delivery to your hotel or residence with keys ready.",
+        "footerText": "Instant Tarmac Handover"
+      }
+    },
+    "standards": {
+      "insuredFleet": {
+        "title": "100% Insured Fleet",
+        "description": "Comprehensive damage and third-party protection policies aligned with Libyan insurance standards and clear deductibles."
+      },
+      "verifiedBusinesses": {
+        "title": "Verified Businesses",
+        "description": "Every rental operator undergoes commercial registry verification, tax ID scrutiny, and on-site physical fleet spot checks."
+      },
+      "transparentPricing": {
+        "title": "Transparent LYD Pricing",
+        "description": "Exact daily rates with full itemized breakdown of security deposits and zero extortionate card transaction fees."
+      },
+      "vehicleTelematics": {
+        "title": "Real Vehicle Telematics",
+        "description": "Vehicles equipped with satellite tracking and 24/7 dedicated emergency assistance across primary Libyan expressways."
+      }
+    },
+    "regions": {
+      "tripoli": {
+        "badge": "Capital Hub",
+        "subtitle": "Mitiga MJI Airport & Hai Al-Andalus Marina Hub",
+        "features": ["VIP Lounge Pickup", "Armored Escort Available"]
+      },
+      "benghazi": {
+        "badge": "Eastern Hub",
+        "subtitle": "Benina BEN Airport & Downtown Commercial Hub",
+        "features": ["Direct Hotel Delivery", "Corporate Accounts"]
+      },
+      "misrata": {
+        "badge": "Trade Corridor",
+        "subtitle": "Commercial Free Zone & Port Logistics Hub",
+        "features": ["Heavy Duty 4x4 & Pickups", "Executive Sedans"]
+      },
+      "sabha": {
+        "badge": "Sahara Gateway",
+        "subtitle": "Southern Desert Gateway & Exploration Base",
+        "features": ["Sahara Expedition Prep", "Satellite Telematics"]
+      }
+    },
+    "regionFeatures": {
+      "rescue": {
+        "title": "24/7 ROADSIDE RESCUE",
+        "description": "Active fleet patrol across the Libyan Coastal Expressway"
+      },
+      "telematics": {
+        "title": "GPS TELEMATICS INCLUDED",
+        "description": "Instant coordinate tracking & remote breakdown assistance"
+      },
+      "clearance": {
+        "title": "INTER-CITY TRAVEL CLEARANCE",
+        "description": "Pre-cleared digital rental documentation for transit checkpoints"
+      }
+    },
+    "partnerMetrics": {
+      "onlineBookings": {
+        "title": "100% Online Bookings",
+        "subtitle": "Fleet Control & real-time GPS dispatch"
+      },
+      "fleetControl": {
+        "title": "Automated Fleet Control",
+        "subtitle": "Guaranteed digital escrow protection"
+      },
+      "payouts": {
+        "title": "Direct Payouts in LYD",
+        "subtitle": "Instant weekly bank transfers in LYD"
+      }
+    },
+    "operators": {
+      "alSafwa": "Executive & Armored",
+      "sahary": "Desert 4WD & Pickups",
+      "madina": "Daily Economy & Sedan",
+      "apex": "Supercars & GTs"
+    },
+    "trendingSpecs": {
+      "trans": "TRANS",
+      "seats": "SEATS",
+      "power": "POWER",
+      "drive": "DRIVE",
+      "engine": "ENGINE"
+    }
+  },
+  "fleet": {
+    "breadcrumb": "Fleet / Explore Cars",
+    "title": "Our Fleet",
+    "subtitle": "Real-time availability confirmed with telemetry synchronization across every NexRide pick-up hub.",
+    "verifiedMatch": "Verified vehicles matching your filters: {{count}}",
+    "params": {
+      "location": "Location",
+      "schedule": "Schedule",
+      "tier": "Fleet Tier",
+      "allHubs": "All hubs",
+      "allCategories": "All Categories",
+      "locationsCount": "{{count}} locations",
+      "flexibleDates": "Flexible dates · 5 days"
+    },
+    "tokens": {
+      "location": "Location: {{name}}",
+      "fleet": "Fleet: {{name}}"
+    },
+    "results": {
+      "title": "Vehicles in Tripoli",
+      "availableCount": "Available: {{count}}",
+      "telemetryNote": "Real-time availability confirmed with telemetry synchronization.",
+      "sortBy": "Sort by:",
+      "clearAll": "Clear all"
+    },
+    "sort": {
+      "recommended": "Recommended for VIP",
+      "priceDesc": "Price: High to Low",
+      "priceAsc": "Price: Low to High",
+      "rating": "Highest Fleet Rating"
+    },
+    "empty": {
+      "title": "No vehicles match your filters",
+      "desc": "Try raising the max price or removing some filters.",
+      "action": "Reset all filters"
+    },
+    "pagination": {
+      "summary": "Showing {{range}} of {{total}} verified vehicles"
+    },
+    "trust": {
+      "title": "NexRide Guarantee & Road Rescue",
+      "desc": "Every rental is secured with GPS recovery, licensed commercial liability, and 24/7 Tripoli rapid replacement units.",
+      "learnMore": "Learn More"
+    },
+    "commandBar": {
+      "all": "All ({{count}})",
+      "segment": "{{label}} ({{count}})"
+    },
+    "filters": {
+      "title": "Filters",
+      "resetAll": "Reset All",
+      "apply": "Apply Filters ({{count}} Cars)",
+      "libyanLocation": "Libyan Location",
+      "ratePerDay": "Rate Per Day",
+      "priceRange": "100 - {{max}} LYD",
+      "priceMin": "Min: 100 LYD",
+      "priceMax": "Max: 2,500+ LYD",
+      "bodyProfile": "Body Profile",
+      "bodyCount": "{{label}} ({{count}})",
+      "drivetrainSpecs": "Drivetrain & Specs",
+      "certifiedFleets": "Certified Fleets",
+      "reservationPerks": "Reservation Perks",
+      "locations": {
+        "mitiga": "Tripoli - Mitiga Airport (MJI)",
+        "downtown": "Tripoli Downtown / Hai Al-Andalus",
+        "benina": "Benghazi - Benina Airport (BEN)",
+        "misrata": "Misrata Commercial Free Zone"
+      },
+      "bodies": {
+        "suv": "SUVs",
+        "coupe": "Coupe",
+        "sedan": "Sedans",
+        "offroad": "4x4 Offroad"
+      },
+      "drivetrains": {
+        "automatic": "Automatic Transmission",
+        "manual": "Manual Transmission",
+        "highOctane": "Petrol High-Octane"
+      },
+      "perks": {
+        "instantConfirmation": "Instant Confirmation",
+        "airportVip": "Airport VIP Terminal Drop-off",
+        "zeroDeposit": "Zero Cash Deposit Option"
+      }
+    },
+    "card": {
+      "topPick": "Top Executive Pick",
+      "toggleFavorite": "Toggle favorite",
+      "periodDays": "{{count}}-days",
+      "details": "Details",
+      "reserve": "Reserve ({{total}} LYD)",
+      "specs": {
+        "engine": "Engine",
+        "capacity": "Capacity",
+        "gearbox": "Gearbox",
+        "fuel": "Fuel"
+      }
+    }
+  },
+  "vehicleDetail": {
+    "crumbCars": "Cars",
+    "crumbLuxurySuv": "Luxury SUVs",
+    "crumbEconomy": "Economy Cars",
+    "crumbVehicles": "Vehicles",
+    "linkCopied": "Link Copied!",
+    "share": "Share",
+    "save": "Save",
+    "termsSheet": "Terms Sheet",
+    "perDay": "/ day",
+    "instantConfirmationActive": "Instant Confirmation Active",
+    "minDays": "Min. {{days}} Days",
+    "pickupDate": "Pick-up Date",
+    "returnDate": "Return Date",
+    "deliveryPoint": "Delivery / Handover Point",
+    "selectProtection": "Select Protection Package",
+    "included": "Included",
+    "durationRate": "{{days}} Days Duration × {{rate}} LYD",
+    "totalPayableNow": "Total Payable Now",
+    "totalLabel": "Total:",
+    "conciergeAid": "{{status}} Aid",
+    "armoredConvoy": "Armored B6 convoy packages on request",
+    "dispatchHotline": "24/7 dispatch hotline available",
+    "inquire": "Inquire",
+    "planApplied": "{{plan}} applied to this quote",
+    "metricsHeading": "Performance & Capacity Metrics",
+    "factoryCalibration": "Factory Calibration",
+    "moreAngles": "+{{count}} More Angles",
+    "cabinTour": "Includes 360° Cabin Tour",
+    "specBlueprintHeading": "Detailed Technical Blueprint",
+    "requirementsHeading": "Rental Eligibility & Verification",
+    "hubsHeading": "Pickup & Drop-off Hubs",
+    "hubsSub": "Choose your preferred location during booking checkout",
+    "mapAlt": "Tripoli delivery zone map",
+    "operatorRating": "{{rating}} Rating",
+    "agencyWhatsapp": "Agency WhatsApp",
+    "directCall": "Direct Call",
+    "renterFeedback": "Verified Renter Feedback",
+    "viewSpecs": "View Specs",
+    "showcaseView": "Showcase View",
+    "galleryObsidian": "Obsidian Edition · Tripoli Fleet Hub 01",
+    "galleryModelHub": "{{model}} · Tripoli Hub",
+    "galleryMasterView": "Master View 1 of 12",
+    "galleryMasterViewAlt": "Master View 1 of 6",
+    "altG63Showroom": "Mercedes-AMG G63 Black Edition Tripoli Showroom",
+    "altMbux": "MBUX Dual Cockpit & Carbon Trim",
+    "altExhausts": "AMG Twin Side Exhausts",
+    "altAlloys": "22-inch AMG Forged Cross-Spoke Alloys",
+    "altAlloysShort": "22\" Forged Cross-Spoke Alloys",
+    "altCockpit": "Interior cockpit detail",
+    "altProfile": "Rear side profile",
+    "labelCockpit": "Executive Cockpit",
+    "labelProfile": "Dynamic Profile",
+    "badgeInstant": "Instant Confirmation",
+    "badgeModelYear": "Model Year 2024",
+    "badgeDriveModes": "Chauffeured or Self-Drive",
+    "badgeVerified": "Verified Availability",
+    "verifiedBookings": "{{count}} verified Libyan bookings",
+    "tierOne": "Tier 1",
+    "locationLine": "Tripoli: {{hub}} Hub Delivery",
+    "locationLineG63": "Tripoli: Mitiga VIP & Corinthia Tripoli Hub",
+    "liveDispatch": "Live Dispatch Status",
+    "statusReadyMji": "Inspected & Ready at Mitiga VIP Terminal",
+    "statusReadyAt": "Inspected & Ready at {{operator}}",
+    "metricGearbox": "Gearbox",
+    "metricSubPaddle": "التغيير عبر الذراعين (Paddle)",
+    "metricOutput": "Output",
+    "metricSubV8": "4.0L V8 Biturbo",
+    "metricSeating": "Seating",
+    "metricSubNappa": "Nappa Heated & Ventilated",
+    "metricFuel": "Fuel Protocol",
+    "metricSubFullToFull": "Full-to-Full Policy",
+    "metricDrivetrain": "Drivetrain",
+    "metricSubDiffLocks": "3 Differential Locks 100%",
+    "metricLuggage": "Luggage Space",
+    "metricSubBags": "4 Large + 2 Carry-on Bags",
+    "metricSubRearClimate": "Rear Climate Ready",
+    "metricSubTerrainAssist": "Terrain Assist",
+    "metricSubBagsCabin": "4 Bags + Cabin Suites",
+    "valueExecutiveSeats": "5 Executive Seats",
+    "valueOctane98": "Octane 98 Petrol",
+    "valueLiters667": "667 Liters",
+    "valueAutoAwd": "Automatic AWD",
+    "valueManualDrive": "Manual Drive",
+    "valueFullTrunk": "Full Trunk",
+    "valueFull4wd": "Full 4WD",
+    "descHeadingG63": "Executive Presence & Tactical Road Command in Libya",
+    "descHeading": "{{model}} — Executive Grade Rental in Libya",
+    "descPara1G63": "تقف مرسيدس-AMG G63 في قمة التقاء بين سلطة لا تقبل المساومة، وتسارع موروث من الحلبة، وقدرة على مختلف التضاريس لا تخضع للمفاضلة. وبطلاء Obsidian Night Magno، اختارت Star Rentals ليبيا هذه الحصة من موديل 2024 يدوياً للدبلوماسيين وكبار التنفيذيين ووفود الأعراس المرموقة التي تطلب هيبة بلا منازع في كل أنحاء طرابلس والممر الساحلي.",
+    "descPara2G63": "Equipped with a handcrafted 4.0-liter twin-turbocharged V8 generating 577 horsepower, the G63 effortlessly glides down the Tripoli Ring Road while maintaining supreme acoustic composure thanks to double-laminated acoustic privacy glazing. Triple electronic differential locks ensure uninterrupted forward progress whether navigating sand-dusted desert trails towards Gharyan or high-security diplomatic convoys in downtown Tripoli.",
+    "descPara1": "Fully inspected and telemetry-synchronized, this vehicle (class: {{segment}}) is delivered ready for both business and leisure use across Greater Tripoli.",
+    "descPara2": "Operated by {{operator}} with a {{rating}} verified partner rating, every reservation includes GPS recovery, licensed commercial liability, and 24/7 Tripoli rapid replacement units.",
+    "featureBurmester": "Burmester® 3D Surround Sound (15 Speakers)",
+    "featureCamera360": "360° Camera with Transparent Hood Tech",
+    "featureCarplay": "Wireless Apple CarPlay & Android Auto",
+    "featureDampers": "Adaptive Dampers with AMG RIDE CONTROL",
+    "specGroupPower": "Power & Mechanics",
+    "specGroupInterior": "Interior & Comfort",
+    "specGroupCabin": "Cabin & Comfort",
+    "specGroupSecurity": "Security & Tracking",
+    "specEngine": "Engine",
+    "specValEngineV8": "4.0L V8 Handcrafted",
+    "specHorsepower": "Horsepower",
+    "specValHorsepower": "577 hp @ 6,000 RPM",
+    "specTorque": "Torque",
+    "specValTorque": "850 Nm @ 2,500 RPM",
+    "specAcceleration": "0-100 km/h",
+    "specValAcceleration": "4.5 Seconds",
+    "specTopSpeed": "Top Speed",
+    "specValTopSpeed": "240 km/h (Gov. Limited)",
+    "specUpholstery": "Upholstery",
+    "specValNappa": "Exclusive Nappa Leather",
+    "specSunroof": "Sunroof",
+    "specValSunroof": "Electric Tilt & Slide Glass",
+    "specClimate": "Climate",
+    "specValClimate": "Tri-Zone Thermotronic",
+    "specAirPurification": "Air Purification",
+    "specValAirPurification": "Air-Balance Ionization",
+    "specSoundDamping": "Sound Dampening",
+    "specValAcoustic": "Acoustic Shield Glass",
+    "specTelematics": "Telematics",
+    "specValTelematics": "Real-time GPS 24/7",
+    "specEmergencySos": "Emergency SOS",
+    "specValNationalAssist": "Libyan National Assist",
+    "specBlindSpot": "Blind Spot",
+    "specValRadarAssist": "Active Radar Assist",
+    "specCameras": "Cameras",
+    "specValSurroundView": "Surround View 360°",
+    "specArmoring": "Armoring Ready",
+    "specValChassis": "Reinforced Chassis",
+    "specGearbox": "Gearbox",
+    "specFuel": "Fuel",
+    "specDailyRate": "Daily Rate",
+    "specCapacity": "Capacity",
+    "specCategory": "Category",
+    "specSegment": "Segment",
+    "specRecovery": "Recovery",
+    "specValRoadRescue": "NexRide Road Rescue",
+    "zeroPaperwork": "Zero Paperwork at Pickup",
+    "reqAgeTitle": "Age Requirement: 23+",
+    "reqAgeBody": "يجب أن يكون السائق الرئيسي حائزاً على سجل قيادة نظيف لمدة عامين ميلاديين كاملين على الأقل.",
+    "reqDepositTitle": "Security Deposit",
+    "reqDepositBody": "Refundable 2,500 LYD pre-authorization hold via Local Card, Visa, Mastercard, or Cash escrow.",
+    "reqDocsTitle": "Documentation Required",
+    "reqDocsBody": "Valid Libyan National ID / Passport, and Libyan Driving License or International Driver's Permit (IDP).",
+    "reqMileageTitle": "Daily Mileage Allowance",
+    "reqMileageBody": "300 km / day included free of charge. Excess distance billed at a transparent 2.50 LYD per kilometer.",
+    "hubBadgeMji": "Complimentary Mitiga Terminal Meet",
+    "hubBadgeGeneric": "Complimentary Hub Meet Delivery",
+    "hubOneName": "Hub 1: Mitiga Int'l Airport (MJI)",
+    "hubOneDesc": "Terminal VIP Lounge Concourse, Tripoli. Dedicated NexRide bay with chilled executive delivery.",
+    "hubTwoName": "Hub 2: Corinthia Hotel Tripoli",
+    "hubTwoDesc": "سوق الثلثة، واجهة طرابلس البحرية. مكتب استقبال لخدمة صفّ السيارات متاح 24 ساعة.",
+    "conciergeChauffeurTitle": "Direct Concierge Chauffeur Available",
+    "conciergeDeliveryTitle": "Direct Concierge Delivery Available",
+    "conciergeBodyFull": "We can also deliver directly to any private villa or embassy compound in Greater Tripoli.",
+    "conciergeBody": "Delivered directly to any private villa or embassy compound in Greater Tripoli.",
+    "viewZoneMap": "View Delivery Zone Map",
+    "operatorMetaPartner": "Commercial Fleet Partner #LY-1104 · Tripoli & Misrata Branches",
+    "operatorMetaVerified": "Commercial Fleet Partner · Verified Operator",
+    "completedRentalsFixed": "1,280+ Completed Rentals",
+    "completedRentals": "{{count}}+ Completed Rentals",
+    "responseTime": "5 Min Average Response Time",
+    "verifiedDriversFull": "100% Verified Drivers",
+    "verifiedDrivers": "Verified Drivers",
+    "ratingsSub": "Based on {{count}} completed journeys in Tripoli & Benghazi",
+    "barCleanliness": "Vehicle Cleanliness & Detailing",
+    "barHandover": "Airport Handover Velocity",
+    "barMechanical": "Mechanical & Engine Integrity",
+    "barCommunication": "Host Communication",
+    "reviewCtxCorporate": "Corporate Delegation · 7 Days Rental",
+    "reviewCtxWedding": "Wedding Escort Convoy · 3 Days",
+    "reviewCtxExecutive": "Executive Booking · 5 Days",
+    "reviewCtxAirport": "Airport Arrival · 2 Days",
+    "timeTwoWeeks": "2 weeks ago",
+    "timeThreeWeeks": "3 weeks ago",
+    "timeLastMonth": "Last month",
+    "reviewBodyOne": "Impeccable vehicle state. Star Rentals handed over the G63 curbside at Mitiga VIP lounge within 4 minutes of walking off the tarmac. Freshly detailed, full tank of 98 octane, and zero delays during return.",
+    "reviewBodyTwo": "The sound of the V8 twin exhausts through the downtown streets was breathtaking. Completely flawless mechanical condition. Will definitely be renting again for executive foreign guest arrivals.",
+    "reviewBodyThree": "Smooth handover at the designated hub. The {{model}} was immaculate and exactly as described.",
+    "reviewBodyFour": "Flawless pickup from the airport terminal and a transparent return process. The verified partner rating is well earned.",
+    "similarHeading": "Alternative Executive Options",
+    "similarSub": "Available for immediate delivery in Greater Tripoli",
+    "similarLinkLabel": "View All Prestige Fleet",
+    "subtitleFlatSix": "محرك مسطّح Naturally Aspirated بست أسطوانات سعة 4.0 لتر · 502 حصان",
+    "subtitleTwinTurbo": "3.5L Twin Turbo V6 · 7 Passenger Luxury",
+    "tagTrack": "Track & Grand Touring",
+    "tagAllTerrain": "All-Terrain Flagship",
+    "segmentLuxury": "Luxury",
+    "segmentSports": "Sports",
+    "segmentOffroad": "4x4 Offroad",
+    "segmentEconomy": "Economy",
+    "planStandardName": "Standard Escrow Protection",
+    "planStandardDesc": "Third-party liability + 2,500 LYD deductible",
+    "planExecutiveName": "Comprehensive Executive Shield",
+    "planExecutiveDesc": "Zero deductible, rim & glass coverage",
+    "planExecutiveNote": "+120 LYD/d",
+    "deliveryMji": "Mitiga International Airport (VIP Lounge Concourse)",
+    "deliveryCorinthia": "Corinthia Hotel Tripoli (Valet Deck)",
+    "deliveryCustom": "Custom Concierge Address in Greater Tripoli",
+    "depositLabel": "Refundable Security Deposit",
+    "depositAmount": "2,500 LYD (Held)",
+    "freeMeetGreet": "Airport VIP Terminal Meet & Greet",
+    "freeRoadside": "24/7 Nationwide Satellite Roadside Assist",
+    "reserveNow": "Reserve Vehicle Now",
+    "confirmedWith": "Confirmed with {{operator}}!",
+    "trustCancellation": "Free cancellation up to 24 hours prior to pickup",
+    "trustContract": "Official Libyan Ministry of Transport e-Contract",
+    "trustEscrow": "Encrypted local card, wire, or cash escrow confirmation"
+  },
+  "checkout": {
+    "header": {
+      "stepLabel": "Step 2 of 2: Review & Secure Checkout",
+      "backLabel": "Back to Vehicle Details",
+      "crumbs": {
+        "fleet": "Fleet",
+        "tripoliLuxury": "Tripoli Luxury",
+        "tripoliFleet": "Tripoli Fleet",
+        "checkout": "Checkout"
+      }
+    },
+    "itinerary": {
+      "title": "Rental Itinerary",
+      "pickupLabel": "Pickup & Handover",
+      "dropoffLabel": "Return Depot",
+      "durationLabel": "{{days}} Days Reserved ({{hours}} Hours)",
+      "cancelNote": "Free cancellation up to 24h prior to pickup",
+      "changeLabel": "Change Dates"
+    },
+    "driver": {
+      "title": "Primary Driver Information",
+      "intro": "Enter official details matching your Libyan National ID or International Passport and driving credential.",
+      "fields": {
+        "firstName": {
+          "label": "First Name",
+          "placeholder": "First name"
+        },
+        "lastName": {
+          "label": "Last Name",
+          "placeholder": "Family name"
+        },
+        "email": {
+          "label": "Email Address",
+          "placeholder": "Email for digital keys & vouchers",
+          "badge": "Verified"
+        },
+        "phone": {
+          "label": "Libyan Mobile Phone",
+          "placeholder": "091 / 092 / 094",
+          "badge": "SMS Dispatch",
+          "hint": "Used for driver VIP pickup coordinator contact at Mitiga."
+        }
+      },
+      "confirmPrefix": "I confirm the primary driver is",
+      "confirmAge": "25 years or older",
+      "confirmRest": "and has held a valid physical driver's license for a minimum of 2 consecutive years."
+    },
+    "options": {
+      "title": "Selected Options & Protection",
+      "intro": "Tailor your executive reservation with premier roadside services and tailored protection.",
+      "recommended": "Recommended",
+      "perDay": "/ day",
+      "flatFee": "flat fee",
+      "addons": {
+        "insurance": {
+          "name": "Comprehensive Zero-Deductible Coverage",
+          "description": "Full exterior shield, windshield glass, tires, and third-party liability without excess."
+        },
+        "driver": {
+          "name": "Additional Authorized Driver",
+          "description": "Share the steering wheel with an accredited colleague or family member."
+        },
+        "childseat": {
+          "name": "Child Safety Seat (ISOFIX Sanitized)",
+          "description": "Premium ergonomic seat suitable for infant to 4 years old, pre-installed."
+        },
+        "delivery": {
+          "name": "Doorstep VIP Valet Handover",
+          "description": "Direct delivery to Corinthia Hotel, Radisson Blu, or private villa within Tripoli."
+        }
+      }
+    },
+    "payment": {
+      "title": "Payment Method",
+      "lockLabel": "256-bit SSL PCI-DSS Encrypted",
+      "railLabel": "Accepted Payment Rails",
+      "tabCardLabel": "Credit / Local Cards",
+      "tabCashLabel": "Pay on Pickup (Deposit)",
+      "cardValueNote": "Tokenized & Verified",
+      "cvcHelp": "3 digits on back of card",
+      "cashDepositHeading": "{{percent}}% Immediate Online Booking Deposit",
+      "cashNote": "Reserve the {{title}} today with a small 20% commitment charge ({{deposit}}). The remaining balance ({{remaining}}) can be settled in cash or via local point-of-sale terminal directly upon vehicle key collection at Mitiga VIP Desk.",
+      "cardFields": {
+        "cardholder": {
+          "label": "Cardholder Name",
+          "placeholder": "NAME AS ON CARD"
+        },
+        "cardNumber": {
+          "label": "Card Number",
+          "placeholder": "•••• •••• •••• 8842"
+        },
+        "expiry": {
+          "label": "Expires (MM/YY)",
+          "placeholder": "MM/YY"
+        },
+        "cvc": {
+          "label": "CVC / CVV",
+          "placeholder": "123"
+        },
+        "billingCity": {
+          "label": "Billing City",
+          "placeholder": "Tripoli"
+        }
+      },
+      "trustBadges": {
+        "centralBank": "Libyan Central Bank Authorized",
+        "instantSms": "Instant Confirmation SMS",
+        "zeroFees": "Zero Concealed Fees"
+      }
+    },
+    "summary": {
+      "ratingAndReviews": "{{rating}} · {{reviews}} reviews",
+      "timelinePickup": "Pick-up: {{date}}, {{time}}",
+      "timelineReturn": "Return: {{date}}, {{time}}",
+      "fareDetailsTitle": "Fare & Fee Details",
+      "baseRental": "Vehicle Base Rental ({{note}})",
+      "baseNote": "{{rate}} LYD × {{days}} days",
+      "municipalLabel": "Municipal & Platform Service Fee",
+      "depositLabel": "Refundable Security Deposit",
+      "depositNote": "Pre-authorization hold • Released on return",
+      "totalLabel": "Total Due Today",
+      "totalNote": "All applicable Libyan taxes included",
+      "ctaIdle": "Pay {{total}} & Confirm Booking",
+      "ctaProcessing": "Securing Reservation & Authorization...",
+      "ctaDone": "Booking Confirmed! SMS Voucher Dispatched",
+      "viewConfirmation": "View Booking Confirmation",
+      "secureNote": "Bank-grade encrypted transaction via Libyan Payment Network",
+      "agreementNote": "By clicking confirm, you agree to NexRide's Master Rental Agreement, Libyan Road Authority guidelines, and {{operator}} Terms.",
+      "valueProps": {
+        "freeCancel": {
+          "title": "Free Cancel",
+          "sub": "Up to 24h"
+        },
+        "exactModel": {
+          "title": "Exact Model",
+          "sub": "100% Guaranteed"
+        },
+        "hotline": {
+          "title": "24/7 Libyan",
+          "sub": "VIP Hotline"
+        }
+      }
+    }
+  },
+  "booking": {
+    "crumbs": {
+      "checkout": "Checkout",
+      "current": "Booking Confirmation"
+    },
+    "stepBadge": {
+      "caption": "Step 3 of 3:",
+      "value": "Secured & Verified"
+    },
+    "success": {
+      "badge": "Confirmed",
+      "validation": "Libya National Transport Authority Validated",
+      "title": "Booking Confirmed",
+      "desc": "Your {{vehicle}} reservation is secured. Confirmation SMS and downloadable digital travel credentials have been dispatched to your verified contacts.",
+      "printLabel": "Print Voucher",
+      "downloadLabel": "Download Digital PDF",
+      "toastPrint": "Voucher opened for print",
+      "toastDownload": "Generating official PDF voucher..."
+    },
+    "reference": {
+      "label": "Booking Reference:",
+      "copyTitle": "Copy code",
+      "copyToast": "Booking reference copied to clipboard",
+      "chips": {
+        "escrow": "Moamalat Secured Escrow",
+        "instantDispatch": "Instant Host Dispatch"
+      }
+    },
+    "timeline": {
+      "title": "Reservation Execution Schedule"
+    },
+    "milestones": {
+      "step1": "Step 01",
+      "step2": "Step 02",
+      "step3": "Step 03",
+      "statusDone": "Completed",
+      "statusNext": "Next Action",
+      "statusScheduled": "Scheduled",
+      "title1": "Payment & Reservation",
+      "title2": "Handover & Key Delivery",
+      "title3": "Vehicle Return",
+      "detail1": "Paid {{amount}} • 24 Oct 2024",
+      "detail2": "24 Oct 2024 · 10:00 AM at Mitiga VIP",
+      "detail3": "27 Oct 2024 · 10:00 AM (Mitiga)"
+    },
+    "vehicle": {
+      "badgeTier": "Executive Tier",
+      "badgeSpec": "2024 Specification",
+      "gpsLabel": "GPS & Telematics Active",
+      "category": "Full-Size Luxury Sedan"
+    },
+    "operator": {
+      "location": "Tripoli Central",
+      "ratingNote": "142 verified bookings",
+      "phoneLabel": "Contact Depot Dispatch"
+    },
+    "identification": {
+      "title": "Renter & Operator Identification",
+      "primaryDriver": "Primary Driver",
+      "dispatchHotline": "Dispatch Hotline",
+      "emailDelivery": "Email Delivery",
+      "noteVerified": "Passport & License Verified",
+      "noteSms": "SMS Alerts Active",
+      "noteToken": "Digital Token Sent"
+    },
+    "route": {
+      "title": "Trip Route & Schedule",
+      "daysBadge": "{{days}} Days / {{hours}} Hours",
+      "pickupLabel": "Pick-Up Depot",
+      "dropoffLabel": "Drop-Off Depot",
+      "pickupDatetime": "Thursday, 24 Oct 2024 · 10:00 AM",
+      "dropoffDatetime": "Sunday, 27 Oct 2024 · 10:00 AM",
+      "pickupNote": "Meet & Greet coordinator waiting at Terminal 1 Executive Arrivals lounge with passenger placard."
+    },
+    "payment": {
+      "title": "Payment Summary",
+      "paidBadge": "Paid in Full",
+      "depositLabel": "Refundable Deposit (Escrow Pre-auth)",
+      "totalLabel": "Total Settled",
+      "totalNote": "Via Moamalat / Libyan Card",
+      "viaNote": "Paid using Card ending in",
+      "authLabel": "Auth: #"
+    },
+    "fare": {
+      "baseRental": "Vehicle Base Rental ({{price}} LYD × {{days}} days)",
+      "addonDays": "{{name}} ({{price}} LYD × {{days}} days)",
+      "addonFlat": "{{name}} ({{price}} LYD flat)",
+      "municipalFee": "Municipal Fleet Fee & Platform Tax"
+    },
+    "protocol": {
+      "title": "Arrival & Handover Protocol",
+      "subtitle": "Review the essential checklist for seamless key exchange at Mitiga Airport VIP Terminal.",
+      "documents": {
+        "title": "Mandatory Documents",
+        "body": "Bring your physical Driver's License, Original Passport or Libyan National Identity Card, and the digital token on this screen."
+      },
+      "depot": {
+        "title": "Designated Depot Bay",
+        "body": "Mitiga Airport VIP Arrival Terminal, Dedicated Executive Parking Lot C, Bay 14. Dispatch assistant will be waiting."
+      },
+      "cancellation": {
+        "title": "Cancellation Policy",
+        "body": "Free 100% refund available up to 24 hours prior to scheduled departure (before 23 Oct 2024, 10:00 AM)."
+      }
+    },
+    "dock": {
+      "back": "Back to Marketplace",
+      "browseMore": "Browse More Vehicles",
+      "manage": "Manage Reservation"
+    }
+  }
+}

@@ -1,8 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ConfirmationIcon } from "./ConfirmationIcon";
 import type { ConfirmationMeta } from "../../types/bookingConfirmation";
 
 export const ExecutionTimeline: React.FC<{ meta: ConfirmationMeta }> = ({ meta }) => {
+  const { t } = useTranslation();
   const { milestones } = meta;
 
   const stateCls = (state: string) => {
@@ -14,7 +16,7 @@ export const ExecutionTimeline: React.FC<{ meta: ConfirmationMeta }> = ({ meta }
   return (
     <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm">
       <h2 className="text-[11px] uppercase tracking-wider font-bold text-[#64748B] mb-6">
-        Reservation Execution Schedule
+        {t("booking.timeline.title")}
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
         {milestones.map((m) => (
@@ -33,10 +35,10 @@ export const ExecutionTimeline: React.FC<{ meta: ConfirmationMeta }> = ({ meta }
                   m.state === "pending" ? "text-[#64748B]" : "text-[#2563EB]"
                 }`}
               >
-                {m.step} • {m.status}
+                {t(m.step)} • {t(m.status)}
               </span>
-              <span className="text-[16px] text-[#0F172A] font-bold">{m.title}</span>
-              <span className="text-[14px] text-[#64748B] mt-0.5">{m.detail}</span>
+              <span className="text-[16px] text-[#0F172A] font-bold">{t(m.title)}</span>
+              <span className="text-[14px] text-[#64748B] mt-0.5">{t(m.detail, m.values)}</span>
             </div>
           </div>
         ))}

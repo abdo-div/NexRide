@@ -3,39 +3,48 @@ import type { RegionHub, RegionFeature } from "../types/region";
 export const REGION_HUBS: RegionHub[] = [
   {
     id: "tripoli",
-    badge: "Capital Hub",
+    badge: "data.regions.tripoli.badge",
     code: "MJI",
     cityName: "TRIPOLI",
-    subtitle: "Mitiga MJI Airport & Hai Al-Andalus Marina Hub",
+    subtitle: "data.regions.tripoli.subtitle",
     vehiclesAvailable: 48,
-    features: ["VIP Lounge Pickup", "Armored Escort Available"],
+    features: [
+      "data.regions.tripoli.features.0",
+      "data.regions.tripoli.features.1",
+    ],
   },
   {
     id: "benghazi",
-    badge: "Eastern Hub",
+    badge: "data.regions.benghazi.badge",
     code: "BEN",
     cityName: "BENGHAZI",
-    subtitle: "Benina BEN Airport & Downtown Commercial Hub",
+    subtitle: "data.regions.benghazi.subtitle",
     vehiclesAvailable: 24,
-    features: ["Direct Hotel Delivery", "Corporate Accounts"],
+    features: [
+      "data.regions.benghazi.features.0",
+      "data.regions.benghazi.features.1",
+    ],
   },
   {
     id: "misrata",
-    badge: "Trade Corridor",
+    badge: "data.regions.misrata.badge",
     code: "MRA",
     cityName: "MISRATA",
-    subtitle: "Commercial Free Zone & Port Logistics Hub",
+    subtitle: "data.regions.misrata.subtitle",
     vehiclesAvailable: 16,
-    features: ["Heavy Duty 4x4 & Pickups", "Executive Sedans"],
+    features: [
+      "data.regions.misrata.features.0",
+      "data.regions.misrata.features.1",
+    ],
   },
   {
     id: "sabha",
-    badge: "Sahara Gateway",
+    badge: "data.regions.sabha.badge",
     code: "SEB",
     cityName: "SABHA",
-    subtitle: "Southern Desert Gateway & Exploration Base",
+    subtitle: "data.regions.sabha.subtitle",
     vehiclesAvailable: 12,
-    features: ["Sahara Expedition Prep", "Satellite Telematics"],
+    features: ["data.regions.sabha.features.0", "data.regions.sabha.features.1"],
   },
 ];
 
@@ -43,20 +52,19 @@ export const REGION_FEATURES: RegionFeature[] = [
   {
     id: "rescue",
     iconType: "sos",
-    title: "24/7 ROADSIDE RESCUE",
-    description: "Active fleet patrol across the Libyan Coastal Expressway",
+    title: "data.regionFeatures.rescue.title",
+    description: "data.regionFeatures.rescue.description",
   },
   {
     id: "telematics",
     iconType: "gps",
-    title: "GPS TELEMATICS INCLUDED",
-    description: "Instant coordinate tracking & remote breakdown assistance",
+    title: "data.regionFeatures.telematics.title",
+    description: "data.regionFeatures.telematics.description",
   },
   {
     id: "clearance",
     iconType: "shield",
-    title: "INTER-CITY TRAVEL CLEARANCE",
-    description:
-      "Pre-cleared digital rental documentation for transit checkpoints",
+    title: "data.regionFeatures.clearance.title",
+    description: "data.regionFeatures.clearance.description",
   },
 ];

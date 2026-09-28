@@ -82,7 +82,7 @@ export interface PaymentMeta {
   tabCardLabel: string;
   tabCashLabel: string;
   cashDepositPercent: number;
-  cashNote: (vehicleTitle: string, deposit: number, remaining: number) => string;
+  cashNote: string;
   trustBadges: TrustBadge[];
 }
 
@@ -110,17 +110,18 @@ export interface CheckoutMeta {
   securityDeposit: { label: string; note: string; amount: number };
   totalLabel: string;
   totalNote: string;
-  ctaIdle: (total: number) => string;
+  ctaIdle: string;
   ctaProcessing: string;
   ctaDone: string;
   secureNote: string;
-  agreementNote: (operator: string) => string;
+  agreementNote: string;
   valueProps: ValueProp[];
 }
 
 export interface FareLine {
   id: string;
-  label: string;
+  labelKey: string;
+  note: string | null;
   amount: number;
 }
 

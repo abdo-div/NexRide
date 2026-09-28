@@ -14,7 +14,7 @@ export const Hero: React.FC = () => {
         />
 
         {/* Soft White Gradient Layer to keep left-side text fully readable */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 via-45% to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-r rtl:bg-gradient-to-l from-white via-white/80 via-45% to-transparent"></div>
       </div>
 
       {/* Content Container */}

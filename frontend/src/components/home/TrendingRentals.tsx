@@ -1,17 +1,19 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { TrendingHeader } from "./TrendingHeader";
 import { TrendingCard } from "./TrendingCard";
 import { ExploreFleetFooter } from "./ExploreFleetFooter";
 import { TRENDING_CARS_DATA } from "../../data/trendingCarsData";
 
 export const TrendingRentals: React.FC = () => {
+  const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState<string>("All Fleet");
 
   const categories = [
-    "All Fleet",
-    "Luxury SUVs",
-    "Sports & Coupe",
-    "Desert 4x4",
+    { key: "All Fleet", label: t("home.trending.categories.allFleet") },
+    { key: "Luxury SUVs", label: t("home.trending.categories.luxurySUV") },
+    { key: "Sports & Coupe", label: t("home.trending.categories.sportsCoupe") },
+    { key: "Desert 4x4", label: t("home.trending.categories.desert4x4") },
   ];
 
   const filteredCars =

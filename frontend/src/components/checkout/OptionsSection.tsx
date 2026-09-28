@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import type { CheckoutMeta } from "../../types/checkout";
 
 export const OptionsSection: React.FC<{
@@ -6,6 +7,8 @@ export const OptionsSection: React.FC<{
   selected: Set<string>;
   onToggle: (id: string) => void;
 }> = ({ meta, selected, onToggle }) => {
+  const { t } = useTranslation();
+
   return (
     <section className="bg-white rounded-2xl p-6 shadow-sm border border-[#E2E8F0] flex flex-col gap-5">
       <div className="flex flex-col gap-1">
@@ -13,9 +16,9 @@ export const OptionsSection: React.FC<{
           <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold text-[14px]">
             3
           </div>
-          <h2 className="text-[18px] font-bold text-[#0F172A]">{meta.optionsTitle}</h2>
+          <h2 className="text-[18px] font-bold text-[#0F172A]">{t(meta.optionsTitle)}</h2>
         </div>
-        <p className="text-[14px] text-[#64748B] ml-10">{meta.optionsIntro}</p>
+        <p className="text-[14px] text-[#64748B] ms-10">{t(meta.optionsIntro)}</p>
       </div>
 
       <div className="flex flex-col gap-3">
@@ -36,21 +39,21 @@ export const OptionsSection: React.FC<{
               <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex flex-col gap-0.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-[15px] font-bold text-[#0F172A]">{addon.name}</span>
+                    <span className="text-[15px] font-bold text-[#0F172A]">{t(addon.name)}</span>
                     {addon.recommended && (
                       <span className="px-2 py-0.5 rounded-full bg-[#2563EB] text-white text-[11px] font-bold">
-                        Recommended
+                        {t("checkout.options.recommended")}
                       </span>
                     )}
                   </div>
-                  <p className="text-[14px] text-[#64748B]">{addon.description}</p>
+                  <p className="text-[14px] text-[#64748B]">{t(addon.description)}</p>
                 </div>
-                <div className="text-right shrink-0">
+                <div className="text-end shrink-0">
                   <span className="text-[15px] font-bold text-[#0F172A]">
                     +{addon.price.toLocaleString("en-US")} LYD
                   </span>
                   <span className="text-[11px] text-[#64748B] block">
-                    {isDay ? "/ day" : "flat fee"}
+                    {isDay ? t("checkout.options.perDay") : t("checkout.options.flatFee")}
                   </span>
                 </div>
               </div>

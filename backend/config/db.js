@@ -1,11 +1,19 @@
 import mongoose from "mongoose";
 import logger from "../utils/logger.js";
 
-const connectDB = async () => {
-  const DB_URI =
+const getMongoUri = () => {
+  return (
+    process.env.MONGODB_URI ||
+    process.env.MONGO_URI ||
     process.env.DATABASE_URI ||
+    process.env.DATABASE_URL ||
     process.env.DATABASE ||
-    "mongodb://127.0.0.1:27017/nexride?replicaSet=rs0";
+    "mongodb://127.0.0.1:27017/nexride?replicaSet=rs0"
+  );
+};
+
+const connectDB = async () => {
+  const DB_URI = getMongoUri();
 
   try {
     const conn = await mongoose.connect(DB_URI, {
@@ -15,9 +23,13 @@ const connectDB = async () => {
     });
 
     logger.database(`Connected to host: ${conn.connection.host}`);
+    return true;
   } catch (error) {
     logger.error(`MongoDB Connection Error: ${error.message}`);
-    process.exit(1);
+    logger.warn(
+      "MongoDB is unavailable; continuing startup in degraded mode. Set DATABASE_URI to a running instance to enable full readiness.",
+    );
+    return false;
   }
 };
 

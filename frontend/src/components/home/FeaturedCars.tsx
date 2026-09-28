@@ -1,12 +1,20 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FeaturedHeader } from "./FeaturedHeader";
 import { CategoryTabs } from "./CategoryTabs";
 import { CarCard } from "./CarCard";
 import { SAMPLE_CARS } from "../../data/carsData";
 
 export const FeaturedCars: React.FC = () => {
+  const { t } = useTranslation();
+  const categories = [
+    { key: "All", label: t("home.featured.categories.all") },
+    { key: "Sedan", label: t("home.featured.categories.sedan") },
+    { key: "SUV", label: t("home.featured.categories.suv") },
+    { key: "Luxury", label: t("home.featured.categories.luxury") },
+    { key: "Sports", label: t("home.featured.categories.sports") },
+  ];
   const [selectedFilter, setSelectedFilter] = useState<string>("All");
-  const categories = ["All", "Sedan", "SUV", "Luxury", "Sports"];
 
   const filteredCars =
     selectedFilter === "All"

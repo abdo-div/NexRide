@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Car, Share2, Heart, Download } from "lucide-react";
 
@@ -11,6 +12,7 @@ interface Props {
 const Separator = () => <span className="text-[#CBD5E1]">/</span>;
 
 export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave }) => {
+  const { t } = useTranslation();
   const [copied, setCopied] = React.useState(false);
 
   const share = async () => {
@@ -31,19 +33,19 @@ export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave
           className="hover:text-[#2563EB] transition-colors flex items-center gap-1 shrink-0"
         >
           <Car className="w-4 h-4" />
-          {crumbs[0] ?? "Cars"}
+          {t(crumbs[0] ?? "vehicleDetail.crumbCars")}
         </Link>
         {crumbs.slice(1, -1).map((c) => (
           <React.Fragment key={c}>
             <Separator />
             <Link to="/FleetPage" className="hover:text-[#2563EB] transition-colors shrink-0">
-              {c}
+              {t(c)}
             </Link>
           </React.Fragment>
         ))}
         <Separator />
         <span className="text-[#0F172A] font-semibold truncate">
-          {crumbs[crumbs.length - 1] ?? ""}
+          {t(crumbs[crumbs.length - 1] ?? "")}
         </span>
       </nav>
 
@@ -54,7 +56,7 @@ export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave
           className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-[#64748B] hover:text-[#0F172A] transition-colors shadow-sm text-[13px] font-medium"
         >
           <Share2 className="w-[18px] h-[18px]" />
-          {copied ? "Link Copied!" : "Share"}
+          {copied ? t("vehicleDetail.linkCopied") : t("vehicleDetail.share")}
         </button>
         <button
           type="button"
@@ -64,14 +66,14 @@ export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave
           }`}
         >
           <Heart className={`w-[18px] h-[18px] ${saved ? "fill-[#2563EB] text-[#2563EB]" : ""}`} />
-          {saved ? "Saved" : "Save"}
+          {saved ? t("nav.saved") : t("vehicleDetail.save")}
         </button>
         <button
           type="button"
           className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-[#64748B] hover:text-[#0F172A] transition-colors shadow-sm text-[13px] font-medium"
         >
           <Download className="w-[18px] h-[18px]" />
-          Terms Sheet
+          {t("vehicleDetail.termsSheet")}
         </button>
       </div>
     </div>

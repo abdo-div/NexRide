@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import { BadgeCheck, Star, Shield, ArrowRight } from "lucide-react";
 import { CheckoutIcon } from "./CheckoutIcon";
 import type { CheckoutMeta, CheckoutTotals } from "../../types/checkout";
@@ -16,7 +17,9 @@ interface Props {
 const totalLyd = (n: number) => `${n.toLocaleString("en-US")} LYD`;
 
 export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, onConfirm }) => {
+  const { t } = useTranslation();
   const { itinerary, municipalLabel, securityDeposit, totalLabel, totalNote } = meta;
+  const days = itinerary.days;
   const chips = [vehicle.specs.engine, vehicle.specs.gearbox, vehicle.specs.seats, vehicle.specs.fuel];
 
   return (
@@ -31,12 +34,12 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
               className="w-full h-full object-cover"
             />
             {vehicle.badgeTag && (
-              <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-white/90 backdrop-blur-md text-[11px] font-bold text-[#0F172A]">
+              <div className="absolute top-3 start-3 px-2.5 py-1 rounded-md bg-white/90 backdrop-blur-md text-[11px] font-bold text-[#0F172A]">
                 {vehicle.badgeTag}
               </div>
             )}
             {vehicle.badgeTagSecondary && (
-              <div className="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-[#2563EB] text-white text-[11px] font-bold">
+              <div className="absolute top-3 end-3 px-2.5 py-1 rounded-md bg-[#2563EB] text-white text-[11px] font-bold">
                 {vehicle.badgeTagSecondary}
               </div>
             )}
@@ -68,7 +71,10 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
                   {vehicle.operator.isVerified && <BadgeCheck className="w-[14px] h-[14px] text-[#2563EB]" />}
                 </div>
                 <span className="text-[11px] text-[#64748B]">
-                  {vehicle.operator.rating.toFixed(2)} · {vehicle.operator.reviewsCount} reviews
+                  {t("checkout.summary.ratingAndReviews", {
+                    rating: vehicle.operator.rating.toFixed(2),
+                    reviews: vehicle.operator.reviewsCount,
+                  })}
                 </span>
               </div>
             </div>
@@ -83,8 +89,20 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
         {/* Timeline recap */}
         <div className="p-3.5 rounded-xl bg-[#F8FAFC] flex flex-col gap-2 text-[11px]">
           {[
-            { label: `Pick-up: ${itinerary.pickup.date}, ${itinerary.pickup.time}`, value: itinerary.pickup.location },
-            { label: `Return: ${itinerary.dropoff.date}, ${itinerary.dropoff.time}`, value: itinerary.dropoff.location },
+            {
+              label: t("checkout.summary.timelinePickup", {
+                date: itinerary.pickup.date,
+                time: itinerary.pickup.time,
+              }),
+              value: itinerary.pickup.location,
+            },
+            {
+              label: t("checkout.summary.timelineReturn", {
+                date: itinerary.dropoff.date,
+                time: itinerary.dropoff.time,
+              }),
+              value: itinerary.dropoff.location,
+            },
           ].map((row) => (
             <div key={row.label} className="flex items-center justify-between gap-2">
               <span className="text-[#64748B] flex items-center gap-1.5">{row.label}</span>
@@ -95,20 +113,29 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
 
         {/* Fare breakdown */}
         <div className="flex flex-col gap-3">
-          <h3 className="text-[15px] font-bold text-[#0F172A]">Fare &amp; Fee Details</h3>
+          <h3 className="text-[15px] font-bold text-[#0F172A]">{t("checkout.summary.fareDetailsTitle")}</h3>
           <div className="flex flex-col gap-2 text-[13px]">
             <div className="flex justify-between items-center text-[#0F172A]">
-              <span>Vehicle Base Rental ({totals.baseNote})</span>
+              <span>
+                {t("checkout.summary.baseRental", {
+                  note: t(totals.baseNote, {
+                    rate: vehicle.pricePerDay.toLocaleString("en-US"),
+                    days,
+                  }),
+                })}
+              </span>
               <span className="font-semibold">{totalLyd(totals.base)}</span>
             </div>
             {totals.addonLines.map((line) => (
               <div key={line.id} className="flex justify-between items-center text-[#0F172A]">
-                <span className="text-[#64748B]">{line.label}</span>
+                <span className="text-[#64748B]">
+                  {line.note ? `${t(line.labelKey)} (${line.note})` : t(line.labelKey)}
+                </span>
                 <span className="font-semibold">{totalLyd(line.amount)}</span>
               </div>
             ))}
             <div className="flex justify-between items-center text-[#0F172A]">
-              <span className="text-[#64748B]">{municipalLabel}</span>
+              <span className="text-[#64748B]">{t(municipalLabel)}</span>
               <span className="font-semibold">{totalLyd(totals.municipalFee)}</span>
             </div>
           </div>
@@ -117,8 +144,8 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
             <div className="flex items-center gap-2">
               <Shield className="w-[18px] h-[18px] text-[#2563EB]" />
               <div className="flex flex-col">
-                <span className="text-[11px] font-bold text-[#0F172A]">{securityDeposit.label}</span>
-                <span className="text-[10px] text-[#64748B]">{securityDeposit.note}</span>
+                <span className="text-[11px] font-bold text-[#0F172A]">{t(securityDeposit.label)}</span>
+                <span className="text-[10px] text-[#64748B]">{t(securityDeposit.note)}</span>
               </div>
             </div>
             <span className="text-[12px] font-bold text-[#0F172A]">
@@ -129,11 +156,11 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
           <div className="p-4 rounded-xl bg-[#F8FAFC] flex items-center justify-between mt-1">
             <div className="flex flex-col">
               <span className="text-[11px] uppercase tracking-wider text-[#64748B] font-bold">
-                {totalLabel}
+                {t(totalLabel)}
               </span>
-              <span className="text-[10px] text-[#94A3B8]">{totalNote}</span>
+              <span className="text-[10px] text-[#94A3B8]">{t(totalNote)}</span>
             </div>
-            <div className="text-right">
+            <div className="text-end">
               <span className="text-[28px] font-extrabold text-[#2563EB] tracking-tight tabular-nums">
                 {totalLyd(totals.total)}
               </span>
@@ -149,8 +176,8 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
               className="w-full py-4 px-6 rounded-xl bg-[#0F172A] hover:bg-slate-800 text-white text-[16px] font-bold shadow-lg flex items-center justify-center gap-2 transition-all transform active:scale-[0.98]"
             >
               <CheckoutIcon name="check" className="w-5 h-5" />
-              View Booking Confirmation
-              <ArrowRight className="w-5 h-5" />
+              {t("checkout.summary.viewConfirmation")}
+              <ArrowRight className="w-5 h-5 rtl:rotate-180" />
             </Link>
           ) : (
             <button
@@ -166,12 +193,14 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
               {phase === "processing" ? (
                 <>
                   <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {meta.ctaProcessing}
+                  {t(meta.ctaProcessing)}
                 </>
               ) : (
                 <>
-                  {meta.ctaIdle(totals.total)}
-                  <span aria-hidden>→</span>
+                  {t(meta.ctaIdle, { total: totalLyd(totals.total) })}
+                  <span aria-hidden className="inline-block rtl:rotate-180">
+                    →
+                  </span>
                 </>
               )}
             </button>
@@ -179,10 +208,10 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
           <div className="flex flex-col gap-2 text-center">
             <p className="text-[11px] text-[#64748B] flex items-center justify-center gap-1.5">
               <Shield className="w-[14px] h-[14px] text-[#2563EB]" />
-              {meta.secureNote}
+              {t(meta.secureNote)}
             </p>
             <p className="text-[10px] text-[#94A3B8] leading-tight">
-              {meta.agreementNote(vehicle.operator.name)}
+              {t(meta.agreementNote, { operator: vehicle.operator.name })}
             </p>
           </div>
         </div>
@@ -195,8 +224,8 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
               className="p-2.5 rounded-lg bg-[#F8FAFC] text-center flex flex-col items-center gap-1"
             >
               <CheckoutIcon name={prop.icon} className="w-[18px] h-[18px] text-[#2563EB]" />
-              <span className="text-[11px] font-bold text-[#0F172A]">{prop.title}</span>
-              <span className="text-[10px] text-[#94A3B8]">{prop.sub}</span>
+              <span className="text-[11px] font-bold text-[#0F172A]">{t(prop.title)}</span>
+              <span className="text-[10px] text-[#94A3B8]">{t(prop.sub)}</span>
             </div>
           ))}
         </div>

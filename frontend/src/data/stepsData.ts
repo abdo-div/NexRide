@@ -4,33 +4,29 @@ export const HOW_IT_WORKS_STEPS: HowItWorksStep[] = [
   {
     stepNumber: "01",
     iconType: "search",
-    title: "SEARCH",
-    description:
-      "Real-time inventories from licensed Libyan agencies with transparent daily rates in LYD. Filter by city, class, and tarmac delivery.",
-    footerText: "Verified Fleet Database",
+    title: "data.steps.search.title",
+    description: "data.steps.search.description",
+    footerText: "data.steps.search.footerText",
   },
   {
     stepNumber: "02",
     iconType: "compare",
-    title: "COMPARE",
-    description:
-      "Compare technical specs, rental rules, insurance escrows, and verified customer ratings before locking your booking.",
-    footerText: "Side-by-Side Clarity",
+    title: "data.steps.compare.title",
+    description: "data.steps.compare.description",
+    footerText: "data.steps.compare.footerText",
   },
   {
     stepNumber: "03",
     iconType: "reserve",
-    title: "RESERVE",
-    description:
-      "Lock in vehicle instantly in 60s with digital booking token recognized across commercial checkpoints with escrow security.",
-    footerText: "60-Second Escrow Lock",
+    title: "data.steps.reserve.title",
+    description: "data.steps.reserve.description",
+    footerText: "data.steps.reserve.footerText",
   },
   {
     stepNumber: "04",
     iconType: "drive",
-    title: "DRIVE",
-    description:
-      "Tarmac handover at Mitiga or Benina, or direct concierge delivery to your hotel or residence with keys ready.",
-    footerText: "Instant Tarmac Handover",
+    title: "data.steps.drive.title",
+    description: "data.steps.drive.description",
+    footerText: "data.steps.drive.footerText",
   },
 ];

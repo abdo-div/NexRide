@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Heart, Fuel, Gauge, Users, MapPin, CheckCircle2 } from "lucide-react";
 import type { Car } from "../../types/car";
 
@@ -6,7 +7,29 @@ interface CarCardProps {
   car: Car;
 }
 
+const TYPE_LABEL_KEYS: Record<string, string> = {
+  sedan: "home.featured.categories.sedan",
+  suv: "home.featured.categories.suv",
+  luxury: "home.featured.categories.luxury",
+  sports: "home.featured.categories.sports",
+};
+
 export const CarCard: React.FC<CarCardProps> = ({ car }) => {
+  const { t } = useTranslation();
+  const typeKey = TYPE_LABEL_KEYS[car.type.toLowerCase()];
+  const transmissionKey =
+    car.transmission.toLowerCase() === "manual"
+      ? "data.common.manual"
+      : "data.common.automatic";
+  const fuelKey =
+    car.fuelType.toLowerCase() === "diesel"
+      ? "data.common.diesel"
+      : car.fuelType.toLowerCase() === "hybrid"
+      ? "data.common.hybrid"
+      : car.fuelType.toLowerCase() === "electric"
+      ? "data.common.electric"
+      : "data.common.gasoline";
+
   return (
     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
       {/* Card Header & Image */}
@@ -21,12 +44,12 @@ export const CarCard: React.FC<CarCardProps> = ({ car }) => {
           {car.isVerified && (
             <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
           )}
-          <span>{car.type}</span>
+          <span>{typeKey ? t(typeKey) : car.type}</span>
         </div>
 
         <button
           type="button"
-          aria-label="Save car"
+          aria-label={t("data.common.saveCar")}
           className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-md text-slate-600 hover:text-rose-500 hover:bg-white shadow-xs transition-colors"
         >
           <Heart className="w-4 h-4" />
@@ -51,15 +74,17 @@ export const CarCard: React.FC<CarCardProps> = ({ car }) => {
           <div className="grid grid-cols-3 gap-2 py-3.5 my-3 border-y border-slate-100 text-xs text-slate-600 font-medium">
             <div className="flex items-center gap-1.5">
               <Gauge className="w-3.5 h-3.5 text-slate-400" />
-              <span>{car.transmission}</span>
+              <span>{t(transmissionKey)}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Fuel className="w-3.5 h-3.5 text-slate-400" />
-              <span>{car.fuelType}</span>
+              <span>{t(fuelKey)}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 text-slate-400" />
-              <span>{car.seats} Seats</span>
+              <span>
+                {car.seats} {t("data.common.seats")}
+              </span>
             </div>
           </div>
         </div>
@@ -68,14 +93,14 @@ export const CarCard: React.FC<CarCardProps> = ({ car }) => {
         <div className="flex items-center justify-between pt-1 mt-auto">
           <div>
             <span className="text-xs text-slate-500 font-medium">
-              Starting from
+              {t("home.featured.startingFrom")}
             </span>
             <div className="flex items-baseline gap-1">
               <span className="text-xl font-extrabold text-blue-600">
                 {car.pricePerDay}
               </span>
               <span className="text-xs font-bold text-slate-700">
-                {car.currency} / day
+                {car.currency} / {t("data.common.day")}
               </span>
             </div>
           </div>
@@ -84,7 +109,7 @@ export const CarCard: React.FC<CarCardProps> = ({ car }) => {
             href={`#book-${car.id}`}
             className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs hover:shadow-md transition-all active:scale-95"
           >
-            Rent Now
+            {t("data.common.rentNow")}
           </a>
         </div>
       </div>

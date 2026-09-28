@@ -3,7 +3,7 @@ import { CheckCircle2 } from "lucide-react";
 
 export const ConfirmationToast: React.FC<{ text: string | null }> = ({ text }) => (
   <div
-    className={`fixed bottom-8 right-8 z-50 flex items-center gap-2 bg-[#0F172A] text-white px-4 py-2.5 rounded-xl shadow-xl transition-all duration-300 ${
+    className={`fixed bottom-8 end-8 z-50 flex items-center gap-2 bg-[#0F172A] text-white px-4 py-2.5 rounded-xl shadow-xl transition-all duration-300 ${
       text ? "translate-y-0 opacity-100" : "translate-y-24 opacity-0 pointer-events-none"
     }`}
   >

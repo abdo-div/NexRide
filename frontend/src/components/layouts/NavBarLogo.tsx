@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Car } from "lucide-react";
 import { Link } from "react-router";
 
@@ -7,6 +8,7 @@ interface NavBarLogoProps {
 }
 
 export const NavBarLogo: React.FC<NavBarLogoProps> = ({ onDark = false }) => {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center gap-8 shrink-0">
       <Link to="/" className="flex items-center gap-2 group">
@@ -30,7 +32,7 @@ export const NavBarLogo: React.FC<NavBarLogoProps> = ({ onDark = false }) => {
                 : "bg-blue-50 border-blue-200 text-blue-700"
             }`}
           >
-            LIBYA
+            {t("nav.libya")}
           </span>
         </div>
       </Link>

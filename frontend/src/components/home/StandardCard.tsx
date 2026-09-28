@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ShieldCheck, Building2, CreditCard, Car } from "lucide-react";
 import type { StandardFeature } from "../../types/standard";
 
@@ -7,6 +8,7 @@ interface StandardCardProps {
 }
 
 export const StandardCard: React.FC<StandardCardProps> = ({ feature }) => {
+  const { t } = useTranslation();
   const renderIcon = () => {
     switch (feature.iconType) {
       case "shield":
@@ -32,12 +34,12 @@ export const StandardCard: React.FC<StandardCardProps> = ({ feature }) => {
 
         {/* Title */}
         <h3 className="font-black text-lg text-slate-900 tracking-tight mb-3 group-hover:text-blue-600 transition-colors">
-          {feature.title}
+          {t(feature.title)}
         </h3>
 
         {/* Description */}
         <p className="text-xs text-slate-500 font-medium leading-relaxed">
-          {feature.description}
+          {t(feature.description)}
         </p>
       </div>
     </div>

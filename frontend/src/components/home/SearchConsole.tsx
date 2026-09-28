@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Search,
   MapPin,
@@ -39,12 +40,6 @@ const TIME_OPTIONS: string[] = Array.from({ length: 24 * 2 }, (_, i) => {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 });
 
-const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
-const WEEKDAY_HEADS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
-
 interface LocationOption {
   name: string;
   kind: "city" | "airport";
@@ -62,8 +57,14 @@ function buildMonth(year: number, month: number): (Date | null)[] {
 
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
-const fmtDate = (d: Date | null) =>
-  d ? d.toLocaleDateString("en-GB", { weekday: "short", day: "2-digit", month: "short" }) : "";
+const fmtDate = (
+  d: Date | null,
+  weekdayHeads: string[],
+  months: string[],
+) =>
+  d
+    ? `${weekdayHeads[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`
+    : "";
 const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
 
 // ----------------------------------------------------------------------------
@@ -91,6 +92,10 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
   onClose,
   popupRef,
 }) => {
+  const { t } = useTranslation();
+  const months = t("home.search.months").split(" ");
+  const weekdayHeads = t("home.search.weekdayHeads").split(" ");
+
   const today = startOfDay(new Date());
   const initial = value && value >= (min ?? today) ? value : min ?? today;
   const [view, setView] = useState({
@@ -137,7 +142,7 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
               {chip}
             </span>
             <span className="text-sm font-bold text-slate-900">
-              {MONTHS[view.month]} {view.year}
+              {months[view.month]} {view.year}
             </span>
           </div>
           <div className="flex items-center gap-1">
@@ -147,7 +152,7 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
               disabled={!canGoPrev}
               className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-600 hover:bg-slate-100 disabled:opacity-30"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
             </button>
             <button
               type="button"
@@ -155,7 +160,7 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
               disabled={!canGoNext}
               className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-600 hover:bg-slate-100 disabled:opacity-30"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4 rtl:rotate-180" />
             </button>
           </div>
         </div>
@@ -171,7 +176,7 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
                 : "border-slate-200 text-slate-600 hover:border-blue-600 hover:text-blue-600"
             }`}
           >
-            Today
+            {t("home.search.today")}
           </button>
           <button
             type="button"
@@ -182,7 +187,7 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
                 : "border-slate-200 text-slate-600 hover:border-blue-600 hover:text-blue-600"
             }`}
           >
-            Tomorrow
+            {t("home.search.tomorrow")}
           </button>
           <button
             type="button"
@@ -193,15 +198,15 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
                 : "border-slate-200 text-slate-600 hover:border-blue-600 hover:text-blue-600"
             }`}
           >
-            + 1 Week
+            {t("home.search.plusWeek")}
           </button>
         </div>
 
         {/* Calendar grid */}
         <div className="p-3 pb-1">
           <div className="grid grid-cols-7 mb-1">
-            {WEEKDAY_HEADS.map((w) => (
-              <span key={w} className="text-center text-[9px] font-bold text-slate-400 py-1">
+            {weekdayHeads.map((w, i) => (
+              <span key={i} className="text-center text-[9px] font-bold text-slate-400 py-1">
                 {w}
               </span>
             ))}
@@ -235,21 +240,21 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
         {/* Time list (horizontal grid, no scroll) */}
         <div className="px-3 pb-3">
           <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-            {chip} time
+            {chip} · {t("home.search.time")}
           </div>
           <div className="grid grid-cols-8 gap-1">
-            {TIME_OPTIONS.map((t) => (
+            {TIME_OPTIONS.map((tEl) => (
               <button
-                key={t}
+                key={tEl}
                 type="button"
-                onClick={() => onPick(value ?? today, t)}
+                onClick={() => onPick(value ?? today, tEl)}
                 className={`py-1 rounded-md text-[10px] font-bold text-center transition-colors ${
-                  time === t
+                  time === tEl
                     ? "bg-blue-600 text-white"
                     : "text-slate-600 hover:bg-slate-100"
                 }`}
               >
-                {t}
+                {tEl}
               </button>
             ))}
           </div>
@@ -257,14 +262,14 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
 
         <div className="flex items-center justify-between px-3 py-2 border-t border-slate-100">
           <span className="text-[11px] font-semibold text-slate-500">
-            Select date &amp; time
+            {t("home.search.selectDateTime")}
           </span>
           <button
             type="button"
             onClick={onClose}
             className="text-[11px] font-bold text-blue-600 hover:underline"
           >
-            Close
+            {t("home.search.close")}
           </button>
         </div>
       </div>
@@ -295,6 +300,7 @@ const LocationField: React.FC<LocationFieldProps> = ({
   onPick,
   popupRef,
 }) => {
+  const { t } = useTranslation();
   const [filterKind, setFilterKind] = useState<"city" | "airport" | "all">("all");
   const [query, setQuery] = useState("");
   const [mapMode, setMapMode] = useState(false);
@@ -350,9 +356,9 @@ const LocationField: React.FC<LocationFieldProps> = ({
           <div className="flex items-center gap-1 p-2">
             {(
               [
-                ["all", "All"],
-                ["city", "Cities"],
-                ["airport", "Airports"],
+                ["all", t("home.search.all")],
+                ["city", t("home.search.cities")],
+                ["airport", t("home.search.airports")],
               ] as const
             ).map(([k, lbl]) => (
               <button
@@ -378,7 +384,7 @@ const LocationField: React.FC<LocationFieldProps> = ({
                 autoFocus={open}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search for a city or airport…"
+                placeholder={t("home.search.searchLocation")}
                 className="w-full bg-transparent py-2 text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none"
               />
             </div>
@@ -421,7 +427,7 @@ const LocationField: React.FC<LocationFieldProps> = ({
             ))}
             {cityList.length === 0 && airportList.length === 0 && (
               <div className="px-2.5 py-4 text-xs text-slate-400 text-center">
-                No locations match "{query}".
+                {t("home.search.noLocations", { query })}
               </div>
             )}
           </div>
@@ -434,7 +440,7 @@ const LocationField: React.FC<LocationFieldProps> = ({
           >
             <span className="flex items-center gap-2 text-[11px] font-bold text-slate-700">
               <Map className="w-3.5 h-3.5 text-slate-400" />
-              Rental offers on the map
+              {t("home.search.mapOffers")}
             </span>
             <span
               className={`w-8 h-[18px] rounded-full p-[2px] transition-colors ${
@@ -459,6 +465,7 @@ const LocationField: React.FC<LocationFieldProps> = ({
 // ----------------------------------------------------------------------------
 
 export const SearchConsole: React.FC = () => {
+  const { t } = useTranslation();
   const today = startOfDay(new Date());
 
   const [openPicker, setOpenPicker] = useState<
@@ -515,9 +522,9 @@ export const SearchConsole: React.FC = () => {
     setReturnDate(toDate);
   };
 
-  const handlePickupDate = (d: Date, t: string) => {
+  const handlePickupDate = (d: Date, tEl: string) => {
     setPickupDate(d);
-    setPickupTime(t);
+    setPickupTime(tEl);
     if (returnDate && returnDate < d) setReturnDate(d);
   };
 
@@ -531,10 +538,12 @@ export const SearchConsole: React.FC = () => {
       <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
       <div className="flex-1 min-w-0 text-left">
         <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-          Pick-up date &amp; time
+          {t("home.search.pickupDateTime")}
         </div>
         <div className={`truncate text-sm font-bold ${pickupDate ? "text-slate-900" : "text-slate-400"}`}>
-          {pickupDate ? `${fmtDate(pickupDate)} · ${pickupTime}` : "Today · 10:00"}
+          {pickupDate
+            ? `${fmtDate(pickupDate, t("home.search.weekdayHeads").split(" "), t("home.search.months").split(" "))} · ${pickupTime}`
+            : `${t("home.search.today")} · ${pickupTime}`}
         </div>
       </div>
       <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
@@ -546,10 +555,12 @@ export const SearchConsole: React.FC = () => {
       <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
       <div className="flex-1 min-w-0 text-left">
         <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-          Return date &amp; time
+          {t("home.search.returnDateTime")}
         </div>
         <div className={`truncate text-sm font-bold ${returnDate ? "text-slate-900" : "text-slate-400"}`}>
-          {returnDate ? `${fmtDate(returnDate)} · ${returnTime}` : `Today · ${returnTime}`}
+          {returnDate
+            ? `${fmtDate(returnDate, t("home.search.weekdayHeads").split(" "), t("home.search.months").split(" "))} · ${returnTime}`
+            : `${t("home.search.today")} · ${returnTime}`}
         </div>
       </div>
       <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
@@ -568,10 +579,10 @@ export const SearchConsole: React.FC = () => {
           {/* Pick-up location */}
           <div className="bg-white rounded-t-2xl lg:rounded-tr-none relative">
             <LocationField
-              label="Pick-up"
+              label={t("home.search.pickup")}
               value={pickupLocation}
               open={openPicker === "pickup"}
-              placeholder="Choose pick-up location"
+              placeholder={t("home.search.choosePickup")}
               onToggle={() => setOpenPicker(openPicker === "pickup" ? null : "pickup")}
               onPick={(opt) => {
                 setPickupLocation(opt);
@@ -593,7 +604,7 @@ export const SearchConsole: React.FC = () => {
             <CalendarPopup
               key={openPicker === "from" ? "from-open" : "from-closed"}
               open={openPicker === "from"}
-              chip="Pick-up"
+              chip={t("home.search.pickup")}
               value={pickupDate}
               time={pickupTime}
               min={today}
@@ -615,13 +626,13 @@ export const SearchConsole: React.FC = () => {
             <CalendarPopup
               key={openPicker === "to" ? "to-open" : "to-closed"}
               open={openPicker === "to"}
-              chip="Return"
+              chip={t("home.search.return")}
               value={returnDate}
               time={returnTime}
               min={pickupDate ?? today}
-              onPick={(d, t) => {
+              onPick={(d, tEl) => {
                 clampReturn(d);
-                setReturnTime(t);
+                setReturnTime(tEl);
               }}
               onClose={() => setOpenPicker(null)}
               popupRef={toRef}
@@ -635,8 +646,8 @@ export const SearchConsole: React.FC = () => {
               className="w-full h-full min-h-[56px] rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-bold text-sm flex items-center justify-center gap-2 px-6 transition-colors shadow-lg shadow-blue-600/25"
             >
               <Search className="w-4 h-4" />
-              <span>Search</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>{t("home.search.search")}</span>
+              <ArrowRight className="w-4 h-4 rtl:rotate-180" />
             </button>
           </div>
         </form>
@@ -654,11 +665,11 @@ export const SearchConsole: React.FC = () => {
               <Check className="w-3 h-3 text-white" />
             </span>
             <span className="text-xs font-bold text-slate-700">
-              Return car at a different location
+              {t("home.search.differentReturn")}
             </span>
           </label>
           <span className="text-[11px] font-medium text-slate-400">
-            Free cancellation · No prepayment required
+            {t("home.search.freeCancellation")}
           </span>
         </div>
 
@@ -667,10 +678,10 @@ export const SearchConsole: React.FC = () => {
           <div className="mx-2 mb-2 rounded-xl bg-slate-50 border border-slate-200 relative overflow-visible">
             <div className="bg-white rounded-xl relative">
               <LocationField
-                label="Return location"
+                label={t("home.search.returnLocation")}
                 value={returnLocation}
                 open={openPicker === "return"}
-                placeholder="Choose return location"
+                placeholder={t("home.search.chooseReturn")}
                 onToggle={() =>
                   setOpenPicker(openPicker === "return" ? null : "return")
                 }
@@ -688,7 +699,7 @@ export const SearchConsole: React.FC = () => {
       {/* Popular picks */}
       <div className="flex flex-wrap items-center gap-2 mt-3">
         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-          Popular:
+          {t("home.search.popular")}
         </span>
         {POPULAR_PICKS.map((pick) => (
           <button

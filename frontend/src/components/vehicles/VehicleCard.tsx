@@ -1,16 +1,38 @@
 import React, { useState } from "react";
 import { Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import { Heart, Star, Gauge, Armchair, Settings, Fuel, CheckCircle2 } from "lucide-react";
 import type { Vehicle } from "../../types/vehicle";
 
-const SPEC_META: { key: keyof Vehicle["specs"]; label: string; icon: React.ReactNode }[] = [
-  { key: "engine", label: "Engine", icon: <Gauge className="w-[18px] h-[18px] text-slate-400" /> },
-  { key: "seats", label: "Capacity", icon: <Armchair className="w-[18px] h-[18px] text-slate-400" /> },
-  { key: "gearbox", label: "Gearbox", icon: <Settings className="w-[18px] h-[18px] text-slate-400" /> },
-  { key: "fuel", label: "Fuel", icon: <Fuel className="w-[18px] h-[18px] text-slate-400" /> },
+const SPEC_META: {
+  key: keyof Vehicle["specs"];
+  labelKey: string;
+  icon: React.ReactNode;
+}[] = [
+  {
+    key: "engine",
+    labelKey: "fleet.card.specs.engine",
+    icon: <Gauge className="w-[18px] h-[18px] text-slate-400" />,
+  },
+  {
+    key: "seats",
+    labelKey: "fleet.card.specs.capacity",
+    icon: <Armchair className="w-[18px] h-[18px] text-slate-400" />,
+  },
+  {
+    key: "gearbox",
+    labelKey: "fleet.card.specs.gearbox",
+    icon: <Settings className="w-[18px] h-[18px] text-slate-400" />,
+  },
+  {
+    key: "fuel",
+    labelKey: "fleet.card.specs.fuel",
+    icon: <Fuel className="w-[18px] h-[18px] text-slate-400" />,
+  },
 ];
 
 export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
+  const { t } = useTranslation();
   const [fav, setFav] = useState(!!vehicle.isFavorite);
 
   return (
@@ -21,16 +43,16 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
           alt={vehicle.title}
           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute top-4 left-4 flex flex-col gap-1.5">
+        <div className="absolute top-4 start-4 flex flex-col gap-1.5">
           {vehicle.isInstantConfirmation && (
             <span className="px-3 py-1 rounded-full bg-[#F97316] text-white text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-              Instant Confirmation
+              {t("fleet.perks.instantConfirmation")}
             </span>
           )}
           {vehicle.isTopPick && (
             <span className="px-3 py-1 rounded-full bg-[#F97316]/95 backdrop-blur-md text-white border border-amber-500/70 text-[10px] font-bold uppercase tracking-wider shadow-sm">
-              Top Executive Pick
+              {t("fleet.card.topPick")}
             </span>
           )}
           {vehicle.badgeTag && !vehicle.isTopPick && (
@@ -47,8 +69,8 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
         <button
           type="button"
           onClick={() => setFav((f) => !f)}
-          aria-label="Toggle favorite"
-          className="absolute top-4 right-4 p-2 rounded-full bg-white/90 backdrop-blur-md text-slate-600 hover:text-red-500 border border-[#E2E8F0] shadow-sm transition-colors"
+          aria-label={t("fleet.card.toggleFavorite")}
+          className="absolute top-4 end-4 p-2 rounded-full bg-white/90 backdrop-blur-md text-slate-600 hover:text-red-500 border border-[#E2E8F0] shadow-sm transition-colors"
         >
           <Heart className={`w-[20px] h-[20px] ${fav ? "fill-red-500 text-red-500" : ""}`} />
         </button>
@@ -63,12 +85,13 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
               </span>
               <h2 className="text-xl font-bold text-[#0F172A] mt-0.5">{vehicle.title}</h2>
             </div>
-            <div className="text-right shrink-0">
+            <div className="text-end shrink-0">
               <div className="text-2xl font-bold text-[#0F172A] tracking-tight tabular-nums">
                 {vehicle.pricePerDay.toLocaleString()} LYD
               </div>
               <span className="text-[11px] text-slate-500">
-                / day · {vehicle.totalForPeriod.toLocaleString()} LYD {vehicle.periodDays}-days
+                {t("data.common.day")} · {vehicle.totalForPeriod.toLocaleString()} LYD{" "}
+                {t("fleet.card.periodDays", { count: vehicle.periodDays })}
               </span>
             </div>
           </div>
@@ -81,12 +104,13 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
             <span className="text-sm font-semibold text-slate-800">{vehicle.operator.name}</span>
             <span className="text-slate-300 text-xs">•</span>
             <div className="flex items-center text-[#F97316] text-xs font-bold">
-              <Star className="w-3.5 h-3.5 fill-[#F97316] text-[#F97316] mr-0.5" />
-              {vehicle.operator.rating} ({vehicle.operator.reviewsCount} reviews)
+              <Star className="w-3.5 h-3.5 fill-[#F97316] text-[#F97316] me-0.5" />
+              {vehicle.operator.rating}{" "}
+              {t("home.operators.reviews", { count: vehicle.operator.reviewsCount })}
             </div>
             {vehicle.operator.isVerified && (
               <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-slate-100 border border-[#E2E8F0] text-[10px] font-medium text-slate-600">
-                Verified Partner
+                {t("home.operators.verifiedPartner")}
               </span>
             )}
           </div>
@@ -98,7 +122,7 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
             <div key={s.key} className="flex items-center gap-2">
               {s.icon}
               <div className="flex flex-col">
-                <span className="text-[10px] font-semibold text-slate-500">{s.label}</span>
+                <span className="text-[10px] font-semibold text-slate-500">{t(s.labelKey)}</span>
                 <span className="text-[11px] font-bold text-[#0F172A]">
                   {vehicle.specs[s.key]}
                 </span>
@@ -122,13 +146,13 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
               to={`/cars/${vehicle.id}`}
               className="px-4 py-2.5 rounded-xl bg-white border border-[#E2E8F0] hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors shadow-sm"
             >
-              Details
+              {t("fleet.card.details")}
             </Link>
             <Link
               to={`/cars/${vehicle.id}`}
               className="px-6 py-2.5 rounded-xl bg-[#2563EB] text-white text-xs font-bold shadow-sm hover:bg-blue-700 active:scale-[0.99] transition-all inline-flex items-center"
             >
-              Reserve ({vehicle.totalForPeriod.toLocaleString()} LYD)
+              {t("fleet.card.reserve", { total: vehicle.totalForPeriod.toLocaleString() })}
             </Link>
           </div>
         </div>

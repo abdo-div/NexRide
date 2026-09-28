@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Lock, CreditCard, Banknote, HelpCircle, Wallet } from "lucide-react";
 import { CheckoutIcon } from "./CheckoutIcon";
 import type { CheckoutMeta } from "../../types/checkout";
@@ -15,6 +16,8 @@ interface Props {
   vehicleTitle: string;
 }
 
+const lyd = (n: number) => `${n.toLocaleString("en-US")} LYD`;
+
 export const PaymentSection: React.FC<Props> = ({
   meta,
   tab,
@@ -23,6 +26,7 @@ export const PaymentSection: React.FC<Props> = ({
   cashRemaining,
   vehicleTitle,
 }) => {
+  const { t } = useTranslation();
   const { payment } = meta;
 
   return (
@@ -32,11 +36,11 @@ export const PaymentSection: React.FC<Props> = ({
           <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold text-[14px]">
             4
           </div>
-          <h2 className="text-[18px] font-bold text-[#0F172A]">Payment Method</h2>
+          <h2 className="text-[18px] font-bold text-[#0F172A]">{t("checkout.payment.title")}</h2>
         </div>
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F8FAFC] text-[#64748B] text-[11px] font-semibold">
           <Lock className="w-[15px] h-[15px] text-[#2563EB]" />
-          {payment.lockLabel}
+          {t(payment.lockLabel)}
         </div>
       </div>
 
@@ -51,7 +55,7 @@ export const PaymentSection: React.FC<Props> = ({
           }`}
         >
           <CreditCard className="w-[18px] h-[18px]" />
-          {payment.tabCardLabel}
+          {t(payment.tabCardLabel)}
         </button>
         <button
           type="button"
@@ -63,7 +67,7 @@ export const PaymentSection: React.FC<Props> = ({
           }`}
         >
           <Banknote className="w-[18px] h-[18px]" />
-          {payment.tabCashLabel}
+          {t(payment.tabCashLabel)}
         </button>
       </div>
 
@@ -71,7 +75,7 @@ export const PaymentSection: React.FC<Props> = ({
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC]">
             <span className="text-[11px] text-[#64748B] uppercase font-bold">
-              {payment.railLabel}
+              {t(payment.railLabel)}
             </span>
             <div className="flex items-center gap-2 flex-wrap">
               {payment.rails.map((rail) => (
@@ -81,7 +85,7 @@ export const PaymentSection: React.FC<Props> = ({
                     rail.highlight ? "text-[#2563EB]" : "text-[#0F172A]"
                   }`}
                 >
-                  {rail.name}
+                  {t(rail.name)}
                 </span>
               ))}
             </div>
@@ -95,29 +99,32 @@ export const PaymentSection: React.FC<Props> = ({
                 <div key={field.id} className={`flex flex-col gap-1.5 ${fullRow ? "sm:col-span-3" : ""}`}>
                   <div className="flex items-center justify-between">
                     <label htmlFor={`pay-${field.id}`} className="text-[12px] font-bold text-[#0F172A]">
-                      {field.label}
+                      {t(field.label)}
                     </label>
                     {field.id === "cardNumber" ? (
                       <span className="inline-flex items-center gap-1 text-[11px] text-[#2563EB] font-bold">
                         <Lock className="w-[13px] h-[13px]" />
-                        {payment.cardValueNote}
+                        {t(payment.cardValueNote)}
                       </span>
                     ) : field.id === "cvc" ? (
-                      <HelpCircle className="w-[15px] h-[15px] text-[#94A3B8]" aria-label="3 digits on back of card" />
+                      <HelpCircle
+                        className="w-[15px] h-[15px] text-[#94A3B8]"
+                        aria-label={t("checkout.payment.cvcHelp")}
+                      />
                     ) : null}
                   </div>
                   <div className="relative">
                     <input
                       id={`pay-${field.id}`}
                       type={field.type ?? "text"}
-                      placeholder={field.placeholder}
+                      placeholder={t(field.placeholder)}
                       defaultValue={field.value}
                       className={`${inputCls} ${field.uppercase ? "uppercase" : ""} ${
                         compact ? "text-center" : ""
                       }`}
                     />
                     {field.id === "cardNumber" && (
-                      <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center">
+                      <div className="absolute end-3.5 top-1/2 -translate-y-1/2 flex items-center">
                         <span className="px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[11px] font-bold text-[#0F172A]">
                           VISA
                         </span>
@@ -135,21 +142,25 @@ export const PaymentSection: React.FC<Props> = ({
             <Wallet className="w-[24px] h-[24px] text-[#2563EB] mt-0.5" />
             <div className="flex flex-col gap-1">
               <h4 className="text-[15px] font-bold text-[#0F172A]">
-                {payment.cashDepositPercent}%{payment.cashDepositPercent === 20 ? " Immediate" : ""} Online Booking Deposit
+                {t("checkout.payment.cashDepositHeading", { percent: payment.cashDepositPercent })}
               </h4>
               <p className="text-[14px] text-[#64748B] leading-relaxed">
-                {payment.cashNote(vehicleTitle, cashDeposit, cashRemaining)}
+                {t(payment.cashNote, {
+                  title: vehicleTitle,
+                  deposit: lyd(cashDeposit),
+                  remaining: lyd(cashRemaining),
+                })}
               </p>
             </div>
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 text-center sm:text-left">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 text-center sm:text-start">
         {payment.trustBadges.map((badge) => (
           <div key={badge.text} className="flex items-center gap-2 text-[#64748B] text-[11px]">
             <CheckoutIcon name={badge.icon} className="w-[16px] h-[16px] text-[#2563EB] shrink-0" />
-            {badge.text}
+            {t(badge.text)}
           </div>
         ))}
       </div>

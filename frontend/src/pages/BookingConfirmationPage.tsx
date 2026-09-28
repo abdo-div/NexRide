@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router";
+import { useTranslation } from "react-i18next";
 import { getBookingConfirmation } from "../data/bookingConfirmationData";
 import { ConfirmationHeader } from "../components/bookingConfirmation/ConfirmationHeader";
 import { ConfirmationToast } from "../components/bookingConfirmation/ConfirmationToast";
@@ -15,6 +16,7 @@ import { ActionDock } from "../components/bookingConfirmation/ActionDock";
 const TOAST_MS = 2500;
 
 export const BookingConfirmationPage: React.FC = () => {
+  const { t } = useTranslation();
   const { vehicleId } = useParams<{ vehicleId: string }>();
   const data = getBookingConfirmation(vehicleId);
   const [toast, setToast] = useState<string | null>(null);
@@ -30,7 +32,7 @@ export const BookingConfirmationPage: React.FC = () => {
     } catch {
       /* clipboard unavailable */
     }
-    showToast(data.meta.reference.copyToast);
+    showToast(t(data.meta.reference.copyToast));
   };
 
   return (
@@ -41,11 +43,11 @@ export const BookingConfirmationPage: React.FC = () => {
           vehicleId={data.vehicle.id}
           meta={data.meta}
           onPrint={() => {
-            showToast(data.meta.success.toastPrint);
+            showToast(t(data.meta.success.toastPrint));
             window.print();
           }}
           onDownload={() => {
-            showToast(data.meta.success.toastDownload);
+            showToast(t(data.meta.success.toastDownload));
             window.setTimeout(() => setToast(null), TOAST_MS);
           }}
         />
