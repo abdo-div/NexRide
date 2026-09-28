@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import {
   User,
   Building2,
@@ -11,11 +12,17 @@ import {
   BadgeCheck,
   UserPlus,
 } from "lucide-react";
+import { ApiError } from "../../lib/apiClient";
+import { useAuth } from "../../context/useAuth";
+import { FieldError, FormAlert, SubmitSpinner } from "./AuthFeedback";
 
 type AccountType = "client" | "corporate";
 
 export const SignUpForm: React.FC = () => {
   const { t } = useTranslation();
+  const { signUp } = useAuth();
+  const navigate = useNavigate();
+
   const [accountType, setAccountType] = useState<AccountType>("client");
   const [fullName, setFullName] = useState("");
   const [officialEmail, setOfficialEmail] = useState("");
@@ -24,10 +31,43 @@ export const SignUpForm: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Registration submitted! Our executive concierge will verify your credentials within 15 minutes.");
+
+    if (password !== confirmPassword) {
+      setFieldErrors({ passwordConfirm: t("auth.errors.passwordMismatch") });
+      return;
+    }
+
+    setFormError("");
+    setFieldErrors({});
+    setIsSubmitting(true);
+
+    try {
+      await signUp({
+        name: fullName.trim(),
+        email: officialEmail.trim(),
+        phoneNumber: `+218${mobile.replace(/^(\+218|0)?/, "")}`,
+        password,
+        passwordConfirm: confirmPassword,
+        role: accountType === "corporate" ? "company" : "customer",
+      });
+      navigate("/", { replace: true });
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setFormError(error.message);
+        setFieldErrors(
+          Object.fromEntries(error.fieldErrors.map(({ field, message }) => [field, message])),
+        );
+      } else {
+        setFormError(t("auth.errors.unexpected"));
+      }
+      setIsSubmitting(false);
+    }
   };
 
   const optionClasses = (active: boolean) =>
@@ -39,6 +79,8 @@ export const SignUpForm: React.FC = () => {
 
   return (
     <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+      {formError && <FormAlert tone="error">{formError}</FormAlert>}
+
       {/* Tier Selector: Personal vs Corporate */}
       <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-slate-100">
         <label className={optionClasses(accountType === "client")}>
@@ -72,18 +114,22 @@ export const SignUpForm: React.FC = () => {
         <label className="text-xs font-semibold text-slate-800">
           {t("auth.signup.fullName")}
         </label>
-        <div className="relative flex items-center">
-          <BadgeCheck className="absolute start-3.5 w-5 h-5 text-slate-400" />
-          <input
-            type="text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            placeholder={t("auth.signup.fullNamePlaceholder")}
-            required
-            className="w-full ps-11 pe-4 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
-          />
+          <div className="relative flex items-center">
+            <BadgeCheck className="absolute start-3.5 w-5 h-5 text-slate-400" />
+            <input
+              type="text"
+              name="name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder={t("auth.signup.fullNamePlaceholder")}
+              autoComplete="name"
+              required
+              className="w-full ps-11 pe-4 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
+            />
+          </div>
+          {fieldErrors.name && <FieldError>{fieldErrors.name}</FieldError>}
         </div>
-      </div>
+
 
       {/* Dual Contact: Email & Mobile */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -95,13 +141,16 @@ export const SignUpForm: React.FC = () => {
             <Mail className="absolute start-3.5 w-5 h-5 text-slate-400" />
             <input
               type="email"
+              name="email"
               value={officialEmail}
               onChange={(e) => setOfficialEmail(e.target.value)}
               placeholder={t("auth.signup.emailPlaceholder")}
+              autoComplete="email"
               required
               className="w-full ps-11 pe-4 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
             />
           </div>
+          {fieldErrors.email && <FieldError>{fieldErrors.email}</FieldError>}
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-slate-800">
@@ -115,13 +164,16 @@ export const SignUpForm: React.FC = () => {
             <Phone className="absolute end-3.5 w-5 h-5 text-slate-400" />
             <input
               type="tel"
+              name="phoneNumber"
               value={mobile}
               onChange={(e) => setMobile(e.target.value)}
               placeholder={t("auth.signup.mobilePlaceholder")}
+              autoComplete="tel-national"
               required
               className="w-full ps-24 pe-11 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
             />
           </div>
+          {fieldErrors.phoneNumber && <FieldError>{fieldErrors.phoneNumber}</FieldError>}
         </div>
       </div>
 
@@ -135,9 +187,12 @@ export const SignUpForm: React.FC = () => {
             <Lock className="absolute start-3.5 w-5 h-5 text-slate-400" />
             <input
               type={showPassword ? "text" : "password"}
+              name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={t("auth.signup.minChars")}
+              autoComplete="new-password"
+              minLength={8}
               required
               className="w-full ps-11 pe-11 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
             />
@@ -154,6 +209,7 @@ export const SignUpForm: React.FC = () => {
               )}
             </button>
           </div>
+          {fieldErrors.password && <FieldError>{fieldErrors.password}</FieldError>}
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-slate-800">
@@ -163,13 +219,18 @@ export const SignUpForm: React.FC = () => {
             <BadgeCheck className="absolute start-3.5 w-5 h-5 text-slate-400" />
             <input
               type={showPassword ? "text" : "password"}
+              name="passwordConfirm"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder={t("auth.signup.confirmPlaceholder")}
+              autoComplete="new-password"
               required
               className="w-full ps-11 pe-4 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
             />
           </div>
+          {fieldErrors.passwordConfirm && (
+            <FieldError>{fieldErrors.passwordConfirm}</FieldError>
+          )}
         </div>
       </div>
 
@@ -198,10 +259,11 @@ export const SignUpForm: React.FC = () => {
       {/* Submit Sign Up */}
       <button
         type="submit"
-        className="mt-1 w-full py-3.5 px-6 rounded-xl bg-[#2563EB] text-white text-sm font-semibold hover:bg-blue-700 transition-all shadow-[0_4px_16px_rgba(37,99,235,0.28)] flex items-center justify-center gap-2"
+        disabled={isSubmitting}
+        className="mt-1 w-full py-3.5 px-6 rounded-xl bg-[#2563EB] text-white text-sm font-semibold hover:bg-blue-700 transition-all shadow-[0_4px_16px_rgba(37,99,235,0.28)] flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-[#2563EB]"
       >
-        <span>{t("auth.signup.submit")}</span>
-        <UserPlus className="w-[18px] h-[18px]" />
+        <span>{isSubmitting ? t("auth.state.creating") : t("auth.signup.submit")}</span>
+        {isSubmitting ? <SubmitSpinner /> : <UserPlus className="w-[18px] h-[18px]" />}
       </button>
     </form>
   );

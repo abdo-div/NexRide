@@ -7,7 +7,11 @@ const noopWorker = {
   close: async () => null,
 };
 
-const createEmailWorker = async () => {
+/**
+ * Starts the background email worker. Called after the HTTP server is listening
+ * so an unreachable Redis can never delay or prevent the API from starting.
+ */
+export const startEmailWorker = async () => {
   const redisReady = await isRedisAvailable(bullmqConnection);
 
   if (!redisReady) {
@@ -50,5 +54,3 @@ const createEmailWorker = async () => {
     { connection: bullmqConnection, prefix: "nexride" },
   );
 };
-
-export const emailWorker = await createEmailWorker();

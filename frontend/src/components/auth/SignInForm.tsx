@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate } from "react-router";
 import {
   AtSign,
   Lock,
@@ -9,6 +10,9 @@ import {
   ArrowRight,
   BadgeCheck,
 } from "lucide-react";
+import { ApiError } from "../../lib/apiClient";
+import { useAuth } from "../../context/useAuth";
+import { FieldError, FormAlert, SubmitSpinner } from "./AuthFeedback";
 
 interface SignInFormProps {
   onForgotPassword: () => void;
@@ -16,14 +20,40 @@ interface SignInFormProps {
 
 export const SignInForm: React.FC<SignInFormProps> = ({ onForgotPassword }) => {
   const { t } = useTranslation();
+  const { signIn } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [trustDevice, setTrustDevice] = useState(true);
+  const [formError, setFormError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const redirectTo = (location.state as { from?: string } | null)?.from ?? "/";
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Authentication authorized. Redirecting to your NexRide Executive Dispatch Portal...");
+    setFormError("");
+    setFieldErrors({});
+    setIsSubmitting(true);
+
+    try {
+      await signIn({ identifier, password });
+      navigate(redirectTo, { replace: true });
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setFormError(error.message);
+        setFieldErrors(
+          Object.fromEntries(error.fieldErrors.map(({ field, message }) => [field, message])),
+        );
+      } else {
+        setFormError(t("auth.errors.unexpected"));
+      }
+      setIsSubmitting(false);
+    }
   };
 
   const handleGovernmentSso = () => {
@@ -33,6 +63,8 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onForgotPassword }) => {
   return (
     <div className="flex flex-col gap-5">
       <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+        {formError && <FormAlert tone="error">{formError}</FormAlert>}
+
         {/* Field: Identifier */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-slate-800 flex items-center justify-between">
@@ -45,13 +77,17 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onForgotPassword }) => {
             <AtSign className="absolute start-3.5 w-5 h-5 text-slate-400" />
             <input
               type="text"
+              name="identifier"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               placeholder={t("auth.signin.identifierPlaceholder")}
+              autoComplete="username"
               required
               className="w-full ps-11 pe-4 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
             />
           </div>
+          {fieldErrors.identifier && <FieldError>{fieldErrors.identifier}</FieldError>}
+          {fieldErrors.email && <FieldError>{fieldErrors.email}</FieldError>}
         </div>
 
         {/* Field: Password */}
@@ -72,9 +108,11 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onForgotPassword }) => {
             <Lock className="absolute start-3.5 w-5 h-5 text-slate-400" />
             <input
               type={showPassword ? "text" : "password"}
+              name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={t("auth.signin.passwordPlaceholder")}
+              autoComplete="current-password"
               required
               className="w-full ps-11 pe-11 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
             />
@@ -91,6 +129,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onForgotPassword }) => {
               )}
             </button>
           </div>
+          {fieldErrors.password && <FieldError>{fieldErrors.password}</FieldError>}
         </div>
 
         {/* Remember Me & Security Level */}
@@ -115,10 +154,15 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onForgotPassword }) => {
         {/* Primary Submit Button */}
         <button
           type="submit"
-          className="mt-1 w-full py-3.5 px-6 rounded-xl bg-[#2563EB] text-white text-sm font-semibold hover:bg-blue-700 transition-all shadow-[0_4px_16px_rgba(37,99,235,0.28)] flex items-center justify-center gap-2 group"
+          disabled={isSubmitting}
+          className="mt-1 w-full py-3.5 px-6 rounded-xl bg-[#2563EB] text-white text-sm font-semibold hover:bg-blue-700 transition-all shadow-[0_4px_16px_rgba(37,99,235,0.28)] flex items-center justify-center gap-2 group disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-[#2563EB]"
         >
-          <span>{t("auth.signin.submit")}</span>
-          <ArrowRight className="w-[18px] h-[18px] group-hover:translate-x-1 transition-transform rtl:rotate-180 rtl:group-hover:-translate-x-1" />
+          <span>{isSubmitting ? t("auth.state.signingIn") : t("auth.signin.submit")}</span>
+          {isSubmitting ? (
+            <SubmitSpinner />
+          ) : (
+            <ArrowRight className="w-[18px] h-[18px] group-hover:translate-x-1 transition-transform rtl:rotate-180 rtl:group-hover:-translate-x-1" />
+          )}
         </button>
       </form>
 

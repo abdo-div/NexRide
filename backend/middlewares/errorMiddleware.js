@@ -115,22 +115,21 @@ export default (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
 
+  // Normalise driver-level errors (Mongo, JWT) before choosing the renderer.
+  // This previously only happened in production, which meant development
+  // responses leaked raw messages such as "E11000 duplicate key error" with a
+  // 500 status instead of a clean 400/401 the client can act on.
+  let error = err;
+  if (error.name === "CastError") error = handleCastErrorDB(error);
+  if (error.code === 11000) error = handleDuplicateFieldsDB(error);
+  if (error.name === "ValidationError")
+    error = handleValidationErrorDB(error);
+  if (error.name === "JsonWebTokenError") error = handleJWTError();
+  if (error.name === "TokenExpiredError") error = handleJWTExpiredError();
+
   if (process.env.NODE_ENV === "production") {
-    // Shallow copy retaining prototypes and non-enumerable properties
-    let error = { ...err };
-    error.message = err.message;
-    error.name = err.name;
-    error.code = err.code;
-
-    if (error.name === "CastError") error = handleCastErrorDB(error);
-    if (error.code === 11000) error = handleDuplicateFieldsDB(error);
-    if (error.name === "ValidationError")
-      error = handleValidationErrorDB(error);
-    if (error.name === "JsonWebTokenError") error = handleJWTError();
-    if (error.name === "TokenExpiredError") error = handleJWTExpiredError();
-
     sendErrorProd(error, req, res);
   } else {
-    sendErrorDev(err, req, res);
+    sendErrorDev(error, req, res);
   }
 };
