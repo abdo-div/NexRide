@@ -1,17 +1,19 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ConfirmationIcon } from "./ConfirmationIcon";
 import type { ConfirmationData } from "../../types/bookingConfirmation";
 
 export const RouteSchedule: React.FC<{ data: ConfirmationData }> = ({ data }) => {
+  const { t } = useTranslation();
   const { route } = data.meta;
   const stops = [route.pickup, route.dropoff];
 
   return (
     <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col gap-5">
       <div className="flex items-center justify-between">
-        <h3 className="text-[18px] text-[#0F172A] font-bold">{route.title}</h3>
+        <h3 className="text-[18px] text-[#0F172A] font-bold">{t(route.title)}</h3>
         <span className="text-[11px] bg-[#F8FAFC] px-2.5 py-1 rounded-md text-[#64748B] font-bold">
-          {route.daysBadge}
+          {t(route.daysBadge, { days: route.days, hours: route.days * 24 })}
         </span>
       </div>
       <div className="space-y-4">
@@ -30,13 +32,13 @@ export const RouteSchedule: React.FC<{ data: ConfirmationData }> = ({ data }) =>
                   stop.primary ? "text-[#2563EB]" : "text-[#64748B]"
                 }`}
               >
-                {stop.label}
+                {t(stop.label)}
               </span>
               <span className="text-[16px] font-bold text-[#0F172A]">{stop.location}</span>
-              <span className="text-[14px] text-[#64748B]">{stop.datetime}</span>
+              <span className="text-[14px] text-[#64748B]">{t(stop.datetime)}</span>
               {stop.note && (
                 <p className="text-[11px] text-[#64748B] mt-1.5 p-2 rounded bg-[#F8FAFC]">
-                  {stop.note}
+                  {t(stop.note)}
                 </p>
               )}
             </div>

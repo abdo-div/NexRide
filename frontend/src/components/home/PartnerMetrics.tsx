@@ -1,7 +1,9 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { PARTNER_METRICS } from "../../data/partnerData";
 
 export const PartnerMetrics: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-8">
       {PARTNER_METRICS.map((metric) => {
@@ -22,10 +24,10 @@ export const PartnerMetrics: React.FC = () => {
                     : "text-blue-400"
               }`}
             >
-              {metric.title}
+              {t(metric.title)}
             </h4>
             <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
-              {metric.subtitle}
+              {t(metric.subtitle)}
             </p>
           </div>
         );

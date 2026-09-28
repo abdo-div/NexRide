@@ -10,7 +10,7 @@ export const OPERATORS_DATA: FleetOperator[] = [
     rating: 4.9,
     reviewsCount: 142,
     fleetSize: 48,
-    specialty: "Executive & Armored",
+    specialty: "data.operators.alSafwa",
     isVerified: true,
   },
   {
@@ -22,7 +22,7 @@ export const OPERATORS_DATA: FleetOperator[] = [
     rating: 4.8,
     reviewsCount: 98,
     fleetSize: 65,
-    specialty: "Desert 4WD & Pickups",
+    specialty: "data.operators.sahary",
     isVerified: true,
   },
   {
@@ -34,7 +34,7 @@ export const OPERATORS_DATA: FleetOperator[] = [
     rating: 4.7,
     reviewsCount: 210,
     fleetSize: 32,
-    specialty: "Daily Economy & Sedan",
+    specialty: "data.operators.madina",
     isVerified: true,
   },
   {
@@ -46,7 +46,7 @@ export const OPERATORS_DATA: FleetOperator[] = [
     rating: 5.0,
     reviewsCount: 89,
     fleetSize: 22,
-    specialty: "Supercars & GTs",
+    specialty: "data.operators.apex",
     isVerified: true,
   },
 ];

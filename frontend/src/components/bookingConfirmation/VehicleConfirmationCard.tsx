@@ -1,9 +1,11 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Phone, Star, BadgeCheck } from "lucide-react";
 import { ConfirmationIcon } from "./ConfirmationIcon";
 import type { ConfirmationData } from "../../types/bookingConfirmation";
 
 export const VehicleConfirmationCard: React.FC<{ data: ConfirmationData }> = ({ data }) => {
+  const { t } = useTranslation();
   const { vehicle, meta } = data;
   const { vehicleCard, operator } = meta;
   const chips = [
@@ -17,17 +19,17 @@ export const VehicleConfirmationCard: React.FC<{ data: ConfirmationData }> = ({ 
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col">
       <div className="relative w-full h-64 sm:h-80 bg-slate-100 overflow-hidden">
         <img src={vehicle.image} alt={vehicle.title} className="w-full h-full object-cover" />
-        <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+        <div className="absolute top-4 start-4 flex flex-wrap gap-2">
           <span className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-[#0F172A] shadow-sm">
-            {vehicleCard.badgePrimary}
+            {t(vehicleCard.badgePrimary)}
           </span>
           <span className="bg-[#2563EB] px-3 py-1 rounded-full text-[11px] font-bold text-white shadow-sm">
-            {vehicleCard.badgeSecondary}
+            {t(vehicleCard.badgeSecondary)}
           </span>
         </div>
-        <div className="absolute bottom-4 right-4 bg-[#0F172A]/85 backdrop-blur-md px-3 py-1 rounded-lg text-white text-[11px] flex items-center gap-1.5">
+        <div className="absolute bottom-4 end-4 bg-[#0F172A]/85 backdrop-blur-md px-3 py-1 rounded-lg text-white text-[11px] flex items-center gap-1.5">
           <ConfirmationIcon name="gps" className="w-[16px] h-[16px] text-[#B4C5FF]" />
-          {vehicleCard.gpsLabel}
+          {t(vehicleCard.gpsLabel)}
         </div>
       </div>
 
@@ -35,7 +37,7 @@ export const VehicleConfirmationCard: React.FC<{ data: ConfirmationData }> = ({ 
         <div>
           <div className="flex items-center justify-between gap-4">
             <span className="text-[11px] uppercase tracking-wider text-[#2563EB] font-bold">
-              {vehicleCard.category}
+              {t(vehicleCard.category)}
             </span>
             <span className="text-[11px] text-[#64748B] font-mono">{vehicleCard.vin}</span>
           </div>
@@ -71,14 +73,14 @@ export const VehicleConfirmationCard: React.FC<{ data: ConfirmationData }> = ({ 
                   <Star className="w-[14px] h-[14px] fill-[#F97316] text-[#F97316]" />
                   {vehicle.operator.rating.toFixed(2)}
                 </span>
-                <span>({operator.ratingNote})</span>
-                <span>• {operator.locationLabel}</span>
+                <span>({t(operator.ratingNote)})</span>
+                <span>• {t(operator.locationLabel)}</span>
               </div>
             </div>
           </div>
           <a
             href={operator.phoneHref}
-            title={operator.phoneLabel}
+            title={t(operator.phoneLabel)}
             className="p-2.5 rounded-lg bg-white text-[#0F172A] hover:text-[#2563EB] shadow-sm transition-all flex items-center gap-1 text-[12px] shrink-0"
           >
             <Phone className="w-[18px] h-[18px]" />

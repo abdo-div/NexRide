@@ -35,11 +35,14 @@ export type ConfirmationIconKey =
 
 export type MilestoneState = "done" | "next" | "pending";
 
+export type TemplateValues = Record<string, string | number>;
+
 export interface Milestone {
   step: string;
   status: string;
   title: string;
   detail: string;
+  values?: TemplateValues;
   icon: ConfirmationIconKey;
   state: MilestoneState;
 }
@@ -76,6 +79,8 @@ export interface RouteStop {
 export interface FareLine {
   label: string;
   amount: string;
+  nameKey?: string;
+  values?: TemplateValues;
 }
 
 export interface HandoverCard {
@@ -98,7 +103,7 @@ export interface ConfirmationMeta {
     badge: string;
     validation: string;
     title: string;
-    desc: (vehicleTitle: string) => string;
+    desc: string;
     printLabel: string;
     downloadLabel: string;
     toastPrint: string;
@@ -128,6 +133,7 @@ export interface ConfirmationMeta {
   };
   route: {
     title: string;
+    days: number;
     daysBadge: string;
     pickup: RouteStop;
     dropoff: RouteStop;

@@ -6,6 +6,7 @@ import { FleetPage } from "./pages/FleetPage";
 import VehicleDetailPage from "./pages/VehicleDetailPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import BookingConfirmationPage from "./pages/BookingConfirmationPage";
+import AuthPage from "./pages/AuthPage";
 
 function App() {
   return (
@@ -20,6 +21,8 @@ function App() {
             <Route path="/cars/:vehicleId" element={<VehicleDetailPage />} />
             <Route path="/checkout/:vehicleId" element={<CheckoutPage />} />
             <Route path="/booking-confirmed/:vehicleId" element={<BookingConfirmationPage />} />
+            <Route path="/login" element={<AuthPage />} />
+            <Route path="/auth" element={<AuthPage />} />
           </Routes>
         </main>
         <Footer />

@@ -1,8 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Radio, ShieldCheck } from "lucide-react";
 import { REGION_FEATURES } from "../../data/regionData";
 
 export const RegionFeaturesBanner: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <div className="mt-8 bg-[#0b1329]/90 border border-slate-800 rounded-2xl p-5 md:p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
       {REGION_FEATURES.map((item) => (
@@ -29,10 +31,10 @@ export const RegionFeaturesBanner: React.FC = () => {
           {/* Feature Text */}
           <div>
             <h4 className="text-xs font-extrabold text-white tracking-wide uppercase mb-0.5">
-              {item.title}
+              {t(item.title)}
             </h4>
             <p className="text-[11px] text-slate-400 leading-snug font-medium">
-              {item.description}
+              {t(item.description)}
             </p>
           </div>
         </div>

@@ -67,10 +67,13 @@ const ICONS: Record<ConfirmationIconKey, React.ComponentType<{ className?: strin
   security: Lock,
 };
 
+const DIRECTIONAL: ConfirmationIconKey[] = ["arrowLeft", "arrowRight"];
+
 export const ConfirmationIcon: React.FC<{ name: ConfirmationIconKey; className?: string }> = ({
   name,
   className,
 }) => {
   const Icon = ICONS[name];
-  return <Icon className={className} />;
+  const flip = DIRECTIONAL.includes(name) ? " rtl:rotate-180" : "";
+  return <Icon className={`${className ?? ""}${flip}`} />;
 };

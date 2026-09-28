@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Search, Scale, Lock, Key } from "lucide-react";
 import type { HowItWorksStep } from "../../types/step";
 
@@ -7,6 +8,7 @@ interface StepCardProps {
 }
 
 export const StepCard: React.FC<StepCardProps> = ({ step }) => {
+  const { t } = useTranslation();
   const renderIcon = () => {
     switch (step.iconType) {
       case "search":
@@ -46,10 +48,10 @@ export const StepCard: React.FC<StepCardProps> = ({ step }) => {
 
         {/* Title & Description */}
         <h3 className="font-black text-base text-slate-900 tracking-tight uppercase mb-3">
-          {step.title}
+          {t(step.title)}
         </h3>
         <p className="text-xs text-slate-500 font-medium leading-relaxed min-h-[72px]">
-          {step.description}
+          {t(step.description)}
         </p>
       </div>
 
@@ -60,7 +62,7 @@ export const StepCard: React.FC<StepCardProps> = ({ step }) => {
             isDriveStep ? "text-emerald-600" : "text-blue-600"
           }`}
         >
-          {step.footerText}
+          {t(step.footerText)}
         </span>
       </div>
     </div>

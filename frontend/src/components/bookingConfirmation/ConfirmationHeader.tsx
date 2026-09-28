@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import { Printer, Download } from "lucide-react";
 import { ConfirmationIcon } from "./ConfirmationIcon";
 import type { ConfirmationMeta } from "../../types/bookingConfirmation";
@@ -19,6 +20,7 @@ export const ConfirmationHeader: React.FC<Props> = ({
   onPrint,
   onDownload,
 }) => {
+  const { t } = useTranslation();
   const { crumbs, stepBadge, success } = meta;
   const vehicleCrumbIndex = 2;
 
@@ -26,34 +28,37 @@ export const ConfirmationHeader: React.FC<Props> = ({
     <>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <nav className="flex items-center gap-2 text-[13px] text-[#64748B]">
-          {crumbs.map((crumb, i) => (
-            <React.Fragment key={i}>
-              {i > 0 && <span className="text-[#CBD5E1]">/</span>}
-              {crumb.to ? (
-                <Link to={crumb.to} className="hover:text-[#2563EB] transition-colors">
-                  {crumb.label}
-                </Link>
-              ) : i === vehicleCrumbIndex ? (
-                <Link
-                  to={`/cars/${vehicleId}`}
-                  className="hover:text-[#2563EB] transition-colors truncate max-w-[200px]"
-                >
-                  {crumb.label}
-                </Link>
-              ) : (
-                <span className={i === crumbs.length - 1 ? "text-[#0F172A] font-bold" : ""}>
-                  {crumb.label}
-                </span>
-              )}
-            </React.Fragment>
-          ))}
+          {crumbs.map((crumb, i) => {
+            const text = i === vehicleCrumbIndex ? crumb.label : t(crumb.label);
+            return (
+              <React.Fragment key={i}>
+                {i > 0 && <span className="text-[#CBD5E1]">/</span>}
+                {crumb.to ? (
+                  <Link to={crumb.to} className="hover:text-[#2563EB] transition-colors">
+                    {text}
+                  </Link>
+                ) : i === vehicleCrumbIndex ? (
+                  <Link
+                    to={`/cars/${vehicleId}`}
+                    className="hover:text-[#2563EB] transition-colors truncate max-w-[200px]"
+                  >
+                    {text}
+                  </Link>
+                ) : (
+                  <span className={i === crumbs.length - 1 ? "text-[#0F172A] font-bold" : ""}>
+                    {text}
+                  </span>
+                )}
+              </React.Fragment>
+            );
+          })}
         </nav>
         <div className="inline-flex items-center gap-2 bg-white shadow-sm px-3.5 py-1.5 rounded-full self-start sm:self-auto">
           <ConfirmationIcon name="verified" className="w-[16px] h-[16px] text-[#2563EB]" />
           <span className="text-[11px] uppercase tracking-wider text-[#0F172A] font-bold">
-            {stepBadge.caption}
+            {t(stepBadge.caption)}
           </span>
-          <span className="text-[11px] text-[#2563EB] font-bold">{stepBadge.value}</span>
+          <span className="text-[11px] text-[#2563EB] font-bold">{t(stepBadge.value)}</span>
         </div>
       </div>
 
@@ -67,26 +72,26 @@ export const ConfirmationHeader: React.FC<Props> = ({
         <div className="flex flex-col gap-1.5 z-10 max-w-2xl">
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full bg-[#DBE1FF] text-[#003EA8] text-[11px] font-bold uppercase tracking-wider">
-              {success.badge}
+              {t(success.badge)}
             </span>
             <span className="text-[#CBD5E1]">•</span>
-            <span className="text-[11px] text-[#64748B]">{success.validation}</span>
+            <span className="text-[11px] text-[#64748B]">{t(success.validation)}</span>
           </div>
           <h1 className="text-[32px] sm:text-[40px] font-bold text-[#0F172A] tracking-tight">
-            {success.title}
+            {t(success.title)}
           </h1>
           <p className="text-[14px] text-[#64748B] leading-relaxed">
-            {success.desc(vehicleTitle)}
+            {t(success.desc, { vehicle: vehicleTitle })}
           </p>
         </div>
-        <div className="md:ml-auto shrink-0 flex flex-col sm:flex-row md:flex-col gap-2 w-full md:w-auto z-10">
+        <div className="md:ms-auto shrink-0 flex flex-col sm:flex-row md:flex-col gap-2 w-full md:w-auto z-10">
           <button
             type="button"
             onClick={onPrint}
             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#F8FAFC] hover:bg-[#F1F5F9] text-[#0F172A] text-[12px] font-semibold transition-all shadow-sm"
           >
             <Printer className="w-[18px] h-[18px]" />
-            {success.printLabel}
+            {t(success.printLabel)}
           </button>
           <button
             type="button"
@@ -94,7 +99,7 @@ export const ConfirmationHeader: React.FC<Props> = ({
             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#F8FAFC] hover:bg-[#F1F5F9] text-[#0F172A] text-[12px] font-semibold transition-all shadow-sm"
           >
             <Download className="w-[18px] h-[18px]" />
-            {success.downloadLabel}
+            {t(success.downloadLabel)}
           </button>
         </div>
       </div>

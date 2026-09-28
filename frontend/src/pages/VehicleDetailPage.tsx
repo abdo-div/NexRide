@@ -24,7 +24,7 @@ export const VehicleDetailPage: React.FC = () => {
       <div className="max-w-[1360px] mx-auto px-4 lg:px-8 pt-24 pb-20">
         <DetailBreadcrumbs crumbs={detail.crumbs} saved={saved} onToggleSave={() => setSaved((s) => !s)} />
         <DetailTitleBar detail={detail} />
-        <DetailGallery images={detail.gallery} />
+        <DetailGallery detail={detail} />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-8 flex flex-col gap-8">

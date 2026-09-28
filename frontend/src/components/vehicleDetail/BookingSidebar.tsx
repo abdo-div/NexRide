@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { Bolt, CheckCircle2, ShieldCheck, Lock, Info, Headphones, ArrowRight } from "lucide-react";
 import { DetailIcon } from "./iconMap";
@@ -8,6 +9,7 @@ const daysBetween = (a: string, b: string) =>
   Math.max(1, Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86400000));
 
 export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [pickupDate, setPickupDate] = React.useState(detail.booking.pickupDefault);
   const [returnDate, setReturnDate] = React.useState(detail.booking.returnDefault);
@@ -28,6 +30,8 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
   const selectCls =
     "w-full bg-white border border-[#E2E8F0] text-[#0F172A] text-[12px] px-2.5 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB]";
 
+  const labelCls = "block mb-1 text-[11px] text-[#64748B] font-bold uppercase tracking-wider";
+
   return (
     <aside className="lg:col-span-4 lg:sticky lg:top-24 flex flex-col gap-4">
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#E2E8F0]">
@@ -38,16 +42,16 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
                 {detail.vehicle.pricePerDay.toLocaleString()}
               </span>
               <span className="text-[15px] text-[#0F172A] font-bold">LYD</span>
-              <span className="text-[13px] text-[#64748B]">/ day</span>
+              <span className="text-[13px] text-[#64748B]">{t("vehicleDetail.perDay")}</span>
             </div>
-            <p className="text-[12px] text-[#F97316] font-bold flex items-center gap-1 mt-0.5">
+            <p className="mt-0.5 flex items-center gap-1 text-[12px] text-[#F97316] font-bold">
               <Bolt className="w-[15px] h-[15px] text-[#F97316]" />
-              Instant Confirmation Active
+              {t("vehicleDetail.instantConfirmationActive")}
             </p>
           </div>
-          <div className="text-right">
+          <div className="text-end">
             <span className="px-2.5 py-1 rounded-full bg-[#F1F5F9] border border-[#E2E8F0] text-[#64748B] text-[11px] font-bold">
-              Min. {detail.minDays} Days
+              {t("vehicleDetail.minDays", { days: detail.minDays })}
             </span>
           </div>
         </div>
@@ -55,9 +59,7 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
         <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-3.5 mb-4 space-y-3">
           <div className="grid grid-cols-2 gap-2 pb-2 border-b border-[#E2E8F0]">
             <div>
-              <label className="text-[11px] text-[#64748B] font-bold uppercase tracking-wider block mb-1">
-                Pick-up Date
-              </label>
+              <label className={labelCls}>{t("vehicleDetail.pickupDate")}</label>
               <input
                 type="date"
                 value={pickupDate}
@@ -66,21 +68,17 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
               />
             </div>
             <div>
-              <label className="text-[11px] text-[#64748B] font-bold uppercase tracking-wider block mb-1">
-                Time
-              </label>
+              <label className={labelCls}>{t("home.search.time")}</label>
               <select value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className={selectCls}>
-                {detail.booking.pickupTimes.map((t) => (
-                  <option key={t}>{t}</option>
+                {detail.booking.pickupTimes.map((time) => (
+                  <option key={time}>{time}</option>
                 ))}
               </select>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2 pb-2 border-b border-[#E2E8F0]">
             <div>
-              <label className="text-[11px] text-[#64748B] font-bold uppercase tracking-wider block mb-1">
-                Return Date
-              </label>
+              <label className={labelCls}>{t("vehicleDetail.returnDate")}</label>
               <input
                 type="date"
                 value={returnDate}
@@ -89,31 +87,27 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
               />
             </div>
             <div>
-              <label className="text-[11px] text-[#64748B] font-bold uppercase tracking-wider block mb-1">
-                Time
-              </label>
+              <label className={labelCls}>{t("home.search.time")}</label>
               <select value={returnTime} onChange={(e) => setReturnTime(e.target.value)} className={selectCls}>
-                {detail.booking.returnTimes.map((t) => (
-                  <option key={t}>{t}</option>
+                {detail.booking.returnTimes.map((time) => (
+                  <option key={time}>{time}</option>
                 ))}
               </select>
             </div>
           </div>
           <div>
-            <label className="text-[11px] text-[#64748B] font-bold uppercase tracking-wider block mb-1">
-              Delivery / Handover Point
-            </label>
+            <label className={labelCls}>{t("vehicleDetail.deliveryPoint")}</label>
             <select value={delivery} onChange={(e) => setDelivery(e.target.value)} className={selectCls}>
               {detail.booking.deliveryPoints.map((d) => (
-                <option key={d}>{d}</option>
+                <option key={d}>{t(d)}</option>
               ))}
             </select>
           </div>
         </div>
 
         <div className="mb-4">
-          <label className="text-[11px] text-[#64748B] font-bold uppercase tracking-wider block mb-2">
-            Select Protection Package
+          <label className="block mb-2 text-[11px] text-[#64748B] font-bold uppercase tracking-wider">
+            {t("vehicleDetail.selectProtection")}
           </label>
           <div className="space-y-2">
             {detail.protectionPlans.map((p) => (
@@ -130,8 +124,8 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
                     className="accent-[#2563EB] w-4 h-4"
                   />
                   <div>
-                    <span className="text-[13px] font-bold text-[#0F172A] block">{p.name}</span>
-                    <span className="text-[12px] text-[#64748B]">{p.description}</span>
+                    <span className="block text-[13px] font-bold text-[#0F172A]">{t(p.name)}</span>
+                    <span className="text-[12px] text-[#64748B]">{t(p.description)}</span>
                   </div>
                 </div>
                 <span
@@ -141,7 +135,7 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
                       : "text-[#2563EB] bg-blue-50 border-blue-200"
                   }`}
                 >
-                  {p.priceNote}
+                  {t(p.priceNote)}
                 </span>
               </label>
             ))}
@@ -150,34 +144,34 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
 
         <div className="space-y-2 mb-6 pt-2 text-[13px] text-[#64748B]">
           <div className="flex justify-between">
-            <span>
-              {days} Days Duration × {rate.toLocaleString()} LYD
-            </span>
+            <span>{t("vehicleDetail.durationRate", { days, rate: rate.toLocaleString() })}</span>
             <span className="font-semibold text-[#0F172A] tabular-nums">{gross.toLocaleString()} LYD</span>
           </div>
           {detail.freeIncluded.map((line) => (
             <div key={line} className="flex justify-between">
-              <span>{line}</span>
-              <span className="font-bold text-[#2563EB]">Included</span>
+              <span>{t(line)}</span>
+              <span className="font-bold text-[#2563EB]">{t("vehicleDetail.included")}</span>
             </div>
           ))}
           <div className="flex justify-between pb-2">
             <span className="flex items-center gap-1">
-              {detail.deposit.label}
+              {t(detail.deposit.label)}
               <Info className="w-[14px] h-[14px] text-[#94A3B8]" />
             </span>
-            <span className="font-semibold text-[#0F172A]">{detail.deposit.amount}</span>
+            <span className="font-semibold text-[#0F172A]">{t(detail.deposit.amount)}</span>
           </div>
           <div className="flex items-center justify-between pt-3 text-[#0F172A] font-bold bg-[#F8FAFC] border border-[#E2E8F0] px-4 py-3 rounded-2xl">
             <div>
-              <span className="block text-[12px] font-normal text-[#64748B]">Total Payable Now</span>
-              <span className="text-[16px] font-bold text-[#0F172A]">Total:</span>
+              <span className="block text-[12px] font-normal text-[#64748B]">
+                {t("vehicleDetail.totalPayableNow")}
+              </span>
+              <span className="text-[16px] font-bold text-[#0F172A]">{t("vehicleDetail.totalLabel")}</span>
             </div>
-            <div className="text-right">
+            <div className="text-end">
               <span className="text-[#2563EB] text-[28px] font-extrabold leading-none tabular-nums">
                 {gross.toLocaleString()}
               </span>
-              <span className="text-[#0F172A] text-[13px] ml-1">LYD</span>
+              <span className="ms-1 text-[#0F172A] text-[13px]">LYD</span>
             </div>
           </div>
         </div>
@@ -187,17 +181,17 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
           onClick={reserve}
           className="w-full py-4 rounded-2xl text-white text-[15px] font-extrabold tracking-wide shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 group bg-[#2563EB] hover:bg-blue-700"
         >
-          {detail.reserveLabel}
-          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          {t(detail.reserveLabel)}
+          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
         </button>
 
         <div className="mt-4 space-y-2 pt-2 text-[#64748B] text-[12px]">
-          {detail.trustSignals.map((t) => {
-            const Icon = trustIcons[t.icon];
+          {detail.trustSignals.map((signal) => {
+            const Icon = trustIcons[signal.icon];
             return (
-              <div key={t.text} className="flex items-center gap-2">
+              <div key={signal.text} className="flex items-center gap-2">
                 <Icon className="w-4 h-4 text-[#2563EB]" />
-                {t.text}
+                {t(signal.text)}
               </div>
             );
           })}
@@ -210,11 +204,13 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
             <Headphones className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[13px] font-bold text-[#0F172A]">{detail.liveStatus.label} Aid</p>
+            <p className="text-[13px] font-bold text-[#0F172A]">
+              {t("vehicleDetail.conciergeAid", { status: t(detail.liveStatus.label) })}
+            </p>
             <p className="text-[12px] text-[#64748B]">
               {detail.liveStatus.color === "amber"
-                ? "Armored B6 convoy packages on request"
-                : "24/7 dispatch hotline available"}
+                ? t("vehicleDetail.armoredConvoy")
+                : t("vehicleDetail.dispatchHotline")}
             </p>
           </div>
         </div>
@@ -222,14 +218,14 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
           type="button"
           className="px-3 py-1.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] hover:bg-[#F1F5F9] text-[#2563EB] text-[12px] font-bold transition-colors"
         >
-          Inquire
+          {t("vehicleDetail.inquire")}
         </button>
       </div>
 
       {plan && (
         <div className="hidden lg:flex items-center justify-between text-[11px] text-[#64748B] px-1">
           <DetailIcon name="life" className="w-4 h-4 text-[#2563EB]" />
-          <span>{plan.name} applied to this quote</span>
+          <span>{t("vehicleDetail.planApplied", { plan: t(plan.name) })}</span>
         </div>
       )}
     </aside>

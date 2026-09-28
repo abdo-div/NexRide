@@ -1,7 +1,9 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { LIVE_BOOKING_FEED } from "../../data/partnerData";
 
 export const PartnerDashboardMock: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <div className="bg-[#0b1220] border border-slate-800/80 rounded-3xl p-5 md:p-6 shadow-2xl relative overflow-hidden group">
       {/* OS Header Bar */}
@@ -13,13 +15,13 @@ export const PartnerDashboardMock: React.FC = () => {
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
           </div>
           <span className="text-[11px] font-bold text-slate-400 font-mono ml-2">
-            NexRide Partner OS v3.2
+            {t("home.partners.dashboard.osTitle")}
           </span>
         </div>
 
         <span className="px-2.5 py-0.5 rounded-md bg-emerald-950/80 border border-emerald-800/50 text-[10px] font-extrabold text-emerald-400 font-mono flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          LIVE TELEMETRY
+          {t("home.partners.dashboard.liveTelemetry")}
         </span>
       </div>
 
@@ -28,7 +30,7 @@ export const PartnerDashboardMock: React.FC = () => {
         {/* Monthly Payouts Box */}
         <div className="bg-[#0f172a]/90 border border-slate-800 rounded-2xl p-4">
           <span className="text-[11px] font-semibold text-slate-400 block mb-1">
-            Monthly Payouts
+            {t("home.partners.dashboard.monthlyPayouts")}
           </span>
           <div className="flex items-baseline gap-1.5">
             <span className="text-2xl font-black text-white tracking-tight">
@@ -37,20 +39,20 @@ export const PartnerDashboardMock: React.FC = () => {
             <span className="text-xs font-bold text-cyan-400">LYD</span>
           </div>
           <span className="text-[10px] font-bold text-emerald-400 mt-1 block">
-            ↑ +28% vs last month
+            {t("home.partners.dashboard.vsLastMonth")}
           </span>
         </div>
 
         {/* Active Fleet Utilization Box */}
         <div className="bg-[#0f172a]/90 border border-slate-800 rounded-2xl p-4">
           <span className="text-[11px] font-semibold text-slate-400 block mb-1">
-            Active Fleet Utilization
+            {t("home.partners.dashboard.utilization")}
           </span>
           <span className="text-2xl font-black text-white tracking-tight">
             94.2%
           </span>
           <span className="text-[10px] font-semibold text-slate-400 mt-1 block">
-            48 of 51 Vehicles on Road
+            {t("home.partners.dashboard.vehiclesOnRoad", { count: 48 })}
           </span>
         </div>
       </div>
@@ -59,10 +61,10 @@ export const PartnerDashboardMock: React.FC = () => {
       <div className="bg-[#0f172a]/90 border border-slate-800 rounded-2xl p-4">
         <div className="flex items-center justify-between mb-3">
           <span className="text-[11px] font-bold text-slate-300">
-            Real-time Bookings Feed
+            {t("home.partners.dashboard.bookingsFeed")}
           </span>
           <span className="px-2 py-0.5 rounded-md bg-blue-950 border border-blue-800/50 text-[10px] font-bold text-blue-400">
-            +24 New Today
+            {t("home.partners.dashboard.newToday", { count: 24 })}
           </span>
         </div>
 

@@ -1,9 +1,11 @@
 import React from "react";
 import { Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import { ConfirmationIcon } from "./ConfirmationIcon";
 import type { ConfirmationMeta } from "../../types/bookingConfirmation";
 
 export const ActionDock: React.FC<{ meta: ConfirmationMeta }> = ({ meta }) => {
+  const { t } = useTranslation();
   const { dock } = meta;
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 mt-2 mb-4">
@@ -12,7 +14,7 @@ export const ActionDock: React.FC<{ meta: ConfirmationMeta }> = ({ meta }) => {
         className="text-[14px] text-[#64748B] hover:text-[#0F172A] transition-colors flex items-center gap-1.5"
       >
         {dock.back.icon && <ConfirmationIcon name={dock.back.icon} className="w-[18px] h-[18px]" />}
-        <span>{dock.back.label}</span>
+        <span>{t(dock.back.label)}</span>
       </Link>
       <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
         {dock.actions.map((action) => (
@@ -25,7 +27,7 @@ export const ActionDock: React.FC<{ meta: ConfirmationMeta }> = ({ meta }) => {
                 : "bg-[#F8FAFC] hover:bg-[#F1F5F9] text-[#0F172A]"
             }`}
           >
-            <span>{action.label}</span>
+            <span>{t(action.label)}</span>
             {action.icon && <ConfirmationIcon name={action.icon} className="w-[18px] h-[18px]" />}
           </Link>
         ))}

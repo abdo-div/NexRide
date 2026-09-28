@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import { NavBarLogo } from "./NavBarLogo";
 import { NavBarActions } from "./NavBarActions";
 
 export const NavBar: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -39,34 +41,34 @@ export const NavBar: React.FC = () => {
                 : "text-blue-400 hover:text-blue-300"
             }`}
           >
-            Home
+            {t("nav.home")}
           </Link>
           <a
             href="#featured-fleet"
             className="hover:text-blue-600 transition-colors"
           >
-            Browse Cars
+            {t("nav.browseCars")}
           </a>
           <a
             href="#how-it-works"
             className="hover:text-blue-600 transition-colors"
           >
-            How It Works
+            {t("nav.howItWorks")}
           </a>
           <a
             href="#fleet-operators"
             className="hover:text-blue-600 transition-colors"
           >
-            Fleet Partners
+            {t("nav.fleetPartners")}
           </a>
           <a
             href="#locations"
             className="hover:text-blue-600 transition-colors"
           >
-            Locations
+            {t("nav.locations")}
           </a>
           <a href="#contact" className="hover:text-blue-600 transition-colors">
-            Contact
+            {t("nav.contact")}
           </a>
         </nav>
 

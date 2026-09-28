@@ -1,23 +1,23 @@
 import type { Vehicle } from "../types/vehicle";
 
 export const LOCATION_OPTIONS = [
-  { id: "mji", label: "Tripoli - Mitiga Airport (MJI)", count: 38 },
-  { id: "downtown", label: "Tripoli Downtown / Hai Al-Andalus", count: 46 },
-  { id: "benina", label: "Benghazi - Benina Airport (BEN)", count: 19 },
-  { id: "misrata", label: "Misrata Commercial Free Zone", count: 14 },
+  { id: "mji", label: "fleet.locations.mitiga", count: 38 },
+  { id: "downtown", label: "fleet.locations.downtown", count: 46 },
+  { id: "benina", label: "fleet.locations.benina", count: 19 },
+  { id: "misrata", label: "fleet.locations.misrata", count: 14 },
 ];
 
 export const BODY_PROFILES = [
-  { id: "suv", label: "SUVs", count: 25 },
-  { id: "coupe", label: "Coupe", count: 12 },
-  { id: "sedan", label: "Sedans", count: 22 },
-  { id: "offroad", label: "4x4 Offroad", count: 16 },
+  { id: "suv", label: "fleet.bodies.suv", count: 25 },
+  { id: "coupe", label: "fleet.bodies.coupe", count: 12 },
+  { id: "sedan", label: "fleet.bodies.sedan", count: 22 },
+  { id: "offroad", label: "fleet.bodies.offroad", count: 16 },
 ];
 
 export const DRIVETRAIN_OPTIONS = [
-  { id: "auto", label: "Automatic Transmission", count: 72 },
-  { id: "manual", label: "Manual Transmission", count: 12 },
-  { id: "octane", label: "Petrol High-Octane", count: 68 },
+  { id: "auto", label: "fleet.drivetrains.automatic", count: 72 },
+  { id: "manual", label: "fleet.drivetrains.manual", count: 12 },
+  { id: "octane", label: "fleet.drivetrains.highOctane", count: 68 },
 ];
 
 export const CERTIFIED_FLEETS = [
@@ -28,16 +28,16 @@ export const CERTIFIED_FLEETS = [
 ];
 
 export const PERK_OPTIONS = [
-  { id: "instant", label: "Instant Confirmation" },
-  { id: "airport", label: "Airport VIP Terminal Drop-off" },
-  { id: "zero", label: "Zero Cash Deposit Option" },
+  { id: "instant", label: "fleet.perks.instantConfirmation" },
+  { id: "airport", label: "fleet.perks.airportVip" },
+  { id: "zero", label: "fleet.perks.zeroDeposit" },
 ];
 
 export const SEGMENTS = [
-  { id: "luxury", label: "Luxury SUVs" },
-  { id: "sports", label: "Sports & Coupe" },
-  { id: "offroad", label: "4x4 Desert" },
-  { id: "economy", label: "Economy" },
+  { id: "luxury", label: "home.trending.categories.luxurySUV" },
+  { id: "sports", label: "home.trending.categories.sportsCoupe" },
+  { id: "offroad", label: "home.trending.categories.desert4x4" },
+  { id: "economy", label: "data.categories.economy.title" },
 ];
 
 export const PRICE_MIN = 100;

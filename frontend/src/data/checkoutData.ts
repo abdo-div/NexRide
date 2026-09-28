@@ -46,78 +46,82 @@ export const DEFAULT_CHECKOUT_VEHICLE: Vehicle = {
   ],
 };
 
-const TOTAL_LYD = (amount: number) =>
-  `${amount.toLocaleString("en-US")} LYD`;
-
 const CHECKOUT_META: CheckoutMeta = {
-  stepLabel: "Step 2 of 2: Review & Secure Checkout",
+  stepLabel: "checkout.header.stepLabel",
   crumbs: [
-    { label: "Fleet", to: "/FleetPage" },
-    { label: "Tripoli Luxury" },
+    { label: "checkout.header.crumbs.fleet", to: "/FleetPage" },
+    { label: "checkout.header.crumbs.tripoliLuxury" },
     { label: "Mercedes-Benz S-Class S 500" },
-    { label: "Checkout" },
+    { label: "checkout.header.crumbs.checkout" },
   ],
-  backLabel: "Back to Vehicle Details",
+  backLabel: "checkout.header.backLabel",
   itinerary: {
     pickup: {
       icon: "land",
-      label: "Pickup & Handover",
+      label: "checkout.itinerary.pickupLabel",
       location: "Tripoli Mitiga VIP Terminal (TIP)",
       date: "24 Oct 2024",
       time: "10:00 AM",
     },
     dropoff: {
       icon: "takeoff",
-      label: "Return Depot",
+      label: "checkout.itinerary.dropoffLabel",
       location: "Tripoli Mitiga VIP Terminal (TIP)",
       date: "27 Oct 2024",
       time: "10:00 AM",
     },
     days: 3,
-    durationLabel: "3 Days Reserved (72 Hours)",
-    cancelNote: "Free cancellation up to 24h prior to pickup",
-    changeLabel: "Change Dates",
+    durationLabel: "checkout.itinerary.durationLabel",
+    cancelNote: "checkout.itinerary.cancelNote",
+    changeLabel: "checkout.itinerary.changeLabel",
   },
-  driverTitle: "Primary Driver Information",
-  driverIntro:
-    "Enter official details matching your Libyan National ID or International Passport and driving credential.",
+  driverTitle: "checkout.driver.title",
+  driverIntro: "checkout.driver.intro",
   driverFields: [
-    { id: "firstName", label: "First Name", placeholder: "First name", value: "Tarek" },
-    { id: "lastName", label: "Last Name", placeholder: "Family name", value: "El-Mansouri" },
+    {
+      id: "firstName",
+      label: "checkout.driver.fields.firstName.label",
+      placeholder: "checkout.driver.fields.firstName.placeholder",
+      value: "Tarek",
+    },
+    {
+      id: "lastName",
+      label: "checkout.driver.fields.lastName.label",
+      placeholder: "checkout.driver.fields.lastName.placeholder",
+      value: "El-Mansouri",
+    },
     {
       id: "email",
-      label: "Email Address",
-      placeholder: "Email for digital keys & vouchers",
+      label: "checkout.driver.fields.email.label",
+      placeholder: "checkout.driver.fields.email.placeholder",
       value: "tarek.mansouri@gmail.com",
       type: "email",
-      badge: "Verified",
+      badge: "checkout.driver.fields.email.badge",
       badgeKind: "verified",
     },
     {
       id: "phone",
-      label: "Libyan Mobile Phone",
-      placeholder: "091 / 092 / 094",
+      label: "checkout.driver.fields.phone.label",
+      placeholder: "checkout.driver.fields.phone.placeholder",
       value: "91 234 5678",
       type: "tel",
       prefix: "+218",
-      badge: "SMS Dispatch",
+      badge: "checkout.driver.fields.phone.badge",
       badgeKind: "muted",
-      hint: "Used for driver VIP pickup coordinator contact at Mitiga.",
+      hint: "checkout.driver.fields.phone.hint",
     },
   ],
   driverConfirm: {
-    prefix: "I confirm the primary driver is",
-    strong: "25 years or older",
+    prefix: "checkout.driver.confirmPrefix",
+    strong: "checkout.driver.confirmAge",
   },
-  optionsTitle: "Selected Options & Protection",
-  optionsIntro:
-    "Tailor your executive reservation with premier roadside services and tailored protection.",
+  optionsTitle: "checkout.options.title",
+  optionsIntro: "checkout.options.intro",
   addons: [
     {
       id: "insurance",
-      name: "Comprehensive Zero-Deductible Coverage",
-      description:
-        "Full exterior shield, windshield glass, tires, and third-party liability without excess.",
+      name: "checkout.options.addons.insurance.name",
+      description: "checkout.options.addons.insurance.description",
       price: 45,
       unit: "day",
       recommended: true,
@@ -125,32 +129,30 @@ const CHECKOUT_META: CheckoutMeta = {
     },
     {
       id: "driver",
-      name: "Additional Authorized Driver",
-      description:
-        "Share the steering wheel with an accredited colleague or family member.",
+      name: "checkout.options.addons.driver.name",
+      description: "checkout.options.addons.driver.description",
       price: 25,
       unit: "day",
       defaultOn: true,
     },
     {
       id: "childseat",
-      name: "Child Safety Seat (ISOFIX Sanitized)",
-      description: "Premium ergonomic seat suitable for infant to 4 years old, pre-installed.",
+      name: "checkout.options.addons.childseat.name",
+      description: "checkout.options.addons.childseat.description",
       price: 20,
       unit: "flat",
     },
     {
       id: "delivery",
-      name: "Doorstep VIP Valet Handover",
-      description:
-        "Direct delivery to Corinthia Hotel, Radisson Blu, or private villa within Tripoli.",
+      name: "checkout.options.addons.delivery.name",
+      description: "checkout.options.addons.delivery.description",
       price: 50,
       unit: "flat",
     },
   ],
   payment: {
-    lockLabel: "256-bit SSL PCI-DSS Encrypted",
-    railLabel: "Accepted Payment Rails",
+    lockLabel: "checkout.payment.lockLabel",
+    railLabel: "checkout.payment.railLabel",
     rails: [
       { name: "Visa" },
       { name: "Mastercard" },
@@ -160,75 +162,81 @@ const CHECKOUT_META: CheckoutMeta = {
     cardFields: [
       {
         id: "cardholder",
-        label: "Cardholder Name",
-        placeholder: "NAME AS ON CARD",
+        label: "checkout.payment.cardFields.cardholder.label",
+        placeholder: "checkout.payment.cardFields.cardholder.placeholder",
         value: "TAREK EL MANSOURI",
         uppercase: true,
       },
       {
         id: "cardNumber",
-        label: "Card Number",
-        placeholder: "•••• •••• •••• 8842",
+        label: "checkout.payment.cardFields.cardNumber.label",
+        placeholder: "checkout.payment.cardFields.cardNumber.placeholder",
         value: "•••• •••• •••• 8842",
         badge: "VISA",
       },
       {
         id: "expiry",
-        label: "Expires (MM/YY)",
-        placeholder: "MM/YY",
+        label: "checkout.payment.cardFields.expiry.label",
+        placeholder: "checkout.payment.cardFields.expiry.placeholder",
         value: "08/27",
       },
       {
         id: "cvc",
-        label: "CVC / CVV",
-        placeholder: "123",
+        label: "checkout.payment.cardFields.cvc.label",
+        placeholder: "checkout.payment.cardFields.cvc.placeholder",
         value: "•••",
         type: "password",
       },
       {
         id: "billingCity",
-        label: "Billing City",
-        placeholder: "Tripoli",
+        label: "checkout.payment.cardFields.billingCity.label",
+        placeholder: "checkout.payment.cardFields.billingCity.placeholder",
         value: "Tripoli",
         span2: true,
         type: "text",
       },
     ],
-    cardValueNote: "Tokenized & Verified",
-    tabCardLabel: "Credit / Local Cards",
-    tabCashLabel: "Pay on Pickup (Deposit)",
+    cardValueNote: "checkout.payment.cardValueNote",
+    tabCardLabel: "checkout.payment.tabCardLabel",
+    tabCashLabel: "checkout.payment.tabCashLabel",
     cashDepositPercent: 20,
-    cashNote: (title, deposit, remaining) =>
-      `Reserve the ${title} today with a small 20% commitment charge (${TOTAL_LYD(
-        deposit,
-      )}). The remaining balance (${TOTAL_LYD(
-        remaining,
-      )}) can be settled in cash or via local point-of-sale terminal directly upon vehicle key collection at Mitiga VIP Desk.`,
+    cashNote: "checkout.payment.cashNote",
     trustBadges: [
-      { icon: "shield", text: "Libyan Central Bank Authorized" },
-      { icon: "sms", text: "Instant Confirmation SMS" },
-      { icon: "policy", text: "Zero Concealed Fees" },
+      { icon: "shield", text: "checkout.payment.trustBadges.centralBank" },
+      { icon: "sms", text: "checkout.payment.trustBadges.instantSms" },
+      { icon: "policy", text: "checkout.payment.trustBadges.zeroFees" },
     ],
   },
   municipalFee: 25,
-  municipalLabel: "Municipal & Platform Service Fee",
+  municipalLabel: "checkout.summary.municipalLabel",
   securityDeposit: {
-    label: "Refundable Security Deposit",
-    note: "Pre-authorization hold • Released on return",
+    label: "checkout.summary.depositLabel",
+    note: "checkout.summary.depositNote",
     amount: 1000,
   },
-  totalLabel: "Total Due Today",
-  totalNote: "All applicable Libyan taxes included",
-  ctaIdle: (total) => `Pay ${TOTAL_LYD(total)} & Confirm Booking`,
-  ctaProcessing: "Securing Reservation & Authorization...",
-  ctaDone: "Booking Confirmed! SMS Voucher Dispatched",
-  secureNote: "Bank-grade encrypted transaction via Libyan Payment Network",
-  agreementNote: (operator) =>
-    `By clicking confirm, you agree to NexRide's Master Rental Agreement, Libyan Road Authority guidelines, and ${operator} Terms.`,
+  totalLabel: "checkout.summary.totalLabel",
+  totalNote: "checkout.summary.totalNote",
+  ctaIdle: "checkout.summary.ctaIdle",
+  ctaProcessing: "checkout.summary.ctaProcessing",
+  ctaDone: "checkout.summary.ctaDone",
+  secureNote: "checkout.summary.secureNote",
+  agreementNote: "checkout.summary.agreementNote",
   valueProps: [
-    { icon: "event", title: "Free Cancel", sub: "Up to 24h" },
-    { icon: "car", title: "Exact Model", sub: "100% Guaranteed" },
-    { icon: "support", title: "24/7 Libyan", sub: "VIP Hotline" },
+    {
+      icon: "event",
+      title: "checkout.summary.valueProps.freeCancel.title",
+      sub: "checkout.summary.valueProps.freeCancel.sub",
+    },
+    {
+      icon: "car",
+      title: "checkout.summary.valueProps.exactModel.title",
+      sub: "checkout.summary.valueProps.exactModel.sub",
+    },
+    {
+      icon: "support",
+      title: "checkout.summary.valueProps.hotline.title",
+      sub: "checkout.summary.valueProps.hotline.sub",
+    },
   ],
 };
 
@@ -238,25 +246,26 @@ export const getCheckout = (vehicleId?: string): CheckoutData => {
   const meta: CheckoutMeta = {
     ...CHECKOUT_META,
     crumbs: [
-      { label: "Fleet", to: "/FleetPage" },
-      { label: vehicle.segment === "luxury" ? "Tripoli Luxury" : "Tripoli Fleet" },
+      { label: "checkout.header.crumbs.fleet", to: "/FleetPage" },
+      {
+        label:
+          vehicle.segment === "luxury"
+            ? "checkout.header.crumbs.tripoliLuxury"
+            : "checkout.header.crumbs.tripoliFleet",
+      },
       { label: vehicle.title },
-      { label: "Checkout" },
+      { label: "checkout.header.crumbs.checkout" },
     ],
-    itinerary: {
-      ...CHECKOUT_META.itinerary,
-      durationLabel: `${CHECKOUT_META.itinerary.days} Days Reserved (${CHECKOUT_META.itinerary.days * 24} Hours)`,
-    },
   };
   return { vehicle, meta };
 };
 
 const buildFareLine = (
   id: string,
-  label: string,
+  labelKey: string,
   note: string | null,
   amount: number,
-): FareLine => ({ id, label: note ? `${label} (${note})` : label, amount });
+): FareLine => ({ id, labelKey, note, amount });
 
 export const computeCheckoutTotals = (
   vehicle: Vehicle,
@@ -265,7 +274,7 @@ export const computeCheckoutTotals = (
 ): CheckoutTotals => {
   const days = meta.itinerary.days;
   const base = vehicle.pricePerDay * days;
-  const baseNote = `${vehicle.pricePerDay.toLocaleString("en-US")} LYD × ${days} days`;
+  const baseNote = "checkout.summary.baseNote";
 
   const addonLines: FareLine[] = meta.addons
     .filter((a) => selectedAddonIds.has(a.id))

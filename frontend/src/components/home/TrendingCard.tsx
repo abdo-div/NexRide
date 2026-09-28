@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Heart, Star, ArrowRight } from "lucide-react";
 import type { TrendingCar } from "../../types/trendingCar";
 
@@ -6,7 +7,25 @@ interface TrendingCardProps {
   car: TrendingCar;
 }
 
+const SPEC_LABEL_KEYS: Record<string, string> = {
+  TRANS: "data.trendingSpecs.trans",
+  SEATS: "data.trendingSpecs.seats",
+  POWER: "data.trendingSpecs.power",
+  DRIVE: "data.trendingSpecs.drive",
+  ENGINE: "data.trendingSpecs.engine",
+};
+
+const BADGE_KEYS: Record<string, string> = {
+  "Instant Book": "home.trending.badges.instantBook",
+  "Zero Deposit": "home.trending.badges.zeroDeposit",
+  "Circuit Spec": "home.trending.badges.circuitSpec",
+  "5.0 Rating": "home.trending.badges.fiveRating",
+  "Sahara Ready": "home.trending.badges.saharaReady",
+  "Satellite GPS": "home.trending.badges.satelliteGps",
+};
+
 export const TrendingCard: React.FC<TrendingCardProps> = ({ car }) => {
+  const { t } = useTranslation();
   return (
     <div className="bg-white rounded-3xl border border-slate-200/80 overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
       {/* Top Image Box */}
@@ -28,7 +47,7 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car }) => {
                   : "bg-slate-900/80 text-white border border-white/20"
               }`}
             >
-              {badge}
+              {BADGE_KEYS[badge] ? t(BADGE_KEYS[badge]) : badge}
             </span>
           ))}
         </div>
@@ -36,7 +55,7 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car }) => {
         {/* Saved Heart Button */}
         <button
           type="button"
-          aria-label="Save car"
+          aria-label={t("data.common.saveCar")}
           className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-slate-700 hover:text-rose-500 hover:bg-white shadow-xs transition-colors"
         >
           <Heart className="w-4 h-4" />
@@ -70,7 +89,9 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car }) => {
             {car.specs.map((spec, idx) => (
               <div key={idx} className="flex flex-col">
                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                  {spec.label}
+                  {SPEC_LABEL_KEYS[spec.label]
+                    ? t(SPEC_LABEL_KEYS[spec.label])
+                    : spec.label}
                 </span>
                 <span className="text-[11px] font-extrabold text-slate-700 mt-0.5">
                   {spec.value}
@@ -84,7 +105,7 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car }) => {
         <div className="flex items-center justify-between pt-2">
           <div>
             <span className="text-[10px] font-bold text-slate-400 uppercase block">
-              Daily Tariff
+              {t("home.trending.dailyTariff")}
             </span>
             <div className="flex items-baseline gap-1">
               <span className="text-xl font-black text-slate-900">
@@ -100,8 +121,8 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car }) => {
             href={`#reserve-${car.id}`}
             className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 flex items-center gap-1.5 transition-all active:scale-95"
           >
-            <span>Reserve Ride</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <span>{t("home.trending.reserveRide")}</span>
+            <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
           </a>
         </div>
       </div>

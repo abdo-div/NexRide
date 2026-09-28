@@ -4,29 +4,25 @@ export const STANDARDS_DATA: StandardFeature[] = [
   {
     id: "insured-fleet",
     iconType: "shield",
-    title: "100% Insured Fleet",
-    description:
-      "Comprehensive damage and third-party protection policies aligned with Libyan insurance standards and clear deductibles.",
+    title: "data.standards.insuredFleet.title",
+    description: "data.standards.insuredFleet.description",
   },
   {
     id: "verified-businesses",
     iconType: "building",
-    title: "Verified Businesses",
-    description:
-      "Every rental operator undergoes commercial registry verification, tax ID scrutiny, and on-site physical fleet spot checks.",
+    title: "data.standards.verifiedBusinesses.title",
+    description: "data.standards.verifiedBusinesses.description",
   },
   {
     id: "transparent-pricing",
     iconType: "credit-card",
-    title: "Transparent LYD Pricing",
-    description:
-      "Exact daily rates with full itemized breakdown of security deposits and zero extortionate card transaction fees.",
+    title: "data.standards.transparentPricing.title",
+    description: "data.standards.transparentPricing.description",
   },
   {
     id: "vehicle-telematics",
     iconType: "car",
-    title: "Real Vehicle Telematics",
-    description:
-      "Vehicles equipped with satellite tracking and 24/7 dedicated emergency assistance across primary Libyan expressways.",
+    title: "data.standards.vehicleTelematics.title",
+    description: "data.standards.vehicleTelematics.description",
   },
 ];

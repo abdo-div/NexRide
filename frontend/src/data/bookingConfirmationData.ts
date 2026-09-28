@@ -1,4 +1,9 @@
-import type { ConfirmationData, ConfirmationMeta, FareLine } from "../types/bookingConfirmation";
+import type {
+  ConfirmationData,
+  ConfirmationMeta,
+  FareLine,
+  TemplateValues,
+} from "../types/bookingConfirmation";
 import { getCheckout, computeCheckoutTotals } from "./checkoutData";
 
 const fmt2 = (n: number) => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -10,132 +15,133 @@ const buildMeta = (
   paidTotal: string,
 ): ConfirmationMeta => ({
   crumbs: [
-    { label: "Home", to: "/" },
-    { label: "Checkout" },
+    { label: "nav.home", to: "/" },
+    { label: "booking.crumbs.checkout" },
     { label: vehicleTitle },
-    { label: "Booking Confirmation" },
+    { label: "booking.crumbs.current" },
   ],
-  stepBadge: { caption: "Step 3 of 3:", value: "Secured & Verified" },
+  stepBadge: { caption: "booking.stepBadge.caption", value: "booking.stepBadge.value" },
   success: {
-    badge: "Confirmed",
-    validation: "Libya National Transport Authority Validated",
-    title: "Booking Confirmed",
-    desc: (title) =>
-      `Your ${title} reservation is secured. Confirmation SMS and downloadable digital travel credentials have been dispatched to your verified contacts.`,
-    printLabel: "Print Voucher",
-    downloadLabel: "Download Digital PDF",
-    toastPrint: "Voucher opened for print",
-    toastDownload: "Generating official PDF voucher...",
+    badge: "booking.success.badge",
+    validation: "booking.success.validation",
+    title: "booking.success.title",
+    desc: "booking.success.desc",
+    printLabel: "booking.success.printLabel",
+    downloadLabel: "booking.success.downloadLabel",
+    toastPrint: "booking.success.toastPrint",
+    toastDownload: "booking.success.toastDownload",
   },
   reference: {
-    label: "Booking Reference:",
+    label: "booking.reference.label",
     code: "NX-20481",
-    copyToast: "Booking reference copied to clipboard",
+    copyToast: "booking.reference.copyToast",
     chips: [
-      { icon: "encrypted", text: "Moamalat Secured Escrow" },
-      { icon: "clock", text: "Instant Host Dispatch" },
+      { icon: "encrypted", text: "booking.reference.chips.escrow" },
+      { icon: "clock", text: "booking.reference.chips.instantDispatch" },
     ],
   },
   milestones: [
     {
-      step: "Step 01",
-      status: "Completed",
-      title: "Payment & Reservation",
-      detail: `Paid ${paidTotal} • 24 Oct 2024`,
+      step: "booking.milestones.step1",
+      status: "booking.milestones.statusDone",
+      title: "booking.milestones.title1",
+      detail: "booking.milestones.detail1",
+      values: { amount: paidTotal },
       icon: "check",
       state: "done",
     },
     {
-      step: "Step 02",
-      status: "Next Action",
-      title: "Handover & Key Delivery",
-      detail: "24 Oct 2024 · 10:00 AM at Mitiga VIP",
+      step: "booking.milestones.step2",
+      status: "booking.milestones.statusNext",
+      title: "booking.milestones.title2",
+      detail: "booking.milestones.detail2",
       icon: "car",
       state: "next",
     },
     {
-      step: "Step 03",
-      status: "Scheduled",
-      title: "Vehicle Return",
-      detail: "27 Oct 2024 · 10:00 AM (Mitiga)",
+      step: "booking.milestones.step3",
+      status: "booking.milestones.statusScheduled",
+      title: "booking.milestones.title3",
+      detail: "booking.milestones.detail3",
       icon: "key",
       state: "pending",
     },
   ],
   vehicleCard: {
-    badgePrimary: "Executive Tier",
-    badgeSecondary: "2024 Specification",
-    gpsLabel: "GPS & Telematics Active",
-    category: "Full-Size Luxury Sedan",
+    badgePrimary: "booking.vehicle.badgeTier",
+    badgeSecondary: "booking.vehicle.badgeSpec",
+    gpsLabel: "booking.vehicle.gpsLabel",
+    category: "booking.vehicle.category",
     vin: "VIN: WDD22306...89",
   },
   operator: {
-    locationLabel: "Tripoli Central",
-    ratingNote: "142 verified bookings",
-    phoneLabel: "Contact Depot Dispatch",
+    locationLabel: "booking.operator.location",
+    ratingNote: "booking.operator.ratingNote",
+    phoneLabel: "booking.operator.phoneLabel",
     phone: "+218 91 234 5678",
     phoneHref: "tel:+218912345678",
   },
   identification: {
-    title: "Renter & Operator Identification",
+    title: "booking.identification.title",
     driverName: "Tarek El-Mansouri",
     hotline: "+218 91 234 5678",
     email: "tarek.mansouri@...",
   },
   route: {
-    title: "Trip Route & Schedule",
-    daysBadge: `${days} Days / ${days * 24} Hours`,
+    title: "booking.route.title",
+    days,
+    daysBadge: "booking.route.daysBadge",
     pickup: {
-      label: "Pick-Up Depot",
+      label: "booking.route.pickupLabel",
       location: "Tripoli Mitiga VIP Terminal (TIP)",
-      datetime: "Thursday, 24 Oct 2024 · 10:00 AM",
-      note: "Meet & Greet coordinator waiting at Terminal 1 Executive Arrivals lounge with passenger placard.",
+      datetime: "booking.route.pickupDatetime",
+      note: "booking.route.pickupNote",
       icon: "land",
       primary: true,
     },
     dropoff: {
-      label: "Drop-Off Depot",
+      label: "booking.route.dropoffLabel",
       location: "Tripoli Mitiga VIP Terminal (TIP)",
-      datetime: "Sunday, 27 Oct 2024 · 10:00 AM",
+      datetime: "booking.route.dropoffDatetime",
       icon: "takeoff",
       primary: false,
     },
   },
   payment: {
-    title: "Payment Summary",
-    paidBadge: "Paid in Full",
-    depositLabel: "Refundable Deposit (Escrow Pre-auth)",
+    title: "booking.payment.title",
+    paidBadge: "booking.payment.paidBadge",
+    depositLabel: "booking.payment.depositLabel",
     depositAmount: "1,000.00 LYD",
-    totalLabel: "Total Settled",
-    totalNote: "Via Moamalat / Libyan Card",
-    viaNote: "Paid using Card ending in",
+    totalLabel: "booking.payment.totalLabel",
+    totalNote: "booking.payment.totalNote",
+    viaNote: "booking.payment.viaNote",
   },
   protocol: {
-    title: "Arrival & Handover Protocol",
-    subtitle: "Review the essential checklist for seamless key exchange at Mitiga Airport VIP Terminal.",
+    title: "booking.protocol.title",
+    subtitle: "booking.protocol.subtitle",
     cards: [
       {
         icon: "badge",
-        title: "Mandatory Documents",
-        body: "Bring your physical Driver's License, Original Passport or Libyan National Identity Card, and the digital token on this screen.",
+        title: "booking.protocol.documents.title",
+        body: "booking.protocol.documents.body",
       },
       {
         icon: "location",
-        title: "Designated Depot Bay",
-        body: "Mitiga Airport VIP Arrival Terminal, Dedicated Executive Parking Lot C, Bay 14. Dispatch assistant will be waiting.",
+        title: "booking.protocol.depot.title",
+        body: "booking.protocol.depot.body",
       },
       {
         icon: "restart",
-        title: "Cancellation Policy",
-        body: "Free 100% refund available up to 24 hours prior to scheduled departure (before 23 Oct 2024, 10:00 AM).",
+        title: "booking.protocol.cancellation.title",
+        body: "booking.protocol.cancellation.body",
       },
     ],
   },
   dock: {
-    back: { icon: "arrowLeft", label: "Back to Marketplace", to: "/" },
+    back: { icon: "arrowLeft", label: "booking.dock.back", to: "/" },
     actions: [
-      { label: "Browse More Vehicles", to: "/FleetPage" },
-      { icon: "arrowRight", label: "Manage Reservation", to: "/FleetPage", primary: true },
+      { label: "booking.dock.browseMore", to: "/FleetPage" },
+      { icon: "arrowRight", label: "booking.dock.manage", to: "/FleetPage", primary: true },
     ],
   },
 });
@@ -147,15 +153,25 @@ export const getBookingConfirmation = (vehicleId?: string): ConfirmationData => 
   const totals = computeCheckoutTotals(vehicle, meta, selected);
 
   const fareLines: FareLine[] = [
-    { label: `Vehicle Base Rental (${vehicle.pricePerDay} LYD × ${days} days)`, amount: lyd2(totals.base) },
+    {
+      label: "booking.fare.baseRental",
+      amount: lyd2(totals.base),
+      values: { price: vehicle.pricePerDay, days },
+    },
     ...meta.addons
       .filter((a) => selected.has(a.id))
-      .map((a) => ({
-        label: `${a.name} (${a.price} LYD × ${a.unit === "day" ? days : "flat"})`,
-        amount: lyd2(a.unit === "day" ? a.price * days : a.price),
-      })),
+      .map<FareLine>((a) => {
+        const perDay = a.unit === "day";
+        const values: TemplateValues = perDay ? { price: a.price, days } : { price: a.price };
+        return {
+          label: perDay ? "booking.fare.addonDays" : "booking.fare.addonFlat",
+          amount: lyd2(perDay ? a.price * days : a.price),
+          nameKey: a.name,
+          values,
+        };
+      }),
     {
-      label: "Municipal Fleet Fee & Platform Tax",
+      label: "booking.fare.municipalFee",
       amount: lyd2(totals.municipalFee),
     },
   ];

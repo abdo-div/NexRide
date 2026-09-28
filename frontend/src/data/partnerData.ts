@@ -3,20 +3,20 @@ import type { PartnerMetric, LiveBookingFeedItem } from "../types/partner";
 export const PARTNER_METRICS: PartnerMetric[] = [
   {
     id: "online-bookings",
-    title: "100% Online Bookings",
-    subtitle: "Fleet Control & real-time GPS dispatch",
+    title: "data.partnerMetrics.onlineBookings.title",
+    subtitle: "data.partnerMetrics.onlineBookings.subtitle",
     variant: "blue",
   },
   {
     id: "fleet-control",
-    title: "Automated Fleet Control",
-    subtitle: "Guaranteed digital escrow protection",
+    title: "data.partnerMetrics.fleetControl.title",
+    subtitle: "data.partnerMetrics.fleetControl.subtitle",
     variant: "cyan",
   },
   {
     id: "payouts",
-    title: "Direct Payouts in LYD",
-    subtitle: "Instant weekly bank transfers in LYD",
+    title: "data.partnerMetrics.payouts.title",
+    subtitle: "data.partnerMetrics.payouts.subtitle",
     variant: "amber",
   },
 ];
