@@ -107,11 +107,36 @@
     },
     "forgot": {
       "title": "Reset Account Security",
-      "desc": "Enter your registered corporate email address or Libyan mobile phone (+218). Our automated security gateway will immediately transmit an encrypted 6-digit OTP passcode.",
+      "desc": "Enter your registered corporate email address or Libyan mobile phone (+218). We will transmit a single-use password reset link to the email on your account.",
       "placeholder": "Enter email or mobile (+218 9X XXX XXXX)",
-      "dispatch": "Dispatch SMS / WhatsApp OTP",
+      "dispatch": "Send Reset Link",
       "cancel": "Cancel",
-      "sent": "Encrypted OTP code transmitted successfully to the provided channel. Please check your messages."
+      "sent": "If that account exists, a password reset link is on its way. The link stays valid for 10 minutes."
+    },
+    "reset": {
+      "badge": "Secure Reset",
+      "title": "Choose a New Passcode",
+      "subtitle": "Set a new passcode for your NexRide account. You will be signed in automatically once it is saved.",
+      "newPassword": "New Passcode",
+      "confirmPassword": "Confirm New Passcode",
+      "submit": "Save New Passcode",
+      "expiryNote": "This reset link expires after 10 minutes.",
+      "invalidTitle": "Invalid Reset Link",
+      "invalidDesc": "This password reset link is missing its security token. Request a new one to continue.",
+      "backToSignIn": "Back to Sign In"
+    },
+    "nav": {
+      "signOut": "Sign Out"
+    },
+    "state": {
+      "restoring": "Restoring your session",
+      "signingIn": "Authenticating...",
+      "creating": "Creating account...",
+      "updating": "Updating passcode..."
+    },
+    "errors": {
+      "unexpected": "Something went wrong. Please try again.",
+      "passwordMismatch": "Passwords do not match"
     },
     "showcase": {
       "badge": "Executive Mobility Experience",

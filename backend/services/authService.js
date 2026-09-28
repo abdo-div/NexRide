@@ -14,6 +14,73 @@ export const signToken = (id) => {
 };
 
 /**
+ * Resolves the base URL of the client application so emails link back to the
+ * SPA instead of the API. Falls back to the incoming request origin when
+ * FRONTEND_URL is not configured.
+ */
+const resolveClientUrl = (reqHost, reqProtocol) => {
+  const configured = (process.env.FRONTEND_URL || "").trim();
+  if (configured) return configured.replace(/\/+$/, "");
+  return `${reqProtocol}://${reqHost}`;
+};
+
+/**
+ * Reduces a phone number to its local Libyan digits (no country code, no
+ * leading zero, no separators) so "+218 91 234 5678", "00218912345678",
+ * "0912345678" and "912345678" all collapse to "912345678".
+ */
+const localPhoneDigits = (value) => {
+  if (typeof value !== "string") return "";
+  const digits = value.replace(/\D/g, "");
+  return digits.replace(/^(?:00)?218/, "").replace(/^0+/, "");
+};
+
+/**
+ * Canonical storage format for phone numbers: +218XXXXXXXXX
+ */
+export const normalisePhoneNumber = (value) => {
+  const local = localPhoneDigits(value);
+  return local ? `+218${local}` : "";
+};
+
+/**
+ * Builds a Mongo query matching an account by email address OR phone number so
+ * both the sign-in and account-recovery screens can accept either one. Phone
+ * matching is format-tolerant because historical records were seeded with
+ * several different conventions.
+ */
+const identifierQuery = (identifier) => {
+  const raw = typeof identifier === "string" ? identifier.trim() : "";
+  if (!raw) return { _id: null };
+
+  const lower = raw.toLowerCase();
+  if (lower.includes("@")) return { email: lower };
+
+  const digits = raw.replace(/\D/g, "");
+  const local = localPhoneDigits(raw);
+  const phoneCandidates = new Set(
+    [
+      raw,
+      digits,
+      local,
+      `+${digits}`,
+      `00${digits}`,
+      `+${local}`,
+      `+218${local}`,
+      `00${local}`,
+      `0${local}`,
+    ].filter(Boolean),
+  );
+
+  return {
+    $or: [
+      { email: lower },
+      { phoneNumber: { $in: [...phoneCandidates] } },
+    ],
+  };
+};
+
+/**
  * Register a new user
  */
 export const registerUser = async (userData, reqHost, reqProtocol) => {
@@ -22,12 +89,12 @@ export const registerUser = async (userData, reqHost, reqProtocol) => {
     email: userData.email,
     password: userData.password,
     passwordConfirm: userData.passwordConfirm,
-    phoneNumber: userData.phoneNumber,
+    phoneNumber: normalisePhoneNumber(userData.phoneNumber),
     role: userData.role || "customer",
   });
 
   // Non-blocking welcome email dispatch
-  const dashboardURL = `${reqProtocol}://${reqHost}/dashboard`;
+  const dashboardURL = resolveClientUrl(reqHost, reqProtocol);
   new Email(newUser, dashboardURL).sendWelcome().catch((err) => {
     console.error("Non-critical background welcome email error:", err.message);
   });
@@ -38,12 +105,14 @@ export const registerUser = async (userData, reqHost, reqProtocol) => {
 /**
  * Authenticate user credentials
  */
-export const authenticateUser = async (email, password) => {
-  if (!email || !password) {
+export const authenticateUser = async (identifier, password) => {
+  if (!identifier || !password) {
     throw new AppError("Please provide email and password!", 400);
   }
 
-  const user = await User.findOne({ email }).select("+password");
+  const user = await User.findOne(identifierQuery(identifier)).select(
+    "+password"
+  );
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     throw new AppError("Incorrect email or password", 401);
@@ -55,8 +124,9 @@ export const authenticateUser = async (email, password) => {
 /**
  * Initiate forgot password lifecycle & email reset link
  */
-export const requestPasswordReset = async (email, host, protocol) => {
-  const user = await User.findOne({ email });
+export const requestPasswordReset = async (identifier, host, protocol) => {
+  const user = await User.findOne(identifierQuery(identifier));
+
   if (!user) {
     throw new AppError("There is no user with that email address", 404);
   }
@@ -65,7 +135,7 @@ export const requestPasswordReset = async (email, host, protocol) => {
   await user.save({ validateBeforeSave: false });
 
   try {
-    const resetURL = `${protocol}://${host}/api/v1/users/resetPassword/${resetToken}`;
+    const resetURL = `${resolveClientUrl(host, protocol)}/reset-password/${resetToken}`;
     await new Email(user, resetURL).sendPasswordReset();
     return true;
   } catch (err) {

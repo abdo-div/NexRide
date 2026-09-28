@@ -82,9 +82,16 @@ export default class Email {
         <h2 style="color:#1a1a2e;margin:0 0 16px;font-size:22px;">Password Reset Request</h2>
         <p style="color:#4a5568;line-height:1.7;margin:0 0 16px;">Hello <strong>${this.firstName}</strong>,</p>
         <p style="color:#4a5568;line-height:1.7;margin:0 0 24px;">
-          We received a request to reset your NexRide account password. Send a <strong>PATCH</strong> request containing your new 
-          <code style="background:#f0f4f8;padding:2px 6px;border-radius:4px;">password</code> and 
-          <code style="background:#f0f4f8;padding:2px 6px;border-radius:4px;">passwordConfirm</code> payload to:
+          We received a request to reset your NexRide account password. Choose a new
+          passcode using the secure link below.
+        </p>
+        <div style="margin:0 0 24px;">
+          <a href="${this.url}" style="display:inline-block;background:linear-gradient(135deg,#e94560,#c0392b);color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px;">
+            Reset My Password &rarr;
+          </a>
+        </div>
+        <p style="color:#718096;font-size:13px;line-height:1.7;margin:0 0 12px;">
+          If the button does not work, copy and paste this address into your browser:
         </p>
         <div style="background:#f0f4f8;border-left:4px solid #e94560;border-radius:4px;padding:16px;margin:0 0 24px;word-break:break-all;">
           <p style="margin:0;font-size:13px;color:#2d3748;font-family:monospace;">${this.url}</p>

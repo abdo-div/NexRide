@@ -36,7 +36,7 @@ export const signup = catchAsync(async (req, res, next) => {
 
 export const login = catchAsync(async (req, res, next) => {
   const user = await authService.authenticateUser(
-    req.body.email,
+    req.body.identifier ?? req.body.email,
     req.body.password
   );
   createSendToken(user, 200, req, res);
@@ -53,7 +53,9 @@ export const logout = (req, res) => {
 
 export const forgotPassword = catchAsync(async (req, res, next) => {
   const host = req.get("host");
-  await authService.requestPasswordReset(req.body.email, host, req.protocol);
+  const identifier = req.body.identifier ?? req.body.email;
+
+  await authService.requestPasswordReset(identifier, host, req.protocol);
 
   res.status(200).json({
     status: "success",

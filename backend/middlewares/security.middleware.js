@@ -3,10 +3,23 @@ import cors from "cors";
 import mongoSanitize from "express-mongo-sanitize";
 import rateLimit from "express-rate-limit";
 
-const allowedOrigins = [
+const DEFAULT_ORIGINS = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
   "http://localhost:3000",
   "http://lvh.me:3000",
-  process.env.FRONTEND_DOMAIN,
+];
+
+/**
+ * FRONTEND_DOMAIN accepts a comma-separated list so staging/prod origins can be
+ * whitelisted without touching code (e.g. "https://nexride.ly,https://app.nexride.ly").
+ */
+const allowedOrigins = [
+  ...DEFAULT_ORIGINS,
+  ...(process.env.FRONTEND_DOMAIN || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
 ];
 
 export const securityCors = cors({
