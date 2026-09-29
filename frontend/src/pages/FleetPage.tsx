@@ -1,7 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Car, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react";
+import { Car, ShieldCheck, ChevronLeft, ChevronRight, AlertTriangle } from "lucide-react";
+import { useVehicles } from "../hooks/useVehicles";
 import { useVehicleFilters } from "../hooks/useVehicleFilters";
+import { mapVehicles } from "../lib/vehicleMapper";
 import { CommandBar } from "../components/vehicles/CommandBar";
 import { FilterSideBar } from "../components/vehicles/FilterSideBar";
 import { VehicleCard } from "../components/vehicles/VehicleCard";
@@ -17,9 +19,32 @@ import {
 const labelFor = (list: { id: string; label: string }[], ids: string[]) =>
   list.filter((x) => ids.includes(x.id)).map((x) => x.label);
 
+const SKELETON_KEYS = ["a", "b", "c", "d", "e", "f"];
+
+const VehicleCardSkeleton: React.FC = () => (
+  <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl overflow-hidden shadow-sm flex flex-col xl:flex-row animate-pulse">
+    <div className="xl:w-2/5 h-64 xl:h-auto bg-slate-200" />
+    <div className="xl:w-3/5 p-6 flex flex-col gap-5">
+      <div className="h-3 w-20 rounded bg-slate-200" />
+      <div className="h-6 w-2/3 rounded bg-slate-200" />
+      <div className="h-9 w-full rounded-xl bg-slate-100" />
+      <div className="h-4 w-1/2 rounded bg-slate-200" />
+    </div>
+  </div>
+);
+
 export const FleetPage: React.FC = () => {
   const { t } = useTranslation();
-  const filters = useVehicleFilters();
+  const { vehicles: dtoVehicles, loading, error, reload } = useVehicles();
+
+  // Re-maps whenever the resolved locale changes, since enum labels are
+  // translated during the projection. `t` changes identity on languageChanged.
+  const allVehicles = useMemo(
+    () => mapVehicles(dtoVehicles, (key, fallback) => t(key, fallback)),
+    [dtoVehicles, t],
+  );
+
+  const filters = useVehicleFilters(allVehicles);
   const { filteredVehicles, segmentCounts } = filters;
 
   const [sort, setSort] = useState("recommended");
@@ -226,8 +251,51 @@ export const FleetPage: React.FC = () => {
               </div>
             )}
 
-            {/* Cards */}
-            {vehicles.length === 0 ? (
+            {/* Loading */}
+            {loading && (
+              <div className="flex flex-col gap-6" aria-busy="true" aria-live="polite">
+                <span className="sr-only">{t("fleet.loading.label")}</span>
+                {SKELETON_KEYS.map((key) => (
+                  <VehicleCardSkeleton key={key} />
+                ))}
+              </div>
+            )}
+
+            {/* API error */}
+            {!loading && error && (
+              <div className="bg-[#FFFFFF] border border-red-200 rounded-2xl shadow-sm px-6 py-14 text-center">
+                <div className="mx-auto w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
+                  <AlertTriangle className="w-6 h-6 text-red-500" />
+                </div>
+                <h3 className="text-base font-bold text-[#0F172A]">
+                  {t("fleet.error.title")}
+                </h3>
+                <p className="mt-1 text-sm text-slate-500">{error}</p>
+                <button
+                  type="button"
+                  onClick={reload}
+                  className="mt-5 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+                >
+                  {t("fleet.error.retry")}
+                </button>
+              </div>
+            )}
+
+            {/* Loaded, but the fleet is empty in the database */}
+            {!loading && !error && allVehicles.length === 0 && (
+              <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl shadow-sm px-6 py-16 text-center">
+                <div className="mx-auto w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                  <Car className="w-6 h-6 text-slate-400" />
+                </div>
+                <h3 className="text-base font-bold text-[#0F172A]">
+                  {t("fleet.emptyDb.title")}
+                </h3>
+                <p className="mt-1 text-sm text-slate-500">{t("fleet.emptyDb.desc")}</p>
+              </div>
+            )}
+
+            {/* Loaded with data, but filters exclude everything */}
+            {!loading && !error && allVehicles.length > 0 && vehicles.length === 0 && (
               <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl shadow-sm px-6 py-16 text-center">
                 <div className="mx-auto w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mb-4">
                   <Car className="w-6 h-6 text-slate-400" />
@@ -242,41 +310,50 @@ export const FleetPage: React.FC = () => {
                   {t("fleet.empty.action")}
                 </button>
               </div>
-            ) : (
-              vehicles.map((v) => <VehicleCard key={v.id} vehicle={v} />)
+            )}
+
+            {/* Cards */}
+            {!loading && !error && vehicles.length > 0 && (
+              <div className="flex flex-col gap-6">
+                {vehicles.map((v) => (
+                  <VehicleCard key={v.id} vehicle={v} />
+                ))}
+              </div>
             )}
 
             {/* Pagination */}
-            <div className="bg-[#FFFFFF] p-4 rounded-2xl border border-[#E2E8F0] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
-              <span className="text-[13px] text-slate-500">
-                {t("fleet.pagination.summary", {
-                  range: `1 - ${vehicles.length}`,
-                  total: vehicles.length,
-                })}
-              </span>
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  disabled
-                  className="w-9 h-9 rounded-xl bg-white border border-[#E2E8F0] hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors disabled:opacity-40"
-                >
-                  <ChevronLeft className="w-[18px] h-[18px] rtl:rotate-180" />
-                </button>
-                <button
-                  type="button"
-                  className="w-9 h-9 rounded-xl bg-[#2563EB] text-white text-xs font-bold shadow-sm"
-                >
-                  1
-                </button>
-                <button
-                  type="button"
-                  disabled
-                  className="w-9 h-9 rounded-xl bg-white border border-[#E2E8F0] hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors disabled:opacity-40"
-                >
-                  <ChevronRight className="w-[18px] h-[18px] rtl:rotate-180" />
-                </button>
+            {!loading && !error && vehicles.length > 0 && (
+              <div className="bg-[#FFFFFF] p-4 rounded-2xl border border-[#E2E8F0] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
+                <span className="text-[13px] text-slate-500">
+                  {t("fleet.pagination.summary", {
+                    range: `1 - ${vehicles.length}`,
+                    total: vehicles.length,
+                  })}
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    disabled
+                    className="w-9 h-9 rounded-xl bg-white border border-[#E2E8F0] hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors disabled:opacity-40"
+                  >
+                    <ChevronLeft className="w-[18px] h-[18px] rtl:rotate-180" />
+                  </button>
+                  <button
+                    type="button"
+                    className="w-9 h-9 rounded-xl bg-[#2563EB] text-white text-xs font-bold shadow-sm"
+                  >
+                    1
+                  </button>
+                  <button
+                    type="button"
+                    disabled
+                    className="w-9 h-9 rounded-xl bg-white border border-[#E2E8F0] hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors disabled:opacity-40"
+                  >
+                    <ChevronRight className="w-[18px] h-[18px] rtl:rotate-180" />
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Trust banner */}
             <div className="bg-blue-50/60 border border-blue-200/80 p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 mt-4">

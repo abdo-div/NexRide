@@ -489,6 +489,37 @@
       "desc": "Try raising the max price or removing some filters.",
       "action": "Reset all filters"
     },
+    "emptyDb": {
+      "title": "No vehicles available yet",
+      "desc": "No published and available vehicles are listed right now. Please check back soon."
+    },
+    "loading": {
+      "label": "Loading available vehicles"
+    },
+    "error": {
+      "title": "We couldn't load the fleet",
+      "retry": "Try again"
+    },
+    "seatsUnit": "Seats",
+    "unknownOperator": "Independent owner",
+    "types": {
+      "SEDAN": "Sedan",
+      "SUV": "SUV",
+      "HATCHBACK": "Hatchback",
+      "LUXURY": "Luxury",
+      "VAN": "Van",
+      "PICKUP": "Pickup"
+    },
+    "transmissions": {
+      "AUTOMATIC": "Automatic",
+      "MANUAL": "Manual"
+    },
+    "fuelTypes": {
+      "GASOLINE": "Gasoline",
+      "DIESEL": "Diesel",
+      "ELECTRIC": "Electric",
+      "HYBRID": "Hybrid"
+    },
     "pagination": {
       "summary": "Showing {{range}} of {{total}} verified vehicles"
     },
@@ -553,6 +584,11 @@
     }
   },
   "vehicleDetail": {
+    "unavailable": {
+      "title": "Details not available yet",
+      "desc": "This vehicle came from the live fleet, but its detail page is not connected to the API yet. Head back to the fleet to keep browsing.",
+      "backToFleet": "Back to fleet"
+    },
     "crumbCars": "Cars",
     "crumbLuxurySuv": "Luxury SUVs",
     "crumbEconomy": "Economy Cars",
@@ -760,7 +796,49 @@
     "confirmedWith": "Confirmed with {{operator}}!",
     "trustCancellation": "Free cancellation up to 24 hours prior to pickup",
     "trustContract": "Official Libyan Ministry of Transport e-Contract",
-    "trustEscrow": "Encrypted local card, wire, or cash escrow confirmation"
+    "trustEscrow": "Encrypted local card, wire, or cash escrow confirmation",
+    "badgeModelYearVar": "Model Year {{year}}",
+    "statusAvailableNow": "Available Now",
+    "statusUnavailable": "Unavailable",
+    "statusMaintenance": "In Maintenance",
+    "statusBookableAt": "Bookable at {{operator}}",
+    "statusUnavailableAt": "Currently unavailable at {{operator}}",
+    "metricCategory": "Category",
+    "metricCity": "Location",
+    "descHeadingReal": "About the {{model}}",
+    "pickupBadge": "Pickup Location",
+    "depositNotSet": "Set by the operator at pickup",
+    "barOverall": "Overall Rating",
+    "reviewCtxCompleted": "Verified completed booking",
+    "verifiedCustomer": "Verified customer",
+    "timeJustNow": "Just now",
+    "ratingCountRatings": "{{count}} ratings",
+    "operatorRentals": "{{count}} verified rentals",
+    "operatorManaged": "Managed via NexRide support",
+    "operatorMetaApproved": "Approved commercial fleet partner on NexRide",
+    "operatorMetaPending": "Partnership verification in progress",
+    "tierApproved": "Approved",
+    "tierPending": "Verification Pending",
+    "planFleetRateName": "Published Daily Rate",
+    "planFleetRateDesc": "Rate set by the operator; no additional protection packages published",
+    "reserveUnavailable": "Booking Unavailable Online",
+    "conciergePickupTitle": "Pickup & Handover",
+    "conciergeBodyCity": "Arrange a convenient handover at the pickup location listed on this page.",
+    "similarHeadingFleet": "Similar Vehicles",
+    "similarSubFleet": "Other available vehicles of the same type",
+    "similarLinkLabelFleet": "View Full Fleet",
+    "ratingsTagReal": "Verified Rating",
+    "ratingsSubReal": "Based on {{count}} verified ratings",
+    "error": {
+      "title": "Could not load this vehicle",
+      "desc": "The API did not respond. Check that the backend is running and try again.",
+      "retry": "Try Again"
+    },
+    "notFound": {
+      "title": "Vehicle Not Found",
+      "desc": "This vehicle does not exist or is not published yet.",
+      "backToFleet": "Back to Fleet"
+    }
   },
   "checkout": {
     "header": {

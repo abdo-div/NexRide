@@ -518,8 +518,15 @@ const buildFallbackDetail = (id: string): VehicleDetail => {
   };
 };
 
+/**
+ * True when the id belongs to the placeholder fleet. The Fleet page now links
+ * real MongoDB ids, which have no static detail template yet.
+ */
+export const hasStaticDetail = (id?: string): boolean =>
+  Boolean(id) && MOCK_VEHICLES.some((v) => v.id === id);
+
 export const getVehicleDetail = (id?: string): VehicleDetail => {
-  if (id && id !== "g63-magno" && MOCK_VEHICLES.some((v) => v.id === id)) {
+  if (id && id !== "g63-magno" && hasStaticDetail(id)) {
     return buildFallbackDetail(id);
   }
   return G63_DETAIL;

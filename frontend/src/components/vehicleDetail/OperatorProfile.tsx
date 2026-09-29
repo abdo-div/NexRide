@@ -16,7 +16,7 @@ export const OperatorProfile: React.FC<{ detail: VehicleDetail }> = ({ detail })
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h3 className="text-[18px] font-bold text-[#0F172A]">{op.name}</h3>
-            <BadgeCheck className="w-5 h-5 text-[#2563EB]" />
+            {op.isVerified && <BadgeCheck className="w-5 h-5 text-[#2563EB]" />}
           </div>
           <p className="text-[13px] text-[#64748B]">{t(detail.operator.meta)}</p>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 text-[12px] text-[#64748B]">

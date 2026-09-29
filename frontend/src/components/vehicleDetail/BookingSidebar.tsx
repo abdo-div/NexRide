@@ -45,8 +45,12 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
               <span className="text-[13px] text-[#64748B]">{t("vehicleDetail.perDay")}</span>
             </div>
             <p className="mt-0.5 flex items-center gap-1 text-[12px] text-[#F97316] font-bold">
-              <Bolt className="w-[15px] h-[15px] text-[#F97316]" />
-              {t("vehicleDetail.instantConfirmationActive")}
+              {detail.isReservable !== false && (
+                <>
+                  <Bolt className="w-[15px] h-[15px] text-[#F97316]" />
+                  {t("vehicleDetail.instantConfirmationActive")}
+                </>
+              )}
             </p>
           </div>
           <div className="text-end">
@@ -179,9 +183,16 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
         <button
           type="button"
           onClick={reserve}
-          className="w-full py-4 rounded-2xl text-white text-[15px] font-extrabold tracking-wide shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 group bg-[#2563EB] hover:bg-blue-700"
+          disabled={detail.isReservable === false}
+          className={`w-full py-4 rounded-2xl text-white text-[15px] font-extrabold tracking-wide shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 group ${
+            detail.isReservable === false
+              ? "bg-slate-300 cursor-not-allowed"
+              : "bg-[#2563EB] hover:bg-blue-700"
+          }`}
         >
-          {t(detail.reserveLabel)}
+          {detail.isReservable === false
+            ? t("vehicleDetail.reserveUnavailable")
+            : t(detail.reserveLabel)}
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
         </button>
 

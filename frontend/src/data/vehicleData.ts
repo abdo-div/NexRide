@@ -1,23 +1,23 @@
 import type { Vehicle } from "../types/vehicle";
 
 export const LOCATION_OPTIONS = [
-  { id: "mji", label: "fleet.locations.mitiga", count: 38 },
-  { id: "downtown", label: "fleet.locations.downtown", count: 46 },
-  { id: "benina", label: "fleet.locations.benina", count: 19 },
-  { id: "misrata", label: "fleet.locations.misrata", count: 14 },
+  { id: "mji", label: "fleet.filters.locations.mitiga", count: 38 },
+  { id: "downtown", label: "fleet.filters.locations.downtown", count: 46 },
+  { id: "benina", label: "fleet.filters.locations.benina", count: 19 },
+  { id: "misrata", label: "fleet.filters.locations.misrata", count: 14 },
 ];
 
 export const BODY_PROFILES = [
-  { id: "suv", label: "fleet.bodies.suv", count: 25 },
-  { id: "coupe", label: "fleet.bodies.coupe", count: 12 },
-  { id: "sedan", label: "fleet.bodies.sedan", count: 22 },
-  { id: "offroad", label: "fleet.bodies.offroad", count: 16 },
+  { id: "suv", label: "fleet.filters.bodies.suv", count: 25 },
+  { id: "coupe", label: "fleet.filters.bodies.coupe", count: 12 },
+  { id: "sedan", label: "fleet.filters.bodies.sedan", count: 22 },
+  { id: "offroad", label: "fleet.filters.bodies.offroad", count: 16 },
 ];
 
 export const DRIVETRAIN_OPTIONS = [
-  { id: "auto", label: "fleet.drivetrains.automatic", count: 72 },
-  { id: "manual", label: "fleet.drivetrains.manual", count: 12 },
-  { id: "octane", label: "fleet.drivetrains.highOctane", count: 68 },
+  { id: "auto", label: "fleet.filters.drivetrains.automatic", count: 72 },
+  { id: "manual", label: "fleet.filters.drivetrains.manual", count: 12 },
+  { id: "octane", label: "fleet.filters.drivetrains.highOctane", count: 68 },
 ];
 
 export const CERTIFIED_FLEETS = [
@@ -28,9 +28,9 @@ export const CERTIFIED_FLEETS = [
 ];
 
 export const PERK_OPTIONS = [
-  { id: "instant", label: "fleet.perks.instantConfirmation" },
-  { id: "airport", label: "fleet.perks.airportVip" },
-  { id: "zero", label: "fleet.perks.zeroDeposit" },
+  { id: "instant", label: "fleet.filters.perks.instantConfirmation" },
+  { id: "airport", label: "fleet.filters.perks.airportVip" },
+  { id: "zero", label: "fleet.filters.perks.zeroDeposit" },
 ];
 
 export const SEGMENTS = [

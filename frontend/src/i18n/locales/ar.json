@@ -489,6 +489,37 @@
       "desc": "جرّب رفع الحد الأقصى للسعر أو إزالة بعض عوامل التصفية.",
       "action": "إعادة ضبط كل عوامل التصفية"
     },
+    "emptyDb": {
+      "title": "لا توجد مركبات متاحة حالياً",
+      "desc": "لا توجد مركبات منشورة ومتاحة للإيجار في الوقت الحالي. يُرجى المحاولة لاحقاً."
+    },
+    "loading": {
+      "label": "جارٍ تحميل المركبات المتاحة"
+    },
+    "error": {
+      "title": "تعذّر تحميل الأسطول",
+      "retry": "إعادة المحاولة"
+    },
+    "seatsUnit": "مقاعد",
+    "unknownOperator": "مالك مستقل",
+    "types": {
+      "SEDAN": "سيدان",
+      "SUV": "دفع رباعي",
+      "HATCHBACK": "هاتش باك",
+      "LUXURY": "فاخرة",
+      "VAN": "شاحنة ركاب",
+      "PICKUP": "بيك أب"
+    },
+    "transmissions": {
+      "AUTOMATIC": "أوتوماتيكي",
+      "MANUAL": "يدوي"
+    },
+    "fuelTypes": {
+      "GASOLINE": "بنزين",
+      "DIESEL": "ديزل",
+      "ELECTRIC": "كهربائية",
+      "HYBRID": "هجينة"
+    },
     "pagination": {
       "summary": "عرض {{range}} من أصل {{total}} مركبة موثّقة"
     },
@@ -553,6 +584,11 @@
     }
   },
   "vehicleDetail": {
+    "unavailable": {
+      "title": "التفاصيل غير متاحة بعد",
+      "desc": "هذه المركبة قادمة من الأسطول الحقيقي، لكن صفحة التفاصيل لم تُربط بالواجهة البرمجية بعد. عد إلى الأسطول لمتابعة التصفح.",
+      "backToFleet": "العودة إلى الأسطول"
+    },
     "crumbCars": "السيارات",
     "crumbLuxurySuv": "سيارات الدفع الرباعي الفاخرة",
     "crumbEconomy": "سيارات اقتصادية",
@@ -760,7 +796,49 @@
     "confirmedWith": "تم التأكيد لدى {{operator}}!",
     "trustCancellation": "إلغاء مجاني حتى 24 ساعة قبل الاستلام",
     "trustContract": "عقد إلكتروني رسمي من وزارة النقل الليبية",
-    "trustEscrow": "تأكيد ضمان مشفّر عبر البطاقة المحلية أو التحويل أو النقد"
+    "trustEscrow": "تأكيد ضمان مشفّر عبر البطاقة المحلية أو التحويل أو النقد",
+    "badgeModelYearVar": "طراز عام {{year}}",
+    "statusAvailableNow": "متاح الآن",
+    "statusUnavailable": "غير متاح",
+    "statusMaintenance": "قيد الصيانة",
+    "statusBookableAt": "قابل للحجز لدى {{operator}}",
+    "statusUnavailableAt": "غير متاح حالياً لدى {{operator}}",
+    "metricCategory": "الفئة",
+    "metricCity": "الموقع",
+    "descHeadingReal": "عن {{model}}",
+    "pickupBadge": "موقع الاستلام",
+    "depositNotSet": "يحددها المشغّل عند الاستلام",
+    "barOverall": "التقييم العام",
+    "reviewCtxCompleted": "حجز مكتمل ومُوثَّق",
+    "verifiedCustomer": "عميل مُوثَّق",
+    "timeJustNow": "الآن فقط",
+    "ratingCountRatings": "{{count}} تقييم",
+    "operatorRentals": "{{count}} إيجار مُوثَّق",
+    "operatorManaged": "تُدار عبر دعم NexRide",
+    "operatorMetaApproved": "شريك أساطيل تجاري معتمد على NexRide",
+    "operatorMetaPending": "التحقق من الشراكة قيد الإجراء",
+    "tierApproved": "معتمد",
+    "tierPending": "التحقق قيد الإجراء",
+    "planFleetRateName": "السعر اليومي المنشور",
+    "planFleetRateDesc": "السعر يحدده المشغّل؛ لا توجد باقات حماية إضافية منشورة",
+    "reserveUnavailable": "الحجز عبر الإنترنت غير متاح",
+    "conciergePickupTitle": "الاستلام والتسليم",
+    "conciergeBodyCity": "نسّق تسليماً مناسباً في موقع الاستلام المذكور في هذه الصفحة.",
+    "similarHeadingFleet": "مركبات مشابهة",
+    "similarSubFleet": "مركبات أخرى متاحة من الفئة نفسها",
+    "similarLinkLabelFleet": "عرض كامل الأسطول",
+    "ratingsTagReal": "تقييم مُوثَّق",
+    "ratingsSubReal": "استناداً إلى {{count}} تقييم مُوثَّق",
+    "error": {
+      "title": "تعذّر تحميل هذه المركبة",
+      "desc": "لم تستجب الخدمة. تأكد من تشغيل الخادم الخلفي وحاول مجدداً.",
+      "retry": "إعادة المحاولة"
+    },
+    "notFound": {
+      "title": "المركبة غير موجودة",
+      "desc": "هذه المركبة غير موجودة أو لم تُنشر بعد.",
+      "backToFleet": "العودة إلى الأسطول"
+    }
   },
   "checkout": {
     "header": {

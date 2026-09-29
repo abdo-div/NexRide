@@ -47,7 +47,7 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
           {vehicle.isInstantConfirmation && (
             <span className="px-3 py-1 rounded-full bg-[#F97316] text-white text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-              {t("fleet.perks.instantConfirmation")}
+              {t("fleet.filters.perks.instantConfirmation")}
             </span>
           )}
           {vehicle.isTopPick && (
