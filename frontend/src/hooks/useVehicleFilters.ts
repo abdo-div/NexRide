@@ -1,11 +1,15 @@
 import { useState, useMemo } from "react";
-import { MOCK_VEHICLES, SEGMENTS } from "../data/vehicleData";
+import { SEGMENTS } from "../data/vehicleData";
 import type { Vehicle } from "../types/vehicle";
 
 const toggleIn = (list: string[], id: string) =>
   list.includes(id) ? list.filter((x) => x !== id) : [...list, id];
 
-export const useVehicleFilters = () => {
+/**
+ * Client-side filtering over the vehicles returned by GET /vehicles. The
+ * source list is owned by the caller so this hook stays purely presentational.
+ */
+export const useVehicleFilters = (vehicles: Vehicle[]) => {
   const [maxPrice, setMaxPrice] = useState<number>(2200);
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [selectedBodies, setSelectedBodies] = useState<string[]>([]);
@@ -31,7 +35,7 @@ export const useVehicleFilters = () => {
   const removePerk = (id: string) => setSelectedPerks((prev) => prev.filter((x) => x !== id));
 
   const filteredVehicles = useMemo<Vehicle[]>(() => {
-    return MOCK_VEHICLES.filter((v) => {
+    return vehicles.filter((v) => {
       if (v.pricePerDay > maxPrice) return false;
       if (selectedLocations.length > 0 && !selectedLocations.includes(v.location)) return false;
       if (selectedBodies.length > 0 && !selectedBodies.includes(v.body)) return false;
@@ -44,6 +48,7 @@ export const useVehicleFilters = () => {
       return true;
     });
   }, [
+    vehicles,
     maxPrice,
     selectedLocations,
     selectedBodies,
@@ -54,12 +59,12 @@ export const useVehicleFilters = () => {
   ]);
 
   const segmentCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: MOCK_VEHICLES.length };
+    const counts: Record<string, number> = { all: vehicles.length };
     for (const seg of SEGMENTS) {
-      counts[seg.id] = MOCK_VEHICLES.filter((v) => v.segment === seg.id).length;
+      counts[seg.id] = vehicles.filter((v) => v.segment === seg.id).length;
     }
     return counts;
-  }, []);
+  }, [vehicles]);
 
   const activeCount =
     selectedLocations.length +

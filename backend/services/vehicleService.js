@@ -16,7 +16,12 @@ export const fetchAllVehicles = async (queryParams, tenantId = null) => {
     .limitFields()
     .paginate();
 
-  const vehicles = await features.query;
+  // The public fleet listing must expose the owning company so the client can
+  // show a real operator name, logo and accreditation instead of a bare id.
+  const vehicles = await features.query.populate(
+    "companyId",
+    "name logo city status",
+  );
   return vehicles;
 };
 
@@ -31,10 +36,12 @@ export const fetchVehicleById = async (vehicleId, tenantId = null) => {
     filter.companyId = tenantId;
   }
 
-  const vehicle = await Vehicle.findOne(filter).populate({
-    path: "reviews",
-    select: "review rating customerId",
-  });
+  const vehicle = await Vehicle.findOne(filter)
+    .populate("companyId", "name logo city status")
+    .populate({
+      path: "reviews",
+      select: "review rating customerId createdAt",
+    });
 
   if (!vehicle) {
     throw new AppError("No vehicle found with that ID for this company.", 404);

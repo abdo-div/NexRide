@@ -18,14 +18,14 @@ export const DetailTitleBar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-200 text-[#F97316] text-[11px] font-bold uppercase tracking-wider"
               >
                 <span className="w-2 h-2 rounded-full bg-[#F97316] animate-pulse" />
-                {t(b.text)}
+                {t(b.text, b.vars)}
               </span>
             ) : (
               <span
                 key={b.text}
                 className="px-2.5 py-1 rounded-full bg-white border border-[#E2E8F0] text-[#64748B] text-[11px] font-semibold uppercase"
               >
-                {t(b.text)}
+                {t(b.text, b.vars)}
               </span>
             ),
           )}

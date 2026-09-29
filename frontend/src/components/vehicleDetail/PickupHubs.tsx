@@ -54,8 +54,10 @@ export const PickupHubs: React.FC<{ detail: VehicleDetail }> = ({ detail }) => {
             </div>
           </div>
           <a
-            href="#"
-            onClick={(e) => e.preventDefault()}
+            href={detail.mapUrl ?? "#"}
+            onClick={(e) => {
+              if (!detail.mapUrl) e.preventDefault();
+            }}
             className="hidden sm:block shrink-0 text-[12px] font-bold text-[#2563EB] hover:underline underline-offset-4"
           >
             {t(detail.mapLinkLabel)}

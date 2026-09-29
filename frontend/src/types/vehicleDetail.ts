@@ -23,6 +23,8 @@ export type DetailIconKey =
 export interface DetailBadge {
   kind: "instant" | "plain";
   text: string;
+  /** Interpolation values passed to t(). Required for keys like "Model Year {{year}}". */
+  vars?: Record<string, unknown>;
 }
 
 export interface GalleryImage {
@@ -142,6 +144,14 @@ export interface VehicleDetail {
   hubBadge: string;
   hubs: Hub[];
   mapImage?: string;
+  /** Optional real link target for the delivery-zone map; falls back to "JavaScript:void" when absent. */
+  mapUrl?: string;
+  /**
+   * False when checkout has not been connected to this vehicle yet. The
+   * Reserve button is then disabled instead of handing a real vehicle over to
+   * the mock checkout flow.
+   */
+  isReservable?: boolean;
   conciergeTitle: string;
   conciergeBody: string;
   mapLinkLabel: string;
