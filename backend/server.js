@@ -1,8 +1,25 @@
 import dns from "node:dns";
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
+import path from "node:path";
+import fs from "node:fs";
+import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
-dotenv.config({ path: "./config.env" });
+
+// Load the environment file wherever it actually lives, regardless of the
+// working directory the server is started from. Candidates are checked in
+// order and the first one that exists wins: backend/config.env (legacy),
+// backend/.env, then the project-root .env.
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const envFile = [
+  path.join(__dirname, "config.env"),
+  path.join(__dirname, ".env"),
+  path.join(__dirname, "..", ".env"),
+].find((candidate) => fs.existsSync(candidate));
+
+if (envFile) {
+  dotenv.config({ path: envFile });
+}
 
 const { default: mongoose } = await import("mongoose");
 const { default: app } = await import("./app.js");

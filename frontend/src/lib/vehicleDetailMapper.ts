@@ -235,6 +235,6 @@ export const buildVehicleDetail = (
     cancellationNote: "vehicleDetail.trustCancellation",
     contractNote: "vehicleDetail.trustContract",
     paymentNote: "vehicleDetail.trustEscrow",
-    isReservable: false,
+    isReservable: dto.operationalStatus === "AVAILABLE",
   };
 };

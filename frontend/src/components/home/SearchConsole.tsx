@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import {
   Search,
   MapPin,
@@ -66,6 +67,11 @@ const fmtDate = (
     ? `${weekdayHeads[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`
     : "";
 const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
+
+const toISODate = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+    d.getDate(),
+  ).padStart(2, "0")}`;
 
 // ----------------------------------------------------------------------------
 // Calendar popup (shared by From / Return)
@@ -466,6 +472,7 @@ const LocationField: React.FC<LocationFieldProps> = ({
 
 export const SearchConsole: React.FC = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const today = startOfDay(new Date());
 
   const [openPicker, setOpenPicker] = useState<
@@ -530,7 +537,23 @@ export const SearchConsole: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: wire to GET /api/v1/cars when integrating with the backend
+
+    const params = new URLSearchParams();
+    if (pickupLocation) params.set("location", pickupLocation.name);
+
+    // A single-day rental is implied when the customer picks a date but not a
+    // return date, so the backend availability window is always meaningful.
+    const start = pickupDate;
+    let end = returnDate;
+    if (start && !end) {
+      end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 1);
+    }
+    if (start && end) {
+      params.set("startDate", toISODate(start));
+      params.set("endDate", toISODate(end));
+    }
+
+    navigate(`/fleet?${params.toString()}`);
   };
 
   const fromValue = (

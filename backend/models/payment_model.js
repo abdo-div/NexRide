@@ -63,7 +63,7 @@ const paymentSchema = new mongoose.Schema(
       type: String,
       required: [true, "Payment method is required"],
       enum: {
-        values: ["CASH_ON_DELIVERY", "LOCAL_CARD", "STRIPE", "WALLET"],
+        values: ["CASH_ON_DELIVERY", "LOCAL_CARD", "STRIPE", "MOAMALAT", "WALLET"],
         message: "Invalid payment method",
       },
     },
@@ -74,7 +74,18 @@ const paymentSchema = new mongoose.Schema(
     },
     paymentGateway: {
       type: String,
-      default: "LOCAL", // e.g., "STRIPE", "SADAD", "LOCAL"
+      default: "LOCAL", // e.g., "STRIPE", "MOAMALAT", "SADAD", "LOCAL"
+    },
+    /**
+     * Merchant reference handed to the payment gateway for the current attempt.
+     * Kept on the ledger record so the verify step can map a gateway callback
+     * back to the exact booking/customer without trusting client input.
+     */
+    merchantReference: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: 40,
     },
 
     // -------------------------------------------------------------------------
@@ -136,6 +147,7 @@ paymentSchema.pre("save", async function () {
 
 paymentSchema.index({ bookingId: 1, status: 1 });
 paymentSchema.index({ transactionId: 1 }, { unique: true, sparse: true });
+paymentSchema.index({ merchantReference: 1 }, { unique: true, sparse: true });
 
 const Payment =
   mongoose.models.Payment || mongoose.model("Payment", paymentSchema);

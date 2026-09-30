@@ -5,6 +5,7 @@ import * as bookingService from "../services/bookingService.js";
 import catchAsync from "../utils/catchAsync.js";
 import * as factory from "./handlerFactory.js";
 import AppError from "../utils/appError.js";
+import { isRedisAvailable } from "../config/redis.js";
 import { acquireVehicleLock } from "../utils/redisLock.js";
 import {
   holdVehicleForCheckout,
@@ -12,7 +13,28 @@ import {
 } from "../services/reservationHold.service.js";
 // Administrative & General Lookup
 export const getAllBookings = factory.getAll(Booking);
-export const getBookingById = factory.getOne(Booking);
+
+// GET /:id must answer with `{ data: { booking } }` — the same envelope used by
+// POST / (create) and GET /my-bookings — so the frontend bookingApi.get contract
+// (`result.data.booking`) holds on every endpoint.
+export const getBookingById = catchAsync(async (req, res, next) => {
+  const booking = await bookingService.getBookingById(req.params.id);
+  res.status(200).json({
+    status: "success",
+    data: { booking },
+  });
+});
+
+// Redis is only a concurrency convenience around the authoritative DB check;
+// a hiccup after the booking committed must never turn a successful booking
+// into an error response.
+const safelyRelease = async (fn) => {
+  try {
+    await fn();
+  } catch (err) {
+    /* best-effort cleanup only */
+  }
+};
 
 /**
  * Pre-booking concurrency check
@@ -39,25 +61,36 @@ export const createBooking = catchAsync(async (req, res, next) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
 
+  // 0. Redis guard: the checkout hold and distributed lock are concurrency
+  //    conveniences, NOT the source of truth. When Redis is unreachable the
+  //    transaction below still runs the authoritative double-booking check, so
+  //    checkout degrades gracefully instead of queueing commands forever on
+  //    the offline client (enableOfflineQueue: true would otherwise hang).
+  const redisReady = await isRedisAvailable();
+
   // 0. Reserve the vehicle for this checkout session (10-minute hold, NX key).
   //    409 if another user is already in checkout for this vehicle.
-  const hold = await holdVehicleForCheckout(vehicleId, req.user.id);
+  const hold = redisReady
+    ? await holdVehicleForCheckout(vehicleId, req.user.id)
+    : { success: true };
   if (!hold.success) {
     return next(new AppError(hold.message, 409));
   }
 
   // 1. Acquire Redis Distributed Lock for the specific vehicle
   let lock;
-  try {
-    lock = await acquireVehicleLock(vehicleId, 10000);
-  } catch (err) {
-    await releaseVehicleHold(vehicleId);
-    return next(
-      new AppError(
-        "Vehicle is currently processing another checkout attempt. Please retry in a few seconds.",
-        429,
-      ),
-    );
+  if (redisReady) {
+    try {
+      lock = await acquireVehicleLock(vehicleId, 10000);
+    } catch (err) {
+      await safelyRelease(() => releaseVehicleHold(vehicleId));
+      return next(
+        new AppError(
+          "Vehicle is currently processing another checkout attempt. Please retry in a few seconds.",
+          429,
+        ),
+      );
+    }
   }
 
   const session = await mongoose.startSession();
@@ -116,8 +149,12 @@ export const createBooking = catchAsync(async (req, res, next) => {
     await session.commitTransaction();
     session.endSession();
 
-    // Release lock upon successful creation
-    await lock.release();
+    // Release lock AND the checkout hold upon successful creation. The hold is
+    // only a checkout-session reservation, not a booking: leaving it in place
+    // for its full 10-minute TTL would prevent any other user (or the same
+    // user's next booking) from checking out the same vehicle immediately.
+    if (lock) await safelyRelease(() => lock.release());
+    if (redisReady) await safelyRelease(() => releaseVehicleHold(vehicleId));
 
     res.status(201).json({
       status: "success",
@@ -128,8 +165,8 @@ export const createBooking = catchAsync(async (req, res, next) => {
     session.endSession();
 
     // Always release lock and checkout hold on failure
-    if (lock) await lock.release();
-    await releaseVehicleHold(vehicleId);
+    if (lock) await safelyRelease(() => lock.release());
+    if (redisReady) await safelyRelease(() => releaseVehicleHold(vehicleId));
     next(error);
   }
 });

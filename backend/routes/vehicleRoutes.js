@@ -2,6 +2,7 @@ import express from "express";
 import reviewRouter from "./reviewRoutes.js";
 import {
   getAllVehicles,
+  searchVehicles,
   getVehicleById,
   getCompanyVehicles,
   createVehicle,
@@ -36,6 +37,7 @@ router.use("/:vehicleId/reviews", reviewRouter);
 // NOTE: Static routes MUST come before parameterized /:id routes
 // -----------------------------------------------------------------------------
 router.get("/", getAllVehicles);
+router.get("/search", searchVehicles);
 router.get("/:id", validate(vehicleIdParamSchema), getVehicleById);
 
 // -----------------------------------------------------------------------------

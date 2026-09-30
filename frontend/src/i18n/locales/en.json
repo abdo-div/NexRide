@@ -465,7 +465,8 @@
       "allHubs": "All hubs",
       "allCategories": "All Categories",
       "locationsCount": "{{count}} locations",
-      "flexibleDates": "Flexible dates · 5 days"
+      "flexibleDates": "Flexible dates · 5 days",
+      "dateRange": "{{start}} – {{end}}"
     },
     "tokens": {
       "location": "Location: {{name}}",
@@ -492,6 +493,11 @@
     "emptyDb": {
       "title": "No vehicles available yet",
       "desc": "No published and available vehicles are listed right now. Please check back soon."
+    },
+    "emptySearch": {
+      "title": "No vehicles available for this search",
+      "desc": "No cars are free for the selected location and dates. Try different dates or a nearby pick-up hub.",
+      "action": "Clear search"
     },
     "loading": {
       "label": "Loading available vehicles"
@@ -600,6 +606,12 @@
     "perDay": "/ day",
     "instantConfirmationActive": "Instant Confirmation Active",
     "minDays": "Min. {{days}} Days",
+    "checkAvailability": "Check Availability",
+    "checkingAvailability": "Checking availability…",
+    "availableForDates": "Available for your selected dates",
+    "notAvailableForDates": "Not available for the selected dates",
+    "continueToCheckout": "Continue to Checkout",
+    "invalidDates": "Return date must be after the pickup date.",
     "pickupDate": "Pick-up Date",
     "returnDate": "Return Date",
     "deliveryPoint": "Delivery / Handover Point",
@@ -841,6 +853,23 @@
     }
   },
   "checkout": {
+    "loading": "Loading vehicle & availability…",
+    "pickupFallback": "Pickup location to be confirmed with the operator",
+    "availability": {
+      "checking": "Checking availability for your dates…",
+      "available": "Available for your selected dates."
+    },
+    "unavailable": {
+      "title": "Not available for these dates",
+      "desc": "This vehicle is already reserved in the selected window. Choose different dates and try again.",
+      "actionLabel": "Choose different dates",
+      "browse": "Browse other vehicles",
+      "fallbackTitle": "This vehicle's details could not be loaded"
+    },
+    "submitError": {
+      "conflict": "This vehicle was just booked by someone else. Choose different dates and try again.",
+      "generic": "We couldn't confirm your booking right now. Please try again."
+    },
     "header": {
       "stepLabel": "Step 2 of 2: Review & Secure Checkout",
       "backLabel": "Back to Vehicle Details",
@@ -1094,5 +1123,30 @@
       "browseMore": "Browse More Vehicles",
       "manage": "Manage Reservation"
     }
+  },
+  "payment": {
+    "title": "Complete your payment",
+    "subtitle": "Secure card payment powered by Moamalat",
+    "bookingRef": "Booking reference",
+    "vehicle": "Vehicle",
+    "dates": "Rental period",
+    "location": "Pickup location",
+    "amount": "Total amount",
+    "payButton": "Pay with Moamalat",
+    "preparing": "Preparing secure payment...",
+    "verifying": "Verifying payment...",
+    "cancelledTitle": "Payment cancelled",
+    "cancelledDesc": "Your booking is still reserved. You can retry the payment or browse other vehicles.",
+    "tryAgain": "Try again",
+    "backToFleet": "Back to fleet",
+    "backToVehicle": "Back to vehicle",
+    "gatewayTitle": "Payment unavailable",
+    "gatewayDesc": "The payment gateway could not be reached. Please try again in a moment.",
+    "gatewayError": "Something went wrong while processing the payment.",
+    "gatewayNotApproved": "Moamalat did not approve the transaction. Please try again or use another method.",
+    "notFoundTitle": "Booking not found",
+    "alreadyPaidTitle": "Booking already paid",
+    "alreadyPaidDesc": "This booking has already been settled. View your confirmation below.",
+    "viewConfirmation": "View booking confirmation"
   }
 }

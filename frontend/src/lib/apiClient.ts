@@ -41,6 +41,8 @@ interface RequestOptions {
   /** Set to false for the sign-in/sign-up calls, which must not send a stale token. */
   auth?: boolean;
   signal?: AbortSignal;
+  /** Extra headers merged over the defaults (e.g. Idempotency-Key). */
+  headers?: Record<string, string>;
 }
 
 const parsePayload = async (response: Response): Promise<Record<string, unknown>> => {
@@ -55,9 +57,12 @@ const parsePayload = async (response: Response): Promise<Record<string, unknown>
 
 export async function request<T>(
   path: string,
-  { method = "GET", body, auth = true, signal }: RequestOptions = {},
+  { method = "GET", body, auth = true, signal, headers: extraHeaders }: RequestOptions = {},
 ): Promise<T> {
-  const headers: Record<string, string> = { Accept: "application/json" };
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    ...extraHeaders,
+  };
   if (body !== undefined) headers["Content-Type"] = "application/json";
 
   if (auth) {

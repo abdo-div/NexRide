@@ -8,6 +8,7 @@ import { FleetPage } from "./pages/FleetPage";
 import VehicleDetailPage from "./pages/VehicleDetailPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import BookingConfirmationPage from "./pages/BookingConfirmationPage";
+import PaymentPage from "./pages/PaymentPage";
 import AuthPage from "./pages/AuthPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 
@@ -29,6 +30,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <CheckoutPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/payment/:bookingId"
+                element={
+                  <ProtectedRoute>
+                    <PaymentPage />
                   </ProtectedRoute>
                 }
               />

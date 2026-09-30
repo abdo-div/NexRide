@@ -1,4 +1,12 @@
-import { redisClient } from "../config/redis.js";
+import { redisClient, isRedisAvailable } from "../config/redis.js";
+
+/**
+ * Redis is only a deduplication convenience: the downstream transaction is the
+ * authoritative gate for a request. When Redis is unreachable the request passes
+ * through unchanged so an offline cache/queue can never surface as a 500 to the
+ * client (ioredis would otherwise reject with "Connection is closed.").
+ */
+const IDEMPOTENCY_PROBE_TIMEOUT_MS = Number(process.env.REDIS_PROBE_TIMEOUT_MS) || 500;
 
 /**
  * Ensures repeated API requests with the same Idempotency-Key header return identical responses without re-executing business logic.
@@ -11,6 +19,13 @@ export const idempotency =
 
     // Skip if no idempotency key is passed in headers
     if (!idempotencyKey) {
+      return next();
+    }
+
+    // Skip deduplication when Redis is not available; the request still runs
+    // its normal business logic (see bookingController for the same pattern).
+    const redisReady = await isRedisAvailable(redisClient, IDEMPOTENCY_PROBE_TIMEOUT_MS);
+    if (!redisReady) {
       return next();
     }
 
@@ -28,11 +43,15 @@ export const idempotency =
       const originalJson = res.json.bind(res);
       res.json = (body) => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
-          redisClient.setex(
-            cacheKey,
-            ttlSeconds,
-            JSON.stringify({ statusCode: res.statusCode, body }),
-          );
+          redisClient
+            .setex(
+              cacheKey,
+              ttlSeconds,
+              JSON.stringify({ statusCode: res.statusCode, body }),
+            )
+            .catch(() => {
+              /* best-effort cache write only */
+            });
         }
         return originalJson(body);
       };

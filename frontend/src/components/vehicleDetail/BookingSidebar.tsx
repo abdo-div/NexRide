@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { Bolt, CheckCircle2, ShieldCheck, Lock, Info, Headphones, ArrowRight } from "lucide-react";
 import { DetailIcon } from "./iconMap";
+import { hasStaticDetail } from "../../data/vehicleDetailData";
+import { bookingApi } from "../../lib/bookingApi";
 import type { VehicleDetail } from "../../types/vehicleDetail";
 
 const daysBetween = (a: string, b: string) =>
@@ -17,13 +19,68 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
   const [returnTime, setReturnTime] = React.useState(detail.booking.returnTimes[1] ?? "");
   const [delivery, setDelivery] = React.useState(detail.booking.deliveryPoints[0] ?? "");
   const [protection, setProtection] = React.useState(detail.protectionPlans[0]?.id ?? "standard");
+  const [check, setCheck] = React.useState<"idle" | "checking" | "available" | "unavailable">("idle");
+  const [checkError, setCheckError] = React.useState<string | null>(null);
+
+  // Placeholder fleet ids have no real vehicle behind them, so they keep the
+  // old direct-navigation (mock) checkout flow. Real bookings go through the
+  // live availability check first.
+  const isStatic = hasStaticDetail(detail.id);
 
   const plan = detail.protectionPlans.find((p) => p.id === protection) ?? detail.protectionPlans[0];
   const days = Math.max(daysBetween(pickupDate, returnDate), detail.minDays);
   const rate = detail.vehicle.pricePerDay + (plan?.pricePerDay ?? 0);
   const gross = days * rate;
 
-  const reserve = () => navigate(`/checkout/${detail.id}`);
+  const submitDates = React.useCallback(() => setCheck("idle"), []);
+
+  const runCheck = async () => {
+    setCheckError(null);
+    if (!pickupDate || !returnDate || returnDate <= pickupDate) {
+      setCheckError(t("vehicleDetail.invalidDates"));
+      setCheck("unavailable");
+      return;
+    }
+    setCheck("checking");
+    try {
+      const result = await bookingApi.checkAvailability(detail.id, pickupDate, returnDate);
+      setCheck(result.data.isAvailable ? "available" : "unavailable");
+    } catch (err) {
+      setCheckError(err instanceof Error ? err.message : "");
+      setCheck("unavailable");
+    }
+  };
+
+  const continueToCheckout = () => {
+    const params = new URLSearchParams({
+      startDate: pickupDate,
+      endDate: returnDate,
+      startTime: pickupTime,
+      endTime: returnTime,
+      location: t(delivery),
+    });
+    navigate(`/checkout/${detail.id}?${params.toString()}`);
+  };
+
+  const onPrimaryClick = () => {
+    if (isStatic) {
+      navigate(`/checkout/${detail.id}`);
+      return;
+    }
+    if (check === "available") {
+      continueToCheckout();
+      return;
+    }
+    void runCheck();
+  };
+
+  const primaryLabel = isStatic
+    ? t(detail.reserveLabel)
+    : check === "checking"
+      ? t("vehicleDetail.checkingAvailability")
+      : check === "available"
+        ? t("vehicleDetail.continueToCheckout")
+        : t("vehicleDetail.checkAvailability");
 
   const trustIcons = { check: CheckCircle2, lock: Lock, shield: ShieldCheck };
 
@@ -67,13 +124,16 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
               <input
                 type="date"
                 value={pickupDate}
-                onChange={(e) => setPickupDate(e.target.value)}
+                onChange={(e) => {
+                  setPickupDate(e.target.value);
+                  submitDates();
+                }}
                 className={selectCls}
               />
             </div>
             <div>
               <label className={labelCls}>{t("home.search.time")}</label>
-              <select value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className={selectCls}>
+              <select value={pickupTime} onChange={(e) => { setPickupTime(e.target.value); submitDates(); }} className={selectCls}>
                 {detail.booking.pickupTimes.map((time) => (
                   <option key={time}>{time}</option>
                 ))}
@@ -86,13 +146,16 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
               <input
                 type="date"
                 value={returnDate}
-                onChange={(e) => setReturnDate(e.target.value)}
+                onChange={(e) => {
+                  setReturnDate(e.target.value);
+                  submitDates();
+                }}
                 className={selectCls}
               />
             </div>
             <div>
               <label className={labelCls}>{t("home.search.time")}</label>
-              <select value={returnTime} onChange={(e) => setReturnTime(e.target.value)} className={selectCls}>
+              <select value={returnTime} onChange={(e) => { setReturnTime(e.target.value); submitDates(); }} className={selectCls}>
                 {detail.booking.returnTimes.map((time) => (
                   <option key={time}>{time}</option>
                 ))}
@@ -101,7 +164,7 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
           </div>
           <div>
             <label className={labelCls}>{t("vehicleDetail.deliveryPoint")}</label>
-            <select value={delivery} onChange={(e) => setDelivery(e.target.value)} className={selectCls}>
+            <select value={delivery} onChange={(e) => { setDelivery(e.target.value); submitDates(); }} className={selectCls}>
               {detail.booking.deliveryPoints.map((d) => (
                 <option key={d}>{t(d)}</option>
               ))}
@@ -180,20 +243,41 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
           </div>
         </div>
 
+        {!isStatic && check === "available" && (
+          <div className="mb-4 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-[12px] font-semibold">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            {t("vehicleDetail.availableForDates")}
+          </div>
+        )}
+        {!isStatic && check === "unavailable" && (
+          <div className="mb-4 px-3 py-2.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-[12px] font-semibold">
+            <p className="flex items-center gap-2">
+              <Info className="w-4 h-4 shrink-0" />
+              {t("vehicleDetail.notAvailableForDates")}
+            </p>
+            {checkError && <p className="mt-1 ps-6 text-[11px] font-normal">{checkError}</p>}
+          </div>
+        )}
+
         <button
           type="button"
-          onClick={reserve}
-          disabled={detail.isReservable === false}
+          onClick={onPrimaryClick}
+          disabled={detail.isReservable === false || check === "checking"}
           className={`w-full py-4 rounded-2xl text-white text-[15px] font-extrabold tracking-wide shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 group ${
-            detail.isReservable === false
+            detail.isReservable === false || check === "checking"
               ? "bg-slate-300 cursor-not-allowed"
               : "bg-[#2563EB] hover:bg-blue-700"
           }`}
         >
+          {check === "checking" && (
+            <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          )}
           {detail.isReservable === false
             ? t("vehicleDetail.reserveUnavailable")
-            : t(detail.reserveLabel)}
-          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
+            : primaryLabel}
+          {check !== "checking" && (
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
+          )}
         </button>
 
         <div className="mt-4 space-y-2 pt-2 text-[#64748B] text-[12px]">
