@@ -1,11 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Lock, CreditCard, Banknote, HelpCircle, Wallet } from "lucide-react";
+import { Lock, CreditCard, Banknote, Wallet } from "lucide-react";
 import { CheckoutIcon } from "./CheckoutIcon";
 import type { CheckoutMeta } from "../../types/checkout";
-
-const inputCls =
-  "w-full px-3.5 py-2.5 rounded-xl bg-[#F8FAFC] text-[#0F172A] text-[14px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-[#94A3B8]";
 
 interface Props {
   meta: CheckoutMeta;
@@ -91,76 +88,29 @@ export const PaymentSection: React.FC<Props> = ({
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50/90 to-indigo-50/50 border border-blue-200/80 flex flex-col gap-2">
+          <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50/90 to-indigo-50/50 border border-blue-200/80 flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="w-5 h-5 rounded-md bg-[#2563EB] text-white flex items-center justify-center text-[10px] font-black">
                   M
                 </span>
                 <span className="text-[13px] font-bold text-[#0F172A]">
-                  Moamalat LightBox Modal (معاملات)
+                  Moamalat LightBox (معاملات)
                 </span>
               </div>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-[#2563EB]">
-                Test Gateway Active
+                Secure Gateway
               </span>
             </div>
             <p className="text-[12px] text-[#475569] leading-relaxed">
-              Clicking <strong>Pay</strong> launches the official Moamalat LightBox window. You can enter your card details inside the secure popup and confirm your reservation.
+              After clicking <strong>Pay</strong>, a secure Moamalat popup will open where you can safely enter your card details. No card information is collected or stored on this page.
             </p>
-            <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-[#64748B]">
-              <span className="font-semibold text-[#0F172A]">Test Card:</span>
-              <code className="px-2 py-0.5 rounded bg-white border border-blue-200 font-mono text-[#2563EB] font-bold">
-                6393 0000 0000 0000
-              </code>
-              <span>Exp: 12/28</span>
-              <span>CVV: 123</span>
+            <div className="flex items-center gap-2">
+              <Lock className="w-[13px] h-[13px] text-[#2563EB] shrink-0" />
+              <span className="text-[11px] text-[#64748B] font-semibold">
+                Your card details are entered directly in the Moamalat secure popup — encrypted end-to-end.
+              </span>
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {payment.cardFields.map((field) => {
-              const fullRow = ["cardholder", "cardNumber"].includes(field.id);
-              const compact = ["expiry", "cvc", "billingCity"].includes(field.id);
-              return (
-                <div key={field.id} className={`flex flex-col gap-1.5 ${fullRow ? "sm:col-span-3" : ""}`}>
-                  <div className="flex items-center justify-between">
-                    <label htmlFor={`pay-${field.id}`} className="text-[12px] font-bold text-[#0F172A]">
-                      {t(field.label)}
-                    </label>
-                    {field.id === "cardNumber" ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] text-[#2563EB] font-bold">
-                        <Lock className="w-[13px] h-[13px]" />
-                        {t(payment.cardValueNote)}
-                      </span>
-                    ) : field.id === "cvc" ? (
-                      <HelpCircle
-                        className="w-[15px] h-[15px] text-[#94A3B8]"
-                        aria-label={t("checkout.payment.cvcHelp")}
-                      />
-                    ) : null}
-                  </div>
-                  <div className="relative">
-                    <input
-                      id={`pay-${field.id}`}
-                      type={field.type ?? "text"}
-                      placeholder={t(field.placeholder)}
-                      defaultValue={field.value}
-                      className={`${inputCls} ${field.uppercase ? "uppercase" : ""} ${
-                        compact ? "text-center" : ""
-                      }`}
-                    />
-                    {field.id === "cardNumber" && (
-                      <div className="absolute end-3.5 top-1/2 -translate-y-1/2 flex items-center">
-                        <span className="px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[11px] font-bold text-[#0F172A]">
-                          VISA
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
       ) : (
