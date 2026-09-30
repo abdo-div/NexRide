@@ -126,6 +126,7 @@ export const buildCheckoutParams = (booking, merchantReference) => {
 export const verifyTransaction = async ({
   merchantReference,
   expectedAmount,
+  systemReference,
 } = {}) => {
   if (!isMoamalatConfigured()) {
     throw new AppError(
@@ -135,33 +136,44 @@ export const verifyTransaction = async ({
   }
 
   const now = new Date();
-  const trxDateTime = formatVerificationDateTime(now);
+  const dateTimeLocalTrxn = formatVerificationDateTime(now);
+  const dateToday = formatDateParam(now);
 
-  const body = {
-    SecureHash: generateVerificationHash({
-      trxDateTime,
-      merchantId: moamalatConfig.merchantId,
-      terminalId: moamalatConfig.terminalId,
-    }),
-    DateTimeLocalTrxn: trxDateTime,
+  const secureHash = generateVerificationHash({
+    trxDateTime: dateTimeLocalTrxn,
+    merchantId: moamalatConfig.merchantId,
+    terminalId: moamalatConfig.terminalId,
+  });
+
+  const requestBody = {
+    SecureHash: secureHash,
+    DateTimeLocalTrxn: dateTimeLocalTrxn,
     TerminalId: moamalatConfig.terminalId,
     MerchantId: moamalatConfig.merchantId,
-    DateFrom: formatDateParam(now),
-    DateTo: formatDateParam(now),
-    MerchantReference: merchantReference,
+    DateFrom: dateToday,
+    DateTo: dateToday,
+    MerchantReference: String(merchantReference),
     FetchType: "0",
     DisplayStart: "0",
     DisplayLength: "1",
   };
 
-  let gateway;
+  let response;
+  let responseText = "";
+  let gateway = null;
+
   try {
-    const response = await fetch(moamalatConfig.verifyUrl, {
+    response = await fetch(moamalatConfig.verifyUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify(requestBody),
     });
-    gateway = await response.json();
+    responseText = await response.text();
+    try {
+      gateway = JSON.parse(responseText);
+    } catch {
+      gateway = null;
+    }
   } catch (err) {
     throw new AppError(
       `Moamalat verification request failed: ${err.message}`,
@@ -169,61 +181,131 @@ export const verifyTransaction = async ({
     );
   }
 
-  const transactionsResponse = gateway?.Transactions;
-  if (!transactionsResponse || transactionsResponse.Status !== "Success") {
-    throw new AppError(
-      "Moamalat gateway could not confirm the transaction.",
-      502,
+  if (!response?.ok || !gateway) {
+    console.error(
+      "Moamalat verification request failed:",
+      response?.status,
+      responseText,
+    );
+    return {
+      verified: false,
+      reason: "Moamalat verification request failed.",
+      status: "GATEWAY_ERROR",
+      merchantReference,
+    };
+  }
+
+  console.log("Moamalat verification response:", JSON.stringify(gateway, null, 2));
+
+  let matchedTransaction = null;
+
+  // Manager reference implementation: walk Transactions array -> DateTransactions
+  if (Array.isArray(gateway.Transactions)) {
+    for (const group of gateway.Transactions) {
+      if (!group || !Array.isArray(group.DateTransactions)) {
+        continue;
+      }
+      for (const txn of group.DateTransactions) {
+        if (
+          txn &&
+          String(txn.MerchantReference) === String(merchantReference)
+        ) {
+          matchedTransaction = txn;
+          break;
+        }
+      }
+      if (matchedTransaction) break;
+    }
+  }
+
+  // Fallback tree walk if nested under a different root
+  if (!matchedTransaction) {
+    const collectRows = (node, rows = []) => {
+      if (!node || typeof node !== "object") return rows;
+      if (Array.isArray(node)) {
+        node.forEach((entry) => collectRows(entry, rows));
+        return rows;
+      }
+      if (node.MerchantReference) {
+        rows.push(node);
+        return rows;
+      }
+      ["Transactions", "DateTransactions"].forEach((key) => {
+        if (node[key]) collectRows(node[key], rows);
+      });
+      return rows;
+    };
+
+    matchedTransaction = collectRows(gateway, []).find(
+      (row) => String(row.MerchantReference) === String(merchantReference),
     );
   }
 
-  // Moamalat nests transaction rows under DateTransactions, sometimes as a
-  // flat list, sometimes grouped under a Transactions node per date. Walk the
-  // tree and collect every row that carries a MerchantReference.
-  const collectRows = (node, rows = []) => {
-    if (!node || typeof node !== "object") return rows;
-    if (Array.isArray(node)) {
-      node.forEach((entry) => collectRows(entry, rows));
-      return rows;
-    }
-    if (node.MerchantReference) {
-      rows.push(node);
-      return rows;
-    }
-    ["Transactions", "DateTransactions"].forEach((key) => {
-      if (node[key]) collectRows(node[key], rows);
-    });
-    return rows;
-  };
-
-  const transaction = collectRows(transactionsResponse, []).find(
-    (row) => row.MerchantReference === merchantReference,
-  );
-
-  if (!transaction) {
+  if (!matchedTransaction) {
     return {
       verified: false,
+      reason: "Transaction was not found.",
+      status: "NOT_FOUND",
       merchantReference,
       systemReference: "",
       networkReference: "",
       amount: 0,
-      status: "NOT_FOUND",
     };
   }
 
-  const referenceMatches = transaction.MerchantReference === merchantReference;
+  const gatewayAmount = Number(matchedTransaction.AmountTrxn);
+  const referenceMatches =
+    String(matchedTransaction.MerchantReference) === String(merchantReference);
+
+  const expectedAmountUnits =
+    expectedAmount != null
+      ? expectedAmount > 5000
+        ? Math.round(Number(expectedAmount))
+        : Math.round(Number(expectedAmount) * 1000)
+      : gatewayAmount;
+
   const amountMatches =
-    Math.round(Number(transaction.AmountTrxn ?? 0)) ===
-    Math.round(amountToUnits(expectedAmount ?? 0));
-  const approved = String(transaction.Status ?? "").toLowerCase() === "approved";
+    Number.isFinite(gatewayAmount) &&
+    Math.round(gatewayAmount) === Math.round(expectedAmountUnits);
+
+  const statusApproved =
+    String(matchedTransaction.Status || "").toLowerCase() === "approved";
+
+  const gatewaySystemReference =
+    matchedTransaction.TransactionId != null
+      ? String(matchedTransaction.TransactionId)
+      : null;
+
+  const systemReferenceMatches =
+    !systemReference ||
+    !gatewaySystemReference ||
+    String(systemReference) === gatewaySystemReference;
+
+  if (
+    !referenceMatches ||
+    !amountMatches ||
+    !statusApproved ||
+    !systemReferenceMatches
+  ) {
+    return {
+      verified: false,
+      reason: "Transaction details did not match.",
+      status: matchedTransaction.Status || null,
+      gatewayAmount: matchedTransaction.AmountTrxn || null,
+      merchantReference,
+      systemReference: gatewaySystemReference || String(systemReference || ""),
+      networkReference: matchedTransaction.RRN || "",
+      amount: Number(matchedTransaction.AmountTrxn ?? 0),
+    };
+  }
 
   return {
-    verified: referenceMatches && amountMatches && approved,
-    merchantReference,
-    systemReference: transaction.TransactionId ?? "",
-    networkReference: transaction.RRN ?? "",
-    amount: Number(transaction.AmountTrxn ?? 0),
-    status: transaction.Status ?? "UNKNOWN",
+    verified: true,
+    merchantReference: matchedTransaction.MerchantReference,
+    systemReference: gatewaySystemReference || String(systemReference || ""),
+    networkReference: matchedTransaction.RRN || "",
+    amount: Number(matchedTransaction.AmountTrxn ?? 0),
+    status: matchedTransaction.Status || "Approved",
   };
 };
 

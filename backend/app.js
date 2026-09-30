@@ -18,6 +18,11 @@ import moamalatRouter from "./routes/moamalatRoutes.js";
 import vehicleRouter from "./routes/vehicleRoutes.js";
 import viewRouter from "./routes/viewRoutes.js";
 import adminRouter from "./routes/admin.routes.js";
+import {
+  getGatewayConfig,
+  createPayment,
+  verifyPayment,
+} from "./controllers/moamalatController.js";
 
 // ============================================
 // SECURITY
@@ -182,7 +187,13 @@ app.use("/api/v1/payments/moamalat", moamalatRouter);
 app.use("/api/v1/payments", paymentRouter);
 app.use("/api/v1/vehicles", vehicleRouter);
 
+// Moamalat direct integration routes (manager specification)
+app.get("/api/config", getGatewayConfig);
+app.post("/api/payment/create", createPayment);
+app.post("/api/payment/verify", verifyPayment);
+
 app.use("/api/v1/admin", adminRouter);
+
 
 // ============================================
 // 14. 404 - ROUTE NOT FOUND

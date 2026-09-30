@@ -99,7 +99,7 @@ export const loadMoamalatLightbox = async (): Promise<LightboxApi> => {
 
 export interface LightboxCallbacks {
   onComplete: (response: LightboxCompleteResponse) => void;
-  onError?: () => void;
+  onError?: (error?: any) => void;
   onCancel?: () => void;
 }
 
@@ -113,13 +113,31 @@ export const openMoamalatLightbox = (
   }
   api.Checkout.configure = {
     ...params,
-    completeCallback: (response) => callbacks.onComplete(response),
-    errorCallback: () => callbacks.onError?.(),
-    cancelCallback: () => callbacks.onCancel?.(),
+    completeCallback: (response) => {
+      console.log("MOAMALAT COMPLETE CALLBACK:", response);
+      try {
+        api.Checkout.closeLightbox();
+      } catch {
+        /* ignore */
+      }
+      callbacks.onComplete(response);
+    },
+    errorCallback: (err) => {
+      console.error("MOAMALAT ERROR CALLBACK:", err);
+      callbacks.onError?.(err);
+    },
+    cancelCallback: () => {
+      console.log("MOAMALAT CANCEL CALLBACK");
+      callbacks.onCancel?.();
+    },
   };
   api.Checkout.showLightbox();
 };
 
 export const closeMoamalatLightbox = (): void => {
-  getLightboxApi()?.Checkout.closeLightbox();
-};
+  try {
+    getLightboxApi()?.Checkout.closeLightbox();
+  } catch {
+    /* ignore */
+  }
+};

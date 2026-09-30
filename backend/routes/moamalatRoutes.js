@@ -1,36 +1,21 @@
 import express from "express";
 import {
   getGatewayConfig,
+  createPayment,
   initiatePayment,
   verifyPayment,
 } from "../controllers/moamalatController.js";
-import { protect, restrictTo } from "../middlewares/authMiddleware.js";
-import { validate } from "../middlewares/validate.middleware.js";
-import {
-  initiatePaymentSchema,
-  verifyPaymentSchema,
-} from "../validations/moamalat.validation.js";
 
 const router = express.Router();
 
 // Public: hands the browser the LightBox script URL. No secrets exposed.
 router.get("/config", getGatewayConfig);
 
-// Protected: customer-only payment lifecycle for their own bookings.
-router.use(protect);
+// Payment creation & initialization routes
+router.post("/create", createPayment);
+router.post("/init", initiatePayment);
 
-router.post(
-  "/init",
-  restrictTo("customer"),
-  validate(initiatePaymentSchema),
-  initiatePayment,
-);
-
-router.post(
-  "/verify",
-  restrictTo("customer"),
-  validate(verifyPaymentSchema),
-  verifyPayment,
-);
+// Verification route
+router.post("/verify", verifyPayment);
 
 export default router;

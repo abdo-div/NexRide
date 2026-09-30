@@ -9,15 +9,23 @@ export interface MoamalatGatewayParams {
   SecureHash: string;
 }
 
-interface GatewayConfigResponse {
+export interface GatewayConfigResponse {
   status: string;
+  lightBoxUrl?: string;
+  env?: string;
   data: { lightBoxUrl: string; env: string };
 }
 
-interface InitiateResponse {
+export interface InitiateResponse {
   status: string;
+  MID?: string;
+  TID?: string;
+  AmountTrxn?: string;
+  MerchantReference?: string;
+  TrxDateTime?: string;
+  SecureHash?: string;
   data: {
-    payment: { id: string; bookingId: string; amount: number; merchantReference: string };
+    payment: { id: string; bookingId: string | null; amount: number; merchantReference: string };
     gateway: { lightBoxUrl: string; env: string; params: MoamalatGatewayParams };
   };
 }
@@ -29,23 +37,38 @@ export interface VerifyResult {
   networkReference?: string;
   amount?: number;
   status?: string;
+  reason?: string;
   alreadyProcessed?: boolean;
-  booking?: { id: string; bookingStatus: string; paymentStatus: string } | null;
+  booking?: { id: string; bookingStatus: string; paymentStatus: string; vehicleId?: string } | null;
 }
 
-interface VerifyResponse {
-  status: string;
-  data: VerifyResult;
+export interface VerifyResponse {
+  status?: string;
+  verified?: boolean;
+  merchantReference?: string;
+  systemReference?: string;
+  networkReference?: string;
+  amount?: number | string;
+  data?: VerifyResult;
 }
 
 /**
- * Moamalat gateway surface consumed by the payment page. The LightBox config
- * endpoint is public (only script URL + env), while initiate/verify require the
- * customer JWT. initiate/verify are idempotent via the backend middleware.
+ * Moamalat gateway API surface.
  */
 export const moamalatApi = {
   getConfig: (): Promise<GatewayConfigResponse> =>
     request("/payments/moamalat/config", { auth: false }),
+
+  create: (payload: {
+    amount: number;
+    reference?: string;
+    bookingId?: string;
+  }): Promise<InitiateResponse> =>
+    request("/payments/moamalat/create", {
+      method: "POST",
+      auth: true,
+      body: payload,
+    }),
 
   initiate: (bookingId: string): Promise<InitiateResponse> =>
     request("/payments/moamalat/init", {
@@ -57,11 +80,11 @@ export const moamalatApi = {
 
   verify: (payload: {
     merchantReference: string;
-    systemReference?: string;
+    systemReference?: string | null;
   }): Promise<VerifyResponse> =>
     request("/payments/moamalat/verify", {
       method: "POST",
-      auth: true,
+      auth: false,
       body: payload,
     }),
 };

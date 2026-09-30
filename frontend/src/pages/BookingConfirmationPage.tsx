@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
+import { ShieldCheck, CheckCircle2 } from "lucide-react";
 import { getBookingConfirmation } from "../data/bookingConfirmationData";
 import { vehicleApi } from "../lib/vehicleApi";
 import { bookingApi } from "../lib/bookingApi";
@@ -186,6 +187,32 @@ export const BookingConfirmationPage: React.FC = () => {
             window.setTimeout(() => setToast(null), TOAST_MS);
           }}
         />
+
+        {(searchParams.get("paid") === "true" || booking?.paymentStatus === "PAID") && (
+          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/90 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm animate-fade-in">
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+              <div className="flex flex-col">
+                <h3 className="text-[16px] font-bold text-emerald-950 flex items-center gap-2">
+                  Payment Verified by Moamalat
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-800">
+                    APPROVED
+                  </span>
+                </h3>
+                <p className="text-[13px] text-emerald-800 font-medium">
+                  Your reservation is fully paid and confirmed. The vehicle has been secured for you.
+                </p>
+              </div>
+            </div>
+            <div className="inline-flex items-center gap-1.5 self-start sm:self-center px-3.5 py-1.5 rounded-xl bg-emerald-100/80 text-emerald-800 text-[12px] font-bold">
+              <ShieldCheck className="w-4 h-4 text-emerald-700" />
+              <span>Moamalat Secured</span>
+            </div>
+          </div>
+        )}
+
         <ReferenceBar meta={resolved.meta} onCopy={copyRef} />
         <ExecutionTimeline meta={resolved.meta} />
 

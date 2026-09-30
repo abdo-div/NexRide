@@ -86,7 +86,7 @@ const PaymentPage: React.FC = () => {
 
   const goToConfirmation = () => {
     if (!booking) return;
-    navigate(`/booking-confirmed/${vehicleIdOf(booking)}?booking=${booking._id}`, {
+    navigate(`/booking-confirmed/${vehicleIdOf(booking)}?booking=${booking._id}&paid=true`, {
       replace: true,
     });
   };
@@ -105,11 +105,11 @@ const PaymentPage: React.FC = () => {
           response?.systemReference ??
           undefined,
       });
-      if (result.data.verified) {
+      if (result.verified || result.data?.verified) {
         goToConfirmation();
       } else {
         setStatus("failed");
-        setError(t("payment.gatewayNotApproved"));
+        setError(result.data?.reason || t("payment.gatewayNotApproved"));
       }
     } catch (err) {
       setStatus("failed");

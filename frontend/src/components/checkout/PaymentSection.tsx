@@ -91,6 +91,33 @@ export const PaymentSection: React.FC<Props> = ({
             </div>
           </div>
 
+          <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50/90 to-indigo-50/50 border border-blue-200/80 flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-md bg-[#2563EB] text-white flex items-center justify-center text-[10px] font-black">
+                  M
+                </span>
+                <span className="text-[13px] font-bold text-[#0F172A]">
+                  Moamalat LightBox Modal (معاملات)
+                </span>
+              </div>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-[#2563EB]">
+                Test Gateway Active
+              </span>
+            </div>
+            <p className="text-[12px] text-[#475569] leading-relaxed">
+              Clicking <strong>Pay</strong> launches the official Moamalat LightBox window. You can enter your card details inside the secure popup and confirm your reservation.
+            </p>
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-[#64748B]">
+              <span className="font-semibold text-[#0F172A]">Test Card:</span>
+              <code className="px-2 py-0.5 rounded bg-white border border-blue-200 font-mono text-[#2563EB] font-bold">
+                6393 0000 0000 0000
+              </code>
+              <span>Exp: 12/28</span>
+              <span>CVV: 123</span>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {payment.cardFields.map((field) => {
               const fullRow = ["cardholder", "cardNumber"].includes(field.id);
