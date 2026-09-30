@@ -13,6 +13,34 @@ interface VehicleResponse {
 }
 
 /**
+ * Customer search criteria. Every field is optional; the backend applies the
+ * ones provided. `location`, `type`, `minPrice`/`maxPrice` filter the fleet,
+ * while `startDate`/`endDate` make availability real by excluding vehicles
+ * that are booked in that window (computed server-side from the bookings).
+ */
+export interface VehicleSearchArgs {
+  location?: string;
+  type?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  startDate?: string;
+  endDate?: string;
+  limit?: number;
+}
+
+const buildSearchQuery = (args: VehicleSearchArgs): string => {
+  const query = new URLSearchParams();
+  if (args.location) query.set("location", args.location);
+  if (args.type) query.set("type", args.type);
+  if (args.minPrice !== undefined) query.set("minPrice", String(args.minPrice));
+  if (args.maxPrice !== undefined) query.set("maxPrice", String(args.maxPrice));
+  if (args.startDate) query.set("startDate", args.startDate);
+  if (args.endDate) query.set("endDate", args.endDate);
+  query.set("limit", String(args.limit ?? 100));
+  return `/vehicles/search?${query.toString()}`;
+};
+
+/**
  * Only PUBLISHED + AVAILABLE vehicles are bookable, so the public fleet
  * listing filters server-side. Sorting and the 100-item cap mirror the
  * backend's APIFeatures bounds.
@@ -26,6 +54,10 @@ export const API_ORIGIN = API_BASE_URL.replace(/\/api\/v1$/, "");
 export const vehicleApi = {
   listAvailable: (signal?: AbortSignal) =>
     request<VehiclesResponse>(AVAILABLE_QUERY, { auth: false, signal }),
+
+  /** Search available vehicles by location, type, price and date availability. */
+  search: (args: VehicleSearchArgs = {}, signal?: AbortSignal) =>
+    request<VehiclesResponse>(buildSearchQuery(args), { auth: false, signal }),
 
   /**
    * Single vehicle for the detail page. Public (no auth) and populated with the

@@ -66,6 +66,20 @@ export const getAllVehicles = catchAsync(async (req, res, next) => {
   });
 });
 
+export const searchVehicles = catchAsync(async (req, res, next) => {
+  // Public search combining customer filters with booking-calendar availability.
+  const vehicles = await vehicleService.fetchAvailableVehicles(
+    req.query,
+    req.tenantId,
+  );
+
+  res.status(200).json({
+    status: "success",
+    results: vehicles.length,
+    data: { vehicles },
+  });
+});
+
 export const getVehicleById = catchAsync(async (req, res, next) => {
   // Pass req.tenantId to prevent accessing vehicles across tenant subdomains
   const vehicle = await vehicleService.fetchVehicleById(req.params.id, req.tenantId);

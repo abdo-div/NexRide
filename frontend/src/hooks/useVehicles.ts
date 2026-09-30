@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { vehicleApi } from "../lib/vehicleApi";
+import type { VehicleSearchArgs } from "../lib/vehicleApi";
 import { ApiError } from "../lib/apiClient";
 import type { VehicleDto } from "../types/vehicle";
 
@@ -12,10 +13,13 @@ export interface VehiclesState {
 }
 
 /**
- * Loads the public fleet listing, tracking loading and failure separately so
- * the page can tell "no results" apart from "could not reach the API".
+ * Loads the fleet using the customer search endpoint. `args` map directly to
+ * the backend query (location, vehicle type, price, date availability) so the
+ * returned list is already filtered by real booking availability. The effect
+ * re-runs whenever any search argument changes.
  */
-export const useVehicles = (): VehiclesState => {
+export const useVehicles = (args: VehicleSearchArgs = {}): VehiclesState => {
+  const { location, type, minPrice, maxPrice, startDate, endDate } = args;
   const [vehicles, setVehicles] = useState<VehicleDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +34,10 @@ export const useVehicles = (): VehiclesState => {
       setError(null);
 
       try {
-        const response = await vehicleApi.listAvailable(controller.signal);
+        const response = await vehicleApi.search(
+          { location, type, minPrice, maxPrice, startDate, endDate },
+          controller.signal,
+        );
         if (!active) return;
         setVehicles(response.data.vehicles ?? []);
       } catch (err) {
@@ -53,7 +60,7 @@ export const useVehicles = (): VehiclesState => {
       active = false;
       controller.abort();
     };
-  }, [attempt]);
+  }, [attempt, location, type, minPrice, maxPrice, startDate, endDate]);
 
   const reload = useCallback(() => setAttempt((n) => n + 1), []);
 

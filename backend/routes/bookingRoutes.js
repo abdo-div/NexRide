@@ -25,21 +25,28 @@ import {
 const router = express.Router();
 
 // -----------------------------------------------------------------------------
-// GLOBAL AUTH GUARD
-// -----------------------------------------------------------------------------
-// All booking interactions require valid JWT authentication
-router.use(protect);
-
-// -----------------------------------------------------------------------------
-// CUSTOMER & SEARCH ROUTES
+// PUBLIC ROUTES
 // -----------------------------------------------------------------------------
 
-// Pre-booking concurrency check (validates dates against existing reservations before checkout)
+// Pre-booking concurrency check — intentionally BEFORE the auth guard so the
+// customer can verify availability from the vehicle detail page before login.
+// Exposes only "is available?" (the same data the public /vehicles/search
+// endpoint already derives from, never booking content itself).
 router.get(
   ["/check-availability", "/checkAvailability"],
   validate(checkAvailabilitySchema),
   checkVehicleAvailability,
 );
+
+// -----------------------------------------------------------------------------
+// GLOBAL AUTH GUARD
+// -----------------------------------------------------------------------------
+// All other booking interactions require valid JWT authentication
+router.use(protect);
+
+// -----------------------------------------------------------------------------
+// CUSTOMER & SEARCH ROUTES
+// -----------------------------------------------------------------------------
 
 // Customer self-service: Fetch bookings made by the logged-in customer
 router.get(

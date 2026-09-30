@@ -35,7 +35,9 @@ export const RouteSchedule: React.FC<{ data: ConfirmationData }> = ({ data }) =>
                 {t(stop.label)}
               </span>
               <span className="text-[16px] font-bold text-[#0F172A]">{stop.location}</span>
-              <span className="text-[14px] text-[#64748B]">{t(stop.datetime)}</span>
+              <span className="text-[14px] text-[#64748B]">
+                {t(stop.datetime, { defaultValue: stop.datetime })}
+              </span>
               {stop.note && (
                 <p className="text-[11px] text-[#64748B] mt-1.5 p-2 rounded bg-[#F8FAFC]">
                   {t(stop.note)}

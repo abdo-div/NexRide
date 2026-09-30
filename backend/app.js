@@ -14,6 +14,7 @@ import reviewRouter from "./routes/reviewRoutes.js";
 import bookingRouter from "./routes/bookingRoutes.js";
 import companyRouter from "./routes/companyRoutes.js";
 import paymentRouter from "./routes/paymentRoutes.js";
+import moamalatRouter from "./routes/moamalatRoutes.js";
 import vehicleRouter from "./routes/vehicleRoutes.js";
 import viewRouter from "./routes/viewRoutes.js";
 import adminRouter from "./routes/admin.routes.js";
@@ -177,6 +178,7 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/bookings", bookingRouter);
 app.use("/api/v1/companies", companyRouter);
+app.use("/api/v1/payments/moamalat", moamalatRouter);
 app.use("/api/v1/payments", paymentRouter);
 app.use("/api/v1/vehicles", vehicleRouter);
 

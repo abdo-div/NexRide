@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams, useNavigate } from "react-router";
 import { Car, ShieldCheck, ChevronLeft, ChevronRight, AlertTriangle } from "lucide-react";
 import { useVehicles } from "../hooks/useVehicles";
 import { useVehicleFilters } from "../hooks/useVehicleFilters";
@@ -35,7 +36,22 @@ const VehicleCardSkeleton: React.FC = () => (
 
 export const FleetPage: React.FC = () => {
   const { t } = useTranslation();
-  const { vehicles: dtoVehicles, loading, error, reload } = useVehicles();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  // Location + dates chosen in the home search console. Passed straight to the
+  // backend so availability is evaluated server-side against the booking
+  // calendar rather than filtered client-side.
+  const searchLocation = searchParams.get("location") ?? "";
+  const searchStart = searchParams.get("startDate") ?? "";
+  const searchEnd = searchParams.get("endDate") ?? "";
+  const hasSearch = Boolean(searchLocation || searchStart || searchEnd);
+
+  const { vehicles: dtoVehicles, loading, error, reload } = useVehicles({
+    location: searchLocation || undefined,
+    startDate: searchStart || undefined,
+    endDate: searchEnd || undefined,
+  });
 
   // Re-maps whenever the resolved locale changes, since enum labels are
   // translated during the projection. `t` changes identity on languageChanged.
@@ -66,12 +82,29 @@ export const FleetPage: React.FC = () => {
 
   const singleLocation = labelFor(LOCATION_OPTIONS, filters.selectedLocations)[0];
 
-  const locationParam =
-    filters.selectedLocations.length === 0
+  const months = t("home.search.months").split(" ");
+  const fmtShortDate = (iso: string) => {
+    const d = new Date(`${iso}T00:00:00`);
+    return Number.isNaN(d.getTime())
+      ? iso
+      : `${d.getDate()} ${months[d.getMonth()]}`;
+  };
+
+  const locationParam = searchLocation
+    ? t("fleet.tokens.location", { name: searchLocation })
+    : filters.selectedLocations.length === 0
       ? t("fleet.params.allHubs")
       : filters.selectedLocations.length === 1 && singleLocation
         ? t(singleLocation)
         : t("fleet.params.locationsCount", { count: filters.selectedLocations.length });
+
+  const scheduleParam =
+    searchStart && searchEnd
+      ? t("fleet.params.dateRange", {
+          start: fmtShortDate(searchStart),
+          end: fmtShortDate(searchEnd),
+        })
+      : t("fleet.params.flexibleDates");
 
   const selectedSegment = filters.segment
     ? SEGMENTS.find((s) => s.id === filters.segment)
@@ -159,7 +192,7 @@ export const FleetPage: React.FC = () => {
       <CommandBar
         params={[
           { label: t("fleet.params.location"), value: locationParam },
-          { label: t("fleet.params.schedule"), value: t("fleet.params.flexibleDates") },
+          { label: t("fleet.params.schedule"), value: scheduleParam },
           { label: t("fleet.params.tier"), value: tierParam },
         ]}
         segment={filters.segment}
@@ -281,17 +314,38 @@ export const FleetPage: React.FC = () => {
               </div>
             )}
 
-            {/* Loaded, but the fleet is empty in the database */}
+            {/* Loaded, but nothing matches the selected search or the database is empty */}
             {!loading && !error && allVehicles.length === 0 && (
-              <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl shadow-sm px-6 py-16 text-center">
-                <div className="mx-auto w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-                  <Car className="w-6 h-6 text-slate-400" />
+              hasSearch ? (
+                <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl shadow-sm px-6 py-16 text-center">
+                  <div className="mx-auto w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center mb-4">
+                    <AlertTriangle className="w-6 h-6 text-amber-500" />
+                  </div>
+                  <h3 className="text-base font-bold text-[#0F172A]">
+                    {t("fleet.emptySearch.title")}
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {t("fleet.emptySearch.desc")}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/fleet")}
+                    className="mt-5 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+                  >
+                    {t("fleet.emptySearch.action")}
+                  </button>
                 </div>
-                <h3 className="text-base font-bold text-[#0F172A]">
-                  {t("fleet.emptyDb.title")}
-                </h3>
-                <p className="mt-1 text-sm text-slate-500">{t("fleet.emptyDb.desc")}</p>
-              </div>
+              ) : (
+                <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl shadow-sm px-6 py-16 text-center">
+                  <div className="mx-auto w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                    <Car className="w-6 h-6 text-slate-400" />
+                  </div>
+                  <h3 className="text-base font-bold text-[#0F172A]">
+                    {t("fleet.emptyDb.title")}
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-500">{t("fleet.emptyDb.desc")}</p>
+                </div>
+              )
             )}
 
             {/* Loaded with data, but filters exclude everything */}
