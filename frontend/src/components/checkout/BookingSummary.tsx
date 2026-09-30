@@ -12,11 +12,12 @@ interface Props {
   totals: CheckoutTotals;
   phase: "idle" | "processing" | "done";
   onConfirm: () => void;
+  tab?: "card" | "cash";
 }
 
 const totalLyd = (n: number) => `${n.toLocaleString("en-US")} LYD`;
 
-export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, onConfirm }) => {
+export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, onConfirm, tab = "card" }) => {
   const { t } = useTranslation();
   const { itinerary, municipalLabel, securityDeposit, totalLabel, totalNote } = meta;
   const days = itinerary.days;
@@ -193,11 +194,13 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
               {phase === "processing" ? (
                 <>
                   <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {t(meta.ctaProcessing)}
+                  <span>{t(meta.ctaProcessing)}</span>
                 </>
               ) : (
                 <>
-                  {t(meta.ctaIdle, { total: totalLyd(totals.total) })}
+                  {tab === "card"
+                    ? `Pay with Moamalat • ${totalLyd(totals.total)}`
+                    : t(meta.ctaIdle, { total: totalLyd(totals.total) })}
                   <span aria-hidden className="inline-block rtl:rotate-180">
                     →
                   </span>

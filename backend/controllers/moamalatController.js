@@ -8,183 +8,352 @@ import {
 } from "../config/moamalat.js";
 import {
   buildCheckoutParams,
-  generateMerchantReference,
+  generateMerchantReference as generateBookingRef,
+  generateSecureHash,
+  formatTrxDateTime,
   verifyTransaction,
   finalizeVerifiedPayment,
 } from "../services/moamalat.service.js";
+import crypto from "node:crypto";
+
+// In-memory cache for standalone / demo / quick payment tracking matching manager reference
+export const pendingPayments = new Map();
 
 /**
- * LightBox script endpoint, public by design: the browser must fetch it before
- * it can inject the Moamalat script. Exposes no secrets, only URLs + env.
+ * Validate incoming amount (in LYD)
+ */
+export function validateAmount(raw) {
+  if (raw === undefined || raw === null || raw === "") {
+    return { ok: false, error: "Amount is required." };
+  }
+  const num = Number(raw);
+  if (!Number.isFinite(num)) {
+    return { ok: false, error: "Amount must be a valid number." };
+  }
+  if (num <= 0) {
+    return { ok: false, error: "Amount must be greater than zero." };
+  }
+  if (num > 1000000) {
+    return { ok: false, error: "Amount is too large." };
+  }
+  return { ok: true, value: num };
+}
+
+/**
+ * Generate a standalone merchant reference matching manager format
+ */
+export function generateMerchantReference() {
+  const ts = Date.now().toString(36).toUpperCase();
+  const rand = crypto.randomBytes(4).toString("hex").toUpperCase();
+  return `PAY-${ts}-${rand}`;
+}
+
+/**
+ * LightBox script & config endpoint.
+ * Serves both /api/config and /api/v1/payments/moamalat/config.
  */
 export const getGatewayConfig = catchAsync(async (req, res, next) => {
   if (!isMoamalatConfigured()) {
-    return next(
-      new AppError(
+    return res.status(500).json({
+      error:
         "Moamalat payment gateway is not configured. Add the MOAMALAT_* environment variables.",
-        500,
-      ),
-    );
+      message:
+        "Moamalat payment gateway is not configured. Add the MOAMALAT_* environment variables.",
+    });
   }
 
+  // Returns both top-level (manager format) and nested (NexRide data format)
   res.status(200).json({
     status: "success",
-    data: { lightBoxUrl: moamalatConfig.lightBoxUrl, env: moamalatConfig.env },
+    lightBoxUrl: moamalatConfig.lightBoxUrl,
+    env: moamalatConfig.env,
+    data: {
+      lightBoxUrl: moamalatConfig.lightBoxUrl,
+      env: moamalatConfig.env,
+    },
   });
 });
 
 /**
- * Starts a payment for a booking owned by the caller. Creates/reuses the
- * PENDING ledger record, generates a fresh merchant reference and returns the
- * signed params the LightBox needs. Idempotency is enforced by the shared
- * Idempotency-Key middleware on the /payments mount.
+ * Standalone & Booking payment creation endpoint.
+ * Serves POST /api/payment/create and POST /api/v1/payments/moamalat/create (and /init).
  */
-export const initiatePayment = catchAsync(async (req, res, next) => {
-  const { bookingId } = req.body;
-
-  const booking = await Booking.findById(bookingId);
-  if (!booking) {
-    return next(new AppError("No booking found with that ID", 404));
-  }
-  if (String(booking.customerId._id || booking.customerId) !== req.user.id) {
-    return next(new AppError("You can only pay for your own booking", 403));
-  }
-  if (booking.bookingStatus !== "PENDING_PAYMENT") {
-    return next(
-      new AppError(
-        booking.paymentStatus === "PAID"
-          ? "This booking has already been paid"
-          : "This booking is not awaiting payment",
-        400,
-      ),
-    );
-  }
-
-  const merchantReference = generateMerchantReference(bookingId);
-
-  // One PENDING ledger row per booking: each re-init rotates the merchant
-  // reference (old one is overwritten, keeping the sparse unique index clean).
-  let payment = await Payment.findOne({
-    bookingId,
-    paymentGateway: "MOAMALAT",
-    status: "PENDING",
-  });
-
-  if (payment) {
-    payment.merchantReference = merchantReference;
-  } else {
-    payment = new Payment({
-      bookingId: booking._id,
-      customerId: req.user.id,
-      companyId: booking.companyId,
-      amount: booking.totalAmount,
-      paymentMethod: "MOAMALAT",
-      paymentGateway: "MOAMALAT",
-      status: "PENDING",
-      merchantReference,
+export const createPayment = catchAsync(async (req, res, next) => {
+  if (!isMoamalatConfigured()) {
+    return res.status(500).json({
+      error:
+        "Server is not configured. Set MOAMALAT_MID, MOAMALAT_TID, and MOAMALAT_SECURE_KEY in config.env",
     });
   }
-  await payment.save();
 
-  const params = buildCheckoutParams(booking, merchantReference);
+  let { amount, reference, bookingId } = req.body || {};
 
+  let booking = null;
+  if (bookingId) {
+    booking = await Booking.findById(bookingId).catch(() => null);
+    if (booking && amount === undefined) {
+      amount = booking.totalAmount;
+    }
+  }
+
+  const check = validateAmount(amount);
+  if (!check.ok) {
+    return res.status(400).json({
+      error: check.error,
+      message: check.error,
+    });
+  }
+
+  // 1 LYD = 1000 smallest units
+  const amountTrxn = Math.round(check.value * 1000);
+
+  const merchantReference =
+    reference && String(reference).trim()
+      ? String(reference).trim().slice(0, 40)
+      : bookingId
+        ? generateBookingRef(bookingId)
+        : generateMerchantReference();
+
+  const trxDateTime = formatTrxDateTime(new Date());
+
+  const hashData = {
+    amount: amountTrxn,
+    trxDateTime,
+    merchantId: moamalatConfig.merchantId,
+    merchantReference,
+    terminalId: moamalatConfig.terminalId,
+  };
+
+  const secureHash = generateSecureHash(hashData);
+
+  // Store in pendingPayments in-memory map
+  pendingPayments.set(merchantReference, {
+    merchantReference,
+    amountTrxn: String(amountTrxn),
+    amountLyd: check.value,
+    bookingId: bookingId || null,
+    createdAt: Date.now(),
+    verified: false,
+  });
+
+  // If a real DB booking was referenced, update or create Payment record in DB
+  let paymentDoc = null;
+  if (booking) {
+    paymentDoc = await Payment.findOne({
+      bookingId: booking._id,
+      paymentGateway: "MOAMALAT",
+      status: "PENDING",
+    });
+
+    if (paymentDoc) {
+      paymentDoc.merchantReference = merchantReference;
+      paymentDoc.amount = check.value;
+      await paymentDoc.save();
+    } else {
+      paymentDoc = new Payment({
+        bookingId: booking._id,
+        customerId: booking.customerId,
+        companyId: booking.companyId,
+        amount: check.value,
+        paymentMethod: "MOAMALAT",
+        paymentGateway: "MOAMALAT",
+        status: "PENDING",
+        merchantReference,
+      });
+      await paymentDoc.save();
+    }
+  }
+
+  // Response matches both the manager's openLightBox(params) expectations:
+  // params.MID, params.TID, params.AmountTrxn, params.MerchantReference, params.TrxDateTime, params.SecureHash
+  // AND the NexRide data wrapper!
   res.status(200).json({
     status: "success",
+    MID: moamalatConfig.merchantId,
+    TID: moamalatConfig.terminalId,
+    AmountTrxn: String(amountTrxn),
+    MerchantReference: merchantReference,
+    TrxDateTime: trxDateTime,
+    SecureHash: secureHash,
     data: {
       payment: {
-        id: payment._id,
-        bookingId: booking._id,
-        amount: booking.totalAmount,
+        id: paymentDoc ? paymentDoc._id : merchantReference,
+        bookingId: booking ? booking._id : null,
+        amount: check.value,
         merchantReference,
       },
       gateway: {
         lightBoxUrl: moamalatConfig.lightBoxUrl,
         env: moamalatConfig.env,
-        params,
+        params: {
+          MID: moamalatConfig.merchantId,
+          TID: moamalatConfig.terminalId,
+          AmountTrxn: String(amountTrxn),
+          MerchantReference: merchantReference,
+          TrxDateTime: trxDateTime,
+          SecureHash: secureHash,
+        },
       },
     },
   });
 });
 
 /**
- * Verifies a payment against Moamalat's FilterTransactions endpoint and, on
- * approval, finalizes booking + payment + vehicle atomically. Always returns a
- * 200 with { verified } — the gateway decision is reported in the body, not as
- * an HTTP error, mirroring how the LightBox contract is consumed.
+ * Starts a payment for a booking owned by the caller (authenticated route).
+ */
+export const initiatePayment = createPayment;
+
+/**
+ * Verifies a payment against Moamalat's FilterTransactions endpoint.
+ * Serves POST /api/payment/verify and POST /api/v1/payments/moamalat/verify.
  */
 export const verifyPayment = catchAsync(async (req, res, next) => {
-  const { merchantReference, systemReference } = req.body;
-
-  const payment = await Payment.findOne({
-    merchantReference,
-    customerId: req.user.id,
-  });
-  if (!payment) {
-    return next(
-      new AppError("No payment found for that merchant reference", 404),
-    );
+  if (!isMoamalatConfigured()) {
+    return res.status(500).json({
+      verified: false,
+      reason: "Server is not configured.",
+      message: "Server is not configured.",
+    });
   }
 
-  // Already finalized by a previous verify — idempotent success.
-  if (payment.status === "COMPLETED") {
+  const { merchantReference, systemReference } = req.body || {};
+
+  if (!merchantReference) {
+    return res.status(400).json({
+      verified: false,
+      reason: "Missing merchantReference.",
+      message: "Missing merchantReference.",
+    });
+  }
+
+  // Lookup in memory and in MongoDB
+  const pendingPayment = pendingPayments.get(String(merchantReference));
+  let paymentDoc = await Payment.findOne({
+    merchantReference: String(merchantReference),
+  }).catch(() => null);
+
+  console.log("SERVER STORED PAYMENT:", pendingPayment || paymentDoc);
+
+  if (!pendingPayment && !paymentDoc) {
+    return res.status(404).json({
+      verified: false,
+      reason: "Original payment record was not found.",
+      message: "Original payment record was not found.",
+    });
+  }
+
+  // Already finalized check (idempotency)
+  if (
+    (pendingPayment && pendingPayment.verified) ||
+    (paymentDoc && paymentDoc.status === "COMPLETED")
+  ) {
     return res.status(200).json({
-      status: "success",
+      verified: true,
+      merchantReference,
+      systemReference:
+        paymentDoc?.transactionId ||
+        pendingPayment?.systemReference ||
+        systemReference ||
+        "",
+      networkReference: pendingPayment?.networkReference || "",
+      amount: paymentDoc?.amount || pendingPayment?.amountLyd || 0,
+      status: "APPROVED",
+      alreadyProcessed: true,
       data: {
         verified: true,
         merchantReference,
-        systemReference: payment.transactionId || systemReference || "",
-        networkReference: "",
-        amount: payment.amount,
+        systemReference:
+          paymentDoc?.transactionId ||
+          pendingPayment?.systemReference ||
+          systemReference ||
+          "",
+        networkReference: pendingPayment?.networkReference || "",
+        amount: paymentDoc?.amount || pendingPayment?.amountLyd || 0,
         status: "APPROVED",
         alreadyProcessed: true,
       },
     });
   }
 
+  const expectedAmount = pendingPayment
+    ? pendingPayment.amountLyd ?? (Number(pendingPayment.amountTrxn) / 1000)
+    : paymentDoc?.amount;
+
   const result = await verifyTransaction({
-    merchantReference,
-    expectedAmount: payment.amount,
+    merchantReference: String(merchantReference),
+    expectedAmount,
+    systemReference,
   });
 
   if (!result.verified) {
     return res.status(200).json({
-      status: "success",
+      verified: false,
+      reason: result.reason || "Transaction details did not match.",
+      status: result.status || null,
+      gatewayAmount: result.gatewayAmount || null,
       data: {
         verified: false,
-        merchantReference,
-        systemReference: result.systemReference || systemReference || "",
-        networkReference: result.networkReference,
-        amount: result.amount / 1000,
-        status: result.status,
+        reason: result.reason || "Transaction details did not match.",
+        status: result.status || null,
+        gatewayAmount: result.gatewayAmount || null,
       },
     });
   }
 
-  await finalizeVerifiedPayment({
-    bookingId: payment.bookingId,
-    paymentId: payment._id,
-    systemReference: result.systemReference || systemReference,
-    networkReference: result.networkReference,
-  });
+  // Update in-memory state
+  if (pendingPayment) {
+    pendingPayment.verified = true;
+    pendingPayment.verifiedAt = Date.now();
+    pendingPayment.systemReference =
+      result.systemReference || String(systemReference || "");
+    pendingPayment.networkReference = result.networkReference || "";
+    pendingPayments.set(String(merchantReference), pendingPayment);
+  }
 
-  const booking = await Booking.findById(payment.bookingId).select(
-    "bookingStatus paymentStatus",
-  );
+  // If a database booking is linked to this payment, finalize in DB
+  let updatedBooking = null;
+  const targetBookingId =
+    paymentDoc?.bookingId || pendingPayment?.bookingId;
 
-  res.status(200).json({
-    status: "success",
+  if (targetBookingId) {
+    try {
+      await finalizeVerifiedPayment({
+        bookingId: targetBookingId,
+        paymentId: paymentDoc?._id,
+        systemReference: result.systemReference || systemReference,
+        networkReference: result.networkReference,
+      });
+
+      updatedBooking = await Booking.findById(targetBookingId).select(
+        "bookingStatus paymentStatus vehicleId",
+      );
+    } catch (err) {
+      console.error("Error finalizing DB booking on payment verification:", err);
+    }
+  }
+
+  const amountLyd = Number(result.amount) / 1000;
+
+  return res.status(200).json({
+    verified: true,
+    merchantReference: result.merchantReference,
+    systemReference: result.systemReference || String(systemReference || ""),
+    networkReference: result.networkReference || null,
+    amount: result.amount,
+    status: result.status,
     data: {
       verified: true,
-      merchantReference,
-      systemReference: result.systemReference || systemReference,
-      networkReference: result.networkReference,
-      amount: result.amount / 1000,
+      merchantReference: result.merchantReference,
+      systemReference: result.systemReference || String(systemReference || ""),
+      networkReference: result.networkReference || null,
+      amount: amountLyd,
       status: "APPROVED",
-      booking: booking
+      booking: updatedBooking
         ? {
-            id: booking._id,
-            bookingStatus: booking.bookingStatus,
-            paymentStatus: booking.paymentStatus,
+            id: updatedBooking._id,
+            bookingStatus: updatedBooking.bookingStatus,
+            paymentStatus: updatedBooking.paymentStatus,
+            vehicleId: updatedBooking.vehicleId,
           }
         : null,
     },

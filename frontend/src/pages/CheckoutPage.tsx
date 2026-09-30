@@ -16,6 +16,13 @@ import { OptionsSection } from "../components/checkout/OptionsSection";
 import { PaymentSection } from "../components/checkout/PaymentSection";
 import { BookingSummary } from "../components/checkout/BookingSummary";
 import type { CheckoutMeta } from "../types/checkout";
+import { moamalatApi } from "../lib/moamalatApi";
+import {
+  loadMoamalatLightbox,
+  openMoamalatLightbox,
+  closeMoamalatLightbox,
+} from "../lib/moamalatLightbox";
+
 
 const addDays = (date: Date, days: number): Date => {
   const next = new Date(date);
@@ -44,6 +51,7 @@ export const CheckoutPage: React.FC = () => {
 };
 
 const MockCheckout: React.FC<{ vehicleId?: string }> = ({ vehicleId }) => {
+  const navigate = useNavigate();
   const { vehicle, meta } = getCheckout(vehicleId);
 
   const [selected, setSelected] = useState<Set<string>>(
@@ -51,6 +59,7 @@ const MockCheckout: React.FC<{ vehicleId?: string }> = ({ vehicleId }) => {
   );
   const [tab, setTab] = useState<"card" | "cash">("card");
   const [phase, setPhase] = useState<"idle" | "processing" | "done">("idle");
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const totals = useMemo(() => computeCheckoutTotals(vehicle, meta, selected), [vehicle, meta, selected]);
 
@@ -65,10 +74,79 @@ const MockCheckout: React.FC<{ vehicleId?: string }> = ({ vehicleId }) => {
       return next;
     });
 
-  const confirm = () => {
+  const confirm = async () => {
     if (phase !== "idle") return;
+    setSubmitError(null);
     setPhase("processing");
-    window.setTimeout(() => setPhase("done"), 1800);
+
+    if (tab === "cash") {
+      setPhase("done");
+      navigate(`/booking-confirmed/${vehicle.id}`);
+      return;
+    }
+
+    try {
+      await loadMoamalatLightbox();
+      const res = await moamalatApi.create({
+        amount: totals.total,
+        reference: `PAY-${vehicle.id.slice(0, 10).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`,
+      });
+
+      const params = res.data?.gateway?.params || {
+        MID: res.MID!,
+        TID: res.TID!,
+        AmountTrxn: res.AmountTrxn!,
+        MerchantReference: res.MerchantReference!,
+        TrxDateTime: res.TrxDateTime!,
+        SecureHash: res.SecureHash!,
+      };
+
+      openMoamalatLightbox(params, {
+        onComplete: async (response) => {
+          closeMoamalatLightbox();
+          setPhase("processing");
+          try {
+            const verifyRes = await moamalatApi.verify({
+              merchantReference: params.MerchantReference,
+              systemReference: response?.SystemReference || response?.systemReference,
+            });
+
+            if (verifyRes.verified || verifyRes.data?.verified) {
+              setPhase("done");
+              navigate(`/booking-confirmed/${vehicle.id}?paid=true&ref=${params.MerchantReference}`, {
+                replace: true,
+              });
+            } else {
+              setPhase("idle");
+              setSubmitError(
+                verifyRes.data?.reason ||
+                  "Moamalat payment verification failed. Please try again.",
+              );
+            }
+          } catch (err) {
+            setPhase("idle");
+            setSubmitError(
+              err instanceof Error ? err.message : "Unable to verify transaction.",
+            );
+          }
+        },
+        onError: () => {
+          closeMoamalatLightbox();
+          setPhase("idle");
+          setSubmitError("Moamalat payment gateway error. Please try again.");
+        },
+        onCancel: () => {
+          closeMoamalatLightbox();
+          setPhase("idle");
+          setSubmitError("Payment was cancelled in Moamalat LightBox.");
+        },
+      });
+    } catch (err) {
+      setPhase("idle");
+      setSubmitError(
+        err instanceof Error ? err.message : "Payment gateway could not be loaded.",
+      );
+    }
   };
 
   return (
@@ -97,8 +175,14 @@ const MockCheckout: React.FC<{ vehicleId?: string }> = ({ vehicleId }) => {
             totals={totals}
             phase={phase}
             onConfirm={confirm}
+            tab={tab}
           />
         </div>
+        {submitError && (
+          <div className="mt-6 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-[13px] font-semibold">
+            {submitError}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -251,16 +335,95 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
     if (!vehicle || !totals || phase !== "idle") return;
     setSubmitError(null);
     setPhase("processing");
+
+    if (tab === "cash") {
+      try {
+        const result = await bookingApi.create({
+          vehicleId,
+          startDate,
+          endDate,
+          pickupLocation: locationParam || undefined,
+        });
+        setPhase("done");
+        navigate(`/booking-confirmed/${vehicle.id}?booking=${result.data.booking._id}`, {
+          replace: true,
+        });
+      } catch (err) {
+        setPhase("idle");
+        setSubmitError(
+          err instanceof ApiError && err.status === 409
+            ? t("checkout.submitError.conflict")
+            : err instanceof Error
+              ? err.message
+              : t("checkout.submitError.generic"),
+        );
+      }
+      return;
+    }
+
     try {
+      await loadMoamalatLightbox();
       const result = await bookingApi.create({
         vehicleId,
         startDate,
         endDate,
         pickupLocation: locationParam || undefined,
       });
-      setPhase("done");
-      navigate(`/payment/${result.data.booking._id}`, {
-        replace: true,
+
+      const booking = result.data.booking;
+      const init = await moamalatApi.initiate(booking._id);
+      const params = init.data.gateway.params;
+
+      openMoamalatLightbox(params, {
+        onComplete: async (response) => {
+          closeMoamalatLightbox();
+          setPhase("processing");
+          try {
+            const verifyRes = await moamalatApi.verify({
+              merchantReference: params.MerchantReference,
+              systemReference: response?.SystemReference || response?.systemReference,
+            });
+
+            if (verifyRes.verified || verifyRes.data?.verified) {
+              setPhase("done");
+              navigate(
+                `/booking-confirmed/${vehicle.id}?booking=${booking._id}&paid=true&ref=${params.MerchantReference}`,
+                { replace: true },
+              );
+            } else {
+              setPhase("idle");
+              setSubmitError(
+                verifyRes.data?.reason ||
+                  t("payment.gatewayNotApproved", {
+                    defaultValue: "Moamalat did not approve the transaction.",
+                  }),
+              );
+            }
+          } catch (err) {
+            setPhase("idle");
+            setSubmitError(
+              err instanceof Error ? err.message : "Verification request failed.",
+            );
+          }
+        },
+        onError: () => {
+          closeMoamalatLightbox();
+          setPhase("idle");
+          setSubmitError(
+            t("payment.gatewayError", {
+              defaultValue: "Moamalat payment gateway error. Please try again.",
+            }),
+          );
+        },
+        onCancel: () => {
+          closeMoamalatLightbox();
+          setPhase("idle");
+          setSubmitError(
+            t("payment.cancelledDesc", {
+              defaultValue: "Payment was cancelled in Moamalat LightBox.",
+            }),
+          );
+        },
       });
     } catch (err) {
       setPhase("idle");
@@ -379,6 +542,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
               totals={totals}
               phase={phase}
               onConfirm={onConfirm}
+              tab={tab}
             />
           )}
         </div>
@@ -393,3 +557,4 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
 };
 
 export default CheckoutPage;
+

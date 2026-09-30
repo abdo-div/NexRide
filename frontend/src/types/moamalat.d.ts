@@ -18,7 +18,7 @@ declare global {
     TrxDateTime: string;
     SecureHash: string;
     completeCallback: (response: LightboxCompleteResponse) => void;
-    errorCallback?: () => void;
+    errorCallback?: (error?: any) => void;
     cancelCallback?: () => void;
   }
 
