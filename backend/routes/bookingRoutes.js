@@ -9,6 +9,7 @@ import {
   updateBookingStatus,
   checkVehicleAvailability,
   getCheckoutSession,
+  downloadBookingInvoice,
 } from "../controllers/bookingController.js";
 import {
   protect,
@@ -92,6 +93,10 @@ router.get("/", restrictTo("admin"), getAllBookings);
 
 // Fetch single booking details (guarded by tenant access verification)
 router.get("/:id", verifyTenantAccess("Booking"), getBookingById);
+
+// Invoice PDF for the paid booking (mirrors payments/:id/invoice but is
+// keyed by the booking id the confirmation page holds)
+router.get("/:id/invoice", verifyTenantAccess("Booking"), downloadBookingInvoice);
 
 // Customer or Admin cancellation route (applies cancellation business rules & refund windows)
 router.patch("/:id/cancel", verifyTenantAccess("Booking"), cancelBooking);

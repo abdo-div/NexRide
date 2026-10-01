@@ -10,6 +10,19 @@ declare global {
     MerchantReference?: string;
   }
 
+  /** Error payload posted by the LightBox via postMessage/errorCallback. */
+  interface LightboxErrorPayload {
+    cbName?: string;
+    callback?: string;
+    error?: string;
+    Info?: string;
+    errorCode?: number | string;
+    timestamp?: string;
+    orderId?: string;
+    status?: number;
+    message?: string;
+  }
+
   interface LightboxCheckoutConfig {
     MID: string;
     TID: string;
@@ -18,7 +31,7 @@ declare global {
     TrxDateTime: string;
     SecureHash: string;
     completeCallback: (response: LightboxCompleteResponse) => void;
-    errorCallback?: (error?: any) => void;
+    errorCallback?: (error?: LightboxErrorPayload) => void;
     cancelCallback?: () => void;
   }
 

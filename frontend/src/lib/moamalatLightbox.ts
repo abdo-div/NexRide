@@ -99,7 +99,7 @@ export const loadMoamalatLightbox = async (): Promise<LightboxApi> => {
 
 export interface LightboxCallbacks {
   onComplete: (response: LightboxCompleteResponse) => void;
-  onError?: (error?: any) => void;
+  onError?: (error?: LightboxErrorPayload) => void;
   onCancel?: () => void;
 }
 

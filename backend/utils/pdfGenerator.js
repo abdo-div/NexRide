@@ -1,11 +1,13 @@
 import PDFDocument from "pdfkit";
 
 /**
- * Dynamically generates a PDF booking receipt and streams it directly to the Express response
+ * Dynamically generates a PDF booking invoice and streams it directly to the
+ * Express response.
  * @param {Object} res - Express response object
- * @param {Object} booking - Populated booking document (with user, vehicle, company)
+ * @param {Object} booking - Populated booking document (customerId, vehicleId, companyId)
+ * @param {Object} [payment] - Payment ledger record (transaction id, status)
  */
-export const generateInvoicePDF = (res, booking) => {
+export const generateInvoicePDF = (res, booking, payment = null) => {
   const doc = new PDFDocument({ size: "A4", margin: 50 });
 
   // Set HTTP headers for PDF download stream
@@ -18,18 +20,28 @@ export const generateInvoicePDF = (res, booking) => {
   // Pipe PDF stream directly into response output
   doc.pipe(res);
 
+  const fmt = (n) =>
+    Number(n || 0).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  const lyd = (n) => `${fmt(n)} LYD`;
+
   const companyName =
-    booking.company?.name || booking.companyId?.name || "NexRide Marketplace";
+    booking.companyId?.name || booking.company?.name || "NexRide Marketplace";
   const customerName =
-    booking.user?.name || booking.customerId?.name || "Customer";
+    booking.customerId?.name || booking.user?.name || "Customer";
   const customerEmail =
-    booking.user?.email || booking.customerId?.email || "N/A";
+    booking.customerId?.email || booking.user?.email || "N/A";
   const customerPhone =
-    booking.user?.phoneNumber || booking.customerId?.phoneNumber || "N/A";
-  const vehicleMake =
-    booking.vehicle?.make || booking.vehicleId?.make || "Rental";
+    booking.customerId?.phoneNumber || booking.user?.phoneNumber || "N/A";
+  const vehicleMake = booking.vehicleId?.make || booking.vehicle?.make || "Rental";
   const vehicleModel =
-    booking.vehicle?.model || booking.vehicleId?.model || "Vehicle";
+    booking.vehicleId?.model || booking.vehicle?.model || "Vehicle";
+  const vehicleYear = booking.vehicleId?.year || booking.vehicle?.year || "";
+  const vehicleTitle = [vehicleYear, vehicleMake, vehicleModel]
+    .filter(Boolean)
+    .join(" ");
   const startDateStr = booking.startDate
     ? new Date(booking.startDate).toLocaleDateString()
     : "N/A";
@@ -37,6 +49,9 @@ export const generateInvoicePDF = (res, booking) => {
     ? new Date(booking.endDate).toLocaleDateString()
     : "N/A";
   const totalAmount = booking.totalAmount ?? booking.totalPrice ?? 0;
+  const dailyRate = booking.dailyRate ?? 0;
+  const totalDays = booking.totalDays || 1;
+  const transactionRef = payment?.transactionId || "N/A";
 
   // --- HEADER SECTION ---
   doc
@@ -52,43 +67,44 @@ export const generateInvoicePDF = (res, booking) => {
       50,
       105,
     )
+    .text(`Payment Ref: ${transactionRef}`, 50, 120)
     .moveDown();
 
   // Divider Line
   doc
     .strokeColor("#e2e8f0")
     .lineWidth(1)
-    .moveTo(50, 125)
-    .lineTo(545, 125)
+    .moveTo(50, 140)
+    .lineTo(545, 140)
     .stroke();
 
   // --- CUSTOMER & RENTAL DETAILS ---
   doc
     .fontSize(12)
     .fillColor("#0f172a")
-    .text("Customer Details:", 50, 140)
+    .text("Customer Details:", 50, 155)
     .fontSize(10)
     .fillColor("#475569")
-    .text(`Name: ${customerName}`, 50, 160)
-    .text(`Email: ${customerEmail}`, 50, 175)
-    .text(`Phone: ${customerPhone}`, 50, 190);
+    .text(`Name: ${customerName}`, 50, 175)
+    .text(`Email: ${customerEmail}`, 50, 190)
+    .text(`Phone: ${customerPhone}`, 50, 205);
 
   doc
     .fontSize(12)
     .fillColor("#0f172a")
-    .text("Vehicle Info:", 300, 140)
+    .text("Vehicle Info:", 300, 155)
     .fontSize(10)
     .fillColor("#475569")
-    .text(`Vehicle: ${vehicleMake} ${vehicleModel}`, 300, 160)
+    .text(`Vehicle: ${vehicleTitle}`, 300, 175)
     .text(
       `Pickup Location: ${booking.pickupLocation || "Branch Pickup"}`,
       300,
-      175,
+      190,
     )
-    .text(`Duration: ${startDateStr} to ${endDateStr}`, 300, 190);
+    .text(`Duration: ${startDateStr} to ${endDateStr}`, 300, 205);
 
   // --- SUMMARY TABLE ---
-  const tableTop = 230;
+  const tableTop = 240;
   doc.fillColor("#f1f5f9").rect(50, tableTop, 495, 25).fill();
 
   doc
@@ -100,14 +116,40 @@ export const generateInvoicePDF = (res, booking) => {
   doc
     .fillColor("#334155")
     .text(
-      `Vehicle Rental Reservation (${booking.totalDays || 1} Days)`,
+      `Vehicle Rental Reservation (${totalDays} Days at ${lyd(dailyRate)}/day)`,
       60,
       tableTop + 35,
     )
-    .text(`$${Number(totalAmount).toFixed(2)}`, 450, tableTop + 35, {
+    .text(lyd(totalAmount), 450, tableTop + 35, {
       width: 90,
       align: "right",
     });
+
+  // --- TOTALS FOOTER ---
+  const totalRowTop = tableTop + 80;
+  doc
+    .moveTo(50, totalRowTop)
+    .lineTo(545, totalRowTop)
+    .strokeColor("#e2e8f0")
+    .stroke();
+
+  doc
+    .fontSize(11)
+    .fillColor("#0f172a")
+    .text("Total Paid", 60, totalRowTop + 12, { width: 300 })
+    .text(lyd(totalAmount), 450, totalRowTop + 12, {
+      width: 90,
+      align: "right",
+    });
+
+  doc
+    .fillColor("#64748b")
+    .fontSize(9)
+    .text(
+      `Payment status: ${booking.paymentStatus || "UNPAID"} · Currency: LYD (Libyan Dinar)`,
+      60,
+      totalRowTop + 34,
+    );
 
   // Footer / Signoff
   doc
