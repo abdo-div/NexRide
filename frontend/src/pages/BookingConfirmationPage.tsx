@@ -35,6 +35,7 @@ export const BookingConfirmationPage: React.FC = () => {
   const bookingId = searchParams.get("booking");
   const data = useMemo<ConfirmationData>(() => getBookingConfirmation(vehicleId), [vehicleId]);
   const [toast, setToast] = useState<string | null>(null);
+  const [downloadingInvoice, setDownloadingInvoice] = useState(false);
 
   // When navigated with ?booking=<id>, overlay the real booking onto the
   // static confirmation shell (reference, vehicle, dates, totals).
@@ -171,6 +172,36 @@ export const BookingConfirmationPage: React.FC = () => {
     showToast(t(resolved.meta.reference.copyToast));
   };
 
+  const saveBlobAsFile = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadInvoice = async () => {
+    // Static shell (no real booking id): nothing to invoice yet.
+    if (!booking) {
+      showToast(t(resolved.meta.success.toastDownload));
+      return;
+    }
+    if (downloadingInvoice) return;
+    setDownloadingInvoice(true);
+    try {
+      const blob = await bookingApi.downloadInvoice(booking._id);
+      saveBlobAsFile(blob, `invoice-${booking._id}.pdf`);
+      showToast(t(resolved.meta.success.toastDownload));
+    } catch {
+      showToast(t("booking.success.toastDownloadError"));
+    } finally {
+      setDownloadingInvoice(false);
+    }
+  };
+
   return (
     <div className="bg-[#F8FAFC] min-h-screen">
       <div className="max-w-[1360px] mx-auto px-4 lg:px-8 pt-24 md:pt-28 pb-8 md:pb-12 flex flex-col gap-6">
@@ -182,10 +213,8 @@ export const BookingConfirmationPage: React.FC = () => {
             showToast(t(resolved.meta.success.toastPrint));
             window.print();
           }}
-          onDownload={() => {
-            showToast(t(resolved.meta.success.toastDownload));
-            window.setTimeout(() => setToast(null), TOAST_MS);
-          }}
+          onDownload={handleDownloadInvoice}
+          downloadBusy={downloadingInvoice}
         />
 
         {(searchParams.get("paid") === "true" || booking?.paymentStatus === "PAID") && (

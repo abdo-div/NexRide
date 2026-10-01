@@ -106,6 +106,7 @@ export interface ConfirmationMeta {
     desc: string;
     printLabel: string;
     downloadLabel: string;
+    downloadBusyLabel: string;
     toastPrint: string;
     toastDownload: string;
   };

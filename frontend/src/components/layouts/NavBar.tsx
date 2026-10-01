@@ -3,10 +3,12 @@ import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { NavBarLogo } from "./NavBarLogo";
 import { NavBarActions } from "./NavBarActions";
+import { useAuth } from "../../context/useAuth";
 
 export const NavBar: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -49,6 +51,14 @@ export const NavBar: React.FC = () => {
           >
             {t("nav.browseCars")}
           </a>
+          {isAuthenticated && (
+            <Link
+              to="/my-bookings"
+              className="hover:text-blue-600 transition-colors"
+            >
+              {t("nav.myBookings")}
+            </Link>
+          )}
           <a
             href="#how-it-works"
             className="hover:text-blue-600 transition-colors"

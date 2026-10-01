@@ -28,6 +28,7 @@ const buildMeta = (
     desc: "booking.success.desc",
     printLabel: "booking.success.printLabel",
     downloadLabel: "booking.success.downloadLabel",
+    downloadBusyLabel: "booking.success.downloadBusyLabel",
     toastPrint: "booking.success.toastPrint",
     toastDownload: "booking.success.toastDownload",
   },

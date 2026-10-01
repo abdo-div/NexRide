@@ -1,8 +1,7 @@
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
 import * as paymentService from "../services/paymentService.js";
-import { generateInvoicePDF } from "../utils/pdfGenerator.js";
-import Booking from "../models/booking_model.js";
+import { streamInvoiceForPayment } from "../services/invoiceService.js";
 
 export const processPayment = catchAsync(async (req, res, next) => {
   const payment = await paymentService.executePaymentProcessing(
@@ -83,18 +82,5 @@ export const downloadInvoicePDF = catchAsync(async (req, res, next) => {
     );
   }
 
-  // Fetch populated booking details (user, vehicle, company context)
-  const booking = await Booking.findById(payment.bookingId)
-    .populate("customerId", "name email phoneNumber")
-    .populate("vehicleId", "make model")
-    .populate("companyId", "name");
-
-  if (!booking) {
-    return next(
-      new AppError("No booking reservation associated with this payment", 404)
-    );
-  }
-
-  // Stream PDF binary response directly via PDFKit
-  generateInvoicePDF(res, booking);
+  await streamInvoiceForPayment(res, payment);
 });

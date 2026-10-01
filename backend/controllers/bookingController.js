@@ -1,7 +1,9 @@
 import mongoose from "mongoose";
 import Booking from "../models/booking_model.js";
 import Vehicle from "../models/vehicle_model.js";
+import Payment from "../models/payment_model.js";
 import * as bookingService from "../services/bookingService.js";
+import { streamInvoiceForPayment } from "../services/invoiceService.js";
 import catchAsync from "../utils/catchAsync.js";
 import * as factory from "./handlerFactory.js";
 import AppError from "../utils/appError.js";
@@ -23,6 +25,24 @@ export const getBookingById = catchAsync(async (req, res, next) => {
     status: "success",
     data: { booking },
   });
+});
+
+// Streams the official invoice PDF for the newly paid booking. Resolves the
+// latest payment ledger record for the booking, then hands off to the shared
+// invoice streamer so the layout is identical to the payments/:id/invoice
+// endpoint it mirrors.
+export const downloadBookingInvoice = catchAsync(async (req, res, next) => {
+  const payment = await Payment.findOne({ bookingId: req.params.id }).sort({
+    createdAt: -1,
+  });
+
+  if (!payment) {
+    return next(
+      new AppError("No payment record found for this booking", 404),
+    );
+  }
+
+  await streamInvoiceForPayment(res, payment);
 });
 
 // Redis is only a concurrency convenience around the authoritative DB check;

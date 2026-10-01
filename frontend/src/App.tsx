@@ -11,6 +11,8 @@ import BookingConfirmationPage from "./pages/BookingConfirmationPage";
 import PaymentPage from "./pages/PaymentPage";
 import AuthPage from "./pages/AuthPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import MyBookingsPage from "./pages/MyBookingsPage";
+import BookingDetailsPage from "./pages/BookingDetailsPage";
 
 function App() {
   return (
@@ -52,6 +54,22 @@ function App() {
               <Route path="/login" element={<AuthPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+              <Route
+                path="/my-bookings"
+                element={
+                  <ProtectedRoute>
+                    <MyBookingsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/my-bookings/:bookingId"
+                element={
+                  <ProtectedRoute>
+                    <BookingDetailsPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>

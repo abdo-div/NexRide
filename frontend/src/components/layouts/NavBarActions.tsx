@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Heart, LogOut, UserRound } from "lucide-react";
+import { Heart, LayoutDashboard, LogOut, UserRound } from "lucide-react";
 import { LanguageToggle } from "./LanguageToggle";
 import { useAuth } from "../../context/useAuth";
 
@@ -92,6 +92,15 @@ export const NavBarActions: React.FC<NavBarActionsProps> = ({
                   {user?.email}
                 </p>
               </div>
+              <Link
+                to="/my-bookings"
+                role="menuitem"
+                onClick={() => setIsMenuOpen(false)}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-[#0F172A] hover:bg-[#F1F5F9] transition-colors"
+              >
+                <LayoutDashboard className="w-4 h-4 text-[#2563EB]" />
+                <span>{t("nav.myBookings")}</span>
+              </Link>
               <button
                 type="button"
                 role="menuitem"
