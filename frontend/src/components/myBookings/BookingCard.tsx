@@ -17,6 +17,7 @@ import {
   Star,
   Store,
   CircleX,
+  Eye,
 } from "lucide-react";
 import type { BookingDto } from "../../types/booking";
 import { photoUrl } from "../../lib/vehicleMapper";
@@ -393,6 +394,16 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           </div>
 
           <div className="flex flex-col gap-2 mt-4">
+            {!isActive && (
+              <button
+                type="button"
+                onClick={openDetails}
+                className="w-full py-2 px-4 bg-[#EFF4FF] hover:bg-[#DBEAFE] text-[#2563EB] text-sm font-bold rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              >
+                <Eye className="w-4 h-4" />
+                {t("myBookings.actions.viewDetails")}
+              </button>
+            )}
             {isActive && (
               <>
                 <button
