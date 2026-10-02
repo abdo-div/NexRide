@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 import { Heart, Star, ArrowRight } from "lucide-react";
 import type { TrendingCar } from "../../types/trendingCar";
 
@@ -13,6 +14,7 @@ const SPEC_LABEL_KEYS: Record<string, string> = {
   POWER: "data.trendingSpecs.power",
   DRIVE: "data.trendingSpecs.drive",
   ENGINE: "data.trendingSpecs.engine",
+  FUEL: "data.trendingSpecs.fuel",
 };
 
 const BADGE_KEYS: Record<string, string> = {
@@ -22,6 +24,8 @@ const BADGE_KEYS: Record<string, string> = {
   "5.0 Rating": "home.trending.badges.fiveRating",
   "Sahara Ready": "home.trending.badges.saharaReady",
   "Satellite GPS": "home.trending.badges.satelliteGps",
+  "Top Rated": "home.trending.badges.topRated",
+  "Best Price": "home.trending.badges.bestPrice",
 };
 
 export const TrendingCard: React.FC<TrendingCardProps> = ({ car }) => {
@@ -94,7 +98,7 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car }) => {
                     : spec.label}
                 </span>
                 <span className="text-[11px] font-extrabold text-slate-700 mt-0.5">
-                  {spec.value}
+                  {spec.valueKey ? t(spec.valueKey) : spec.value}
                 </span>
               </div>
             ))}
@@ -117,13 +121,13 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car }) => {
             </div>
           </div>
 
-          <a
-            href={`#reserve-${car.id}`}
+          <Link
+            to={car.href ?? `/cars/${car.id}`}
             className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 flex items-center gap-1.5 transition-all active:scale-95"
           >
             <span>{t("home.trending.reserveRide")}</span>
             <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
-          </a>
+          </Link>
         </div>
       </div>
     </div>

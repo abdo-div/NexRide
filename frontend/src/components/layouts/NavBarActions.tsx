@@ -101,6 +101,17 @@ export const NavBarActions: React.FC<NavBarActionsProps> = ({
                 <LayoutDashboard className="w-4 h-4 text-[#2563EB]" />
                 <span>{t("nav.myBookings")}</span>
               </Link>
+              {user?.role?.trim() === "admin" && (
+                <Link
+                  to="/admin"
+                  role="menuitem"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-[#0F172A] hover:bg-[#F1F5F9] transition-colors"
+                >
+                  <LayoutDashboard className="w-4 h-4 text-[#2563EB]" />
+                  <span>{t("nav.adminPanel")}</span>
+                </Link>
+              )}
               <button
                 type="button"
                 role="menuitem"

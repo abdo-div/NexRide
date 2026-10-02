@@ -14,12 +14,13 @@
     "listFleet": "List Your Fleet",
     "saved": "Saved",
     "myBookings": "My Bookings",
+    "adminPanel": "Admin Panel",
     "libya": "LIBYA"
   },
   "myBookings": {
     "breadcrumbHome": "Home",
     "title": "Booking Log & Executive Trips",
-    "vipBadge": "VIP Concierge",
+    "vipBadge": "VIP Concierge Protocol",
     "subtitle": "Manage and track your current and past reservations across the NexRide luxury and armored fleet in Tripoli, Benghazi, and Libyan airport VIP suites.",
     "export": "Export Ledger (Excel)",
     "exportToast": "Booking ledger exported",
@@ -112,7 +113,6 @@
     "gpsInfo": "Live GPS tracking becomes available when your rental turns active.",
     "modifyInfo": "A VIP concierge agent will reach out shortly to adjust your trip.",
     "currency": "LYD",
-    "vipBadge": "VIP Concierge Protocol",
     "vipAvailability": "Available 24/7 all week",
     "vipTitle": "Need a hand with your trip?",
     "vipBody": "Tripoli's NexRide concierge team can reschedule dates, swap vehicles, arrange airport VIP pickup, or plan armored transfers for official delegations.",
@@ -184,10 +184,22 @@
       "guarantee": "100% same-vehicle handover guarantee",
       "specTitle": "Technical & comfort specifications",
       "specs": {
-        "fuel": { "label": "Engine / Fuel", "sub": "Full tank on handover" },
-        "transmission": { "label": "Transmission", "sub": "Smooth drive" },
-        "year": { "label": "Model Year", "sub": "Factory edition" },
-        "pickupMethod": { "label": "Pickup Method", "sub": "Set at booking" }
+        "fuel": {
+          "label": "Engine / Fuel",
+          "sub": "Full tank on handover"
+        },
+        "transmission": {
+          "label": "Transmission",
+          "sub": "Smooth drive"
+        },
+        "year": {
+          "label": "Model Year",
+          "sub": "Factory edition"
+        },
+        "pickupMethod": {
+          "label": "Pickup Method",
+          "sub": "Set at booking"
+        }
       },
       "pickupMethod": {
         "BRANCH_PICKUP": "Branch pickup",
@@ -415,6 +427,11 @@
     }
   },
   "home": {
+    "dataError": {
+      "title": "We couldn't load this section",
+      "desc": "Please try again in a moment.",
+      "retry": "Try again"
+    },
     "hero": {
       "line1": "Find Your",
       "line2": "Perfect Car.",
@@ -449,20 +466,30 @@
       "title": "TRENDING RENTALS IN LIBYA",
       "dailyTariff": "Daily Tariff",
       "reserveRide": "Reserve Ride",
-      "exploreAll": "Explore All 450+ Available Vehicles",
+      "exploreAll": "Explore All {{count}} Available Vehicles",
       "badges": {
         "instantBook": "Instant Book",
         "zeroDeposit": "Zero Deposit",
         "circuitSpec": "Circuit Spec",
         "fiveRating": "5.0 Rating",
         "saharaReady": "Sahara Ready",
-        "satelliteGps": "Satellite GPS"
+        "satelliteGps": "Satellite GPS",
+        "topRated": "Top Rated",
+        "bestPrice": "Best Price"
       },
       "categories": {
         "allFleet": "All Fleet",
         "luxurySUV": "Luxury SUVs",
         "sportsCoupe": "Sports & Coupe",
         "desert4x4": "Desert 4x4"
+      },
+      "empty": {
+        "title": "No vehicles available yet",
+        "desc": "Fleet operators are adding new rentals — check back soon."
+      },
+      "emptyTab": {
+        "title": "No vehicles in this category yet",
+        "desc": "Check the full fleet for current availability."
       }
     },
     "categories": {
@@ -510,7 +537,11 @@
       "fleetSize": "Fleet Size:",
       "vehiclesActive": "{{count}} Vehicles Active",
       "specialty": "Specialty:",
-      "viewFleet": "View Agency Fleet"
+      "viewFleet": "View Agency Fleet",
+      "empty": {
+        "title": "Verified partners are being onboarded",
+        "desc": "Rental companies are completing their accreditation. Approved operators will appear here."
+      }
     },
     "standards": {
       "eyebrow": "UNCOMPROMISING STANDARDS",
@@ -631,22 +662,34 @@
       "tripoli": {
         "badge": "Capital Hub",
         "subtitle": "Mitiga MJI Airport & Hai Al-Andalus Marina Hub",
-        "features": ["VIP Lounge Pickup", "Armored Escort Available"]
+        "features": [
+          "VIP Lounge Pickup",
+          "Armored Escort Available"
+        ]
       },
       "benghazi": {
         "badge": "Eastern Hub",
         "subtitle": "Benina BEN Airport & Downtown Commercial Hub",
-        "features": ["Direct Hotel Delivery", "Corporate Accounts"]
+        "features": [
+          "Direct Hotel Delivery",
+          "Corporate Accounts"
+        ]
       },
       "misrata": {
         "badge": "Trade Corridor",
         "subtitle": "Commercial Free Zone & Port Logistics Hub",
-        "features": ["Heavy Duty 4x4 & Pickups", "Executive Sedans"]
+        "features": [
+          "Heavy Duty 4x4 & Pickups",
+          "Executive Sedans"
+        ]
       },
       "sabha": {
         "badge": "Sahara Gateway",
         "subtitle": "Southern Desert Gateway & Exploration Base",
-        "features": ["Sahara Expedition Prep", "Satellite Telematics"]
+        "features": [
+          "Sahara Expedition Prep",
+          "Satellite Telematics"
+        ]
       }
     },
     "regionFeatures": {
@@ -681,14 +724,16 @@
       "alSafwa": "Executive & Armored",
       "sahary": "Desert 4WD & Pickups",
       "madina": "Daily Economy & Sedan",
-      "apex": "Supercars & GTs"
+      "apex": "Supercars & GTs",
+      "generic": "Licensed rental partner"
     },
     "trendingSpecs": {
       "trans": "TRANS",
       "seats": "SEATS",
       "power": "POWER",
       "drive": "DRIVE",
-      "engine": "ENGINE"
+      "engine": "ENGINE",
+      "fuel": "FUEL"
     }
   },
   "fleet": {
@@ -1388,5 +1433,507 @@
     "alreadyPaidTitle": "Booking already paid",
     "alreadyPaidDesc": "This booking has already been settled. View your confirmation below.",
     "viewConfirmation": "View booking confirmation"
+  },
+  "admin": {
+    "layout": {
+      "hubSubtitle": "Ops Hub",
+      "liveSuffix": "Live",
+      "navOverview": "Overview",
+      "navBookings": "Bookings",
+      "navCompanies": "Companies",
+      "navVehicles": "Vehicles",
+      "navCustomers": "Customers",
+      "navPayments": "Payments",
+      "navCommissions": "Commissions & Payouts",
+      "navMaintenance": "Maintenance",
+      "navReports": "Reports",
+      "navSettings": "Settings",
+      "soon": "Soon",
+      "operationsRole": "Headquarters Operations",
+      "logoutTitle": "Quick logout",
+      "allHubs": "All Hubs",
+      "dispatch": "Dispatch",
+      "dispatchSuffix": "Dispatch Live",
+      "searchPlaceholder": "Search bookings, service issues, fleet numbers...",
+      "hubLabel": "Hub",
+      "currency": "Currency",
+      "notifications": "Notifications",
+      "account": "Account"
+    },
+    "status": {
+      "PENDING_PAYMENT": "Pending payment",
+      "PAID": "Paid",
+      "CONFIRMED": "Confirmed",
+      "ACTIVE": "Active",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled",
+      "EXPIRED": "Expired",
+      "UNPAID": "Unpaid",
+      "REFUNDED": "Refunded",
+      "PARTIALLY_REFUNDED": "Partially refunded",
+      "UNSETTLED": "Unsettled",
+      "PROCESSING": "Processing",
+      "SETTLED": "Settled",
+      "PENDING": "Pending",
+      "APPROVED": "Approved",
+      "SUSPENDED": "Suspended",
+      "REJECTED": "Rejected",
+      "PUBLISHED": "Published",
+      "DRAFT": "Draft",
+      "AVAILABLE": "Available",
+      "MAINTENANCE": "In maintenance",
+      "UNAVAILABLE": "Unavailable"
+    },
+    "kpis": {
+      "bookingsToday": "Bookings Today",
+      "noBaseline": "No baseline",
+      "confirmedActive": "{{confirmed}} confirmed • {{active}} active",
+      "activeRentals": "Active Rentals",
+      "onRoad": "On the road",
+      "availableFleet": "Available Fleet",
+      "readyFleet": "units ready",
+      "inMaintenance": "In Maintenance",
+      "quarantined": "unit quarantined",
+      "revenueToday": "Today's Revenue",
+      "revenueNet": "Net: {{value}} LYD",
+      "pendingPayouts": "Pending Payouts",
+      "payoutPartners": "{{count}} fleet partner"
+    },
+    "chart": {
+      "title": "Dispatch Dynamics",
+      "subtitle": "Real-time demand across hubs",
+      "toggleBookings": "Bookings",
+      "toggleRevenue": "Revenue (LYD)",
+      "totalBookings": "{{count}} bookings in window",
+      "totalRevenue": "{{value}} LYD revenue",
+      "empty": "No movement in this window",
+      "saturation": "Depot Saturation",
+      "noFleet": "No vehicles",
+      "updated": "Telemetry updated"
+    },
+    "feed": {
+      "title": "Real-Time Operations Feed",
+      "actionItems": "{{count}} action item",
+      "emptyTitle": "Nothing to action",
+      "emptyBody": "Quiet right now — new alerts will show here",
+      "reviewDossier": "Review dossier",
+      "verifyVin": "Verify VIN",
+      "schedule": "Schedule",
+      "justNow": "Just now",
+      "minutesAgo": "{{count}} min ago",
+      "hoursAgo": "{{count}} hr ago",
+      "daysAgo": "{{count}} day ago",
+      "openLog": "Open full booking log"
+    },
+    "table": {
+      "recentTitle": "Recent Operations Bookings",
+      "recentSubtitle": "Monitor live transactions across hubs",
+      "unitBadge": "{{count}} active unit",
+      "bookingVehicle": "Booking & Vehicle",
+      "client": "Client / Account",
+      "provider": "Fleet Provider",
+      "pickup": "Pickup",
+      "settlement": "Settlement",
+      "status": "Status",
+      "actions": "Actions",
+      "view": "View",
+      "days": "{{count}} day",
+      "showingOf": "Showing {{shown}} of {{total}} booked",
+      "prev": "Prev",
+      "next": "Next",
+      "empty": "No bookings within this window. Adjust the filters or reload the data."
+    },
+    "overview": {
+      "command": "Operations Command",
+      "grid": "Regional Telemetry Grid",
+      "title": "NexRide Operations",
+      "subtitle": "Watch market-wide activity and run today's operations across all hubs.",
+      "period": {
+        "today": "Today",
+        "7d": "7d",
+        "30d": "30d",
+        "custom": "Custom",
+        "customFrom": "From date",
+        "customTo": "To date"
+      },
+      "refresh": "Refresh Telemetry",
+      "export": "Export Report",
+      "loadError": "Failed to load operations data. Make sure the server is running and try again.",
+      "retry": "Try again"
+    },
+    "bookings": {
+      "command": "Bookings Ledger",
+      "grid": "Dispatch Tracking",
+      "title": "Operations Bookings",
+      "subtitle": "Every marketplace booking across hubs.",
+      "count": "{{count}} bookings",
+      "refresh": "Refresh",
+      "export": "Export CSV",
+      "searchPlaceholder": "Search by reference, client, vehicle...",
+      "statusFilter": "Filter by status",
+      "allStatuses": "All statuses",
+      "companyFilter": "Filter by company",
+      "allCompanies": "All companies",
+      "loadError": "Failed to load bookings.",
+      "retry": "Try again",
+      "empty": "No bookings match. Try adjusting the search or filters."
+    },
+    "fleet": {
+      "command": "Fleet Command",
+      "grid": "VID / Fleet Register",
+      "title": "Fleet & Vehicles Management",
+      "subtitle": "Monitor, audit, and regulate authorized VIP fleets across registered rental concessionaires.",
+      "count": "{{count}} registered vehicles",
+      "refresh": "Refresh Fleet",
+      "export": "Export Fleet CSV",
+      "searchPlaceholder": "Search by brand, model, branch, hub...",
+      "primeAll": "All Vehicles",
+      "primeAvailable": "Available",
+      "primeMaintenance": "In Maintenance",
+      "primeUnavailable": "Unavailable",
+      "filterCompany": "Rental Operator",
+      "filterCompanyAll": "All Operators ({{count}})",
+      "filterStatus": "Fleet Operational Status",
+      "filterStatusAll": "All Operational States",
+      "filterClass": "Vehicle Classification",
+      "filterClassAll": "All Vehicle Categories",
+      "filterHub": "Dispatch Depot / Hub",
+      "filterHubAll": "All Dispatch Hubs",
+      "clearFilters": "Clear Filters",
+      "empty": "No vehicles match. Try adjusting the search or filters.",
+      "sort": "Sort by:",
+      "sortByCreated": "Latest registered",
+      "sortByPriceLow": "Rate (low to high)",
+      "sortByPriceHigh": "Rate (high to low)",
+      "sortByName": "Name",
+      "table": {
+        "registered": "Registered Active Fleet",
+        "records": "{{count}} Records",
+        "vehicle": "Vehicle",
+        "branch": "Branch & Hub",
+        "partner": "Operating Partner",
+        "rate": "Rate (LYD)",
+        "status": "Status",
+        "assignment": "Assignment / Staging",
+        "specs": "Specs",
+        "actions": "Actions",
+        "inspect": "Inspect",
+        "showingOf": "Showing {{shown}} of {{total}} registered vehicles",
+        "perDay": "/day",
+        "seats": "{{count}} seats",
+        "doors": "{{count}} doors",
+        "departsOn": "Departs {{date}}",
+        "stagedAt": "Staged at {{place}}"
+      },
+      "class": {
+        "SEDAN": "Executive Sedan",
+        "SUV": "Prestige SUV",
+        "LUXURY": "Ultra-VIP Flagship",
+        "VAN": "VIP Van & Convoy",
+        "HATCHBACK": "City Hatchback",
+        "PICKUP": "Fleet Pickup"
+      },
+      "kpis": {
+        "totalFleet": "Total Reg. Fleet",
+        "vehicles": "Vehicles",
+        "availableActive": "{{count}} available",
+        "unavailableCount": "{{count}} unavailable",
+        "activeRentals": "Rentals in Progress",
+        "active": "Active",
+        "utilization": "{{pct}}% fleet utilization",
+        "readyDepots": "Ready in Depots",
+        "available": "Available",
+        "atHub": "{{count}} at {{hub}}",
+        "maintenance": "Maintenance Deck",
+        "inService": "In Service",
+        "scheduled": "{{count}} scheduled",
+        "grounded": "{{count}} grounded",
+        "listings": "Fleet Listings",
+        "published": "Published",
+        "drafts": "{{count}} draft",
+        "suspended": "{{count}} suspended"
+      },
+      "drawer": {
+        "title": "Vehicle Profile & Audit Record",
+        "syncedLive": "SYNCED LIVE",
+        "ref": "REF: {{ref}}",
+        "reservedOn": "RESERVED ON {{ref}}",
+        "listingStatus": "Listing {{status}}",
+        "specsTitle": "Registered Specifications",
+        "ratingSub": "{{count}} review",
+        "typeTile": "Classification",
+        "yearTile": "Model Year",
+        "doorsTile": "Doors",
+        "partnerTitle": "Concessionaire & Certification",
+        "partnerCity": "Partner • {{city}}",
+        "approvedOperator": "Approved operator",
+        "historyTitle": "Recent Fleet Bookings",
+        "totalEarned": "Total LYD {{value}} earned",
+        "current": "(Current)",
+        "days": "{{count}} day",
+        "reservedNow": "Reserved now",
+        "completed": "Completed",
+        "noBookings": "No bookings on record",
+        "actionsTitle": "Quick Actions",
+        "openDossier": "Open Latest Booking Dossier",
+        "openLedger": "Open Bookings Ledger",
+        "downloadCsv": "Download Audit CSV"
+      },
+      "compliance": {
+        "title": "Fleet & Operational Compliance",
+        "body": "Vehicles are dispatched only from verified operator hubs. Each listing is checked against the owning concessionaire before it can be rented."
+      }
+    },
+    "drawer": {
+      "title": "Booking Details",
+      "created": "Created {{date}}",
+      "close": "Close",
+      "seats": "{{count}} seats",
+      "perDay": "/day",
+      "client": "Client",
+      "provider": "Fleet Provider",
+      "trip": "Trip",
+      "settlement": "Financial Settlement",
+      "unknown": "Unknown",
+      "duration": "{{count}} days",
+      "rentalPrice": "Rental price",
+      "discount": "Discount",
+      "commission": "NexRide commission",
+      "companyShare": "Company share",
+      "total": "Total"
+    },
+    "detail": {
+      "bookingTitle": "Booking",
+      "bookedOn": "Booked {{date}}",
+      "backToLedger": "Back to bookings",
+      "refresh": "Refresh",
+      "downloadCsv": "Download CSV",
+      "notFoundTitle": "Booking not found",
+      "notFoundBody": "This booking could not be loaded from the ledger. It may have been removed.",
+      "badgeActive": "Active Dispatch",
+      "badgePaid": "Payment Secured",
+      "badgeApproved": "Approved Operator",
+      "badgeCustomer": "Customer",
+      "timelineTitle": "Operational Journey Timeline",
+      "timelineSubtitle": "Lifecycle from real booking and payment records",
+      "stepProgress": "Step {{current}} of {{total}} in progress",
+      "stepComplete": "{{total}} steps complete",
+      "stepCreated": "Booking Created",
+      "stepPaymentPending": "Payment Pending",
+      "stepPaid": "Payment Authorized",
+      "stepTrip": "Trip Window Open",
+      "stepReturn": "Return Due",
+      "stepClosed": "Booking Closed",
+      "stepClosedMeta": "Terminal state",
+      "awaitingPayment": "Awaiting gateway settlement",
+      "activeNow": "Active now",
+      "refunded": "Refunded",
+      "vehicleUnit": "Fleet vehicle",
+      "specClass": "Class",
+      "specTransmission": "Transmission",
+      "specFuel": "Fuel",
+      "specSeats": "Seats",
+      "seatsCount": "{{count}} seats",
+      "specCity": "Hub",
+      "specRate": "Daily Rate",
+      "specRating": "Rating",
+      "specDoors": "Doors",
+      "dailyRate": "{{value}} LYD",
+      "customerTitle": "Customer Dossier",
+      "tripTitle": "Trip Protocol",
+      "email": "Email",
+      "phone": "Phone",
+      "tripDates": "Trip duration",
+      "pickupProtocol": "Pickup mode",
+      "pickupFrom": "Pickup location",
+      "rentalPeriod": "Rental window",
+      "duration": "{{count}} days",
+      "financialTitle": "Financial Settlement",
+      "grossLabel": "Gross Customer Charged",
+      "paidOn": "Processed {{date}}",
+      "invoiceTitle": "Customer Invoice",
+      "baseRental": "Base rental ({{days}} days @ {{rate}} LYD/day)",
+      "splitTitle": "Marketplace Split",
+      "feeLabel": "NexRide fee ({{rate}}%)",
+      "feeDetail": "Retained in HQ escrow",
+      "partnerLabel": "Partner net payout",
+      "pendingSettlement": "Pending settlement",
+      "paymentMethod": "Payment method",
+      "snapshotTitle": "Dispatch Snapshot",
+      "createdOn": "Created",
+      "updatedOn": "Last updated",
+      "hubLabel": "Hub",
+      "protocol": "Protocol",
+      "ledger": "Payment ledger",
+      "totalLiabilities": "Total liabilities",
+      "pickup": {
+        "BRANCH_PICKUP": "Branch pickup",
+        "DELIVERY": "Chauffeured delivery"
+      }
+    },
+    "companies": {
+      "command": "Partner Governance",
+      "grid": "Compliance Registry",
+      "title": "Rental Companies & Fleet Operators",
+      "subtitle": "Verify corporate credentials, escrow payouts, and fleet quality across registered Libyan automotive partners.",
+      "count": "{{count}} partners",
+      "refresh": "Refresh Ledger",
+      "export": "Export Operator Ledger (CSV)",
+      "alert": {
+        "title": "Pending Approval & Regulatory Review",
+        "body": "Corporate checks and regulatory verification awaiting review by the platform operator.",
+        "requiringAction": "{{count}} Requiring Action",
+        "submittedVehicles": "{{count}} vehicles submitted",
+        "approvalPending": "Approval Pending",
+        "reject": "Reject",
+        "review": "Review Dossier",
+        "approve": "Approve Partner"
+      },
+      "kpis": {
+        "registered": "Registered Companies",
+        "partners": "Partners",
+        "approvedCount": "{{count}} Approved",
+        "pendingCount": "{{count}} Pending",
+        "suspendedCount": "{{count}} Suspended",
+        "rejectedCount": "{{count}} Rejected",
+        "fleet": "Managed Fleet",
+        "vehicles": "Vehicles",
+        "addedThisMonth": "+{{count}} vehicles this month",
+        "addedThisMonthNone": "No new vehicles this month",
+        "dispatches": "Gross Platform Dispatches",
+        "lyd": "LYD",
+        "delta": "{{pct}}%",
+        "vsLastMonth": "vs previous 30-day cycle",
+        "vsLastMonthNone": "No prior 30-day cycle",
+        "commission": "Retained Commission",
+        "commissionSub": "Platform take-rate intact",
+        "escrow": "Pending Escrow Payouts",
+        "escrowSub": "{{count}} unsettled records",
+        "escrowSubNone": "Escrow fully settled"
+      },
+      "searchPlaceholder": "Search company name, city, address, or email...",
+      "filterStatus": "Status",
+      "filterStatusAll": "All Statuses ({{count}})",
+      "filterHub": "Hub",
+      "filterHubAll": "All Regions (Libya)",
+      "clearFilters": "Clear Filters",
+      "table": {
+        "title": "Primary Company Management",
+        "records": "{{count}} Records",
+        "showingOf": "Showing {{shown}} of {{total}} fleet partners",
+        "empty": "No companies match. Try adjusting the search or filters.",
+        "company": "Company",
+        "contact": "Business Contact",
+        "fleetSize": "Fleet Size",
+        "activeBookings": "Active Bookings",
+        "financials": "Financials (30D)",
+        "escrow": "Pending Escrow",
+        "registration": "Registration",
+        "status": "Status",
+        "actions": "Actions",
+        "review": "Review",
+        "open": "Open",
+        "vehicles": "Vehicles",
+        "ready": "{{count}} Ready",
+        "inShop": "{{count}} In-Shop",
+        "occupancy": "{{pct}}% Occupancy",
+        "none": "—",
+        "commissionLine": "NexRide ({{rate}}%): {{amount}} LYD",
+        "escrowReady": "Ready for batch payout",
+        "escrowNone": "No unsettled balance",
+        "partnerSince": "{{count}} days partner",
+        "partnerMonths": "{{count}} mo partner",
+        "partnerYears": "{{count}} yr partner",
+        "noFleet": "No vehicles yet",
+        "noBooking": "No reservations yet",
+        "noDispatches": "No dispatches yet"
+      },
+      "dossier": {
+        "underReview": "IN PLATFORM REVIEW",
+        "approved": "APPROVED PARTNER",
+        "suspended": "SUSPENDED",
+        "rejected": "REJECTED",
+        "verified": "Registered Fleet Operator",
+        "taglineFallback": "Fleet operator registered on the NexRide marketplace.",
+        "tabOverview": "Overview & Credentials",
+        "tabVehicles": "Vehicles",
+        "tabBookings": "Bookings",
+        "tabEscrow": "Escrow Payouts",
+        "approve": "Approve Partner",
+        "reject": "Reject",
+        "suspend": "Suspend",
+        "reactivate": "Re-activate",
+        "saving": "Saving...",
+        "approveHint": "Approving publishes this partner as a verified operator.",
+        "mutationError": "Could not update partner status. Please try again.",
+        "creds": {
+          "title": "Corporate Identity",
+          "storefront": "Storefront",
+          "city": "City",
+          "rate": "Commission Rate",
+          "rateDefault": "Platform default",
+          "rateValue": "{{rate}}%",
+          "founded": "Registered",
+          "hq": "Headquarters & Depot",
+          "address": "Depot Address",
+          "contact": "Business Contact",
+          "email": "Business Email",
+          "phone": "Direct Phone",
+          "settlement": "Commission & Settlement Route",
+          "settled": "Settled (net to partner)",
+          "settledCount": "{{count}} settled records",
+          "open": "Pending settlement (escrow)",
+          "openCount": "{{count}} unsettled records",
+          "channels": "Accepted checkout: {{channels}}"
+        },
+        "kpis": {
+          "trips": "Total Lifetime Trips",
+          "completion": "{{pct}}% Completion",
+          "noTrips": "No completed trips",
+          "fleet": "Fleet Occupancy",
+          "deployed": "{{ready}} of {{total}} Deployed",
+          "rating": "Customer Rating",
+          "ratingNone": "No reviews yet",
+          "ratingCount": "{{count}} reviews",
+          "escrow": "Next Escrow Payout",
+          "escrowDue": "{{count}} unsettled records"
+        },
+        "dispatches": {
+          "title": "Registered Fleet (Live Registers)",
+          "viewBookings": "View all dispatches",
+          "noVehicles": "No vehicles registered for this partner yet."
+        },
+        "vehiclesTitle": "Registered Fleet",
+        "vehiclesEmpty": "No vehicles registered yet.",
+        "bookingsTitle": "Bookings & Dispatches",
+        "bookingsSubtitle": "{{active}} active • {{total}} total",
+        "bookingsEmpty": "No bookings on record for this partner.",
+        "ledgerTitle": "Escrow Settlement Ledger",
+        "ledgerSubtitle": "Real payment records for this partner",
+        "ledgerEmpty": "No payments on record for this partner.",
+        "ledger": {
+          "record": "Payment / Record",
+          "amount": "Gross Amount",
+          "rate": "Commission",
+          "net": "Net to Partner",
+          "status": "Status",
+          "ref": "#{{ref}}",
+          "paidAt": "Paid {{date}}",
+          "cash": "Cash on delivery",
+          "moamalat": "Moamalat",
+          "localCard": "Local card",
+          "stripe": "Stripe",
+          "wallet": "Wallet",
+          "unknownMethod": "Unknown method"
+        },
+        "bookingRow": {
+          "ref": "#{{ref}}",
+          "vehicle": "{{vehicle}}",
+          "customer": "{{customer}}",
+          "days": "{{count}} day",
+          "amount": "{{amount}} LYD"
+        }
+      }
+    }
   }
 }

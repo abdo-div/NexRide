@@ -1,10 +1,25 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { CategoryCard } from "./CategoryCard";
-import { CATEGORIES_DATA } from "../../data/categoriesData";
+import { HomeSectionError } from "./HomeSectionError";
+import type { VehicleCategory } from "../../types/category";
 
-export const VehicleCategories: React.FC = () => {
+interface VehicleCategoriesProps {
+  categories: VehicleCategory[];
+  loading: boolean;
+  error: string | null;
+  onRetry: () => void;
+}
+
+export const VehicleCategories: React.FC<VehicleCategoriesProps> = ({
+  categories,
+  loading,
+  error,
+  onRetry,
+}) => {
   const { t } = useTranslation();
+  const showError = error !== null && !loading;
+
   return (
     <section className="w-full py-16 px-6 lg:px-12 bg-white border-b border-slate-100">
       {/* Header */}
@@ -24,11 +39,24 @@ export const VehicleCategories: React.FC = () => {
       </div>
 
       {/* Categories Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        {CATEGORIES_DATA.map((category) => (
-          <CategoryCard key={category.id} category={category} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="rounded-2xl border border-slate-200/80 h-[240px] bg-slate-100/70 animate-pulse"
+            />
+          ))}
+        </div>
+      ) : showError ? (
+        <HomeSectionError onRetry={onRetry} />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {categories.map((category) => (
+            <CategoryCard key={category.id} category={category} />
+          ))}
+        </div>
+      )}
     </section>
   );
 };

@@ -32,7 +32,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
           </span>
           <span className="text-[11px] font-semibold text-slate-400">
             <strong className="text-slate-700">
-              {category.availableCount}+
+              {category.availableCount}
             </strong>{" "}
             {t("home.categories.available")}
           </span>
@@ -60,11 +60,15 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
           </span>
           <div className="flex items-baseline gap-1">
             <span className="text-lg font-black text-blue-600">
-              {category.startingPrice}
+              {category.startingPrice === null
+                ? "—"
+                : category.startingPrice.toLocaleString()}
             </span>
-            <span className="text-xs font-bold text-slate-700">
-              {category.currency}
-            </span>
+            {category.startingPrice !== null && (
+              <span className="text-xs font-bold text-slate-700">
+                {category.currency}
+              </span>
+            )}
           </div>
         </div>
 

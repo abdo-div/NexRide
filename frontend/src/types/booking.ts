@@ -18,12 +18,14 @@ export interface BookingVehicleRef {
   photos?: string[];
   transmission?: string;
   fuelType?: string;
+  seats?: number;
 }
 
 export interface BookingCompanyRef {
   _id: string;
   name?: string;
   phone?: string;
+  city?: string;
 }
 
 export type BookingStatus =
@@ -57,4 +59,5 @@ export interface BookingDto {
   bookingStatus: BookingStatus;
   paymentStatus: PaymentStatus;
   createdAt: string;
+  updatedAt?: string;
 }

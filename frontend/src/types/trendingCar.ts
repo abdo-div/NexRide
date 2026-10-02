@@ -1,6 +1,9 @@
 export interface SpecItem {
   label: string;
-  value: string;
+  /** Literal value shown as-is. */
+  value?: string;
+  /** i18n key resolved with t(valueKey); preferred for localized enums. */
+  valueKey?: string;
 }
 
 export interface TrendingCar {
@@ -17,4 +20,6 @@ export interface TrendingCar {
   dailyPrice: number;
   currency: string;
   category: string;
+  /** Real vehicle detail route; falls back to the mock anchor when absent. */
+  href?: string;
 }
