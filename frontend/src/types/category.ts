@@ -5,6 +5,7 @@ export interface VehicleCategory {
   iconName: "car" | "star" | "mountain" | "zap";
   title: string;
   description: string;
-  startingPrice: number;
+  /** Lowest live daily rate in the bucket; null when no vehicle matches. */
+  startingPrice: number | null;
   currency: string;
 }

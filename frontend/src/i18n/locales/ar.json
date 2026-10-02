@@ -14,12 +14,13 @@
     "listFleet": "أضف أسطولك",
     "saved": "المحفوظة",
     "myBookings": "حجوزاتي",
+    "adminPanel": "لوحة الإدارة",
     "libya": "ليبيا"
   },
   "myBookings": {
     "breadcrumbHome": "الرئيسية",
     "title": "سجل الحجوزات والرحلات التنفيذية",
-    "vipBadge": "VIP Concierge",
+    "vipBadge": "خدمة البروتوكول والتشريفات",
     "subtitle": "إدارة ومتابعة حجوزاتك الحالية والسابقة لأسطول نكس رايد الفاخر والمصفح في طرابلس، بنغازي، وصالات كبار الزوار بالمطارات الليبية.",
     "export": "تصدير السجل (Excel)",
     "exportToast": "تم تصدير سجل الحجوزات",
@@ -112,7 +113,6 @@
     "gpsInfo": "يتوفر تتبع GPS المباشر عند تفعيل استئجارك.",
     "modifyInfo": "سيتواصل معك موظف الكونسيرج VIP قريباً لضبط رحلتك.",
     "currency": "د.ل",
-    "vipBadge": "خدمة البروتوكول والتشريفات",
     "vipAvailability": "متاحة 24/7 طوال الأسبوع",
     "vipTitle": "هل تحتاج مساعدة في رحلتك؟",
     "vipBody": "فريق كونسيرج نكس رايد طرابلس جاهز لتغيير المواعيد أو تبديل المركبات أو ترتيب استقبال مطارات كبار الزوار أو تنظيم رحلات مصفحة للوفود الرسمية.",
@@ -184,10 +184,22 @@
       "guarantee": "ضمان استلام نفس المركبة 100%",
       "specTitle": "المواصفات الفنية وتجهيزات الراحة",
       "specs": {
-        "fuel": { "label": "المحرك / الوقود", "sub": "خزان ممتلئ عند التسليم" },
-        "transmission": { "label": "ناقل الحركة", "sub": "قيادة سلسة" },
-        "year": { "label": "سنة الموديل", "sub": "طراز مصنعي" },
-        "pickupMethod": { "label": "طريقة الاستلام", "sub": "محددة عند الحجز" }
+        "fuel": {
+          "label": "المحرك / الوقود",
+          "sub": "خزان ممتلئ عند التسليم"
+        },
+        "transmission": {
+          "label": "ناقل الحركة",
+          "sub": "قيادة سلسة"
+        },
+        "year": {
+          "label": "سنة الموديل",
+          "sub": "طراز مصنعي"
+        },
+        "pickupMethod": {
+          "label": "طريقة الاستلام",
+          "sub": "محددة عند الحجز"
+        }
       },
       "pickupMethod": {
         "BRANCH_PICKUP": "استلام من الفرع",
@@ -415,6 +427,11 @@
     }
   },
   "home": {
+    "dataError": {
+      "title": "تعذّر تحميل هذا القسم",
+      "desc": "يرجى المحاولة مرة أخرى بعد قليل.",
+      "retry": "إعادة المحاولة"
+    },
     "hero": {
       "line1": "اعثر على",
       "line2": "سيارتك المثالية.",
@@ -449,20 +466,30 @@
       "title": "الإيجارات الرائجة في ليبيا",
       "dailyTariff": "التعرفة اليومية",
       "reserveRide": "احجز الآن",
-      "exploreAll": "استكشف أكثر من 450 مركبة متاحة",
+      "exploreAll": "استكشف جميع المركبات المتاحة ({{count}})",
       "badges": {
         "instantBook": "حجز فوري",
         "zeroDeposit": "بدون ضمان",
         "circuitSpec": "مواصفات حلبة",
         "fiveRating": "تقييم 5.0",
         "saharaReady": "جاهزة للصحراء",
-        "satelliteGps": "GPS أقمار صناعية"
+        "satelliteGps": "GPS أقمار صناعية",
+        "topRated": "الأعلى تقييماً",
+        "bestPrice": "أفضل سعر"
       },
       "categories": {
         "allFleet": "كل الأسطول",
         "luxurySUV": "سيارات دفع رباعي فاخرة",
         "sportsCoupe": "رياضية وكوبيه",
         "desert4x4": "صحراوية 4x4"
+      },
+      "empty": {
+        "title": "لا توجد مركبات متاحة حالياً",
+        "desc": "يعمل مشغّلو الأساطيل على إضافة إيجارات جديدة — تابعنا قريباً."
+      },
+      "emptyTab": {
+        "title": "لا توجد مركبات في هذه الفئة بعد",
+        "desc": "تصفح الأسطول الكامل للاطلاع على التوفر الحالي."
       }
     },
     "categories": {
@@ -510,7 +537,11 @@
       "fleetSize": "حجم الأسطول:",
       "vehiclesActive": "{{count}} مركبة نشطة",
       "specialty": "التخصص:",
-      "viewFleet": "عرض أسطول الوكالة"
+      "viewFleet": "عرض أسطول الوكالة",
+      "empty": {
+        "title": "جاري إضافة الشركاء الموثّقين",
+        "desc": "تكمل شركات التأجير اعتمادها. ستظهر هنا المشغّلون المعتمدون."
+      }
     },
     "standards": {
       "eyebrow": "معايير لا تتزعزع",
@@ -631,22 +662,34 @@
       "tripoli": {
         "badge": "المركز الرئيسي",
         "subtitle": "مطار معيتيقة MJI ومرسى حي الأندلس",
-        "features": ["استلام من صالة VIP", "مرافقة مدرعة متاحة"]
+        "features": [
+          "استلام من صالة VIP",
+          "مرافقة مدرعة متاحة"
+        ]
       },
       "benghazi": {
         "badge": "المركز الشرقي",
         "subtitle": "مطار بنينا BEN والمركز التجاري للمدينة",
-        "features": ["توصيل مباشر للفندق", "حسابات مؤسسية"]
+        "features": [
+          "توصيل مباشر للفندق",
+          "حسابات مؤسسية"
+        ]
       },
       "misrata": {
         "badge": "ممر تجاري",
         "subtitle": "المنطقة الحرة التجارية ومركز لوجستيات الميناء",
-        "features": ["دفع رباعي ثقيل وشاحنات", "سيدان تنفيذية"]
+        "features": [
+          "دفع رباعي ثقيل وشاحنات",
+          "سيدان تنفيذية"
+        ]
       },
       "sabha": {
         "badge": "بوابة الصحراء",
         "subtitle": "بوابة الجنوب الصحراوي وقاعدة الاستكشاف",
-        "features": ["تجهيز رحلات صحراوية", "تتبع بالأقمار الصناعية"]
+        "features": [
+          "تجهيز رحلات صحراوية",
+          "تتبع بالأقمار الصناعية"
+        ]
       }
     },
     "regionFeatures": {
@@ -681,14 +724,16 @@
       "alSafwa": "تنفيذية ومدرعة",
       "sahary": "دفع رباعي صحراوي وشاحنات",
       "madina": "اقتصادية يومية وسيدان",
-      "apex": "سيارات خارقة وسيارات GT"
+      "apex": "سيارات خارقة وسيارات GT",
+      "generic": "شريك تأجير مرخّص"
     },
     "trendingSpecs": {
       "trans": "ناقل الحركة",
       "seats": "مقاعد",
       "power": "القوة",
       "drive": "الدفع",
-      "engine": "المحرك"
+      "engine": "المحرك",
+      "fuel": "الوقود"
     }
   },
   "fleet": {
@@ -1388,5 +1433,507 @@
     "alreadyPaidTitle": "تم دفع الحجز بالفعل",
     "alreadyPaidDesc": "تمت تسوية هذا الحجز مسبقاً. شاهد تأكيد الحجز أدناه.",
     "viewConfirmation": "عرض تأكيد الحجز"
+  },
+  "admin": {
+    "layout": {
+      "hubSubtitle": "مركز العمليات",
+      "liveSuffix": "مباشر",
+      "navOverview": "نظرة عامة",
+      "navBookings": "الحجوزات",
+      "navCompanies": "الشركات",
+      "navVehicles": "المركبات",
+      "navCustomers": "العملاء",
+      "navPayments": "المدفوعات",
+      "navCommissions": "العمولات والمدفوعات",
+      "navMaintenance": "الصيانة",
+      "navReports": "التقارير",
+      "navSettings": "الإعدادات",
+      "soon": "قريباً",
+      "operationsRole": "عمليات المقر الرئيسي",
+      "logoutTitle": "تسجيل خروج سريع",
+      "allHubs": "جميع المراكز",
+      "dispatch": "التوزيع",
+      "dispatchSuffix": "توزيع مباشر",
+      "searchPlaceholder": "ابحث في الحجوزات، مشكلات الخدمة، أرقام الأسطول...",
+      "hubLabel": "المركز",
+      "currency": "العملة",
+      "notifications": "الإشعارات",
+      "account": "الحساب"
+    },
+    "status": {
+      "PENDING_PAYMENT": "بانتظار الدفع",
+      "PAID": "مدفوع",
+      "CONFIRMED": "مؤكد",
+      "ACTIVE": "نشط",
+      "COMPLETED": "مكتمل",
+      "CANCELLED": "ملغى",
+      "EXPIRED": "منتهي",
+      "UNPAID": "غير مدفوع",
+      "REFUNDED": "مسترجع",
+      "PARTIALLY_REFUNDED": "استرداد جزئي",
+      "UNSETTLED": "غير مُسوّى",
+      "PROCESSING": "قيد المعالجة",
+      "SETTLED": "مُسوّى",
+      "PENDING": "قيد الانتظار",
+      "APPROVED": "معتمد",
+      "SUSPENDED": "معلق",
+      "REJECTED": "مرفوض",
+      "PUBLISHED": "منشورة",
+      "DRAFT": "مسودة",
+      "AVAILABLE": "متاحة",
+      "MAINTENANCE": "قيد الصيانة",
+      "UNAVAILABLE": "غير متاحة"
+    },
+    "kpis": {
+      "bookingsToday": "حجوزات اليوم",
+      "noBaseline": "لا توجد فترة سابقة",
+      "confirmedActive": "{{confirmed}} مؤكد • {{active}} نشط",
+      "activeRentals": "الإيجارات النشطة",
+      "onRoad": "على الطريق",
+      "availableFleet": "الأسطول المتاح",
+      "readyFleet": "سيارة جاهزة",
+      "inMaintenance": "قيد الصيانة",
+      "quarantined": "وحدة محتجزة",
+      "revenueToday": "إيرادات اليوم",
+      "revenueNet": "الصافي: {{value}} ل.د",
+      "pendingPayouts": "مدفوعات معلّقة",
+      "payoutPartners": "{{count}} شريك أسطول"
+    },
+    "chart": {
+      "title": "ديناميكيات التوزيع",
+      "subtitle": "الطلبات اللحظية عبر المراكز",
+      "toggleBookings": "الحجوزات",
+      "toggleRevenue": "الإيرادات (ل.د)",
+      "totalBookings": "{{count}} حجز في النطاق",
+      "totalRevenue": "{{value}} ل.د إيرادات",
+      "empty": "لا توجد حركة في هذه الفترة",
+      "saturation": "إشغال المراكز",
+      "noFleet": "لا توجد مركبات",
+      "updated": "آخر تحديث للقياسات"
+    },
+    "feed": {
+      "title": "تغذية العمليات اللحظية",
+      "actionItems": "{{count}} عنصر إجراء",
+      "emptyTitle": "لا يوجد ما يُفعَّل",
+      "emptyBody": "كل شيء هادئ الآن — ستظهر التنبيهات هنا",
+      "reviewDossier": "مراجعة الملف",
+      "verifyVin": "التحقق من الشاصي",
+      "schedule": "جدولة",
+      "justNow": "الآن",
+      "minutesAgo": "قبل {{count}} دقيقة",
+      "hoursAgo": "قبل {{count}} ساعة",
+      "daysAgo": "قبل {{count}} يوم",
+      "openLog": "فتح سجل الحجوزات الكامل"
+    },
+    "table": {
+      "recentTitle": "أحدث حجوزات العمليات",
+      "recentSubtitle": "تتبّع المعاملات المباشرة عبر المراكز",
+      "unitBadge": "{{count}} وحدة نشطة",
+      "bookingVehicle": "الحجز والمركبة",
+      "client": "العميل / الحساب",
+      "provider": "مزود الأسطول",
+      "pickup": "الاستلام",
+      "settlement": "التسوية",
+      "status": "الحالة",
+      "actions": "إجراءات",
+      "view": "عرض",
+      "days": "{{count}} يوم",
+      "showingOf": "عرض {{shown}} من {{total}} حجز",
+      "prev": "السابق",
+      "next": "التالي",
+      "empty": "لا توجد حجوزات ضمن النطاق الحالي. عدّل الفلاتر أو حدّث البيانات."
+    },
+    "overview": {
+      "command": "قيادة العمليات",
+      "grid": "شبكة التليمترية الإقليمية",
+      "title": "عمليات نيكس رايد",
+      "subtitle": "راقب نشاط السوق وأدر عمليات اليوم عبر جميع المراكز.",
+      "period": {
+        "today": "اليوم",
+        "7d": "7 أيام",
+        "30d": "30 يوم",
+        "custom": "مخصص",
+        "customFrom": "من تاريخ",
+        "customTo": "إلى تاريخ"
+      },
+      "refresh": "تحديث القياسات",
+      "export": "تصدير التقرير",
+      "loadError": "تعذّر تحميل بيانات العمليات. تأكد من تشغيل الخادم وحاول مرة أخرى.",
+      "retry": "إعادة المحاولة"
+    },
+    "bookings": {
+      "command": "سجل الحجوزات",
+      "grid": "تتبع التوزيع",
+      "title": "حجوزات العمليات",
+      "subtitle": "كل حجوزات الأسواق عبر المراكز.",
+      "count": "{{count}} حجز",
+      "refresh": "تحديث",
+      "export": "تصدير CSV",
+      "searchPlaceholder": "ابحث بالمعرّف، العميل، السيارة...",
+      "statusFilter": "تصفية الحالة",
+      "allStatuses": "كل الحالات",
+      "companyFilter": "تصفية الشركة",
+      "allCompanies": "كل الشركات",
+      "loadError": "تعذّر تحميل الحجوزات.",
+      "retry": "إعادة المحاولة",
+      "empty": "لا توجد حجوزات مطابقة. جرّب تعديل البحث أو الفلاتر."
+    },
+    "fleet": {
+      "command": "قيادة الأسطول",
+      "grid": "سجل المركبات",
+      "title": "إدارة الأسطول والمركبات",
+      "subtitle": "راقب ودقّق ونظّم أساطيل المركبات المعتمدة عبر شركات التأجير المسجّلة.",
+      "count": "{{count}} مركبة مسجلة",
+      "refresh": "تحديث الأسطول",
+      "export": "تصدير الأسطول CSV",
+      "searchPlaceholder": "ابحث بالعلامة، الطراز، الفرع، المركز...",
+      "primeAll": "كل المركبات",
+      "primeAvailable": "متاحة",
+      "primeMaintenance": "قيد الصيانة",
+      "primeUnavailable": "غير متاحة",
+      "filterCompany": "مشغّل التأجير",
+      "filterCompanyAll": "كل المشغّلين ({{count}})",
+      "filterStatus": "الحالة التشغيلية للأسطول",
+      "filterStatusAll": "كل الحالات التشغيلية",
+      "filterClass": "تصنيف المركبة",
+      "filterClassAll": "كل تصنيفات المركبات",
+      "filterHub": "مركز التوزيع",
+      "filterHubAll": "كل مراكز التوزيع",
+      "clearFilters": "مسح الفلاتر",
+      "empty": "لا توجد مركبات مطابقة. جرّب تعديل البحث أو الفلاتر.",
+      "sort": "ترتيب حسب:",
+      "sortByCreated": "الأحدث تسجيلاً",
+      "sortByPriceLow": "السعر (الأدنى أولاً)",
+      "sortByPriceHigh": "السعر (الأعلى أولاً)",
+      "sortByName": "الاسم",
+      "table": {
+        "registered": "الأسطول المسجّل النشط",
+        "records": "{{count}} سجل",
+        "vehicle": "المركبة",
+        "branch": "الفرع والمركز",
+        "partner": "الشريك المشغّل",
+        "rate": "السعر (ل.د)",
+        "status": "الحالة",
+        "assignment": "التكليف / التجهيز",
+        "specs": "المواصفات",
+        "actions": "إجراءات",
+        "inspect": "فحص",
+        "showingOf": "عرض {{shown}} من {{total}} مركبة مسجلة",
+        "perDay": "/يوم",
+        "seats": "{{count}} مقاعد",
+        "doors": "{{count}} أبواب",
+        "departsOn": "تبدأ في {{date}}",
+        "stagedAt": "تجهيز في {{place}}"
+      },
+      "class": {
+        "SEDAN": "سيدان تنفيذية",
+        "SUV": "دفع رباعي فاخر",
+        "LUXURY": "سيارة فيّ اي بي",
+        "VAN": "فان وحافلة موكب",
+        "HATCHBACK": "هاتشباك المدينة",
+        "PICKUP": "بيك أب أسطول"
+      },
+      "kpis": {
+        "totalFleet": "إجمالي الأسطول",
+        "vehicles": "مركبات",
+        "availableActive": "{{count}} متاحة",
+        "unavailableCount": "{{count}} غير متاحة",
+        "activeRentals": "إيجارات جارية",
+        "active": "نشط",
+        "utilization": "{{pct}}% معدل استغلال الأسطول",
+        "readyDepots": "جاهزة في المراكز",
+        "available": "متاحة",
+        "atHub": "{{count}} في {{hub}}",
+        "maintenance": "منصّة الصيانة",
+        "inService": "قيد الخدمة",
+        "scheduled": "{{count}} مجدولة",
+        "grounded": "{{count}} موقوفة",
+        "listings": "قوائم الأسطول",
+        "published": "منشورة",
+        "drafts": "{{count}} مسودة",
+        "suspended": "{{count}} معلّقة"
+      },
+      "drawer": {
+        "title": "ملف المركبة وسجل التدقيق",
+        "syncedLive": "بيانات مباشرة",
+        "ref": "المرجع: {{ref}}",
+        "reservedOn": "مستَبقة على {{ref}}",
+        "listingStatus": "القائمة {{status}}",
+        "specsTitle": "المواصفات المسجلة",
+        "ratingSub": "{{count}} تقييم",
+        "typeTile": "التصنيف",
+        "yearTile": "سنة الطراز",
+        "doorsTile": "الأبواب",
+        "partnerTitle": "الامتياز والشهادة",
+        "partnerCity": "شريك • {{city}}",
+        "approvedOperator": "مشغّل معتمد",
+        "historyTitle": "أحدث حجوزات الأسطول",
+        "totalEarned": "إجمالي {{value}} ل.د مكتسبة",
+        "current": "(الحالي)",
+        "days": "{{count}} يوم",
+        "reservedNow": "مستبقى الآن",
+        "completed": "مكتمل",
+        "noBookings": "لا توجد حجوزات مسجلة",
+        "actionsTitle": "إجراءات سريعة",
+        "openDossier": "فتح ملف الحجز الأخير",
+        "openLedger": "فتح سجل الحجوزات",
+        "downloadCsv": "تنزيل سجل التدقيق CSV"
+      },
+      "compliance": {
+        "title": "الامتثال التشغيلي للأسطول",
+        "body": "تُجهَّز المركبات فقط من مراكز المشغّلين الموثوقين، ويُتحقق من كل قائمة مع صاحب الامتياز قبل السماح بتأجيرها."
+      }
+    },
+    "drawer": {
+      "title": "تفاصيل الحجز",
+      "created": "تم الإنشاء {{date}}",
+      "close": "إغلاق",
+      "seats": "{{count}} مقاعد",
+      "perDay": "/اليوم",
+      "client": "العميل",
+      "provider": "مزود الأسطول",
+      "trip": "الرحلة",
+      "settlement": "التسوية المالية",
+      "unknown": "غير معروف",
+      "duration": "{{count}} يوم",
+      "rentalPrice": "سعر الإيجار",
+      "discount": "الخصم",
+      "commission": "عمولة نيكس رايد",
+      "companyShare": "حصة الشركة",
+      "total": "الإجمالي"
+    },
+    "detail": {
+      "bookingTitle": "الحجز",
+      "bookedOn": "تم الحجز {{date}}",
+      "backToLedger": "العودة إلى الحجوزات",
+      "refresh": "تحديث",
+      "downloadCsv": "تنزيل CSV",
+      "notFoundTitle": "الحجز غير موجود",
+      "notFoundBody": "تعذر تحميل هذا الحجز من السجل. ربما تمت إزالته.",
+      "badgeActive": "تفعيل مباشر",
+      "badgePaid": "الدفع مؤمَّن",
+      "badgeApproved": "مشغِّل معتمد",
+      "badgeCustomer": "عميل",
+      "timelineTitle": "المسار التشغيلي",
+      "timelineSubtitle": "دورة الحياة المستمدة من سجلات الحجز والدفع الحقيقية",
+      "stepProgress": "الخطوة {{current}} من {{total}} قيد التنفيذ",
+      "stepComplete": "اكتملت {{total}} خطوة",
+      "stepCreated": "تم إنشاء الحجز",
+      "stepPaymentPending": "الدفع قيد الانتظار",
+      "stepPaid": "تم تفويض الدفع",
+      "stepTrip": "فتحت نافذة الرحلة",
+      "stepReturn": "موعد الإرجاع",
+      "stepClosed": "تم إغلاق الحجز",
+      "stepClosedMeta": "حالة نهائية",
+      "awaitingPayment": "بانتظار تسوية البوابة",
+      "activeNow": "نشط الآن",
+      "refunded": "استُرد المبلغ",
+      "vehicleUnit": "مركبة الأسطول",
+      "specClass": "الفئة",
+      "specTransmission": "ناقل الحركة",
+      "specFuel": "الوقود",
+      "specSeats": "المقاعد",
+      "seatsCount": "{{count}} مقاعد",
+      "specCity": "المركز",
+      "specRate": "السعر اليومي",
+      "specRating": "التقييم",
+      "specDoors": "الأبواب",
+      "dailyRate": "{{value}} دينار",
+      "customerTitle": "ملف العميل",
+      "tripTitle": "بروتوكول الرحلة",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "tripDates": "مدة الرحلة",
+      "pickupProtocol": "طريقة الاستلام",
+      "pickupFrom": "موقع الاستلام",
+      "rentalPeriod": "نافذة الإيجار",
+      "duration": "{{count}} يوم",
+      "financialTitle": "التسوية المالية",
+      "grossLabel": "الإجمالي المحتسب على العميل",
+      "paidOn": "تمت المعالجة {{date}}",
+      "invoiceTitle": "فاتورة العميل",
+      "baseRental": "الإيجار الأساسي ({{days}} يوم بسعر {{rate}} دينار/يوم)",
+      "splitTitle": "توزيع السوق",
+      "feeLabel": "رسوم نيكس رايد ({{rate}}%)",
+      "feeDetail": "محتجزة في الضمان الرئيسي",
+      "partnerLabel": "صافي دفع الشريك",
+      "pendingSettlement": "بانتظار التسوية",
+      "paymentMethod": "وسيلة الدفع",
+      "snapshotTitle": "لمحة تشغيلية",
+      "createdOn": "تاريخ الإنشاء",
+      "updatedOn": "آخر تحديث",
+      "hubLabel": "المركز",
+      "protocol": "البروتوكول",
+      "ledger": "سجل الدفعات",
+      "totalLiabilities": "إجمالي الالتزامات",
+      "pickup": {
+        "BRANCH_PICKUP": "استلام من الفرع",
+        "DELIVERY": "توصيل بسائق"
+      }
+    },
+    "companies": {
+      "command": "حوكمة الشركاء",
+      "grid": "سجل الامتثال",
+      "title": "الشركات المؤجِّرة ومشغِّلو الأساطيل",
+      "subtitle": "التحقق من بيانات الشركات، ومدفوعات الضمان، وجودة الأسطول لدى الشركاء الليبيين المسجّلين.",
+      "count": "{{count}} شريك",
+      "refresh": "تحديث السجل",
+      "export": "تصدير سجل المشغّلين (CSV)",
+      "alert": {
+        "title": "موافقات معلّقة ومراجعة تنظيمية",
+        "body": "فحوصات الشركات والتحقق التنظيمي بانتظار مراجعة مشغّل المنصة.",
+        "requiringAction": "{{count}} يتطلب إجراء",
+        "submittedVehicles": "{{count}} مركبة مقدَّمة",
+        "approvalPending": "الموافقة معلّقة",
+        "reject": "رفض",
+        "review": "مراجعة الملف",
+        "approve": "اعتماد الشريك"
+      },
+      "kpis": {
+        "registered": "الشركات المسجّلة",
+        "partners": "شريك",
+        "approvedCount": "{{count}} معتمد",
+        "pendingCount": "{{count}} قيد الانتظار",
+        "suspendedCount": "{{count}} معلّق",
+        "rejectedCount": "{{count}} مرفوض",
+        "fleet": "الأسطول المُدار",
+        "vehicles": "مركبة",
+        "addedThisMonth": "+{{count}} مركبة هذا الشهر",
+        "addedThisMonthNone": "لا مركبات جديدة هذا الشهر",
+        "dispatches": "إجمالي نطاق المنصة",
+        "lyd": "د.ل",
+        "delta": "{{pct}}%",
+        "vsLastMonth": "مقارنة بدورة الثلاثين يوماً السابقة",
+        "vsLastMonthNone": "لا دورة سابقة",
+        "commission": "العمولة المحتجزة",
+        "commissionSub": "حصة المنصة كما هي",
+        "escrow": "مدفوعات الضمان المعلّقة",
+        "escrowSub": "{{count}} سجل غير مُسوّى",
+        "escrowSubNone": "الضمان مُسوّى بالكامل"
+      },
+      "searchPlaceholder": "ابحث باسم الشركة أو المدينة أو العنوان أو البريد...",
+      "filterStatus": "الحالة",
+      "filterStatusAll": "كل الحالات ({{count}})",
+      "filterHub": "المركز",
+      "filterHubAll": "كل المناطق (ليبيا)",
+      "clearFilters": "مسح عوامل التصفية",
+      "table": {
+        "title": "إدارة الشركات الرئيسية",
+        "records": "{{count}} سجل",
+        "showingOf": "عرض {{shown}} من {{total}} شريك أسطول",
+        "empty": "لا توجد شركات مطابقة. جرّب تعديل البحث أو عوامل التصفية.",
+        "company": "الشركة",
+        "contact": "جهة الاتصال",
+        "fleetSize": "حجم الأسطول",
+        "activeBookings": "الحجوزات النشطة",
+        "financials": "المالية (30 يوم)",
+        "escrow": "الضمان المعلّق",
+        "registration": "التسجيل",
+        "status": "الحالة",
+        "actions": "إجراءات",
+        "review": "مراجعة",
+        "open": "فتح",
+        "vehicles": "مركبات",
+        "ready": "{{count}} جاهزة",
+        "inShop": "{{count}} في الصيانة",
+        "occupancy": "إشغال {{pct}}%",
+        "none": "—",
+        "commissionLine": "نيكسرايد ({{rate}}%): {{amount}} د.ل",
+        "escrowReady": "جاهزة للدفعة",
+        "escrowNone": "لا رصيد معلّق",
+        "partnerSince": "شريك منذ {{count}} يوم",
+        "partnerMonths": "شريك منذ {{count}} شهر",
+        "partnerYears": "شريك منذ {{count}} سنة",
+        "noFleet": "لا مركبات بعد",
+        "noBooking": "لا حجوزات بعد",
+        "noDispatches": "لا عمليات بعد"
+      },
+      "dossier": {
+        "underReview": "قيد المراجعة",
+        "approved": "شريك معتمد",
+        "suspended": "معلّق",
+        "rejected": "مرفوض",
+        "verified": "مشغّل أسطول مسجّل",
+        "taglineFallback": "مشغّل أسطول مسجّل في سوق نيكسرايد.",
+        "tabOverview": "نظرة عامة والاعتمادات",
+        "tabVehicles": "المركبات",
+        "tabBookings": "الحجوزات",
+        "tabEscrow": "مدفوعات الضمان",
+        "approve": "اعتماد الشريك",
+        "reject": "رفض",
+        "suspend": "تعليق",
+        "reactivate": "إعادة تفعيل",
+        "saving": "جارٍ الحفظ...",
+        "approveHint": "الاعتماد ينشر هذا الشريك كمشغّل موثوق.",
+        "mutationError": "تعذّر تحديث حالة الشريك. حاول مرة أخرى.",
+        "creds": {
+          "title": "الهوية المؤسسية",
+          "storefront": "الواجهة",
+          "city": "المدينة",
+          "rate": "نسبة العمولة",
+          "rateDefault": "افتراضي المنصة",
+          "rateValue": "{{rate}}%",
+          "founded": "مسجّلة في",
+          "hq": "المقرّ والمستودع",
+          "address": "عنوان المستودع",
+          "contact": "جهة الاتصال",
+          "email": "البريد التجاري",
+          "phone": "الهاتف المباشر",
+          "settlement": "العمولة ومسار التسوية",
+          "settled": "مُسوّى (صافي للشريك)",
+          "settledCount": "{{count}} سجل مُسوّى",
+          "open": "تسوية معلّقة (ضمان)",
+          "openCount": "{{count}} سجل غير مُسوّى",
+          "channels": "قنوات الدفع المقبولة: {{channels}}"
+        },
+        "kpis": {
+          "trips": "إجمالي الرحلات مدى الحياة",
+          "completion": "إكمال {{pct}}%",
+          "noTrips": "لا رحلات مكتملة",
+          "fleet": "إشغال الأسطول",
+          "deployed": "{{ready}} من {{total}} منشورة",
+          "rating": "تقييم العملاء",
+          "ratingNone": "لا تقييمات بعد",
+          "ratingCount": "{{count}} تقييم",
+          "escrow": "مدفوعات الضمان القادمة",
+          "escrowDue": "{{count}} سجل غير مُسوّى"
+        },
+        "dispatches": {
+          "title": "الأسطول المسجّل (سجل مباشر)",
+          "viewBookings": "عرض كل الرحلات",
+          "noVehicles": "لا مركبات مسجّلة لهذا الشريك بعد."
+        },
+        "vehiclesTitle": "الأسطول المسجّل",
+        "vehiclesEmpty": "لا مركبات مسجّلة بعد.",
+        "bookingsTitle": "الحجوزات والرحلات",
+        "bookingsSubtitle": "{{active}} نشطة • {{total}} إجمالي",
+        "bookingsEmpty": "لا حجوزات لهذا الشريك.",
+        "ledgerTitle": "سجل تسوية الضمان",
+        "ledgerSubtitle": "سجلات الدفع الحقيقية لهذا الشريك",
+        "ledgerEmpty": "لا مدفوعات لهذا الشريك.",
+        "ledger": {
+          "record": "الدفعة / السجل",
+          "amount": "الإجمالي",
+          "rate": "العمولة",
+          "net": "صافي الشريك",
+          "status": "الحالة",
+          "ref": "#{{ref}}",
+          "paidAt": "مدفوعة {{date}}",
+          "cash": "دفع عند الاستلام",
+          "moamalat": "معاملات",
+          "localCard": "بطاقة محلية",
+          "stripe": "سترايب",
+          "wallet": "محفظة",
+          "unknownMethod": "طريقة غير معروفة"
+        },
+        "bookingRow": {
+          "ref": "#{{ref}}",
+          "vehicle": "{{vehicle}}",
+          "customer": "{{customer}}",
+          "days": "{{count}} يوم",
+          "amount": "{{amount}} د.ل"
+        }
+      }
+    }
   }
 }

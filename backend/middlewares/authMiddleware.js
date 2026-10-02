@@ -44,6 +44,10 @@ export const protect = catchAsync(async (req, res, next) => {
     );
   }
 
+  // Legacy/seed data can store roles with surrounding whitespace (e.g.
+  // "admin\n"). Normalize once here so every role check downstream works.
+  currentUser.role = String(currentUser.role ?? "").trim();
+
   req.user = currentUser;
   req.tenantId = currentUser.company ? currentUser.company.toString() : null;
 

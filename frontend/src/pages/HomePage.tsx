@@ -1,3 +1,4 @@
+import { useHomeData } from "../hooks/useHomeData";
 import { Hero } from "../components/home/Hero";
 import { VehicleCategories } from "../components/home/VehicleCatigories";
 import { TrendingRentals } from "../components/home/TrendingRentals";
@@ -9,15 +10,39 @@ import { UncompromisingStandards } from "../components/home/UncompromisingStanda
 import { ReadyToHitTheRoad } from "../components/layouts/ReadyToHitTheRoad";
 
 export const HomePage: React.FC = () => {
+  const home = useHomeData();
+
   return (
     <>
       <Hero />
-      <VehicleCategories />
-      <TrendingRentals />
-      <NationwidePresence />
+      <VehicleCategories
+        categories={home.categories}
+        loading={home.loading}
+        error={home.error}
+        onRetry={home.reload}
+      />
+      <TrendingRentals
+        cars={home.trending}
+        types={home.types}
+        totalAvailable={home.totalAvailable}
+        loading={home.loading}
+        error={home.error}
+        onRetry={home.reload}
+      />
+      <NationwidePresence
+        hubs={home.regions}
+        loading={home.loading}
+        error={home.error}
+        onRetry={home.reload}
+      />
       <HowItWorks />
       <PartnerSection />
-      <TrustedOperators />
+      <TrustedOperators
+        operators={home.operators}
+        loading={home.loading}
+        error={home.error}
+        onRetry={home.reload}
+      />
       <UncompromisingStandards />
       <ReadyToHitTheRoad />
     </>

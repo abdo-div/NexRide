@@ -2,10 +2,25 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { RegionCard } from "./RegionCard";
 import { RegionFeaturesBanner } from "./RegionFeaturesBanner";
-import { REGION_HUBS } from "../../data/regionData";
+import { HomeSectionError } from "./HomeSectionError";
+import type { RegionHub } from "../../types/region";
 
-export const NationwidePresence: React.FC = () => {
+interface NationwidePresenceProps {
+  hubs: RegionHub[];
+  loading: boolean;
+  error: string | null;
+  onRetry: () => void;
+}
+
+export const NationwidePresence: React.FC<NationwidePresenceProps> = ({
+  hubs,
+  loading,
+  error,
+  onRetry,
+}) => {
   const { t } = useTranslation();
+  const showError = error !== null && !loading;
+
   return (
     <section className="w-full py-20 px-6 lg:px-12 bg-[#030712] text-white border-b border-slate-900">
       {/* Section Header */}
@@ -22,11 +37,24 @@ export const NationwidePresence: React.FC = () => {
       </div>
 
       {/* Region Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {REGION_HUBS.map((hub) => (
-          <RegionCard key={hub.id} hub={hub} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="rounded-2xl border border-slate-800 h-[220px] bg-slate-800/40 animate-pulse"
+            />
+          ))}
+        </div>
+      ) : showError ? (
+        <HomeSectionError onRetry={onRetry} />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {hubs.map((hub) => (
+            <RegionCard key={hub.id} hub={hub} />
+          ))}
+        </div>
+      )}
 
       {/* Bottom Features Banner */}
       <RegionFeaturesBanner />
