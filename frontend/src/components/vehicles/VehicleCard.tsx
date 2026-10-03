@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Heart, Star, Gauge, Armchair, Settings, Fuel, CheckCircle2 } from "lucide-react";
 import type { Vehicle } from "../../types/vehicle";
+import { VehicleImage } from "../VehicleImage";
 
 const SPEC_META: {
   key: keyof Vehicle["specs"];
@@ -38,7 +39,7 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
   return (
     <article className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition-all flex flex-col xl:flex-row group">
       <div className="xl:w-2/5 relative h-64 xl:h-auto overflow-hidden bg-slate-100">
-        <img
+        <VehicleImage
           src={vehicle.image}
           alt={vehicle.title}
           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"

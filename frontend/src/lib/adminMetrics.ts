@@ -3,7 +3,12 @@ import type {
   BookingDto,
 } from "../types/booking";
 import type { VehicleDto } from "../types/vehicle";
-import type { AdminCompanyDto, AdminOverviewData } from "../types/admin";
+import type {
+  AdminCompanyDto,
+  AdminCustomerDto,
+  AdminPaymentDto,
+  AdminOverviewData,
+} from "../types/admin";
 
 // -----------------------------------------------------------------------------
 // Period handling
@@ -449,4 +454,163 @@ export const companiesCsv = (
     "\uFEFF" +
     [header, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\r\n")
   );
+};
+
+/**
+ * CSV export of the real registered renter accounts, enriched with derived
+ * activity: booking counts and lifetime spend from the booking/payment ledgers.
+ */
+export const customersCsv = (
+  customers: AdminCustomerDto[],
+  bookings: BookingDto[],
+  payments: AdminPaymentDto[],
+): string => {
+  const countBy = (list: BookingDto[]): Map<string, number> => {
+    const map = new Map<string, number>();
+    list.forEach((b) => {
+      const id =
+        typeof b.customerId === "object" ? b.customerId?._id ?? "" : (b.customerId ?? "");
+      map.set(id, (map.get(id) ?? 0) + 1);
+    });
+    return map;
+  };
+  const bookCounts = countBy(bookings);
+  const activeBookings = bookings.filter((b) =>
+    (["PAID", "CONFIRMED", "ACTIVE"] as readonly string[]).includes(b.bookingStatus),
+  );
+  const activeCounts = countBy(activeBookings);
+  const spendBy = new Map<string, number>();
+  payments
+    .filter((p) => p.status === "COMPLETED")
+    .forEach((p) => {
+      const id =
+        typeof p.customerId === "object"
+          ? p.customerId?._id ?? ""
+          : (p.customerId ?? "");
+      spendBy.set(id, (spendBy.get(id) ?? 0) + p.amount);
+    });
+
+  const header = [
+    "Name",
+    "Email",
+    "Phone",
+    "Account Status",
+    "Total Bookings",
+    "Active Bookings",
+    "Lifetime Spend (LYD)",
+    "Channels",
+    "Registered",
+  ];
+  const rows = customers.map((c) => [
+    c.name,
+    c.email,
+    c.phoneNumber ?? "",
+    c.status ?? "ACTIVE",
+    bookCounts.get(c._id) ?? 0,
+    activeCounts.get(c._id) ?? 0,
+    Math.round(spendBy.get(c._id) ?? 0),
+    channelsLabel(payments, c),
+    c.createdAt ?? "",
+  ]);
+  return (
+    "\uFEFF" +
+    [header, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\r\n")
+  );
+};
+
+/**
+ * CSV export of the real payment ledger, enriched by joining the unpopulated
+ * refs against the renter registry, bookings and fleet companies.
+ */
+export const paymentsCsv = (
+  payments: AdminPaymentDto[],
+  bookings: BookingDto[],
+  customers: AdminCustomerDto[],
+  companies: AdminCompanyDto[],
+): string => {
+  const idOf = (value: unknown): string =>
+    typeof value === "object" && value
+      ? (value as { _id?: string })._id ?? ""
+      : ((value ?? "") as string);
+  const customerOf = (payment: AdminPaymentDto): AdminCustomerDto | undefined =>
+    customers.find((c) => c._id === idOf(payment.customerId));
+  const companyOf = (payment: AdminPaymentDto): AdminCompanyDto | undefined =>
+    companies.find((c) => c._id === idOf(payment.companyId));
+  const bookingOf = (payment: AdminPaymentDto): BookingDto | undefined =>
+    bookings.find((b) => b._id === idOf(payment.bookingId));
+
+  const header = [
+    "Transaction Ref",
+    "Merchant Reference",
+    "Transaction ID",
+    "Booking Ref",
+    "Vehicle",
+    "Customer",
+    "Customer Email",
+    "Company",
+    "Method",
+    "Gateway",
+    "Currency",
+    "Amount",
+    "Commission",
+    "Commission Rate (%)",
+    "Company Share",
+    "Status",
+    "Payout Status",
+    "Paid At",
+    "Created",
+  ];
+  const rows = payments.map((p) => {
+    const booking = bookingOf(p);
+    const vehicle =
+      typeof booking?.vehicleId === "object"
+        ? `${booking.vehicleId.make ?? ""} ${booking.vehicleId.model ?? ""}`.trim()
+        : "";
+    const customer = customerOf(p);
+    const company = companyOf(p);
+    return [
+      `#TRX-${p._id.slice(-6).toUpperCase()}`,
+      p.merchantReference ?? "",
+      p.transactionId ?? "",
+      booking ? `#NX-${booking._id.slice(-6).toUpperCase()}` : "",
+      vehicle,
+      customer?.name ?? "",
+      customer?.email ?? "",
+      company?.name ?? "",
+      p.paymentMethod ?? "",
+      p.paymentGateway ?? "",
+      p.currency ?? "LYD",
+      p.amount,
+      p.commissionAmount,
+      p.commissionRate,
+      p.companyShare,
+      p.status,
+      p.payoutStatus,
+      p.paidAt ?? "",
+      p.createdAt ?? "",
+    ];
+  });
+  return (
+    "\uFEFF" +
+    [header, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\r\n")
+  );
+};
+
+const channelsLabel = (
+  payments: AdminPaymentDto[],
+  customer: AdminCustomerDto,
+): string => {
+  const seen = new Set<string>();
+  payments
+    .filter((p) => {
+      const id =
+        typeof p.customerId === "object"
+          ? p.customerId?._id ?? ""
+          : (p.customerId ?? "");
+      return id === customer._id && p.status === "COMPLETED";
+    })
+    .forEach((p) => {
+      if (p.paymentMethod) seen.add(p.paymentMethod);
+    });
+  return Array.from(seen).join(" ");
 };

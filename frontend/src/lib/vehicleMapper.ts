@@ -71,7 +71,12 @@ export const initialsFrom = (name: string): string =>
 export const photoUrl = (photo: string | undefined): string => {
   if (!photo) return PLACEHOLDER_IMAGE;
   if (/^https?:\/\//i.test(photo)) return photo;
-  return `${API_ORIGIN}/vehicles/${photo}`;
+  const normalizedPath = photo.replace(/^\/+/, "");
+  if (/^(cars|vehicles)\//i.test(normalizedPath)) {
+    return `${API_ORIGIN}/${normalizedPath}`;
+  }
+  const directory = normalizedPath.startsWith("vehicle-") ? "vehicles" : "cars";
+  return `${API_ORIGIN}/${directory}/${encodeURIComponent(normalizedPath)}`;
 };
 
 const isCompanyRef = (

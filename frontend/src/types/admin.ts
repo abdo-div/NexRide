@@ -4,6 +4,24 @@ import type { VehicleDto } from "./vehicle";
 /** Company document as returned by the admin /companies listing. */
 export type CompanyStatus = "PENDING" | "APPROVED" | "SUSPENDED" | "REJECTED";
 
+/**
+ * Account lifecycle status used by the platform operator for renter accounts.
+ * Mirrors the User model enum (ACTIVE | SUSPENDED | BANNED).
+ */
+export type UserStatus = "ACTIVE" | "SUSPENDED" | "BANNED";
+
+export interface AdminCustomerDto {
+  _id: string;
+  name: string;
+  email: string;
+  phoneNumber?: string;
+  photo?: string;
+  role?: string;
+  status?: UserStatus;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface AdminCompanyDto {
   _id: string;
   ownerId?: string;
@@ -45,6 +63,10 @@ export interface AdminPaymentDto {
   commissionRate: number;
   companyShare: number;
   paymentMethod?: string;
+  /** Gateway fields surfaced by the ledger service (nullable on the schema). */
+  transactionId?: string | null;
+  paymentGateway?: string;
+  merchantReference?: string;
   status: PaymentLedgerStatus;
   payoutStatus: PayoutStatus;
   paidAt?: string | null;

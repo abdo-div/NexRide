@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-export type StatusKind = "booking" | "payment" | "payout" | "company" | "vehicle";
+export type StatusKind = "booking" | "payment" | "payout" | "company" | "vehicle" | "user";
 
 const BOOKING_STYLES: Record<string, string> = {
   PENDING_PAYMENT: "bg-amber-50 text-amber-800",
@@ -18,6 +18,10 @@ const PAYMENT_STYLES: Record<string, string> = {
   PAID: "bg-emerald-50 text-emerald-700",
   REFUNDED: "bg-amber-50 text-amber-800",
   PARTIALLY_REFUNDED: "bg-amber-50 text-amber-700",
+  // Ledger statuses (Payment.status) share the same pill.
+  PENDING: "bg-amber-50 text-amber-800",
+  COMPLETED: "bg-emerald-50 text-emerald-700",
+  FAILED: "bg-red-50 text-red-700",
 };
 
 const PAYOUT_STYLES: Record<string, string> = {
@@ -37,6 +41,12 @@ const VEHICLE_STYLES: Record<string, string> = {
   AVAILABLE: "bg-blue-50 text-blue-700",
   MAINTENANCE: "bg-amber-50 text-amber-800",
   UNAVAILABLE: "bg-rose-50 text-rose-700",
+};
+
+const USER_STYLES: Record<string, string> = {
+  ACTIVE: "bg-emerald-50 text-emerald-700",
+  SUSPENDED: "bg-red-50 text-red-700",
+  BANNED: "bg-rose-50 text-rose-700",
 };
 
 interface StatusPillProps {
@@ -63,20 +73,26 @@ export const StatusPill: React.FC<StatusPillProps> = ({
           ? PAYOUT_STYLES
           : kind === "company"
             ? COMPANY_STYLES
-            : VEHICLE_STYLES;
+            : kind === "user"
+              ? USER_STYLES
+              : VEHICLE_STYLES;
   const tone = pool[status] ?? "bg-slate-100 text-slate-500";
   const dotTone =
     kind === "booking"
       ? status === "ACTIVE"
         ? "bg-emerald-600"
         : "bg-slate-400"
-      : kind === "vehicle" && status === "AVAILABLE"
-        ? "bg-blue-500"
-        : kind === "vehicle" && status === "MAINTENANCE"
-          ? "bg-amber-500"
-          : kind === "vehicle" && status === "UNAVAILABLE"
-            ? "bg-rose-500"
-            : "bg-current";
+      : kind === "user"
+        ? status === "ACTIVE"
+          ? "bg-emerald-600"
+          : "bg-current"
+        : kind === "vehicle" && status === "AVAILABLE"
+          ? "bg-blue-500"
+          : kind === "vehicle" && status === "MAINTENANCE"
+            ? "bg-amber-500"
+            : kind === "vehicle" && status === "UNAVAILABLE"
+              ? "bg-rose-500"
+              : "bg-current";
 
   return (
     <span

@@ -2,6 +2,7 @@ import Vehicle from "../models/vehicle_model.js";
 import Booking from "../models/booking_model.js";
 import AppError from "../utils/appError.js";
 import APIFeatures from "../utils/APIFeatures.js";
+import { saveVehicleImage } from "../utils/vehicleImages.js";
 
 // A booking blocks a vehicle while it is paid or active on the customer's side.
 // PENDING_PAYMENT and EXPIRED reservations are excluded: they have no locked dates.
@@ -168,16 +169,11 @@ export const createVehicleListing = async (bodyData, files, tenantCompanyId) => 
 
   // File processing via sharp (if photos are uploaded)
   if (files && (files.imageCover || files.images)) {
-    const sharp = (await import("sharp")).default;
     const photoFilenames = [];
 
     if (files.imageCover) {
       const filename = `vehicle-${newVehicle._id}-${Date.now()}-cover.jpeg`;
-      await sharp(files.imageCover[0].buffer)
-        .resize(2000, 1333)
-        .toFormat("jpeg")
-        .jpeg({ quality: 90 })
-        .toFile(`public/vehicles/${filename}`);
+      await saveVehicleImage(files.imageCover[0].buffer, filename, 90);
       photoFilenames.push(filename);
     }
 
@@ -185,12 +181,7 @@ export const createVehicleListing = async (bodyData, files, tenantCompanyId) => 
       const gallery = await Promise.all(
         files.images.map(async (file, i) => {
           const filename = `vehicle-${newVehicle._id}-${Date.now()}-${i + 1}.jpeg`;
-          await sharp(file.buffer)
-            .resize(2000, 1333)
-            .toFormat("jpeg")
-            .jpeg({ quality: 85 })
-            .toFile(`public/vehicles/${filename}`);
-          return filename;
+          return saveVehicleImage(file.buffer, filename);
         })
       );
       photoFilenames.push(...gallery);
