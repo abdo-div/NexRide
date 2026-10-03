@@ -77,6 +77,15 @@ const userSchema = new mongoose.Schema(
     // -------------------------------------------------------------------------
     // Operational Flags
     // -------------------------------------------------------------------------
+    status: {
+      type: String,
+      enum: {
+        values: ["ACTIVE", "SUSPENDED", "BANNED"],
+        message: "Status must be ACTIVE, SUSPENDED, or BANNED",
+      },
+      default: "ACTIVE",
+      index: true,
+    },
     active: {
       type: Boolean,
       default: true,

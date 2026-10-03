@@ -3,8 +3,10 @@ import type { BookingDto } from "../types/booking";
 import type { VehicleDto } from "../types/vehicle";
 import type {
   AdminCompanyDto,
+  AdminCustomerDto,
   AdminPaymentDto,
   CompanyStatus,
+  UserStatus,
 } from "../types/admin";
 
 // -----------------------------------------------------------------------------
@@ -38,6 +40,17 @@ interface AdminCommissionsResponse {
   data: { payments: AdminPaymentDto[] };
 }
 
+/**
+ * Envelope returned by the shared user controller (userController.getAllUsers).
+ * NOTE: this route passes req.query straight into User.find(), so only real
+ * schema-field filters may be sent (e.g. role) — never limit/sort/page.
+ */
+interface AdminCustomersResponse {
+  status: string;
+  results: number;
+  data: { users: AdminCustomerDto[] };
+}
+
 /** The platform admin endpoints are JWT-gated (protect + restrictTo("admin")). */
 export const adminApi = {
   listBookings: (signal?: AbortSignal) =>
@@ -60,6 +73,24 @@ export const adminApi = {
     request<AdminCommissionsResponse>(
       `/admin/commissions?sort=-createdAt&limit=100`,
       { signal },
+    ),
+
+  /**
+   * Registered renter accounts (GET /api/v1/users?role=customer). No limit or
+   * sort is passed: the user service feeds req.query directly to User.find().
+   */
+  listCustomers: (signal?: AbortSignal) =>
+    request<AdminCustomersResponse>(`/users?role=customer`, { signal }),
+
+  /** Platform operator status transition for a renter account. */
+  updateUserStatus: (
+    id: string,
+    status: UserStatus,
+    signal?: AbortSignal,
+  ) =>
+    request<{ status: string; data: { user: AdminCustomerDto } }>(
+      `/users/${id}/status`,
+      { method: "PATCH", body: { status }, signal },
     ),
 
   /** Platform operator status transition (PENDING -> APPROVED/SUSPENDED/REJECTED). */

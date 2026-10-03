@@ -1,7 +1,7 @@
 import multer from "multer";
-import sharp from "sharp";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
+import { saveVehicleImage } from "../utils/vehicleImages.js";
 import * as vehicleService from "../services/vehicleService.js";
 
 // Multer Storage Configuration
@@ -27,31 +27,27 @@ export const uploadVehicleImages = upload.fields([
 export const resizeVehicleImages = catchAsync(async (req, res, next) => {
   if (!req.files) return next();
 
+  const photos = [];
+
   if (req.files.imageCover) {
-    req.body.imageCover = `vehicle-${req.params.id}-${Date.now()}-cover.jpeg`;
-    await sharp(req.files.imageCover[0].buffer)
-      .resize(2000, 1333)
-      .toFormat("jpeg")
-      .jpeg({ quality: 90 })
-      .toFile(`public/vehicles/${req.body.imageCover}`);
-  }
-
-  if (req.files.images) {
-    req.body.images = [];
-    await Promise.all(
-      req.files.images.map(async (file, i) => {
-        const filename = `vehicle-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
-        await sharp(file.buffer)
-          .resize(2000, 1333)
-          .toFormat("jpeg")
-          .jpeg({ quality: 85 })
-          .toFile(`public/vehicles/${filename}`);
-
-        req.body.images.push(filename);
-      })
+    const filename = `vehicle-${req.params.id}-${Date.now()}-cover.jpeg`;
+    photos.push(
+      await saveVehicleImage(req.files.imageCover[0].buffer, filename, 90),
     );
   }
 
+  if (req.files.images) {
+    photos.push(
+      ...(await Promise.all(
+        req.files.images.map(async (file, i) => {
+          const filename = `vehicle-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+          return saveVehicleImage(file.buffer, filename);
+        }),
+      )),
+    );
+  }
+
+  if (photos.length > 0) req.body.photos = photos;
   next();
 });
 

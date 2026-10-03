@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { ArrowRight, Armchair, Settings } from "lucide-react";
 import type { VehicleDetail } from "../../types/vehicleDetail";
+import { VehicleImage } from "../VehicleImage";
 
 export const SimilarVehicles: React.FC<{ detail: VehicleDetail }> = ({ detail }) => {
   const { t } = useTranslation();
@@ -35,7 +36,7 @@ export const SimilarVehicles: React.FC<{ detail: VehicleDetail }> = ({ detail })
             className="bg-white rounded-2xl overflow-hidden group shadow-sm border border-[#E2E8F0] hover:shadow-md hover:-translate-y-0.5 transition-all"
           >
             <div className="relative h-48 w-full overflow-hidden bg-slate-100">
-              <img
+              <VehicleImage
                 src={s.image}
                 alt={s.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

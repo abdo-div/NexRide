@@ -46,7 +46,9 @@ export const securityCors = cors({
 });
 
 // Helmet Security Headers
-export const securityHeaders = helmet();
+export const securityHeaders = helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+});
 // Prevent NoSQL Injection Queries ($gt, $ne, etc.)
 // Express 5 defines req.query as a getter-only prototype property, so the
 // package's default middleware (which reassigns req.query) throws. We reuse its

@@ -20,6 +20,8 @@ import { AdminBookingsPage } from "./pages/admin/AdminBookingsPage";
 import { AdminBookingDetailPage } from "./pages/admin/AdminBookingDetailPage";
 import { AdminFleetPage } from "./pages/admin/AdminFleetPage";
 import { AdminCompaniesPage } from "./pages/admin/AdminCompaniesPage";
+import { AdminCustomersPage } from "./pages/admin/AdminCustomersPage";
+import { AdminPaymentsPage } from "./pages/admin/AdminPaymentsPage";
 
 /**
  * Public site chrome: shared navbar on top and footer at the bottom. Admin
@@ -108,6 +110,8 @@ function App() {
             <Route path="bookings/:bookingId" element={<AdminBookingDetailPage />} />
             <Route path="companies" element={<AdminCompaniesPage />} />
             <Route path="vehicles" element={<AdminFleetPage />} />
+            <Route path="customers" element={<AdminCustomersPage />} />
+            <Route path="payments" element={<AdminPaymentsPage />} />
           </Route>
         </Routes>
       </AuthProvider>

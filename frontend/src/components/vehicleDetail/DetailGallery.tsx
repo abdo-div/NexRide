@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Camera, LayoutGrid } from "lucide-react";
 import type { VehicleDetail } from "../../types/vehicleDetail";
+import { VehicleImage } from "../VehicleImage";
 
 interface Props {
   detail: VehicleDetail;
@@ -18,7 +19,7 @@ export const DetailGallery: React.FC<Props> = ({ detail }) => {
     <section className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 mb-12">
       {master && (
         <div className="relative md:col-span-8 rounded-2xl overflow-hidden group shadow-sm border border-[#E2E8F0] bg-white min-h-[360px] md:min-h-[520px]">
-          <img
+          <VehicleImage
             src={master.src}
             alt={t(master.alt, { model: detail.vehicle.title })}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -53,7 +54,7 @@ export const DetailGallery: React.FC<Props> = ({ detail }) => {
             key={img.src}
             className="relative rounded-2xl overflow-hidden group shadow-sm border border-[#E2E8F0] bg-white h-[170px] md:h-[120px]"
           >
-            <img
+            <VehicleImage
               src={img.src}
               alt={t(img.alt, { model: detail.vehicle.title })}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
