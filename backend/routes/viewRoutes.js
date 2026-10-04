@@ -2,6 +2,7 @@ import express from "express";
 import Vehicle from "../models/vehicle_model.js";
 import catchAsync from "../utils/catchAsync.js";
 import { isLoggedIn, protect } from "../middlewares/authMiddleware.js";
+import { getPublicVehicleFilter } from "../services/vehicleService.js";
 
 const router = express.Router();
 
@@ -34,7 +35,9 @@ router.use(isLoggedIn);
 router.get(
   "/",
   catchAsync(async (req, res) => {
-    const rawCars = await Vehicle.find().limit(8).lean();
+    const rawCars = await Vehicle.find(await getPublicVehicleFilter())
+      .limit(8)
+      .lean();
     const cars = rawCars.map(mapCarForView);
     const availableCount = cars.filter((car) => car.available).length;
     res.status(200).render("overview", { cars, availableCount });
@@ -44,7 +47,7 @@ router.get(
 router.get(
   "/fleet",
   catchAsync(async (req, res) => {
-    const rawCars = await Vehicle.find().lean();
+    const rawCars = await Vehicle.find(await getPublicVehicleFilter()).lean();
     const cars = rawCars.map(mapCarForView);
     res.status(200).render("fleet", { cars });
   }),
@@ -53,7 +56,9 @@ router.get(
 router.get(
   "/car/:id",
   catchAsync(async (req, res) => {
-    const car = await Vehicle.findById(req.params.id).lean();
+    const car = await Vehicle.findOne(
+      await getPublicVehicleFilter(req.params.id),
+    ).lean();
     if (!car)
       return res.status(404).render("error", { msg: "Vehicle not found" });
     res.status(200).render("car", { car: mapCarForView(car) });

@@ -33,6 +33,12 @@ import {
   securityCors,
   sanitizeNoSQL,
 } from "./middlewares/security.middleware.js";
+import { protect, restrictTo } from "./middlewares/authMiddleware.js";
+import { validate } from "./middlewares/validate.middleware.js";
+import {
+  initiatePaymentSchema,
+  verifyPaymentSchema,
+} from "./validations/moamalat.validation.js";
 
 // ============================================
 // RATE LIMITING
@@ -164,8 +170,6 @@ app.use(
 
 app.use("/api/v1/bookings", idempotency(86400));
 
-app.use("/api/v1/payments", idempotency(86400));
-
 // ============================================
 // 12. API DOCUMENTATION
 // ============================================
@@ -189,8 +193,14 @@ app.use("/api/v1/vehicles", vehicleRouter);
 
 // Moamalat direct integration routes (manager specification)
 app.get("/api/config", getGatewayConfig);
-app.post("/api/payment/create", createPayment);
-app.post("/api/payment/verify", verifyPayment);
+app.post(
+  "/api/payment/create",
+  protect,
+  restrictTo("customer"),
+  validate(initiatePaymentSchema),
+  createPayment,
+);
+app.post("/api/payment/verify", validate(verifyPaymentSchema), verifyPayment);
 
 app.use("/api/v1/admin", adminRouter);
 

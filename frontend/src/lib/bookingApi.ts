@@ -13,7 +13,15 @@ interface AvailabilityResponse {
 
 interface BookingResponse {
   status: string;
-  data: { booking: BookingDto };
+  data: {
+    booking: BookingDto;
+    payment?: {
+      _id: string;
+      amount: number;
+      paymentMethod: "CASH_ON_DELIVERY";
+      status: "PENDING";
+    };
+  };
 }
 
 export interface MyBookingsResponse {
@@ -28,6 +36,7 @@ export interface CreateBookingPayload {
   endDate: string;
   pickupLocation?: string;
   pickupMethod?: "BRANCH_PICKUP" | "DELIVERY";
+  paymentMethod?: "CASH_ON_DELIVERY";
 }
 
 /**

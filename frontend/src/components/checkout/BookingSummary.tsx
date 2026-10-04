@@ -200,7 +200,9 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
                 <>
                   {tab === "card"
                     ? `Pay with Moamalat • ${totalLyd(totals.total)}`
-                    : t(meta.ctaIdle, { total: totalLyd(totals.total) })}
+                    : t("checkout.summary.cashConfirmCta", {
+                        total: totalLyd(totals.total),
+                      })}
                   <span aria-hidden className="inline-block rtl:rotate-180">
                     →
                   </span>

@@ -14,6 +14,7 @@ import {
   verifyTenantAccess,
 } from "../middlewares/authMiddleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
+import { idempotency } from "../middlewares/idempotence.middleware.js";
 import { processPaymentSchema } from "../validations/payment.validation.js";
 import { idParamSchema } from "../validations/common.validation.js";
 
@@ -32,6 +33,7 @@ router.post(
 // PROTECTED TRANSACTION ROUTES
 // -----------------------------------------------------------------------------
 router.use(protect);
+router.use(idempotency(86400));
 
 router.post(
   "/process",

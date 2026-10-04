@@ -8,6 +8,9 @@ import type {
   AdminCustomerDto,
   AdminPaymentDto,
   AdminOverviewData,
+  AdminPayoutRow,
+  MaintenanceEventDto,
+  ReportsSummary,
 } from "../types/admin";
 
 // -----------------------------------------------------------------------------
@@ -593,6 +596,271 @@ export const paymentsCsv = (
   return (
     "\uFEFF" +
     [header, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\r\n")
+  );
+};
+
+/**
+ * CSV export of the clearing ledger (one row per fleet operator settlement
+ * run), straight from the live /admin/payouts/ledger aggregation.
+ */
+export const payoutsCsv = (rows: AdminPayoutRow[]): string => {
+  const header = [
+    "Payout ID",
+    "Fleet Operator",
+    "Hub",
+    "Commission Rate (%)",
+    "Bookings",
+    "Gross GMV",
+    "NexRide Fee",
+    "Net Partner Share",
+    "Pending Payout",
+    "Processing",
+    "Settled",
+    "Adjustments",
+    "Status",
+    "Last Settlement",
+  ];
+  const data = rows.map((row) => [
+    `PO-${(row.companyId ?? "").slice(-6).toUpperCase()}`,
+    row.company?.name ?? "",
+    row.company?.city ?? "",
+    row.company?.customCommissionRate ?? "",
+    row.bookings,
+    Math.round(row.gross),
+    Math.round(row.fee),
+    Math.round(row.net),
+    Math.round(row.unsettled),
+    Math.round(row.processing),
+    Math.round(row.settled),
+    Math.round(row.adjustments),
+    row.payoutStatus,
+    row.lastPayoutSetAt ?? (row.lastPaidAt ?? ""),
+  ]);
+  return (
+    "\uFEFF" +
+    [header, ...data].map((r) => r.map(escapeCsv).join(",")).join("\r\n")
+  );
+};
+
+/**
+ * CSV export of the fleet-maintenance ledger (one row per maintenance /
+ * quarantine event), straight from the live /admin/maintenance list.
+ */
+export const maintenanceCsv = (events: MaintenanceEventDto[]): string => {
+  const header = [
+    "Event ID",
+    "Vehicle Ref",
+    "Vehicle",
+    "Category",
+    "Priority",
+    "Dispatch Status",
+    "Trigger",
+    "Workshop",
+    "Partner / Garage",
+    "Intake",
+    "Est. Return",
+    "Completed",
+    "Est. Cost (LYD)",
+  ];
+  const data = events.map((event) => {
+    const vehicle = typeof event.vehicleId === "object" ? event.vehicleId : null;
+    const company = typeof event.companyId === "object" ? event.companyId : null;
+    return [
+      `MNT-${(event._id ?? "").slice(-6).toUpperCase()}`,
+      vehicle?._id ? `#VR-${vehicle._id.slice(-6).toUpperCase()}` : "",
+      vehicle ? `${vehicle.make ?? ""} ${vehicle.model ?? ""} ${vehicle.year ?? ""}` : "",
+      event.category,
+      event.priority,
+      event.dispatchStatus,
+      event.triggerReason,
+      event.workshop ?? "",
+      company?.name ?? "",
+      (event.intakeDate ?? "").slice(0, 10),
+      (event.estReturnDate ?? "").slice(0, 10),
+      (event.completedDate ?? "").slice(0, 10),
+      Math.round(event.estCost ?? 0),
+    ];
+  });
+  return (
+    "\uFEFF" +
+    [header, ...data].map((r) => r.map(escapeCsv).join(",")).join("\r\n")
+  );
+};
+
+/**
+ * CSV export of the Reports & Analytics summary — flat, exportable snapshots
+ * of the real period aggregation: headline KPIs, weekly GMV/commission buckets,
+ * the status funnel, top operators and top vehicles.
+ */
+export const reportsCsv = (summary: ReportsSummary): string => {
+  const header = [
+    "Metric",
+    "Period Start",
+    "Period End",
+    "Bookings",
+    "Completed",
+    "Active On-Road",
+    "Cancelled",
+    "Pending",
+    "Completion (%)",
+    "Churn (%)",
+    "Gross GMV (LYD)",
+    "Net Commission (LYD)",
+    "Take Rate (%)",
+    "Avg Ticket (LYD)",
+    "Refunds (LYD)",
+    "Cleared Share (LYD)",
+    "Clearing Health (%)",
+    "Active Renters",
+    "New Renters",
+    "Returning Renters",
+    "Retention (%)",
+    "Avg Spend / Renter (LYD)",
+    "Repeat Renters (3+)",
+    "Fleet Size",
+    "Deployed Today",
+    "Utilization (%)",
+    "Partners",
+    "Certified Partners",
+  ];
+  const rows = [
+    header,
+    [
+      "Executive Summary",
+      summary.period.from,
+      summary.period.to,
+      summary.funnel.total,
+      summary.funnel.completed,
+      summary.funnel.activeOnRoad,
+      summary.funnel.cancelled,
+      summary.funnel.pending,
+      summary.funnel.completionPct.toFixed(1),
+      summary.funnel.churnPct.toFixed(1),
+      Math.round(summary.financial.gross),
+      Math.round(summary.financial.cut),
+      summary.financial.takeRate.toFixed(1),
+      Math.round(summary.financial.avgTicket),
+      Math.round(summary.financial.refunds.amount),
+      Math.round(summary.clearing.settledShare),
+      summary.clearing.healthPct.toFixed(1),
+      summary.renters.active,
+      summary.renters.new,
+      summary.renters.returning,
+      summary.renters.retentionPct.toFixed(1),
+      Math.round(summary.renters.avgSpendPerClient),
+      summary.renters.repeatRenters,
+      summary.fleet.size,
+      summary.fleet.deployedToday,
+      summary.fleet.utilizationPct.toFixed(1),
+      summary.partners.total,
+      summary.partners.approved,
+    ],
+  ];
+
+  // Weekly GMV + commission buckets, one row per week
+  summary.weekly.forEach((w) => {
+    rows.push([
+      `Weekly GMV+Cut ${w.label}`,
+      w.start,
+      w.end,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      Math.round(w.gross),
+      Math.round(w.cut),
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+    ]);
+  });
+
+  // Top performing operators
+  summary.topCompanies.forEach((c) => {
+    rows.push([
+      `Top Operator ${c.rank} :: ${c.name}`,
+      "Top Companies",
+      c.city,
+      c.bookings,
+      c.completed,
+      c.activeNow,
+      "",
+      "",
+      c.completionPct.toFixed(1),
+      "",
+      Math.round(c.gross),
+      Math.round(c.cut),
+      "",
+      Math.round(c.avgTicket),
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      c.status,
+      "",
+    ]);
+  });
+
+  // Top performing vehicles
+  summary.topVehicles.forEach((v) => {
+    rows.push([
+      `Top Vehicle ${v.rank} :: ${v.vehicle.make} ${v.vehicle.model} ${v.vehicle.year}`,
+      "Top Vehicles",
+      v.operator.city,
+      v.bookings,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      Math.round(v.revenue),
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      v.utilizationPct.toFixed(1),
+      v.operator.name,
+      "",
+    ]);
+  });
+
+  return (
+    "\uFEFF" + rows.map((row) => row.map(escapeCsv).join(",")).join("\r\n")
   );
 };
 

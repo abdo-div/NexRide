@@ -2,8 +2,16 @@ import jwt from "jsonwebtoken";
 import { promisify } from "util";
 import mongoose from "mongoose";
 import User from "../models/User_model.js";
+import Company from "../models/Company_model.js";
 import AppError from "../utils/appError.js";
 import catchAsync from "../utils/catchAsync.js";
+
+const ACTIVE_USER_STATUS = User.schema
+  .path("status")
+  .enumValues.find((status) => status === "ACTIVE");
+const APPROVED_COMPANY_STATUS = Company.schema
+  .path("status")
+  .enumValues.find((status) => status === "APPROVED");
 
 /**
  * 1. PROTECT: Authenticates JWT token and populates user & tenant context
@@ -38,6 +46,12 @@ export const protect = catchAsync(async (req, res, next) => {
     );
   }
 
+  if (currentUser.status !== ACTIVE_USER_STATUS) {
+    return next(
+      new AppError("Your account is not active. Please contact support.", 403),
+    );
+  }
+
   if (currentUser.changedPasswordAfter(decoded.iat)) {
     return next(
       new AppError("User recently changed password! Please log in again.", 401),
@@ -51,15 +65,22 @@ export const protect = catchAsync(async (req, res, next) => {
   req.user = currentUser;
   req.tenantId = currentUser.company ? currentUser.company.toString() : null;
 
-  // If tenantId is not yet set but user is a company owner, resolve company
-  if (!req.tenantId && currentUser.role === "company") {
-    const ownedCompany = await mongoose
-      .model("Company")
-      .findOne({ ownerId: currentUser._id });
-    if (ownedCompany) {
-      req.tenantId = ownedCompany._id.toString();
-      req.user.company = ownedCompany._id;
+  if (currentUser.role === "company") {
+    const company = currentUser.company
+      ? await Company.findById(currentUser.company)
+      : await Company.findOne({ ownerId: currentUser._id });
+
+    if (!company || company.status !== APPROVED_COMPANY_STATUS) {
+      return next(
+        new AppError(
+          "Your company is not approved or is suspended.",
+          403,
+        ),
+      );
     }
+
+    req.tenantId = company._id.toString();
+    req.user.company = company._id;
   }
 
   res.locals.user = currentUser;

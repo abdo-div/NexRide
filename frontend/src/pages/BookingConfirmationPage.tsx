@@ -33,6 +33,7 @@ export const BookingConfirmationPage: React.FC = () => {
   const { vehicleId } = useParams<{ vehicleId: string }>();
   const [searchParams] = useSearchParams();
   const bookingId = searchParams.get("booking");
+  const paymentMethod = searchParams.get("paymentMethod") ?? undefined;
   const data = useMemo<ConfirmationData>(() => getBookingConfirmation(vehicleId), [vehicleId]);
   const [toast, setToast] = useState<string | null>(null);
   const [downloadingInvoice, setDownloadingInvoice] = useState(false);
@@ -83,7 +84,28 @@ export const BookingConfirmationPage: React.FC = () => {
   }, [booking, targetVehicleId, t]);
 
   const resolved = useMemo<ConfirmationData>(() => {
-    if (!booking) return data;
+    if (!booking) {
+      if (!bookingId) return data;
+      const isCashPending = paymentMethod === "CASH_ON_DELIVERY";
+      return {
+        ...data,
+        meta: {
+          ...data.meta,
+          milestones: data.meta.milestones.map((milestone, index) =>
+            index === 0
+              ? {
+                  ...milestone,
+                  status: "booking.milestones.statusPending",
+                  detail: isCashPending
+                    ? "booking.milestones.detailCashPending"
+                    : "booking.milestones.detailPaymentPending",
+                  state: "next",
+                }
+              : milestone,
+          ),
+        },
+      };
+    }
 
     const vehicle = realVehicle ?? data.vehicle;
     const customer = typeof booking.customerId === "object" ? booking.customerId : null;
@@ -113,11 +135,26 @@ export const BookingConfirmationPage: React.FC = () => {
         ...data.meta.reference,
         code: referenceCodeFrom(booking._id),
       },
-      milestones: data.meta.milestones.map((milestone, index) =>
-        index === 0
-          ? { ...milestone, values: { amount: lyd2(booking.totalAmount) } }
-          : milestone,
-      ),
+      milestones: data.meta.milestones.map((milestone, index) => {
+        if (index !== 0) return milestone;
+        const isPaid = booking.paymentStatus === "PAID";
+        const isCashPending =
+          booking.paymentStatus === "UNPAID" &&
+          paymentMethod === "CASH_ON_DELIVERY";
+        return {
+          ...milestone,
+          status: isPaid
+            ? milestone.status
+            : "booking.milestones.statusPending",
+          detail: isPaid
+            ? milestone.detail
+            : isCashPending
+              ? "booking.milestones.detailCashPending"
+              : "booking.milestones.detailPaymentPending",
+          state: isPaid ? "done" : "next",
+          values: { amount: lyd2(booking.totalAmount) },
+        };
+      }),
       identification: customer?.name
         ? {
             ...data.meta.identification,
@@ -156,7 +193,7 @@ export const BookingConfirmationPage: React.FC = () => {
       fareLines,
       total: lyd2(booking.totalAmount),
     };
-  }, [data, booking, realVehicle, i18n.language]);
+  }, [data, booking, bookingId, paymentMethod, realVehicle, i18n.language]);
 
   const showToast = (text: string) => {
     setToast(text);
@@ -202,6 +239,10 @@ export const BookingConfirmationPage: React.FC = () => {
     }
   };
 
+  const showPaidConfirmation = bookingId
+    ? booking?.paymentStatus === "PAID"
+    : searchParams.get("paid") === "true";
+
   return (
     <div className="bg-[#F8FAFC] min-h-screen">
       <div className="max-w-[1360px] mx-auto px-4 lg:px-8 pt-24 md:pt-28 pb-8 md:pb-12 flex flex-col gap-6">
@@ -217,7 +258,7 @@ export const BookingConfirmationPage: React.FC = () => {
           downloadBusy={downloadingInvoice}
         />
 
-        {(searchParams.get("paid") === "true" || booking?.paymentStatus === "PAID") && (
+        {showPaidConfirmation && (
           <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/90 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm animate-fade-in">
             <div className="flex items-center gap-3.5">
               <div className="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
@@ -252,7 +293,13 @@ export const BookingConfirmationPage: React.FC = () => {
           </div>
           <div className="lg:col-span-5 flex flex-col gap-5">
             <RouteSchedule data={resolved} />
-            <PaymentSummary data={resolved} />
+            <PaymentSummary
+              data={resolved}
+              paymentStatus={
+                bookingId ? booking?.paymentStatus ?? "UNPAID" : undefined
+              }
+              paymentMethod={paymentMethod}
+            />
           </div>
         </div>
 

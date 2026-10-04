@@ -29,7 +29,9 @@ export const idempotency =
       return next();
     }
 
-    const cacheKey = `idempotency:${idempotencyKey}`;
+    const actorId = req.user?._id || req.user?.id;
+    const actorScope = actorId ? actorId.toString() : "anonymous";
+    const cacheKey = `idempotency:${actorScope}:${idempotencyKey}`;
 
     try {
       const cachedResponse = await redisClient.get(cacheKey);

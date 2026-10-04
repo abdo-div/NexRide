@@ -1,5 +1,6 @@
 import Vehicle from "../models/vehicle_model.js";
 import Booking from "../models/booking_model.js";
+import Company from "../models/Company_model.js";
 import AppError from "../utils/appError.js";
 import APIFeatures from "../utils/APIFeatures.js";
 import { saveVehicleImage } from "../utils/vehicleImages.js";
@@ -7,18 +8,81 @@ import { saveVehicleImage } from "../utils/vehicleImages.js";
 // A booking blocks a vehicle while it is paid or active on the customer's side.
 // PENDING_PAYMENT and EXPIRED reservations are excluded: they have no locked dates.
 const BOOKED_STATUSES = ["PAID", "CONFIRMED", "ACTIVE"];
+const PUBLIC_FILTER_FIELDS = new Set([
+  "type",
+  "make",
+  "model",
+  "year",
+  "city",
+  "dailyPrice",
+  "seats",
+  "doors",
+  "transmission",
+  "fuelType",
+  "pickupLocation",
+]);
+const PUBLIC_QUERY_CONTROLS = new Set([
+  "page",
+  "sort",
+  "limit",
+  "fields",
+  "search",
+]);
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+export const getApprovedCompanyIds = async () =>
+  Company.find({ status: "APPROVED", deletedAt: null }).distinct("_id");
+
+export const buildPublicVehicleFilter = (approvedCompanyIds, tenantId = null) => {
+  const filter = {
+    listingStatus: "PUBLISHED",
+    operationalStatus: "AVAILABLE",
+    deletedAt: null,
+    companyId: { $in: approvedCompanyIds },
+  };
+
+  if (tenantId) filter.$and = [{ companyId: tenantId }];
+  return filter;
+};
+
+export const sanitizePublicVehicleQuery = (queryParams = {}) =>
+  Object.fromEntries(
+    Object.entries(queryParams).filter(
+      ([key]) =>
+        PUBLIC_FILTER_FIELDS.has(key) || PUBLIC_QUERY_CONTROLS.has(key),
+    ),
+  );
+
+export const getPublicVehicleFilter = async (vehicleId = null, tenantId = null) => {
+  const filter = buildPublicVehicleFilter(
+    await getApprovedCompanyIds(),
+    tenantId,
+  );
+  if (vehicleId) filter._id = vehicleId;
+  return filter;
+};
 
 /**
  * Fetch all vehicles matching search/filter/pagination criteria
  * Automatically enforces tenant isolation when req.tenantId is provided
  */
-export const fetchAllVehicles = async (queryParams, tenantId = null) => {
+export const fetchAllVehicles = async (
+  queryParams,
+  tenantId = null,
+  publicOnly = false,
+) => {
   // Inject tenant filter if request originates from a company subdomain
-  const filter = tenantId ? { companyId: tenantId } : {};
+  const filter = publicOnly
+    ? buildPublicVehicleFilter(await getApprovedCompanyIds(), tenantId)
+    : tenantId
+      ? { companyId: tenantId }
+      : {};
+  const effectiveQuery = publicOnly
+    ? sanitizePublicVehicleQuery(queryParams)
+    : queryParams;
 
-  const features = new APIFeatures(Vehicle.find(filter), queryParams)
+  const features = new APIFeatures(Vehicle.find(filter), effectiveQuery)
     .filter()
     .sort()
     .limitFields()
@@ -43,11 +107,10 @@ export const fetchAllVehicles = async (queryParams, tenantId = null) => {
  * never by the client.
  */
 export const fetchAvailableVehicles = async (queryParams, tenantId = null) => {
-  const filter = {
-    listingStatus: "PUBLISHED",
-    operationalStatus: "AVAILABLE",
-  };
-  if (tenantId) filter.companyId = tenantId;
+  const filter = buildPublicVehicleFilter(
+    await getApprovedCompanyIds(),
+    tenantId,
+  );
 
   // Location: case-insensitive match against the city or the pickup branch
   if (queryParams.location) {
@@ -110,13 +173,14 @@ export const fetchAvailableVehicles = async (queryParams, tenantId = null) => {
 /**
  * Fetch single vehicle by ID and populate user reviews
  */
-export const fetchVehicleById = async (vehicleId, tenantId = null) => {
-  const filter = { _id: vehicleId };
-
-  // Guard against accessing another company's vehicle directly by ID via URL
-  if (tenantId) {
-    filter.companyId = tenantId;
-  }
+export const fetchVehicleById = async (
+  vehicleId,
+  tenantId = null,
+  publicOnly = true,
+) => {
+  const filter = publicOnly
+    ? await getPublicVehicleFilter(vehicleId, tenantId)
+    : { _id: vehicleId, ...(tenantId ? { companyId: tenantId } : {}) };
 
   const vehicle = await Vehicle.findOne(filter)
     .populate("companyId", "name logo city status")

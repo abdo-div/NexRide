@@ -38,10 +38,10 @@ const NAV_ENTRIES: NavEntry[] = [
   { path: "/admin/vehicles", labelKey: "admin.layout.navVehicles", icon: Car, enabled: true },
   { path: "/admin/customers", labelKey: "admin.layout.navCustomers", icon: Users, enabled: true },
   { path: "/admin/payments", labelKey: "admin.layout.navPayments", icon: CreditCard, enabled: true },
-  { path: "/admin/commissions", labelKey: "admin.layout.navCommissions", icon: Wallet, enabled: false },
-  { path: "/admin/maintenance", labelKey: "admin.layout.navMaintenance", icon: Wrench, enabled: false },
-  { path: "/admin/reports", labelKey: "admin.layout.navReports", icon: BarChart3, enabled: false },
-  { path: "/admin/settings", labelKey: "admin.layout.navSettings", icon: Settings, enabled: false },
+  { path: "/admin/commissions", labelKey: "admin.layout.navCommissions", icon: Wallet, enabled: true },
+  { path: "/admin/maintenance", labelKey: "admin.layout.navMaintenance", icon: Wrench, enabled: true },
+  { path: "/admin/reports", labelKey: "admin.layout.navReports", icon: BarChart3, enabled: true },
+  { path: "/admin/settings", labelKey: "admin.layout.navSettings", icon: Settings, enabled: true },
 ];
 
 /**
