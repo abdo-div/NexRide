@@ -1,4 +1,6 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router";
+import { LoaderCircle } from "lucide-react";
 import NavBar from "./components/layouts/NavBar";
 import { Footer } from "./components/layouts/Footer";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
@@ -15,17 +17,74 @@ import MyBookingsPage from "./pages/MyBookingsPage";
 import BookingDetailsPage from "./pages/BookingDetailsPage";
 import { AdminRoute } from "./components/admin/AdminRoute";
 import { AdminLayout } from "./components/admin/AdminLayout";
-import { AdminOverviewPage } from "./pages/admin/AdminOverviewPage";
-import { AdminBookingsPage } from "./pages/admin/AdminBookingsPage";
-import { AdminBookingDetailPage } from "./pages/admin/AdminBookingDetailPage";
-import { AdminFleetPage } from "./pages/admin/AdminFleetPage";
-import { AdminCompaniesPage } from "./pages/admin/AdminCompaniesPage";
-import { AdminCustomersPage } from "./pages/admin/AdminCustomersPage";
-import { AdminPaymentsPage } from "./pages/admin/AdminPaymentsPage";
-import { AdminCommissionsPage } from "./pages/admin/AdminCommissionsPage";
-import { AdminMaintenancePage } from "./pages/admin/AdminMaintenancePage";
-import { AdminReportsPage } from "./pages/admin/AdminReportsPage";
-import { AdminSettingsPage } from "./pages/admin/AdminSettingsPage";
+
+const AdminOverviewPage = lazy(() =>
+  import("./pages/admin/AdminOverviewPage").then((module) => ({
+    default: module.AdminOverviewPage,
+  })),
+);
+const AdminBookingsPage = lazy(() =>
+  import("./pages/admin/AdminBookingsPage").then((module) => ({
+    default: module.AdminBookingsPage,
+  })),
+);
+const AdminBookingDetailPage = lazy(() =>
+  import("./pages/admin/AdminBookingDetailPage").then((module) => ({
+    default: module.AdminBookingDetailPage,
+  })),
+);
+const AdminFleetPage = lazy(() =>
+  import("./pages/admin/AdminFleetPage").then((module) => ({
+    default: module.AdminFleetPage,
+  })),
+);
+const AdminCompaniesPage = lazy(() =>
+  import("./pages/admin/AdminCompaniesPage").then((module) => ({
+    default: module.AdminCompaniesPage,
+  })),
+);
+const AdminCustomersPage = lazy(() =>
+  import("./pages/admin/AdminCustomersPage").then((module) => ({
+    default: module.AdminCustomersPage,
+  })),
+);
+const AdminPaymentsPage = lazy(() =>
+  import("./pages/admin/AdminPaymentsPage").then((module) => ({
+    default: module.AdminPaymentsPage,
+  })),
+);
+const AdminCommissionsPage = lazy(() =>
+  import("./pages/admin/AdminCommissionsPage").then((module) => ({
+    default: module.AdminCommissionsPage,
+  })),
+);
+const AdminMaintenancePage = lazy(() =>
+  import("./pages/admin/AdminMaintenancePage").then((module) => ({
+    default: module.AdminMaintenancePage,
+  })),
+);
+const AdminReportsPage = lazy(() =>
+  import("./pages/admin/AdminReportsPage").then((module) => ({
+    default: module.AdminReportsPage,
+  })),
+);
+const AdminSettingsPage = lazy(() =>
+  import("./pages/admin/AdminSettingsPage").then((module) => ({
+    default: module.AdminSettingsPage,
+  })),
+);
+
+function RouteLoadingFallback() {
+  return (
+    <div
+      className="flex min-h-[60vh] items-center justify-center"
+      role="status"
+      aria-label="Loading page"
+    >
+      <LoaderCircle className="h-8 w-8 animate-spin text-[#2563EB]" />
+    </div>
+  );
+}
 
 /**
  * Public site chrome: shared navbar on top and footer at the bottom. Admin
@@ -104,9 +163,11 @@ function App() {
           <Route
             path="/admin"
             element={
-              <AdminRoute>
-                <AdminLayout />
-              </AdminRoute>
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <AdminRoute>
+                  <AdminLayout />
+                </AdminRoute>
+              </Suspense>
             }
           >
             <Route index element={<AdminOverviewPage />} />
