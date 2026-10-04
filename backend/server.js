@@ -1,10 +1,8 @@
-import dns from "node:dns";
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
-
 import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
+import { configureDnsServers } from "./config/dnsConfig.js";
 
 // Load the environment file wherever it actually lives, regardless of the
 // working directory the server is started from. Candidates are checked in
@@ -20,6 +18,8 @@ const envFile = [
 if (envFile) {
   dotenv.config({ path: envFile });
 }
+
+configureDnsServers(process.env.DNS_SERVERS);
 
 const { default: mongoose } = await import("mongoose");
 const { default: app } = await import("./app.js");
