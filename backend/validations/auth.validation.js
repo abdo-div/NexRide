@@ -36,7 +36,6 @@ export const signupSchema = z.object({
         .min(1, "A phone number is required for rental confirmations"),
       password,
       passwordConfirm,
-      role: z.enum(["customer", "company", "admin"]).optional(),
     })
     .refine(passwordsMatch, passwordMismatch),
 });

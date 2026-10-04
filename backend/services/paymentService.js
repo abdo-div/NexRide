@@ -2,11 +2,8 @@ import Stripe from "stripe";
 import mongoose from "mongoose";
 import Payment from "../models/payment_model.js";
 import Booking from "../models/booking_model.js";
-import Vehicle from "../models/vehicle_model.js";
 import AppError from "../utils/appError.js";
 import APIFeatures from "../utils/APIFeatures.js";
-import { releaseVehicleHold } from "./reservationHold.service.js";
-import { addEmailToQueue } from "../queues/emailQueue.js";
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY)
@@ -16,7 +13,8 @@ const stripe = process.env.STRIPE_SECRET_KEY
  * Execute payment intent inside a Mongoose ACID Transaction
  */
 export const executePaymentProcessing = async (paymentData, customerId) => {
-  const { bookingId, paymentMethod } = paymentData;
+  const { bookingId } = paymentData;
+  const paymentMethod = paymentData.paymentMethod || "CASH_ON_DELIVERY";
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -27,58 +25,46 @@ export const executePaymentProcessing = async (paymentData, customerId) => {
       throw new AppError("No booking found with that ID", 404);
     }
 
-    if (booking.bookingStatus !== "PENDING_PAYMENT") {
+    const bookingCustomerId = booking.customerId?._id ?? booking.customerId;
+    if (!bookingCustomerId || bookingCustomerId.toString() !== customerId.toString()) {
+      throw new AppError("You can only process payment for your own booking.", 403);
+    }
+
+    if (
+      booking.bookingStatus !== "PENDING_PAYMENT" ||
+      booking.paymentStatus !== "UNPAID"
+    ) {
       throw new AppError(
-        "This booking has already been processed or cancelled",
-        400,
+        "This booking is not eligible for payment.",
+        409,
       );
     }
 
-    // Create payment ledger record
+    const completedPayment = await Payment.findOne({
+      bookingId: booking._id,
+      status: "COMPLETED",
+    }).session(session);
+    if (completedPayment) {
+      throw new AppError("This booking has already been paid.", 409);
+    }
+
     const payment = await Payment.create(
       [
         {
           bookingId: booking._id,
-          customerId,
-          companyId: booking.companyId,
+          customerId: bookingCustomerId,
+          companyId: booking.companyId?._id ?? booking.companyId,
           amount: booking.totalAmount,
-          paymentMethod: paymentMethod || "CASH_ON_DELIVERY",
-          status: "COMPLETED",
+          paymentMethod,
+          status: "PENDING",
           payoutStatus: "UNSETTLED",
-          paidAt: new Date(),
         },
       ],
       { session },
     );
 
-    // Atomically update Booking status
-    booking.bookingStatus = "PAID";
-    booking.paymentStatus = "PAID";
-    await booking.save({ session, validateBeforeSave: false });
-
-    await Vehicle.findByIdAndUpdate(
-      booking.vehicleId,
-      { operationalStatus: "UNAVAILABLE" },
-      { session },
-    );
-
     await session.commitTransaction();
     session.endSession();
-
-    // Checkout concluded — free the vehicle reservation hold.
-    await releaseVehicleHold(booking.vehicleId);
-
-    // Enqueue the booking confirmation email for the background worker.
-    // booking.customerId / vehicleId are auto-populated by the Booking model.
-    const customer = booking.customerId;
-    const vehicle = booking.vehicleId;
-    if (customer?.email) {
-      await addEmailToQueue("BOOKING_CONFIRMATION", {
-        email: customer.email,
-        bookingId: booking._id.toString(),
-        vehicleName: vehicle ? `${vehicle.make} ${vehicle.model}` : "Your vehicle",
-      });
-    }
 
     return payment[0];
   } catch (error) {

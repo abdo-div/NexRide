@@ -73,11 +73,23 @@ export const checkVehicleAvailability = catchAsync(async (req, res, next) => {
   });
 });
 
+export const buildBookingCollisionQuery = (vehicleId, startDate, endDate) => ({
+  vehicleId,
+  bookingStatus: { $in: ["PAID", "CONFIRMED", "ACTIVE"] },
+  $or: [{ startDate: { $lt: endDate }, endDate: { $gt: startDate } }],
+});
+
 /**
  * Customer booking creation
  */
 export const createBooking = catchAsync(async (req, res, next) => {
-  const { vehicleId, startDate, endDate, pickupLocation } = req.body;
+  const {
+    vehicleId,
+    startDate,
+    endDate,
+    pickupLocation,
+    paymentMethod,
+  } = req.body;
   const start = new Date(startDate);
   const end = new Date(endDate);
 
@@ -128,11 +140,9 @@ export const createBooking = catchAsync(async (req, res, next) => {
     }
 
     // 2. Double-booking collision check within database transaction session
-    const existingCollision = await Booking.findOne({
-      vehicle: vehicleId,
-      bookingStatus: { $in: ["PAID", "CONFIRMED", "ACTIVE"] },
-      $or: [{ startDate: { $lt: end }, endDate: { $gt: start } }],
-    }).session(session);
+    const existingCollision = await Booking.findOne(
+      buildBookingCollisionQuery(vehicleId, start, end),
+    ).session(session);
 
     if (existingCollision) {
       throw new AppError("Vehicle is already booked during these dates.", 409);
@@ -166,6 +176,24 @@ export const createBooking = catchAsync(async (req, res, next) => {
       { session },
     );
 
+    let payment;
+    if (paymentMethod === "CASH_ON_DELIVERY") {
+      [payment] = await Payment.create(
+        [
+          {
+            bookingId: booking._id,
+            customerId: req.user.id,
+            companyId: vehicle.companyId,
+            amount: booking.totalAmount,
+            paymentMethod,
+            status: "PENDING",
+            payoutStatus: "UNSETTLED",
+          },
+        ],
+        { session },
+      );
+    }
+
     await session.commitTransaction();
     session.endSession();
 
@@ -176,9 +204,12 @@ export const createBooking = catchAsync(async (req, res, next) => {
     if (lock) await safelyRelease(() => lock.release());
     if (redisReady) await safelyRelease(() => releaseVehicleHold(vehicleId));
 
+    const data = { booking };
+    if (payment) data.payment = payment;
+
     res.status(201).json({
       status: "success",
-      data: { booking },
+      data,
     });
   } catch (error) {
     await session.abortTransaction();

@@ -164,8 +164,6 @@ const MockCheckout: React.FC<{ vehicleId?: string }> = ({ vehicleId }) => {
               meta={meta}
               tab={tab}
               onTab={setTab}
-              cashDeposit={totals.cashDeposit}
-              cashRemaining={totals.cashRemaining}
               vehicleTitle={vehicle.title}
             />
           </div>
@@ -343,11 +341,18 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
           startDate,
           endDate,
           pickupLocation: locationParam || undefined,
+          paymentMethod: "CASH_ON_DELIVERY",
         });
         setPhase("done");
-        navigate(`/booking-confirmed/${vehicle.id}?booking=${result.data.booking._id}`, {
-          replace: true,
+        const confirmationQuery = new URLSearchParams({
+          booking: result.data.booking._id,
+          paymentMethod:
+            result.data.payment?.paymentMethod ?? "CASH_ON_DELIVERY",
         });
+        navigate(
+          `/booking-confirmed/${vehicle.id}?${confirmationQuery.toString()}`,
+          { replace: true },
+        );
       } catch (err) {
         setPhase("idle");
         setSubmitError(
@@ -503,8 +508,6 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
               meta={meta}
               tab={tab}
               onTab={setTab}
-              cashDeposit={totals.cashDeposit}
-              cashRemaining={totals.cashRemaining}
               vehicleTitle={vehicle.title}
             />
           </div>
@@ -557,4 +560,4 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
 };
 
 export default CheckoutPage;
-
+

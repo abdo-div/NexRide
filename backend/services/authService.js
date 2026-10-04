@@ -90,7 +90,7 @@ export const registerUser = async (userData, reqHost, reqProtocol) => {
     password: userData.password,
     passwordConfirm: userData.passwordConfirm,
     phoneNumber: normalisePhoneNumber(userData.phoneNumber),
-    role: userData.role || "customer",
+    role: "customer",
   });
 
   // Non-blocking welcome email dispatch

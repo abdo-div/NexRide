@@ -22,6 +22,10 @@ import { AdminFleetPage } from "./pages/admin/AdminFleetPage";
 import { AdminCompaniesPage } from "./pages/admin/AdminCompaniesPage";
 import { AdminCustomersPage } from "./pages/admin/AdminCustomersPage";
 import { AdminPaymentsPage } from "./pages/admin/AdminPaymentsPage";
+import { AdminCommissionsPage } from "./pages/admin/AdminCommissionsPage";
+import { AdminMaintenancePage } from "./pages/admin/AdminMaintenancePage";
+import { AdminReportsPage } from "./pages/admin/AdminReportsPage";
+import { AdminSettingsPage } from "./pages/admin/AdminSettingsPage";
 
 /**
  * Public site chrome: shared navbar on top and footer at the bottom. Admin
@@ -112,6 +116,10 @@ function App() {
             <Route path="vehicles" element={<AdminFleetPage />} />
             <Route path="customers" element={<AdminCustomersPage />} />
             <Route path="payments" element={<AdminPaymentsPage />} />
+            <Route path="commissions" element={<AdminCommissionsPage />} />
+            <Route path="maintenance" element={<AdminMaintenancePage />} />
+            <Route path="reports" element={<AdminReportsPage />} />
+            <Route path="settings" element={<AdminSettingsPage />} />
           </Route>
         </Routes>
       </AuthProvider>

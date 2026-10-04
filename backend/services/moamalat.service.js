@@ -259,9 +259,7 @@ export const verifyTransaction = async ({
 
   const expectedAmountUnits =
     expectedAmount != null
-      ? expectedAmount > 5000
-        ? Math.round(Number(expectedAmount))
-        : Math.round(Number(expectedAmount) * 1000)
+      ? amountToUnits(Number(expectedAmount))
       : gatewayAmount;
 
   const amountMatches =
@@ -278,8 +276,8 @@ export const verifyTransaction = async ({
 
   const systemReferenceMatches =
     !systemReference ||
-    !gatewaySystemReference ||
-    String(systemReference) === gatewaySystemReference;
+    (gatewaySystemReference &&
+      String(systemReference) === gatewaySystemReference);
 
   if (
     !referenceMatches ||
@@ -334,12 +332,38 @@ export const finalizeVerifiedPayment = async ({
       throw new AppError("No booking found with that ID", 404);
     }
 
+    const paymentBookingId = payment.bookingId?._id ?? payment.bookingId;
+    if (paymentBookingId?.toString() !== booking._id.toString()) {
+      throw new AppError("Payment does not belong to the expected booking.", 409);
+    }
+
+    if (
+      payment.paymentGateway !== "MOAMALAT" ||
+      payment.paymentMethod !== "MOAMALAT"
+    ) {
+      throw new AppError("Payment was not initialized for Moamalat.", 409);
+    }
+
+    if (amountToUnits(Number(payment.amount)) !== amountToUnits(Number(booking.totalAmount))) {
+      throw new AppError("Payment amount does not match the booking amount.", 409);
+    }
+
     const alreadyPaid =
-      payment.status === "COMPLETED" && booking.paymentStatus === "PAID";
+      payment.status === "COMPLETED" &&
+      booking.bookingStatus === "PAID" &&
+      booking.paymentStatus === "PAID";
     if (alreadyPaid) {
       await session.commitTransaction();
       session.endSession();
       return payment;
+    }
+
+    if (
+      payment.status !== "PENDING" ||
+      booking.bookingStatus !== "PENDING_PAYMENT" ||
+      booking.paymentStatus !== "UNPAID"
+    ) {
+      throw new AppError("Payment or booking is not eligible for finalization.", 409);
     }
 
     booking.bookingStatus = "PAID";

@@ -8,19 +8,13 @@ interface Props {
   meta: CheckoutMeta;
   tab: "card" | "cash";
   onTab: (tab: "card" | "cash") => void;
-  cashDeposit: number;
-  cashRemaining: number;
   vehicleTitle: string;
 }
-
-const lyd = (n: number) => `${n.toLocaleString("en-US")} LYD`;
 
 export const PaymentSection: React.FC<Props> = ({
   meta,
   tab,
   onTab,
-  cashDeposit,
-  cashRemaining,
   vehicleTitle,
 }) => {
   const { t } = useTranslation();
@@ -122,11 +116,7 @@ export const PaymentSection: React.FC<Props> = ({
                 {t("checkout.payment.cashDepositHeading", { percent: payment.cashDepositPercent })}
               </h4>
               <p className="text-[14px] text-[#64748B] leading-relaxed">
-                {t(payment.cashNote, {
-                  title: vehicleTitle,
-                  deposit: lyd(cashDeposit),
-                  remaining: lyd(cashRemaining),
-                })}
+                {t(payment.cashNote, { title: vehicleTitle })}
               </p>
             </div>
           </div>

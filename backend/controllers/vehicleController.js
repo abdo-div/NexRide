@@ -52,8 +52,12 @@ export const resizeVehicleImages = catchAsync(async (req, res, next) => {
 });
 
 export const getAllVehicles = catchAsync(async (req, res, next) => {
-  // Pass req.tenantId so subdomains filter automatically (returns all if req.tenantId is null)
-  const vehicles = await vehicleService.fetchAllVehicles(req.query, req.tenantId);
+  const publicOnly = req.user?.role !== "admin";
+  const vehicles = await vehicleService.fetchAllVehicles(
+    req.query,
+    req.tenantId,
+    publicOnly,
+  );
 
   res.status(200).json({
     status: "success",
@@ -77,8 +81,11 @@ export const searchVehicles = catchAsync(async (req, res, next) => {
 });
 
 export const getVehicleById = catchAsync(async (req, res, next) => {
-  // Pass req.tenantId to prevent accessing vehicles across tenant subdomains
-  const vehicle = await vehicleService.fetchVehicleById(req.params.id, req.tenantId);
+  const vehicle = await vehicleService.fetchVehicleById(
+    req.params.id,
+    req.tenantId,
+    req.user?.role !== "admin",
+  );
 
   res.status(200).json({
     status: "success",

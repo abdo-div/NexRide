@@ -9,18 +9,11 @@ import {
 import {
   buildCheckoutParams,
   generateMerchantReference as generateBookingRef,
-  generateSecureHash,
-  formatTrxDateTime,
   verifyTransaction,
   finalizeVerifiedPayment,
 } from "../services/moamalat.service.js";
-import crypto from "node:crypto";
-
-// In-memory cache for standalone / demo / quick payment tracking matching manager reference
-export const pendingPayments = new Map();
-
 /**
- * Validate incoming amount (in LYD)
+ * Validate the booking's stored amount (in LYD)
  */
 export function validateAmount(raw) {
   if (raw === undefined || raw === null || raw === "") {
@@ -37,15 +30,6 @@ export function validateAmount(raw) {
     return { ok: false, error: "Amount is too large." };
   }
   return { ok: true, value: num };
-}
-
-/**
- * Generate a standalone merchant reference matching manager format
- */
-export function generateMerchantReference() {
-  const ts = Date.now().toString(36).toUpperCase();
-  const rand = crypto.randomBytes(4).toString("hex").toUpperCase();
-  return `PAY-${ts}-${rand}`;
 }
 
 /**
@@ -75,8 +59,7 @@ export const getGatewayConfig = catchAsync(async (req, res, next) => {
 });
 
 /**
- * Standalone & Booking payment creation endpoint.
- * Serves POST /api/payment/create and POST /api/v1/payments/moamalat/create (and /init).
+ * Creates a Moamalat payment attempt for an owned, payable booking.
  */
 export const createPayment = catchAsync(async (req, res, next) => {
   if (!isMoamalatConfigured()) {
@@ -86,82 +69,72 @@ export const createPayment = catchAsync(async (req, res, next) => {
     });
   }
 
-  let { amount, reference, bookingId } = req.body || {};
-
-  let booking = null;
-  if (bookingId) {
-    booking = await Booking.findById(bookingId).catch(() => null);
-    if (booking && amount === undefined) {
-      amount = booking.totalAmount;
-    }
+  const body = req.body || {};
+  if (["amount", "total", "reference"].some((key) => Object.hasOwn(body, key))) {
+    throw new AppError("Only bookingId is accepted; payment amount and reference are server-generated.", 400);
   }
 
-  const check = validateAmount(amount);
+  const bookingId = body.bookingId;
+  const booking = await Booking.findById(bookingId);
+  if (!booking) {
+    throw new AppError("No booking found with that ID", 404);
+  }
+
+  const customerId = req.user?._id || req.user?.id;
+  if (!customerId) {
+    throw new AppError("You must be logged in to initialize a payment.", 401);
+  }
+  const bookingCustomerId = booking.customerId?._id ?? booking.customerId;
+  if (!bookingCustomerId || bookingCustomerId.toString() !== customerId.toString()) {
+    throw new AppError("You can only pay for your own booking.", 403);
+  }
+
+  if (
+    booking.bookingStatus !== "PENDING_PAYMENT" ||
+    booking.paymentStatus !== "UNPAID"
+  ) {
+    throw new AppError("This booking is not eligible for payment.", 409);
+  }
+
+  const completedPayment = await Payment.findOne({
+    bookingId: booking._id,
+    status: "COMPLETED",
+  });
+  if (completedPayment) {
+    throw new AppError("This booking has already been paid.", 409);
+  }
+
+  const check = validateAmount(booking.totalAmount);
   if (!check.ok) {
-    return res.status(400).json({
-      error: check.error,
-      message: check.error,
-    });
+    throw new AppError(check.error, 400);
   }
 
   // 1 LYD = 1000 smallest units
-  const amountTrxn = Math.round(check.value * 1000);
+  const merchantReference = generateBookingRef(booking._id);
+  const params = buildCheckoutParams(booking, merchantReference);
 
-  const merchantReference =
-    reference && String(reference).trim()
-      ? String(reference).trim().slice(0, 40)
-      : bookingId
-        ? generateBookingRef(bookingId)
-        : generateMerchantReference();
-
-  const trxDateTime = formatTrxDateTime(new Date());
-
-  const hashData = {
-    amount: amountTrxn,
-    trxDateTime,
-    merchantId: moamalatConfig.merchantId,
-    merchantReference,
-    terminalId: moamalatConfig.terminalId,
-  };
-
-  const secureHash = generateSecureHash(hashData);
-
-  // Store in pendingPayments in-memory map
-  pendingPayments.set(merchantReference, {
-    merchantReference,
-    amountTrxn: String(amountTrxn),
-    amountLyd: check.value,
-    bookingId: bookingId || null,
-    createdAt: Date.now(),
-    verified: false,
+  let paymentDoc = await Payment.findOne({
+    bookingId: booking._id,
+    paymentGateway: "MOAMALAT",
+    status: "PENDING",
   });
 
-  // If a real DB booking was referenced, update or create Payment record in DB
-  let paymentDoc = null;
-  if (booking) {
-    paymentDoc = await Payment.findOne({
+  if (paymentDoc) {
+    paymentDoc.merchantReference = merchantReference;
+    paymentDoc.amount = check.value;
+    await paymentDoc.save();
+  } else {
+    paymentDoc = new Payment({
       bookingId: booking._id,
+      customerId: bookingCustomerId,
+      companyId: booking.companyId?._id ?? booking.companyId,
+      amount: check.value,
+      paymentMethod: "MOAMALAT",
       paymentGateway: "MOAMALAT",
       status: "PENDING",
+      merchantReference,
     });
-
-    if (paymentDoc) {
-      paymentDoc.merchantReference = merchantReference;
-      paymentDoc.amount = check.value;
-      await paymentDoc.save();
-    } else {
-      paymentDoc = new Payment({
-        bookingId: booking._id,
-        customerId: booking.customerId,
-        companyId: booking.companyId,
-        amount: check.value,
-        paymentMethod: "MOAMALAT",
-        paymentGateway: "MOAMALAT",
-        status: "PENDING",
-        merchantReference,
-      });
-      await paymentDoc.save();
-    }
+    await paymentDoc.save();
   }
 
   // Response matches both the manager's openLightBox(params) expectations:
@@ -169,30 +142,18 @@ export const createPayment = catchAsync(async (req, res, next) => {
   // AND the NexRide data wrapper!
   res.status(200).json({
     status: "success",
-    MID: moamalatConfig.merchantId,
-    TID: moamalatConfig.terminalId,
-    AmountTrxn: String(amountTrxn),
-    MerchantReference: merchantReference,
-    TrxDateTime: trxDateTime,
-    SecureHash: secureHash,
+    ...params,
     data: {
       payment: {
-        id: paymentDoc ? paymentDoc._id : merchantReference,
-        bookingId: booking ? booking._id : null,
+        id: paymentDoc._id,
+        bookingId: booking._id,
         amount: check.value,
         merchantReference,
       },
       gateway: {
         lightBoxUrl: moamalatConfig.lightBoxUrl,
         env: moamalatConfig.env,
-        params: {
-          MID: moamalatConfig.merchantId,
-          TID: moamalatConfig.terminalId,
-          AmountTrxn: String(amountTrxn),
-          MerchantReference: merchantReference,
-          TrxDateTime: trxDateTime,
-          SecureHash: secureHash,
-        },
+        params,
       },
     },
   });
@@ -226,15 +187,12 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
     });
   }
 
-  // Lookup in memory and in MongoDB
-  const pendingPayment = pendingPayments.get(String(merchantReference));
-  let paymentDoc = await Payment.findOne({
+  const paymentDoc = await Payment.findOne({
     merchantReference: String(merchantReference),
-  }).catch(() => null);
-
-  console.log("SERVER STORED PAYMENT:", pendingPayment || paymentDoc);
-
-  if (!pendingPayment && !paymentDoc) {
+    paymentGateway: "MOAMALAT",
+    paymentMethod: "MOAMALAT",
+  });
+  if (!paymentDoc) {
     return res.status(404).json({
       verified: false,
       reason: "Original payment record was not found.",
@@ -242,46 +200,68 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
     });
   }
 
-  // Already finalized check (idempotency)
-  if (
-    (pendingPayment && pendingPayment.verified) ||
-    (paymentDoc && paymentDoc.status === "COMPLETED")
-  ) {
+  const bookingId = paymentDoc.bookingId?._id ?? paymentDoc.bookingId;
+  const booking = await Booking.findById(bookingId);
+  if (!booking) {
+    throw new AppError("No booking found for this payment.", 404);
+  }
+
+  const paymentBookingId = paymentDoc.bookingId?._id ?? paymentDoc.bookingId;
+  if (paymentBookingId.toString() !== booking._id.toString()) {
+    throw new AppError("Payment does not match the expected booking.", 409);
+  }
+
+  const amountMatches =
+    Math.round(Number(paymentDoc.amount) * 1000) ===
+    Math.round(Number(booking.totalAmount) * 1000);
+  if (!amountMatches) {
+    throw new AppError("Payment amount does not match the booking amount.", 409);
+  }
+
+  if (paymentDoc.status === "COMPLETED") {
+    if (
+      booking.bookingStatus !== "PAID" ||
+      booking.paymentStatus !== "PAID"
+    ) {
+      throw new AppError("Completed payment has inconsistent booking state.", 409);
+    }
     return res.status(200).json({
       verified: true,
       merchantReference,
-      systemReference:
-        paymentDoc?.transactionId ||
-        pendingPayment?.systemReference ||
-        systemReference ||
-        "",
-      networkReference: pendingPayment?.networkReference || "",
-      amount: paymentDoc?.amount || pendingPayment?.amountLyd || 0,
+      systemReference: paymentDoc.transactionId || systemReference || "",
+      networkReference: "",
+      amount: paymentDoc.amount,
       status: "APPROVED",
       alreadyProcessed: true,
       data: {
         verified: true,
         merchantReference,
-        systemReference:
-          paymentDoc?.transactionId ||
-          pendingPayment?.systemReference ||
-          systemReference ||
-          "",
-        networkReference: pendingPayment?.networkReference || "",
-        amount: paymentDoc?.amount || pendingPayment?.amountLyd || 0,
+        systemReference: paymentDoc.transactionId || systemReference || "",
+        networkReference: "",
+        amount: paymentDoc.amount,
         status: "APPROVED",
         alreadyProcessed: true,
+        booking: {
+          id: booking._id,
+          bookingStatus: booking.bookingStatus,
+          paymentStatus: booking.paymentStatus,
+          vehicleId: booking.vehicleId,
+        },
       },
     });
   }
 
-  const expectedAmount = pendingPayment
-    ? pendingPayment.amountLyd ?? (Number(pendingPayment.amountTrxn) / 1000)
-    : paymentDoc?.amount;
+  if (
+    paymentDoc.status !== "PENDING" ||
+    booking.bookingStatus !== "PENDING_PAYMENT" ||
+    booking.paymentStatus !== "UNPAID"
+  ) {
+    throw new AppError("This booking is not eligible for payment verification.", 409);
+  }
 
   const result = await verifyTransaction({
     merchantReference: String(merchantReference),
-    expectedAmount,
+    expectedAmount: booking.totalAmount,
     systemReference,
   });
 
@@ -300,37 +280,16 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
     });
   }
 
-  // Update in-memory state
-  if (pendingPayment) {
-    pendingPayment.verified = true;
-    pendingPayment.verifiedAt = Date.now();
-    pendingPayment.systemReference =
-      result.systemReference || String(systemReference || "");
-    pendingPayment.networkReference = result.networkReference || "";
-    pendingPayments.set(String(merchantReference), pendingPayment);
-  }
+  await finalizeVerifiedPayment({
+    bookingId: booking._id,
+    paymentId: paymentDoc._id,
+    systemReference: result.systemReference || systemReference,
+    networkReference: result.networkReference,
+  });
 
-  // If a database booking is linked to this payment, finalize in DB
-  let updatedBooking = null;
-  const targetBookingId =
-    paymentDoc?.bookingId || pendingPayment?.bookingId;
-
-  if (targetBookingId) {
-    try {
-      await finalizeVerifiedPayment({
-        bookingId: targetBookingId,
-        paymentId: paymentDoc?._id,
-        systemReference: result.systemReference || systemReference,
-        networkReference: result.networkReference,
-      });
-
-      updatedBooking = await Booking.findById(targetBookingId).select(
-        "bookingStatus paymentStatus vehicleId",
-      );
-    } catch (err) {
-      console.error("Error finalizing DB booking on payment verification:", err);
-    }
-  }
+  const updatedBooking = await Booking.findById(booking._id).select(
+    "bookingStatus paymentStatus vehicleId",
+  );
 
   const amountLyd = Number(result.amount) / 1000;
 
