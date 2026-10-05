@@ -15,7 +15,7 @@ interface CompaniesResponse {
   data: { companies: CompanyDto[] };
 }
 
-/** Public operator directory; every non-deleted company is returned. */
+/** Public operator directory; only approved, non-deleted companies are returned. */
 export const companyApi = {
   listActive: (signal?: AbortSignal) =>
     request<CompaniesResponse>("/companies", { auth: false, signal }),

@@ -4,6 +4,79 @@ import Company from "../models/Company_model.js";
 import { updateCompanyStatusSchema } from "../validations/company.validation.js";
 import * as companyService from "../services/companyService.js";
 
+test("admin company listing includes records marked inactive", async (t) => {
+  const companies = [{ _id: "company-1", status: "APPROVED", active: false }];
+  const filters = [];
+  let initialQueryArgs;
+  const query = {
+    find(filter) {
+      filters.push(filter);
+      return this;
+    },
+    sort() {
+      return this;
+    },
+    select() {
+      return this;
+    },
+    skip() {
+      return this;
+    },
+    limit() {
+      return this;
+    },
+    then(resolve, reject) {
+      return Promise.resolve(companies).then(resolve, reject);
+    },
+  };
+  t.mock.method(Company, "find", (...args) => {
+    initialQueryArgs = args;
+    return query;
+  });
+
+  const result = await companyService.fetchAllAdminCompanies({});
+
+  assert.deepEqual(result, companies);
+  assert.deepEqual(initialQueryArgs, []);
+  assert.deepEqual(filters, [{}]);
+});
+
+test("public company listing follows approval status instead of legacy active flag", async (t) => {
+  const companies = [{ _id: "company-1", status: "APPROVED", active: false }];
+  const query = {
+    find() {
+      return this;
+    },
+    sort() {
+      return this;
+    },
+    select() {
+      return this;
+    },
+    skip() {
+      return this;
+    },
+    limit() {
+      return this;
+    },
+    then(resolve, reject) {
+      return Promise.resolve(companies).then(resolve, reject);
+    },
+  };
+  let initialQueryArgs;
+  t.mock.method(Company, "find", (...args) => {
+    initialQueryArgs = args;
+    return query;
+  });
+
+  const result = await companyService.fetchAllCompanies({});
+
+  assert.deepEqual(result, companies);
+  assert.deepEqual(initialQueryArgs, [
+    { status: "APPROVED", deletedAt: null },
+  ]);
+});
+
 test("company status updates persist the requested admin transition", async (t) => {
   const company = {
     status: "PENDING",

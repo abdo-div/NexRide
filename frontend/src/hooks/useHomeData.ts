@@ -226,7 +226,6 @@ export const useHomeData = (): HomeDataState => {
           isVerified: company.status === "APPROVED",
         };
       })
-      .filter((operator) => operator.fleetSize > 0)
       .sort((a, b) => b.rating - a.rating);
 
   const types = [...new Set(vehicles.map((vehicle) => vehicle.type))];
