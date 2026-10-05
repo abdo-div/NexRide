@@ -79,6 +79,13 @@ export const buildBookingCollisionQuery = (vehicleId, startDate, endDate) => ({
   $or: [{ startDate: { $lt: endDate }, endDate: { $gt: startDate } }],
 });
 
+export const bookingConcurrency = {
+  isRedisAvailable,
+  holdVehicleForCheckout,
+  acquireVehicleLock,
+  releaseVehicleHold,
+};
+
 /**
  * Customer booking creation
  */
@@ -93,18 +100,37 @@ export const createBooking = catchAsync(async (req, res, next) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
 
-  // 0. Redis guard: the checkout hold and distributed lock are concurrency
-  //    conveniences, NOT the source of truth. When Redis is unreachable the
-  //    transaction below still runs the authoritative double-booking check, so
-  //    checkout degrades gracefully instead of queueing commands forever on
-  //    the offline client (enableOfflineQueue: true would otherwise hang).
-  const redisReady = await isRedisAvailable();
+  // Booking writes require both Redis concurrency controls; never start the
+  // database transaction unless Redis protection has been acquired.
+  let redisReady = false;
+  try {
+    redisReady = await bookingConcurrency.isRedisAvailable();
+  } catch {
+    redisReady = false;
+  }
+  if (!redisReady) {
+    return next(
+      new AppError(
+        "Booking is temporarily unavailable. Please try again shortly.",
+        503,
+      ),
+    );
+  }
 
-  // 0. Reserve the vehicle for this checkout session (10-minute hold, NX key).
-  //    409 if another user is already in checkout for this vehicle.
-  const hold = redisReady
-    ? await holdVehicleForCheckout(vehicleId, req.user.id)
-    : { success: true };
+  let hold;
+  try {
+    hold = await bookingConcurrency.holdVehicleForCheckout(
+      vehicleId,
+      req.user.id,
+    );
+  } catch {
+    return next(
+      new AppError(
+        "Booking is temporarily unavailable. Please try again shortly.",
+        503,
+      ),
+    );
+  }
   if (!hold.success) {
     return next(new AppError(hold.message, 409));
   }
@@ -113,9 +139,25 @@ export const createBooking = catchAsync(async (req, res, next) => {
   let lock;
   if (redisReady) {
     try {
-      lock = await acquireVehicleLock(vehicleId, 10000);
+      lock = await bookingConcurrency.acquireVehicleLock(vehicleId, 10000);
     } catch (err) {
-      await safelyRelease(() => releaseVehicleHold(vehicleId));
+      await safelyRelease(() =>
+        bookingConcurrency.releaseVehicleHold(vehicleId),
+      );
+      let redisStillReady = false;
+      try {
+        redisStillReady = await bookingConcurrency.isRedisAvailable();
+      } catch {
+        redisStillReady = false;
+      }
+      if (!redisStillReady) {
+        return next(
+          new AppError(
+            "Booking is temporarily unavailable. Please try again shortly.",
+            503,
+          ),
+        );
+      }
       return next(
         new AppError(
           "Vehicle is currently processing another checkout attempt. Please retry in a few seconds.",
@@ -123,6 +165,18 @@ export const createBooking = catchAsync(async (req, res, next) => {
         ),
       );
     }
+  }
+
+  if (!lock || typeof lock.release !== "function") {
+    await safelyRelease(() =>
+      bookingConcurrency.releaseVehicleHold(vehicleId),
+    );
+    return next(
+      new AppError(
+        "Booking is temporarily unavailable. Please try again shortly.",
+        503,
+      ),
+    );
   }
 
   const session = await mongoose.startSession();
@@ -202,7 +256,9 @@ export const createBooking = catchAsync(async (req, res, next) => {
     // for its full 10-minute TTL would prevent any other user (or the same
     // user's next booking) from checking out the same vehicle immediately.
     if (lock) await safelyRelease(() => lock.release());
-    if (redisReady) await safelyRelease(() => releaseVehicleHold(vehicleId));
+    await safelyRelease(() =>
+      bookingConcurrency.releaseVehicleHold(vehicleId),
+    );
 
     const data = { booking };
     if (payment) data.payment = payment;
@@ -217,7 +273,9 @@ export const createBooking = catchAsync(async (req, res, next) => {
 
     // Always release lock and checkout hold on failure
     if (lock) await safelyRelease(() => lock.release());
-    if (redisReady) await safelyRelease(() => releaseVehicleHold(vehicleId));
+    await safelyRelease(() =>
+      bookingConcurrency.releaseVehicleHold(vehicleId),
+    );
     next(error);
   }
 });
