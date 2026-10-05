@@ -37,7 +37,7 @@ export const getCompanyByStorefrontIdentifier = catchAsync(
 );
 
 export const getCompanyById = catchAsync(async (req, res, next) => {
-  const company = await companyService.fetchCompanyById(req.params.id);
+  const company = await companyService.fetchPublicCompanyById(req.params.id);
 
   res.status(200).json({
     status: "success",

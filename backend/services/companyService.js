@@ -47,17 +47,28 @@ export const fetchCompanyByStorefront = async (identifier) => {
   return company;
 };
 
-/**
- * Fetch single company by ID
- */
-export const fetchCompanyById = async (companyId) => {
-  const company = await Company.findById(companyId);
+/** Fetch a public-safe company DTO by ID. */
+export const fetchPublicCompanyById = async (companyId) => {
+  const company = await Company.findOne({
+    _id: companyId,
+    status: "APPROVED",
+    deletedAt: null,
+  })
+    .select("_id name slug logo description city")
+    .lean();
 
   if (!company) {
     throw new AppError("No company found with that ID", 404);
   }
 
-  return company;
+  return {
+    _id: company._id,
+    name: company.name,
+    slug: company.slug,
+    logo: company.logo,
+    description: company.description,
+    city: company.city,
+  };
 };
 
 /**
