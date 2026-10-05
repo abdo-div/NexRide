@@ -1,6 +1,9 @@
 import { redisClient } from "../config/redis.js";
 
-const HOLD_TTL_SECONDS = 600; // 10 minutes hold
+// The hold gates who may enter checkout; the PENDING_PAYMENT booking then
+// holds the dates. The reaper window (see bookingExpiry.service.js) is the
+// longer of the two, so a booking is always released after its own hold is.
+const HOLD_TTL_SECONDS = 10 * 60; // 10 minutes hold
 
 export const holdVehicleForCheckout = async (vehicleId, userId) => {
   const normalizedVehicleId = vehicleId?._id ?? vehicleId;

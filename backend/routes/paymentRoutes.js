@@ -117,12 +117,18 @@ router.get(
  *     responses:
  *       200:
  *         description: Invoice PDF
+ *       403:
+ *         description: Tenant access denied
  *       404:
  *         description: Payment not found
  */
 router.get(
   "/:id/invoice",
   validate(idParamSchema()),
+  // Invoices embed customer name, email and phone number. Without this gate
+  // any authenticated user could enumerate payment IDs and download another
+  // tenant's invoice. Mirrors the protection on GET /:id.
+  verifyTenantAccess("Payment"),
   getPaymentById,
   downloadInvoicePDF,
 );

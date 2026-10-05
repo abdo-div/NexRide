@@ -5,10 +5,14 @@ import AppError from "../utils/appError.js";
 import APIFeatures from "../utils/APIFeatures.js";
 import { runPaginatedQuery } from "../utils/paginatedQuery.js";
 import { saveVehicleImage } from "../utils/vehicleImages.js";
+import { DATE_BLOCKING_BOOKING_STATUSES } from "../utils/bookingStatus.js";
 
-// A booking blocks a vehicle while it is paid or active on the customer's side.
-// PENDING_PAYMENT and EXPIRED reservations are excluded: they have no locked dates.
-const BOOKED_STATUSES = ["PAID", "CONFIRMED", "ACTIVE"];
+// A booking blocks a vehicle for its dates once the reservation exists. A
+// PENDING_PAYMENT booking is written before the customer reaches the payment
+// gateway, so it holds the dates too; `services/bookingExpiry.service.js`
+// releases abandoned ones by flipping them to EXPIRED. COMPLETED rentals are
+// in the past and never block future dates.
+const BOOKED_STATUSES = DATE_BLOCKING_BOOKING_STATUSES;
 const PUBLIC_FILTER_FIELDS = new Set([
   "type",
   "make",
@@ -285,9 +289,17 @@ export const createVehicleListing = async (bodyData, files, tenantCompanyId) => 
 
 /**
  * Update vehicle record
+ *
+ * Tenant ownership is immutable, so any `companyId` in the payload is discarded
+ * regardless of what validation allowed through. The zod schema already omits
+ * the field, but the service is also reachable from other callers and from
+ * seeded data, so the guarantee is enforced here too. Passing the field must
+ * never be able to move a vehicle between tenants.
  */
 export const updateVehicleRecord = async (vehicleId, updateData) => {
-  const vehicle = await Vehicle.findByIdAndUpdate(vehicleId, updateData, {
+  const { companyId: _ignoredCompanyId, ...safeUpdateData } = updateData ?? {};
+
+  const vehicle = await Vehicle.findByIdAndUpdate(vehicleId, safeUpdateData, {
     new: true,
     runValidators: true,
   });

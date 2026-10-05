@@ -48,8 +48,13 @@ const createVehicleBody = z.object({
 
 export const createVehicleSchema = z.object({ body: createVehicleBody });
 
+// `companyId` is deliberately absent from the update contract. `.partial()`
+// alone would carry it over from createVehicleBody, letting a company user PATCH
+// `{"companyId": "<competitor>"}` and move one of their vehicles into another
+// tenant's fleet, redirecting its bookings and payouts. Ownership is immutable
+// after creation; a deliberate transfer needs its own audited flow.
 export const updateVehicleSchema = z.object({
-  body: createVehicleBody.partial(),
+  body: createVehicleBody.partial().omit({ companyId: true }),
 });
 
 export const updateVehicleStatusSchema = z.object({

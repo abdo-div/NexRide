@@ -96,16 +96,46 @@ test("different vehicle with overlapping dates is allowed", () => {
   );
 });
 
-test("query filters the persisted vehicleId field and excludes inactive bookings", () => {
+test("query filters the persisted vehicleId field and only includes date-blocking statuses", () => {
   const query = collisionQuery();
   assert.equal(query.vehicleId, requestedVehicleId);
   assert.equal(Object.hasOwn(query, "vehicle"), false);
-  assert.deepEqual(query.bookingStatus.$in, ["PAID", "CONFIRMED", "ACTIVE"]);
+  assert.deepEqual(query.bookingStatus.$in, [
+    "PENDING_PAYMENT",
+    "PAID",
+    "CONFIRMED",
+    "ACTIVE",
+  ]);
 
-  for (const bookingStatus of ["CANCELLED", "EXPIRED", "PENDING_PAYMENT"]) {
+  for (const bookingStatus of ["CANCELLED", "EXPIRED", "COMPLETED"]) {
     assert.equal(
       matchesCollisionQuery(query, existingBooking({ bookingStatus })),
       false,
     );
   }
+});
+
+// P0-1 regression: the reservation row is written before the customer reaches
+// the payment gateway, so it holds the dates. Omitting PENDING_PAYMENT here is
+// what allowed two customers to book the same vehicle for the same dates.
+test("PENDING_PAYMENT booking blocks an overlapping booking", () => {
+  assert.equal(
+    matchesCollisionQuery(
+      collisionQuery(),
+      existingBooking({ bookingStatus: "PENDING_PAYMENT" }),
+    ),
+    true,
+  );
+});
+
+// The other half of the fix: an abandoned checkout must not block the vehicle
+// forever. The reaper flips these to EXPIRED, and EXPIRED must not collide.
+test("EXPIRED booking does not block a new booking", () => {
+  assert.equal(
+    matchesCollisionQuery(
+      collisionQuery(),
+      existingBooking({ bookingStatus: "EXPIRED" }),
+    ),
+    false,
+  );
 });

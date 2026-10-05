@@ -67,9 +67,13 @@ const paymentSchema = new mongoose.Schema(
         message: "Invalid payment method",
       },
     },
+    // No `default: null` on purpose. A sparse unique index skips documents where
+    // the field is absent, but a `null` value is still indexed. Defaulting to
+    // null therefore made every cash payment collide platform-wide on the
+    // second record (E11000). Leaving the field undefined keeps it out of the
+    // partial unique index entirely.
     transactionId: {
       type: String,
-      default: null,
       trim: true,
     },
     paymentGateway: {
@@ -81,9 +85,10 @@ const paymentSchema = new mongoose.Schema(
      * Kept on the ledger record so the verify step can map a gateway callback
      * back to the exact booking/customer without trusting client input.
      */
+    // Same reasoning as transactionId: undefined, never null, so unpaid cash
+    // ledger rows stay out of the partial unique index.
     merchantReference: {
       type: String,
-      default: null,
       trim: true,
       maxlength: 40,
     },
@@ -146,8 +151,25 @@ paymentSchema.pre("save", async function () {
 });
 
 paymentSchema.index({ bookingId: 1, status: 1 });
-paymentSchema.index({ transactionId: 1 }, { unique: true, sparse: true });
-paymentSchema.index({ merchantReference: 1 }, { unique: true, sparse: true });
+
+// Unique only over real gateway strings. `partialFilterExpression` is used
+// instead of `sparse` because sparse still indexes an explicit null, whereas
+// this matches nothing when the field is missing or null. Cash-on-delivery
+// rows omit both fields, so they are excluded and never collide.
+paymentSchema.index(
+  { transactionId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { transactionId: { $type: "string" } },
+  },
+);
+paymentSchema.index(
+  { merchantReference: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { merchantReference: { $type: "string" } },
+  },
+);
 
 const Payment =
   mongoose.models.Payment || mongoose.model("Payment", paymentSchema);

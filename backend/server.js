@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 import { configureDnsServers } from "./config/dnsConfig.js";
 import { validateJwtSecret } from "./config/jwt.js";
+import { validateNodeEnv, getNodeEnv } from "./config/env.js";
+import { getClientUrl } from "./config/clientUrl.js";
 
 // Load the environment file wherever it actually lives, regardless of the
 // working directory the server is started from. Candidates are checked in
@@ -20,7 +22,15 @@ if (envFile) {
   dotenv.config({ path: envFile });
 }
 
+// Security posture is pinned before anything else loads, so a misconfigured
+// deployment fails here with an actionable message instead of booting with full
+// stack traces and no rate limiting.
+validateNodeEnv();
 validateJwtSecret();
+// FRONTEND_URL must be resolvable outside development. Without it, email links
+// would have to fall back to the request host, which a forged Host header
+// controls.
+getClientUrl({ allowLocalFallback: false });
 configureDnsServers(process.env.DNS_SERVERS);
 
 const { default: mongoose } = await import("mongoose");
@@ -46,9 +56,9 @@ const server = app.listen(PORT, () => {
   listening = true;
 
   chalkLogger.success(
-    `NexRide API running in ${process.env.NODE_ENV} mode on port ${PORT} 🚀`,
+    `NexRide API running in ${getNodeEnv()} mode on port ${PORT} 🚀`,
   );
-  logger.info({ port: PORT, env: process.env.NODE_ENV }, "NexRide API started");
+  logger.info({ port: PORT, env: getNodeEnv() }, "NexRide API started");
 });
 
 // Without this handler a port conflict crashes the process with a raw stack
@@ -90,6 +100,17 @@ startEmailWorker()
 warmEmailQueue();
 
 // -----------------------------------------------------------------------------
+// Release abandoned checkout reservations so a PENDING_PAYMENT booking cannot
+// hold a vehicle's dates forever once it started blocking collisions.
+// -----------------------------------------------------------------------------
+const {
+  startBookingExpiryReaper,
+  stopBookingExpiryReaper,
+} = await import("./services/bookingExpiry.service.js");
+
+startBookingExpiryReaper();
+
+// -----------------------------------------------------------------------------
 // Graceful Shutdown (SIGTERM / SIGINT)
 // -----------------------------------------------------------------------------
 let forceExitTimer = null;
@@ -119,6 +140,9 @@ const shutdown = async (signal, exitCode = 0) => {
 };
 
 const cleanupResources = async (exitCode = 0) => {
+  // Stop the booking expiry reaper so no sweep outlives the database
+  stopBookingExpiryReaper();
+
   // Stop the BullMQ email worker and finish in-flight jobs
   try {
     await emailWorker.close();

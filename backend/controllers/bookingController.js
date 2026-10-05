@@ -13,6 +13,10 @@ import {
   holdVehicleForCheckout,
   releaseVehicleHold,
 } from "../services/reservationHold.service.js";
+import {
+  DATE_BLOCKING_BOOKING_STATUSES,
+  buildDateOverlapFilter,
+} from "../utils/bookingStatus.js";
 // Administrative register.
 //
 // The search allowlist lives in the service (`BOOKING_SEARCH_FIELDS`) because the
@@ -88,8 +92,8 @@ export const checkVehicleAvailability = catchAsync(async (req, res, next) => {
 
 export const buildBookingCollisionQuery = (vehicleId, startDate, endDate) => ({
   vehicleId,
-  bookingStatus: { $in: ["PAID", "CONFIRMED", "ACTIVE"] },
-  $or: [{ startDate: { $lt: endDate }, endDate: { $gt: startDate } }],
+  bookingStatus: { $in: DATE_BLOCKING_BOOKING_STATUSES },
+  $or: buildDateOverlapFilter(startDate, endDate),
 });
 
 export const bookingConcurrency = {

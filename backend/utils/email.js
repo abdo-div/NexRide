@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { htmlToText } from "html-to-text";
+import { isProduction } from "../config/env.js";
 
 /**
  * Enterprise Transactional Email Dispatcher
@@ -194,7 +195,7 @@ export default class Email {
  * @returns {import("nodemailer").Transporter}
  */
 export function createTransport() {
-  if (process.env.NODE_ENV === "production") {
+  if (isProduction()) {
     return nodemailer.createTransport({
       host: process.env.SMTP_HOST || "smtp.sendgrid.net",
       port: Number(process.env.SMTP_PORT) || 587,

@@ -5,6 +5,7 @@ import AppError from "../utils/appError.js";
 import * as factory from "./serviceFactory.js";
 import { runPaginatedQuery } from "../utils/paginatedQuery.js";
 import Email from "../utils/email.js";
+import { DATE_BLOCKING_BOOKING_STATUSES } from "../utils/bookingStatus.js";
 
 // The search allowlist is deliberately limited to fields stored on the booking
 // document. Populated references (vehicle make/model, customer and partner
@@ -99,7 +100,7 @@ export const checkAvailability = async (vehicleId, startDate, endDate) => {
   // Overlap condition: (ExistingStart < RequestedEnd) AND (ExistingEnd > RequestedStart)
   const overlappingBooking = await Booking.findOne({
     vehicleId,
-    bookingStatus: { $in: ["CONFIRMED", "ACTIVE", "PAID"] },
+    bookingStatus: { $in: DATE_BLOCKING_BOOKING_STATUSES },
     startDate: { $lt: end },
     endDate: { $gt: start },
   });
