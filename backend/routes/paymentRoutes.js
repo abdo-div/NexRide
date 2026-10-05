@@ -5,7 +5,6 @@ import {
   getAllPayments,
   getCompanyPayoutSummary,
   settleCompanyPayout,
-  handleStripeWebhook,
   downloadInvoicePDF,
 } from "../controllers/paymentController.js";
 import {
@@ -19,15 +18,6 @@ import { processPaymentSchema } from "../validations/payment.validation.js";
 import { idParamSchema } from "../validations/common.validation.js";
 
 const router = express.Router();
-
-// -----------------------------------------------------------------------------
-// WEBHOOK ROUTES (must be before protect middleware, no auth required)
-// -----------------------------------------------------------------------------
-router.post(
-  "/webhook/stripe",
-  express.raw({ type: "application/json" }),
-  handleStripeWebhook,
-);
 
 // -----------------------------------------------------------------------------
 // PROTECTED TRANSACTION ROUTES

@@ -176,8 +176,6 @@ export const methodLabelKey = (method: string | undefined): string => {
       return "moamalat";
     case "LOCAL_CARD":
       return "localCard";
-    case "STRIPE":
-      return "stripe";
     case "WALLET":
       return "wallet";
     default:

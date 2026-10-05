@@ -281,23 +281,6 @@ export const createBooking = catchAsync(async (req, res, next) => {
 });
 
 /**
- * Initialize Stripe payment
- */
-export const getCheckoutSession = catchAsync(async (req, res, next) => {
-  const session = await bookingService.createCheckoutSession({
-    vehicleId: req.params.vehicleId,
-    user: req.user,
-    protocol: req.protocol,
-    host: req.get("host"),
-  });
-
-  res.status(200).json({
-    status: "success",
-    session,
-  });
-});
-
-/**
  * Fetch customer self-service bookings
  */
 export const getMyBookings = catchAsync(async (req, res, next) => {

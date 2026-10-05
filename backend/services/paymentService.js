@@ -1,13 +1,8 @@
-import Stripe from "stripe";
 import mongoose from "mongoose";
 import Payment from "../models/payment_model.js";
 import Booking from "../models/booking_model.js";
 import AppError from "../utils/appError.js";
 import APIFeatures from "../utils/APIFeatures.js";
-
-const stripe = process.env.STRIPE_SECRET_KEY
-  ? new Stripe(process.env.STRIPE_SECRET_KEY)
-  : null;
 
 /**
  * Execute payment intent inside a Mongoose ACID Transaction
@@ -89,7 +84,6 @@ export const fetchPaymentById = async (paymentId) => {
 
   return payment;
 };
-
 /**
  * Fetch all payments with filtering for Tenants/Admins
  */
@@ -166,42 +160,4 @@ export const settlePaymentPayout = async (paymentId) => {
   }
 
   return payment;
-};
-
-/**
- * Process raw Stripe webhook signatures
- */
-export const processStripeWebhookEvent = async (rawBody, signature) => {
-  if (!stripe) {
-    throw new AppError(
-      "Payment processing is not configured. Add STRIPE_SECRET_KEY.",
-      500,
-    );
-  }
-
-  let event;
-
-  try {
-    event = stripe.webhooks.constructEvent(
-      rawBody,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET,
-    );
-  } catch (err) {
-    throw new AppError(
-      `Webhook Signature Verification Failed: ${err.message}`,
-      400,
-    );
-  }
-
-  if (event.type === "payment_intent.succeeded") {
-    const paymentIntent = event.data.object;
-
-    await Payment.findOneAndUpdate(
-      { transactionId: paymentIntent.id },
-      { status: "COMPLETED" },
-    );
-  }
-
-  return true;
 };

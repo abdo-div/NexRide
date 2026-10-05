@@ -1,4 +1,3 @@
-import Stripe from "stripe";
 import Booking from "../models/booking_model.js";
 import Vehicle from "../models/vehicle_model.js";
 import AppError from "../utils/appError.js";
@@ -112,48 +111,6 @@ export const createCustomerBooking = async (userId, bookingData, user) => {
   }
 
   return newBooking;
-};
-
-/**
- * Stripe checkout session generator
- */
-export const createCheckoutSession = async ({
-  vehicleId,
-  user,
-  protocol,
-  host,
-}) => {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    throw new AppError("Stripe secret key is not configured.", 500);
-  }
-
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-  const vehicle = await Vehicle.findById(vehicleId);
-  if (!vehicle) throw new AppError("Vehicle not found", 404);
-
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
-    success_url: `${protocol}://${host}/my-bookings?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${protocol}://${host}/vehicles/${vehicleId}`,
-    customer_email: user.email,
-    client_reference_id: vehicleId,
-    mode: "payment",
-    line_items: [
-      {
-        price_data: {
-          currency: "usd",
-          unit_amount: vehicle.dailyPrice * 100,
-          product_data: {
-            name: `${vehicle.make} ${vehicle.model}`,
-            description: `Daily Rate: $${vehicle.dailyPrice}`,
-          },
-        },
-        quantity: 1,
-      },
-    ],
-  });
-
-  return session;
 };
 
 /**

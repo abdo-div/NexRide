@@ -8,7 +8,6 @@ import {
   cancelBooking,
   updateBookingStatus,
   checkVehicleAvailability,
-  getCheckoutSession,
   downloadBookingInvoice,
 } from "../controllers/bookingController.js";
 import {
@@ -20,7 +19,6 @@ import { validate } from "../middlewares/validate.middleware.js";
 import {
   createBookingSchema,
   checkAvailabilitySchema,
-  checkoutSessionSchema,
 } from "../validations/booking.validation.js";
 
 const router = express.Router();
@@ -62,14 +60,6 @@ router.post(
   restrictTo("customer"),
   validate(createBookingSchema),
   createBooking,
-);
-
-// Initialize online payment checkout session (Stripe / Local Payment Gateways)
-router.get(
-  "/checkout-session/:vehicleId",
-  restrictTo("customer"),
-  validate(checkoutSessionSchema),
-  getCheckoutSession,
 );
 
 // -----------------------------------------------------------------------------

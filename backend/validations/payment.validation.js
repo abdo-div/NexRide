@@ -5,7 +5,7 @@ export const processPaymentSchema = z.object({
   body: z.object({
     bookingId: objectId,
     paymentMethod: ciEnum(
-      ["CASH_ON_DELIVERY", "LOCAL_CARD", "STRIPE", "WALLET"],
+      ["CASH_ON_DELIVERY", "LOCAL_CARD", "WALLET"],
       "Invalid payment method",
     ).optional(),
   }),

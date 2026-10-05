@@ -38,7 +38,6 @@
     "pug": "^3.0.4",
     "redlock": "^5.0.0-beta.2",
     "sharp": "^0.35.3",
-    "stripe": "^22.3.0",
     "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^14.0.2",

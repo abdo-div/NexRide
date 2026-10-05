@@ -22,7 +22,6 @@ export const createBookingSchema = z.object({
     })
     .refine(dateRangeIsValid, dateRangeError),
 });
-
 export const checkAvailabilitySchema = z.object({
   query: z
     .object({
@@ -31,14 +30,4 @@ export const checkAvailabilitySchema = z.object({
       endDate: isoDate,
     })
     .refine(dateRangeIsValid, dateRangeError),
-});
-
-export const checkoutSessionSchema = z.object({
-  params: z.object({ vehicleId: objectId }),
-  query: z
-    .object({
-      startDate: isoDate.optional(),
-      endDate: isoDate.optional(),
-    })
-    .optional(),
-});
+  });

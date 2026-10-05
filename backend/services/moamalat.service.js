@@ -377,7 +377,7 @@ export const finalizeVerifiedPayment = async ({
 
     // Booking overlap checks + fleet search already exclude PAID/CONFIRMED/
     // ACTIVE records; flipping operationalStatus mirrors the existing
-    // cash/Stripe completion path and satisfies "car no longer available".
+    // cash completion path and satisfies "car no longer available".
     await Vehicle.findByIdAndUpdate(
       booking.vehicleId,
       { operationalStatus: "UNAVAILABLE" },
