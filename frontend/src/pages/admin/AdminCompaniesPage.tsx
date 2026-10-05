@@ -21,8 +21,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useAdminData } from "../../hooks/useAdminData";
-import { companiesCsv, filterByHub } from "../../lib/adminMetrics";
-import { useAdminHub } from "../../context/adminHub";
+import { companiesCsv } from "../../lib/adminMetrics";
 import { adminApi } from "../../lib/adminApi";
 import { saveBlobAsFile } from "../../lib/bookingView";
 import {
@@ -100,7 +99,6 @@ export const AdminCompaniesPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { data, loading, error, reload } = useAdminData();
-  const { hub } = useAdminHub();
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("ALL");
@@ -111,22 +109,7 @@ export const AdminCompaniesPage: React.FC = () => {
   const [mutationError, setMutationError] = useState(false);
   const dossierRef = useRef<HTMLDivElement>(null);
 
-  // -------------------------------------------------------------------------
-  // Hub-aware base datasets (companies matched case-insensitively because the
-  // seed data mixes "Tripoli" and "tripoli").
-  // -------------------------------------------------------------------------
-  const base = useMemo(() => {
-    const filtered = filterByHub(data, hub);
-    const companies = hub
-      ? data.companies.filter(
-          (c) =>
-            c.city.toLocaleLowerCase(i18n.language) ===
-            hub.toLocaleLowerCase(i18n.language),
-        )
-      : data.companies;
-    return { ...filtered, companies };
-  }, [data, hub, i18n.language]);
-  const { companies, vehicles, bookings, payments } = base;
+  const { companies, vehicles, bookings, payments } = data;
 
   const resetPage = () => setPage(1);
 

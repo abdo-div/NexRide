@@ -2,11 +2,23 @@ import Company from "../models/Company_model.js";
 import AppError from "../utils/appError.js";
 import APIFeatures from "../utils/APIFeatures.js";
 
-/**
- * Fetch all active companies matching search/filter criteria
- */
+/** Fetch approved, non-deleted companies for the public directory. */
 export const fetchAllCompanies = async (queryParams) => {
-  const features = new APIFeatures(Company.find({ active: { $ne: false } }), queryParams)
+  const features = new APIFeatures(
+    Company.find({ status: "APPROVED", deletedAt: null }),
+    queryParams,
+  )
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+
+  return await features.query;
+};
+
+/** Fetch every company for platform administration, including inactive records. */
+export const fetchAllAdminCompanies = async (queryParams) => {
+  const features = new APIFeatures(Company.find(), queryParams)
     .filter()
     .sort()
     .limitFields()
@@ -24,7 +36,8 @@ export const fetchCompanyByStorefront = async (identifier) => {
       { subdomain: identifier.toLowerCase() },
       { slug: identifier.toLowerCase() },
     ],
-    active: { $ne: false },
+    status: "APPROVED",
+    deletedAt: null,
   });
 
   if (!company) {

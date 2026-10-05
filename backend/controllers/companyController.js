@@ -13,6 +13,16 @@ export const getAllCompanies = catchAsync(async (req, res, next) => {
   });
 });
 
+export const getAllAdminCompanies = catchAsync(async (req, res, next) => {
+  const companies = await companyService.fetchAllAdminCompanies(req.query);
+
+  res.status(200).json({
+    status: "success",
+    results: companies.length,
+    data: { companies },
+  });
+});
+
 export const getCompanyByStorefrontIdentifier = catchAsync(
   async (req, res, next) => {
     const company = await companyService.fetchCompanyByStorefront(

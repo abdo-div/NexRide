@@ -3,7 +3,7 @@ import { protect, restrictTo } from "../middlewares/authMiddleware.js";
 import { safePagination } from "../middlewares/pagination.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import {
-  getAllCompanies,
+  getAllAdminCompanies,
   updateCompanyStatus,
 } from "../controllers/companyController.js";
 import { getAllVehicles } from "../controllers/vehicleController.js";
@@ -36,7 +36,7 @@ const router = express.Router();
 // APIFeatures-driven list services can never be forced to scan unbounded rows.
 router.use(protect, restrictTo("admin"));
 
-router.get("/companies", safePagination(20, 100), getAllCompanies);
+router.get("/companies", safePagination(20, 100), getAllAdminCompanies);
 router.get("/vehicles", safePagination(20, 100), getAllVehicles);
 router.get("/bookings", safePagination(20, 100), getAllBookings);
 // Commission/payout ledger lives on the Payment collection
