@@ -1,4 +1,5 @@
 import AppError from "../utils/appError.js";
+import { isDevelopment } from "../config/env.js";
 
 /**
  * Transforms Mongoose CastError (invalid ObjectIDs)
@@ -127,9 +128,14 @@ export default (err, req, res, next) => {
   if (error.name === "JsonWebTokenError") error = handleJWTError();
   if (error.name === "TokenExpiredError") error = handleJWTExpiredError();
 
-  if (process.env.NODE_ENV === "production") {
-    sendErrorProd(error, req, res);
-  } else {
+  // Fail closed: stack traces are shown ONLY in an exact "development" run.
+  // Any other value, including "staging" and a typo like "prod", gets the
+  // hardened renderer. The previous `=== "production"` check meant a typo
+  // leaked full serialized stacks, including file paths and query values, to
+  // every API client.
+  if (isDevelopment()) {
     sendErrorDev(error, req, res);
+  } else {
+    sendErrorProd(error, req, res);
   }
 };

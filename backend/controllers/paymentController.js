@@ -78,5 +78,15 @@ export const downloadInvoicePDF = catchAsync(async (req, res, next) => {
     );
   }
 
+  // The invoice embeds customer name, email and phone number, so ownership is
+  // proven here as well as on the route. `verifyTenantAccess` covers the routed
+  // path; this check keeps the guarantee attached to the handler itself so it
+  // holds no matter how the route is wired.
+  paymentService.assertInvoiceAccess(
+    payment,
+    req.user,
+    req.tenantId ?? req.user?.company,
+  );
+
   await streamInvoiceForPayment(res, payment);
 });

@@ -26,11 +26,7 @@ const createSendToken = (user, statusCode, req, res) => {
 };
 
 export const signup = catchAsync(async (req, res, next) => {
-  const newUser = await authService.registerUser(
-    req.body,
-    req.get("host"),
-    req.protocol
-  );
+  const newUser = await authService.registerUser(req.body);
   createSendToken(newUser, 201, req, res);
 });
 
@@ -52,10 +48,12 @@ export const logout = (req, res) => {
 };
 
 export const forgotPassword = catchAsync(async (req, res, next) => {
-  const host = req.get("host");
   const identifier = req.body.identifier ?? req.body.email;
 
-  await authService.requestPasswordReset(identifier, host, req.protocol);
+  // The request host is intentionally not passed on. Email link domains come
+  // from FRONTEND_URL only; a forged Host header must not be able to redirect a
+  // password reset token to an attacker's server.
+  await authService.requestPasswordReset(identifier);
 
   res.status(200).json({
     status: "success",

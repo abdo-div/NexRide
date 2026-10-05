@@ -375,7 +375,7 @@ export const finalizeVerifiedPayment = async ({
     payment.paidAt = new Date();
     await payment.save({ session });
 
-    // Booking overlap checks + fleet search already exclude PAID/CONFIRMED/
+    // Booking overlap checks + fleet search already include PAID/CONFIRMED/
     // ACTIVE records; flipping operationalStatus mirrors the existing
     // cash completion path and satisfies "car no longer available".
     await Vehicle.findByIdAndUpdate(

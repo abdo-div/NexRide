@@ -175,6 +175,50 @@ export const fetchPaymentById = async (paymentId) => {
 
   return payment;
 };
+const resolveId = (value) => {
+  if (!value) return null;
+  if (value._id) return value._id.toString();
+  return value.toString();
+};
+
+/**
+ * Guard for the invoice PDF, which embeds customer name, email and phone number.
+ *
+ * The invoice route streams PII for whoever owns the payment, so access must be
+ * proven at the point the data would be released rather than relying on a bare
+ * findById. Admins may read any invoice; otherwise the caller must be the paying
+ * customer or the company the payment belongs to.
+ *
+ * Throws 403 rather than 404 so a missing relationship is never reported as
+ * "not found", which would let callers probe for the existence of other
+ * tenants' payments.
+ */
+export const assertInvoiceAccess = (payment, user, tenantId = null) => {
+  if (!payment) {
+    throw new AppError("No payment record found with that ID", 404);
+  }
+
+  if (!user) {
+    throw new AppError("You are not logged in! Please log in to get access.", 401);
+  }
+
+  if (user.role === "admin") return payment;
+
+  const callerId = (user.id ?? user._id)?.toString();
+  const customerId = resolveId(payment.customerId);
+  const companyId = resolveId(payment.companyId);
+
+  if (customerId && callerId && customerId === callerId) return payment;
+
+  const callerTenantId = (tenantId ?? user.company)?.toString();
+  if (companyId && callerTenantId && companyId === callerTenantId) return payment;
+
+  throw new AppError(
+    "Access Denied. You are not permitted to view this invoice.",
+    403,
+  );
+};
+
 /**
  * Fetch all payments with filtering for Tenants/Admins
  *

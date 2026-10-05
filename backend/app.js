@@ -82,6 +82,7 @@ import { swaggerSpec } from "./config/swagger.js";
 
 import AppError from "./utils/appError.js";
 import globalErrorHandler from "./middlewares/errorMiddleware.js";
+import { isDevelopment } from "./config/env.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -89,7 +90,22 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // ============================================
-// 1. STRUCTURED HTTP LOGGING
+// 1. REVERSE PROXY TRUST
+// ============================================
+
+// The app runs behind a single reverse proxy (Nginx / Render / Fly). Trusting
+// exactly one hop makes `req.protocol` and `req.ip` reflect X-Forwarded-Proto
+// and X-Forwarded-For, so `secure` cookies are issued over TLS and rate
+// limiters bucket by real client IP instead of the proxy's.
+//
+// Trusting `true` would be worse than not setting this at all: any client could
+// forge its own forwarded headers and both spoof its IP past the limiters and
+// downgrade the protocol cookie. A numeric hop count is the safe middle ground
+// because the deployed topology has a fixed depth.
+app.set("trust proxy", 1);
+
+// ============================================
+// 2. STRUCTURED HTTP LOGGING
 // ============================================
 
 app.use(httpLogger);
@@ -120,8 +136,13 @@ app.use(securityCors);
 // 5. DEVELOPMENT LOGGING
 // ============================================
 
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
+if (isDevelopment()) {
+  // Custom format rather than "dev": the built-in dev format omits headers but
+  // logs the full URL, which can carry tokens in query parameters (gateway
+  // callbacks, password-reset codes). The path only is logged here; the
+  // structured logger above carries the same information safely.
+  morgan.token("safe-url", (req) => req.originalUrl?.split("?")[0] ?? req.url);
+  app.use(morgan(":method :safe-url :status :res[content-type] - :response-time ms"));
 }
 
 // ============================================

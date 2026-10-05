@@ -4,6 +4,7 @@ import User from "../models/User_model.js";
 import AppError from "../utils/appError.js";
 import Email from "../utils/email.js";
 import { getJwtSecret } from "../config/jwt.js";
+import { resolveClientUrl } from "../config/clientUrl.js";
 
 /**
  * Sign JWT Token
@@ -16,14 +17,13 @@ export const signToken = (id) => {
 
 /**
  * Resolves the base URL of the client application so emails link back to the
- * SPA instead of the API. Falls back to the incoming request origin when
- * FRONTEND_URL is not configured.
+ * SPA instead of the API.
+ *
+ * Reads FRONTEND_URL exclusively. The previous signature accepted the request's
+ * host and protocol and used them as a fallback, which made every reset link
+ * forgeable via a `Host` header. The host arguments are no longer accepted so a
+ * future caller cannot reintroduce the fallback by passing them along.
  */
-const resolveClientUrl = (reqHost, reqProtocol) => {
-  const configured = (process.env.FRONTEND_URL || "").trim();
-  if (configured) return configured.replace(/\/+$/, "");
-  return `${reqProtocol}://${reqHost}`;
-};
 
 /**
  * Reduces a phone number to its local Libyan digits (no country code, no
@@ -84,7 +84,7 @@ const identifierQuery = (identifier) => {
 /**
  * Register a new user
  */
-export const registerUser = async (userData, reqHost, reqProtocol) => {
+export const registerUser = async (userData) => {
   const newUser = await User.create({
     name: userData.name,
     email: userData.email,
@@ -95,7 +95,7 @@ export const registerUser = async (userData, reqHost, reqProtocol) => {
   });
 
   // Non-blocking welcome email dispatch
-  const dashboardURL = resolveClientUrl(reqHost, reqProtocol);
+  const dashboardURL = resolveClientUrl();
   new Email(newUser, dashboardURL).sendWelcome().catch((err) => {
     console.error("Non-critical background welcome email error:", err.message);
   });
@@ -125,7 +125,7 @@ export const authenticateUser = async (identifier, password) => {
 /**
  * Initiate forgot password lifecycle & email reset link
  */
-export const requestPasswordReset = async (identifier, host, protocol) => {
+export const requestPasswordReset = async (identifier) => {
   const user = await User.findOne(identifierQuery(identifier));
 
   if (!user) {
@@ -136,7 +136,7 @@ export const requestPasswordReset = async (identifier, host, protocol) => {
   await user.save({ validateBeforeSave: false });
 
   try {
-    const resetURL = `${resolveClientUrl(host, protocol)}/reset-password/${resetToken}`;
+    const resetURL = `${resolveClientUrl()}/reset-password/${resetToken}`;
     await new Email(user, resetURL).sendPasswordReset();
     return true;
   } catch (err) {
