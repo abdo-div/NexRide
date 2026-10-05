@@ -123,7 +123,13 @@ const payoutStatusOf = (row) => {
  * live aggregate of that partner's payment ledger (gross GMV, NexRide fee, net
  * share, pending/settled balances) joined with the company record for naming.
  */
-export const buildPayoutLedger = async ({ companyId, search, ...paginationQuery } = {}) => {
+export const buildPayoutLedger = async ({
+  companyId,
+  search,
+  status,
+  cycle,
+  ...paginationQuery
+} = {}) => {
   const match = { status: { $in: ["COMPLETED", "REFUNDED"] } };
   if (companyId) {
     match.companyId = new mongoose.Types.ObjectId(companyId);
@@ -138,6 +144,24 @@ export const buildPayoutLedger = async ({ companyId, search, ...paginationQuery 
           $or: [
             { "company.name": new RegExp(escapeRegExp(searchTerm), "i") },
             { "company.city": new RegExp(escapeRegExp(searchTerm), "i") },
+            {
+              $expr: {
+                $regexMatch: {
+                  input: {
+                    $concat: [
+                      "PO-",
+                      {
+                        $toUpper: {
+                          $substrCP: [{ $toString: "$company._id" }, 18, 6],
+                        },
+                      },
+                    ],
+                  },
+                  regex: escapeRegex(searchTerm),
+                  options: "i",
+                },
+              },
+            },
           ],
         }
       : null;
@@ -235,6 +259,41 @@ export const buildPayoutLedger = async ({ companyId, search, ...paginationQuery 
 
   if (searchFilter) {
     pipeline.push({ $match: searchFilter });
+  }
+
+  pipeline.push({
+    $addFields: {
+      payoutStatus: {
+        $switch: {
+          branches: [
+            { case: { $gt: ["$unsettled", 0] }, then: "PENDING" },
+            { case: { $gt: ["$processing", 0] }, then: "PROCESSING" },
+            { case: { $gt: ["$settled", 0] }, then: "PAID" },
+            { case: { $gt: ["$adjustments", 0] }, then: "ADJUSTED" },
+          ],
+          default: "CLEARED",
+        },
+      },
+    },
+  });
+
+  if (status && status !== "ALL") {
+    pipeline.push({ $match: { payoutStatus: status } });
+  }
+
+  const cycleDays = { monthly: 30, biweekly: 14, week: 7 }[cycle];
+  if (cycleDays) {
+    const from = new Date(Date.now() - cycleDays * 86400000);
+    pipeline.push({
+      $match: {
+        $expr: {
+          $gte: [
+            { $ifNull: ["$lastPayoutSetAt", "$lastPaidAt"] },
+            from,
+          ],
+        },
+      },
+    });
   }
 
   // The ledger is aggregated to one row per fleet operator, so the window is

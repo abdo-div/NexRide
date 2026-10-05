@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -15,6 +15,7 @@ import {
   Users,
 } from "lucide-react";
 import { useAdminCustomers } from "../../hooks/useAdminCustomers";
+import { usePaginatedList } from "../../hooks/usePaginatedList";
 import { customersCsv } from "../../lib/adminMetrics";
 import { adminApi } from "../../lib/adminApi";
 import { saveBlobAsFile } from "../../lib/bookingView";
@@ -27,15 +28,20 @@ import { AdminCustomersTable } from "../../components/admin/AdminCustomersTable"
 import { CustomerDossierPanel } from "../../components/admin/CustomerDossierPanel";
 import type { AdminCustomerDto, UserStatus } from "../../types/admin";
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 20;
 
 const STATUS_OPTIONS: UserStatus[] = ["ACTIVE", "SUSPENDED", "BANNED"];
 
 export const AdminCustomersPage: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
-  const { data, loading, error, reload } = useAdminCustomers();
-  const { customers, bookings, vehicles, payments } = data;
+  const {
+    data,
+    loading: registryLoading,
+    error: registryError,
+    reload: reloadRegistry,
+  } = useAdminCustomers();
+  const { customers: referenceCustomers, bookings, vehicles, payments } = data;
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("ALL");
@@ -45,35 +51,68 @@ export const AdminCustomersPage: React.FC = () => {
   const [mutationError, setMutationError] = useState(false);
   const dossierRef = useRef<HTMLDivElement>(null);
 
+  const queryKey = useMemo(
+    () => ({ page, limit: PAGE_SIZE, search, status }),
+    [page, search, status],
+  );
+  const fetchPage = useCallback(
+    async (signal: AbortSignal) => {
+      const res = await adminApi.listCustomers(
+        {
+          page,
+          limit: PAGE_SIZE,
+          search: search.trim() || undefined,
+          status,
+        },
+        signal,
+      );
+      return { rows: res.data.users ?? [], pagination: res.pagination };
+    },
+    [page, search, status],
+  );
+  const {
+    rows: customers,
+    pagination,
+    loading: pageLoading,
+    error: pageError,
+    reload: reloadPage,
+  } = usePaginatedList<AdminCustomerDto>(fetchPage, queryKey);
+  const loading = registryLoading || pageLoading;
+  const error = registryError || pageError;
+  const reload = useCallback(() => {
+    reloadRegistry();
+    reloadPage();
+  }, [reloadRegistry, reloadPage]);
+
   const resetPage = () => setPage(1);
 
   // -------------------------------------------------------------------------
   // Registry KPIs (real backend datasets only)
   // -------------------------------------------------------------------------
   const kpis = useMemo(() => {
-    const activeAccounts = customers.filter((c) => (c.status ?? "ACTIVE") === "ACTIVE").length;
-    const restricted = customers.filter(
+    const activeAccounts = referenceCustomers.filter((c) => (c.status ?? "ACTIVE") === "ACTIVE").length;
+    const restricted = referenceCustomers.filter(
       (c) => c.status === "SUSPENDED" || c.status === "BANNED",
     ).length;
-    const neverRented = customers.filter(
+    const neverRented = referenceCustomers.filter(
       (c) => bookingsOfCustomer(bookings, c).length === 0,
     ).length;
     const activeRentals = bookings.filter((b) => b.bookingStatus === "ACTIVE").length;
     const occupancy =
       vehicles.length > 0 ? Math.round((activeRentals / vehicles.length) * 100) : 0;
 
-    const totalSpend = customers.reduce(
+    const totalSpend = referenceCustomers.reduce(
       (sum, c) => sum + spendOfCustomer(payments, c),
       0,
     );
-    const renters = customers.filter(
+    const renters = referenceCustomers.filter(
       (c) => bookingsOfCustomer(bookings, c).length > 0,
     ).length;
     const avgSpend = renters > 0 ? totalSpend / renters : 0;
 
     let topSpend = 0;
     let topName = "";
-    customers.forEach((c) => {
+    referenceCustomers.forEach((c) => {
       const spend = spendOfCustomer(payments, c);
       if (spend > topSpend) {
         topSpend = spend;
@@ -82,13 +121,13 @@ export const AdminCustomersPage: React.FC = () => {
     });
 
     // Completed-payment delta vs previous 30-day cycle (real ledger).
-    const currentGross = grossSince(customers, payments, 30);
-    const priorGross = grossBetween(customers, payments, 60, 30);
+    const currentGross = grossSince(referenceCustomers, payments, 30);
+    const priorGross = grossBetween(referenceCustomers, payments, 60, 30);
     const delta =
       priorGross > 0 ? Math.round(((currentGross - priorGross) / priorGross) * 100) : null;
 
     return {
-      total: customers.length,
+      total: data.customerTotal,
       activeAccounts,
       restricted,
       neverRented,
@@ -99,29 +138,9 @@ export const AdminCustomersPage: React.FC = () => {
       topCustomerName: topName,
       delta,
     };
-  }, [customers, bookings, vehicles, payments]);
+  }, [data.customerTotal, referenceCustomers, bookings, vehicles, payments]);
 
-  // -------------------------------------------------------------------------
-  // Filtered rows (search + account status), newest first
-  // -------------------------------------------------------------------------
-  const filtered = useMemo(() => {
-    const needle = search.trim().toLocaleLowerCase(i18n.language);
-    const list = customers
-      .filter((c) => status === "ALL" || (c.status ?? "ACTIVE") === status)
-      .filter((c) => {
-        if (!needle) return true;
-        const haystack = [c.name, c.email, c.phoneNumber, c.status]
-          .join(" ")
-          .toLocaleLowerCase(i18n.language);
-        return haystack.includes(needle);
-      })
-      .slice();
-    list.sort(
-      (a, b) =>
-        new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime(),
-    );
-    return list;
-  }, [customers, status, search, i18n.language]);
+  const filtered = customers;
 
   // -------------------------------------------------------------------------
   // Selected customer: remembered selection, else the most active on the page.
@@ -210,7 +229,7 @@ export const AdminCustomersPage: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-3">
           <span className="rounded-full bg-[#EFF4FF] px-3 py-1 text-xs font-bold text-[#2563EB]">
-            {t("admin.customers.count", { count: filtered.length })}
+            {t("admin.customers.count", { count: pagination.total })}
           </span>
           <button
             type="button"
@@ -349,7 +368,7 @@ export const AdminCustomersPage: React.FC = () => {
                 value: s,
                 label: t(`admin.status.${s}`),
               }))}
-              allLabel={t("admin.customers.filterStatusAll", { count: customers.length })}
+              allLabel={t("admin.customers.filterStatusAll", { count: data.customerTotal })}
             />
             <div className="flex items-end sm:col-span-1 xl:col-span-3">
               <button
@@ -373,7 +392,7 @@ export const AdminCustomersPage: React.FC = () => {
               {t("admin.customers.table.title")}
             </span>
             <span className="rounded-full bg-[#E5EEFF] px-2 py-0.5 text-xs font-bold text-[#2563EB]">
-              {t("admin.customers.table.records", { count: filtered.length })}
+              {t("admin.customers.table.records", { count: pagination.total })}
             </span>
           </div>
           <div className="flex items-center gap-1 text-xs text-[#565E74]">
@@ -413,9 +432,9 @@ export const AdminCustomersPage: React.FC = () => {
             selectedId={selected?._id ?? ""}
             onSelect={handleSelect}
             openDossier={(c) => openDossier(c)}
-            page={page}
-            pageSize={PAGE_SIZE}
+            pagination={pagination}
             onPageChange={setPage}
+            loading={pageLoading}
             emptyLabel={t("admin.customers.table.empty")}
           />
         )}

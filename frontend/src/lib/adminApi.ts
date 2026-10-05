@@ -56,6 +56,11 @@ export interface AdminListParams {
   hub?: string;
   /** Account role scope; the customers register is locked to `customer`. */
   role?: string;
+  paymentMethod?: string;
+  /** Rolling payment window: today, 7d or 30d. */
+  range?: string;
+  /** Derived payout ledger date window. */
+  cycle?: string;
 }
 
 const listQuery = (params: AdminListParams = {}): string => {
@@ -83,6 +88,11 @@ const listQuery = (params: AdminListParams = {}): string => {
     query.set("priority", params.priority);
   }
   if (params.status && params.status !== "ALL") query.set("status", params.status);
+  if (params.paymentMethod && params.paymentMethod !== "ALL") {
+    query.set("paymentMethod", params.paymentMethod);
+  }
+  if (params.range && params.range !== "ALL") query.set("range", params.range);
+  if (params.cycle && params.cycle !== "ALL") query.set("cycle", params.cycle);
   if (params.hub && params.hub !== "ALL") query.set("hub", params.hub);
   if (params.role) query.set("role", params.role);
 

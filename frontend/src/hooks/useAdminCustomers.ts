@@ -10,6 +10,7 @@ import type { VehicleDto } from "../types/vehicle";
 
 export interface AdminCustomersData {
   customers: AdminCustomerDto[];
+  customerTotal: number;
   bookings: BookingDto[];
   vehicles: VehicleDto[];
   companies: AdminCompanyDto[];
@@ -18,6 +19,7 @@ export interface AdminCustomersData {
 
 export const EMPTY_CUSTOMERS_DATA: AdminCustomersData = {
   customers: [],
+  customerTotal: 0,
   bookings: [],
   vehicles: [],
   companies: [],
@@ -73,6 +75,7 @@ export const useAdminCustomers = (): {
         if (!active) return;
         setData({
           customers: customersRes.data.users ?? EMPTY_RESPONSES.customers,
+          customerTotal: customersRes.pagination.total,
           bookings: bookingsRes.data.data ?? EMPTY_RESPONSES.bookings,
           vehicles: vehiclesRes.data.vehicles ?? EMPTY_RESPONSES.vehicles,
           companies: companiesRes.data.companies ?? EMPTY_RESPONSES.companies,

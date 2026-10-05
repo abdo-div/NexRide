@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -19,21 +19,20 @@ import {
   Wallet,
 } from "lucide-react";
 import { useAdminPayments } from "../../hooks/useAdminPayments";
+import { usePaginatedList } from "../../hooks/usePaginatedList";
+import { adminApi } from "../../lib/adminApi";
 import { paymentsCsv } from "../../lib/adminMetrics";
 import { saveBlobAsFile, formatDate } from "../../lib/bookingView";
 import { buildPaymentMetrics } from "../../lib/paymentMetrics";
 import {
   bookingOfPayment,
-  companyOfPayment,
   paymentMethodsOf,
-  paymentTimestamp,
-  paymentSearchText,
 } from "../../lib/paymentView";
 import { AdminPaymentsTable } from "../../components/admin/AdminPaymentsTable";
 import { PaymentDossierPanel } from "../../components/admin/PaymentDossierPanel";
 import type { AdminPaymentDto } from "../../types/admin";
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 20;
 
 const STATUS_OPTIONS = ["PENDING", "COMPLETED", "FAILED", "REFUNDED"] as const;
 const RANGE_OPTIONS = ["ALL", "today", "7d", "30d"] as const;
@@ -41,8 +40,18 @@ const RANGE_OPTIONS = ["ALL", "today", "7d", "30d"] as const;
 export const AdminPaymentsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { data, loading, error, reload } = useAdminPayments();
-  const { payments, bookings, customers, companies } = data;
+  const {
+    data,
+    loading: registryLoading,
+    error: registryError,
+    reload: reloadRegistry,
+  } = useAdminPayments();
+  const {
+    payments: referencePayments,
+    bookings,
+    customers,
+    companies,
+  } = data;
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("ALL");
@@ -53,46 +62,47 @@ export const AdminPaymentsPage: React.FC = () => {
   const [selectedId, setSelectedId] = useState("");
   const dossierRef = useRef<HTMLDivElement>(null);
 
-  const methods = useMemo(() => paymentMethodsOf(payments), [payments]);
-  const metrics = useMemo(() => buildPaymentMetrics(payments), [payments]);
+  const methods = useMemo(() => paymentMethodsOf(referencePayments), [referencePayments]);
+  const metrics = useMemo(() => buildPaymentMetrics(referencePayments), [referencePayments]);
 
   const resetPage = () => setPage(1);
 
-  // -------------------------------------------------------------------------
-  // Filtered ledger (search + real field filters), newest first
-  // -------------------------------------------------------------------------
-  const filtered = useMemo(() => {
-    const needle = search.trim().toLocaleLowerCase(i18n.language);
-    const list = payments
-      .filter((p) => status === "ALL" || p.status === status)
-      .filter((p) => method === "ALL" || p.paymentMethod === method)
-      .filter((p) => {
-        if (provider === "ALL") return true;
-        return companyOfPayment(companies, p)?._id === provider;
-      })
-      .filter((p) => inRange(p, range))
-      .filter((p) => {
-        if (!needle) return true;
-        return paymentSearchText(p, bookings, customers, companies).includes(needle);
-      });
-    list.sort(
-      (a, b) =>
-        new Date(paymentTimestamp(b) ?? 0).getTime() -
-        new Date(paymentTimestamp(a) ?? 0).getTime(),
-    );
-    return list;
-  }, [
-    payments,
-    bookings,
-    customers,
-    companies,
-    status,
-    method,
-    provider,
-    range,
-    search,
-    i18n.language,
-  ]);
+  const queryKey = useMemo(
+    () => ({ page, limit: PAGE_SIZE, search, status, method, provider, range }),
+    [page, search, status, method, provider, range],
+  );
+  const fetchPage = useCallback(
+    async (signal: AbortSignal) => {
+      const res = await adminApi.listCommissions(
+        {
+          page,
+          limit: PAGE_SIZE,
+          search: search.trim() || undefined,
+          status,
+          paymentMethod: method,
+          companyId: provider,
+          range,
+        },
+        signal,
+      );
+      return { rows: res.data.payments ?? [], pagination: res.pagination };
+    },
+    [page, search, status, method, provider, range],
+  );
+  const {
+    rows: payments,
+    pagination,
+    loading: pageLoading,
+    error: pageError,
+    reload: reloadPage,
+  } = usePaginatedList<AdminPaymentDto>(fetchPage, queryKey);
+  const filtered = payments;
+  const loading = registryLoading || pageLoading;
+  const error = registryError || pageError;
+  const reload = useCallback(() => {
+    reloadRegistry();
+    reloadPage();
+  }, [reloadRegistry, reloadPage]);
 
   // -------------------------------------------------------------------------
   // Selected transaction (remembered, else most recent)
@@ -161,7 +171,7 @@ export const AdminPaymentsPage: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-3">
           <span className="rounded-full bg-[#EFF4FF] px-3 py-1 text-xs font-bold text-[#2563EB]">
-            {t("admin.payments.count", { count: filtered.length })}
+            {t("admin.payments.count", { count: pagination.total })}
           </span>
           <button
             type="button"
@@ -185,7 +195,7 @@ export const AdminPaymentsPage: React.FC = () => {
       </div>
 
       {/* KPI bento (5 cards) */}
-      {!loading && !error && payments.length > 0 && (
+      {!loading && !error && referencePayments.length > 0 && (
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           <KpiCard
             label={t("admin.payments.kpis.gross")}
@@ -226,7 +236,7 @@ export const AdminPaymentsPage: React.FC = () => {
             value={formatLydCompact(metrics.escrowSum)}
             suffix={t("admin.payments.kpis.lyd")}
             sub={t("admin.payments.kpis.escrowSub", { count: metrics.escrowCount })}
-            progress={pct(metrics.escrowCount, Math.max(payments.length, 1))}
+            progress={pct(metrics.escrowCount, Math.max(referencePayments.length, 1))}
             barTone="bg-amber-500"
           />
           <KpiCard
@@ -256,7 +266,7 @@ export const AdminPaymentsPage: React.FC = () => {
       )}
 
       {/* Analytical mini-row (3 cards) */}
-      {!loading && !error && payments.length > 0 && (
+      {!loading && !error && referencePayments.length > 0 && (
         <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
           {/* Channel distribution */}
           <div className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_2px_12px_rgba(15,23,42,0.04)]">
@@ -432,7 +442,7 @@ export const AdminPaymentsPage: React.FC = () => {
                 value: s,
                 label: t(`admin.status.${s}`),
               }))}
-              allLabel={t("admin.payments.filterAll", { count: payments.length })}
+              allLabel={t("admin.payments.filterAll", { count: pagination.total })}
             />
             <FilterSelect
               label={t("admin.payments.filterMethod")}
@@ -446,7 +456,7 @@ export const AdminPaymentsPage: React.FC = () => {
                 value: m,
                 label: t(`admin.payments.methods.${m}`, { defaultValue: m }),
               }))}
-              allLabel={t("admin.payments.filterAll", { count: payments.length })}
+              allLabel={t("admin.payments.filterAll", { count: pagination.total })}
             />
             <FilterSelect
               label={t("admin.payments.filterProvider")}
@@ -495,7 +505,7 @@ export const AdminPaymentsPage: React.FC = () => {
               {t("admin.payments.table.title")}
             </span>
             <span className="rounded-full bg-[#E5EEFF] px-2 py-0.5 text-xs font-bold text-[#2563EB]">
-              {t("admin.payments.table.records", { count: filtered.length })}
+              {t("admin.payments.table.records", { count: pagination.total })}
             </span>
           </div>
           <div className="flex items-center gap-1 text-xs text-[#565E74]">
@@ -537,9 +547,9 @@ export const AdminPaymentsPage: React.FC = () => {
             onSelect={handleSelect}
             openDossier={(p) => openDossier(p)}
             viewBooking={viewBooking}
-            page={page}
-            pageSize={PAGE_SIZE}
+            pagination={pagination}
             onPageChange={setPage}
+            loading={pageLoading}
             emptyLabel={t("admin.payments.table.empty")}
           />
         )}
@@ -564,7 +574,7 @@ export const AdminPaymentsPage: React.FC = () => {
       </div>
 
       {/* Ledger integrity strip */}
-      {!loading && !error && payments.length > 0 && (
+      {!loading && !error && referencePayments.length > 0 && (
         <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_2px_12px_rgba(15,23,42,0.03)] md:flex-row">
           <div className="flex items-start gap-4">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E5EEFF] text-[#2563EB]">
@@ -591,14 +601,6 @@ export const AdminPaymentsPage: React.FC = () => {
 
 const pct = (part: number, total: number): number =>
   total > 0 ? Math.round((part / total) * 100) : 0;
-
-/** Whether a ledger record falls inside the selected real date range. */
-const inRange = (payment: AdminPaymentDto, range: string): boolean => {
-  if (range === "ALL") return true;
-  const at = new Date(paymentTimestamp(payment) ?? payment.createdAt ?? 0).getTime();
-  const span = range === "today" ? 1 : range === "7d" ? 7 : 30;
-  return at >= Date.now() - span * 86400000;
-};
 
 const formatLydCompact = (value: number): string =>
   new Intl.NumberFormat("en-US", {

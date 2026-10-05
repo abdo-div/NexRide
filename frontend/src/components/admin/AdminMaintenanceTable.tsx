@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import {
   CheckCircle2,
@@ -6,7 +6,7 @@ import {
   MoreHorizontal,
   Wrench,
 } from "lucide-react";
-import type { MaintenanceEventDto } from "../../types/admin";
+import type { MaintenanceEventDto, PaginationMeta } from "../../types/admin";
 import { formatDate, formatLYD } from "../../lib/bookingView";
 import {
   companyOf,
@@ -15,6 +15,7 @@ import {
   vehicleOf,
 } from "../../lib/maintenanceView";
 import { MaintenanceStatusChip } from "./MaintenanceStatusChip";
+import { AdminPagination } from "./AdminPagination";
 
 export interface AdminMaintenanceTableProps {
   rows: MaintenanceEventDto[];
@@ -23,9 +24,9 @@ export interface AdminMaintenanceTableProps {
   openDossier: (event: MaintenanceEventDto) => void;
   completeEvent: (event: MaintenanceEventDto) => void;
   busy: boolean;
-  page: number;
-  pageSize?: number;
+  pagination: PaginationMeta;
   onPageChange: (page: number) => void;
+  loading?: boolean;
   emptyLabel: string;
 }
 
@@ -37,19 +38,12 @@ export const AdminMaintenanceTable: React.FC<AdminMaintenanceTableProps> = ({
   openDossier,
   completeEvent,
   busy,
-  page,
-  pageSize = 8,
+  pagination,
   onPageChange,
+  loading = false,
   emptyLabel,
 }) => {
   const { t, i18n } = useTranslation();
-
-  const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
-  const safePage = Math.min(page, totalPages);
-  const slice = useMemo(
-    () => rows.slice((safePage - 1) * pageSize, safePage * pageSize),
-    [rows, safePage, pageSize],
-  );
 
   if (rows.length === 0) {
     return (
@@ -67,12 +61,12 @@ export const AdminMaintenanceTable: React.FC<AdminMaintenanceTableProps> = ({
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="text-xs text-[#565E74]">
           {t("admin.maintenance.filters.showingCount", {
-            shown: Math.min(rows.length, (safePage - 1) * pageSize + 1),
-            total: rows.length,
+            shown: rows.length,
+            total: pagination.total,
           })}
         </div>
         <div className="inline-flex items-center gap-1.5 rounded-lg bg-[#EFF4FF] px-2.5 py-1 text-[11px] font-semibold text-[#565E74]">
-          {t("admin.maintenance.table.records", { count: rows.length })}
+          {t("admin.maintenance.table.records", { count: pagination.total })}
         </div>
       </div>
 
@@ -93,7 +87,7 @@ export const AdminMaintenanceTable: React.FC<AdminMaintenanceTableProps> = ({
             </tr>
           </thead>
           <tbody className="text-sm">
-            {slice.map((event) => {
+            {rows.map((event) => {
               const vehicle = vehicleOf(event);
               const company = companyOf(event);
               const selected = event._id === selectedId;
@@ -247,43 +241,12 @@ export const AdminMaintenanceTable: React.FC<AdminMaintenanceTableProps> = ({
         </table>
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-3 text-xs text-[#565E74]">
-        <span>{t("admin.maintenance.count", { count: rows.length })}</span>
-        {totalPages > 1 && (
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              disabled={safePage <= 1}
-              onClick={() => onPageChange(safePage - 1)}
-              className="rounded-lg bg-[#EFF4FF] px-3 py-1.5 font-semibold text-[#565E74] transition-colors enabled:hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-            >
-              {t("admin.table.prev")}
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => onPageChange(p)}
-                className={`rounded-lg px-3 py-1.5 font-semibold transition-colors cursor-pointer ${
-                  p === safePage
-                    ? "bg-[#2563EB] text-white shadow-sm"
-                    : "bg-[#EFF4FF] text-[#565E74] hover:bg-[#E5EEFF]"
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-            <button
-              type="button"
-              disabled={safePage >= totalPages}
-              onClick={() => onPageChange(safePage + 1)}
-              className="rounded-lg bg-[#EFF4FF] px-3 py-1.5 font-semibold text-[#565E74] transition-colors enabled:hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-            >
-              {t("admin.table.next")}
-            </button>
-          </div>
-        )}
-      </div>
+      <AdminPagination
+        pagination={pagination}
+        onPageChange={onPageChange}
+        shownCount={rows.length}
+        loading={loading}
+      />
     </div>
   );
 };

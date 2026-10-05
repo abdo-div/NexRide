@@ -1,10 +1,99 @@
 import mongoose from "mongoose";
 import Payment from "../models/payment_model.js";
 import Booking from "../models/booking_model.js";
+import Company from "../models/Company_model.js";
+import User from "../models/User_model.js";
 import AppError from "../utils/appError.js";
 import { runPaginatedQuery } from "../utils/paginatedQuery.js";
 
-const PAYMENT_SEARCH_FIELDS = ["status", "paymentMethod", "payoutStatus"];
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const buildPaymentSearchFilter = async (search) => {
+  const term = typeof search === "string" ? search.trim() : "";
+  if (!term) return null;
+
+  const regex = new RegExp(escapeRegex(term), "i");
+  const [customerIds, companyIds, bookingRows] = await Promise.all([
+    User.distinct("_id", {
+      $or: [
+        { name: regex },
+        { email: regex },
+        { phoneNumber: regex },
+      ],
+    }),
+    Company.distinct("_id", { name: regex }),
+    Booking.aggregate([
+      {
+        $addFields: {
+          searchReference: {
+            $concat: [
+              "NX-",
+              {
+                $toUpper: {
+                  $substrCP: [{ $toString: "$_id" }, 18, 6],
+                },
+              },
+            ],
+          },
+        },
+      },
+      { $match: { searchReference: regex } },
+      { $project: { _id: 1 } },
+    ]),
+  ]);
+
+  return {
+    $or: [
+      { merchantReference: regex },
+      { transactionId: regex },
+      { paymentMethod: regex },
+      { status: regex },
+      { customerId: { $in: customerIds } },
+      { companyId: { $in: companyIds } },
+      { bookingId: { $in: bookingRows.map((row) => row._id) } },
+      {
+        $expr: {
+          $regexMatch: {
+            input: {
+              $concat: [
+                "#TRX-",
+                {
+                  $toUpper: {
+                    $substrCP: [{ $toString: "$_id" }, 18, 6],
+                  },
+                },
+              ],
+            },
+            regex: regex.source,
+            options: "i",
+          },
+        },
+      },
+    ],
+  };
+};
+
+const paymentRangeFilter = (range) => {
+  const days = { today: 1, "7d": 7, "30d": 30 }[range];
+  if (!days) return null;
+
+  const from = new Date(Date.now() - days * 86400000);
+  return {
+    $or: [
+      { paidAt: { $gte: from } },
+      { paidAt: null, createdAt: { $gte: from } },
+    ],
+  };
+};
+
+const combineFilters = (...filters) => {
+  const active = filters.filter(
+    (filter) => filter && Object.keys(filter).length > 0,
+  );
+  if (active.length === 0) return {};
+  if (active.length === 1) return active[0];
+  return { $and: active };
+};
 
 /**
  * Execute payment intent inside a Mongoose ACID Transaction
@@ -94,18 +183,33 @@ export const fetchPaymentById = async (paymentId) => {
  * ledger instead of silently stopping at the per-page cap.
  */
 export const fetchAllPayments = async (queryParams, user) => {
-  let filter = {};
-
-  // If role is company, restrict strictly to their own revenue ledger
-  if (user.role === "company") {
-    filter.companyId = user.company;
-  }
+  const filter = combineFilters(
+    user.role === "company" ? { companyId: user.company } : null,
+    paymentRangeFilter(queryParams.range),
+    await buildPaymentSearchFilter(queryParams.search),
+  );
 
   const { docs, pagination } = await runPaginatedQuery(
     Payment,
     filter,
     queryParams,
-    { searchFields: PAYMENT_SEARCH_FIELDS },
+    {
+      excludeFields: ["range", "search"],
+      populate:
+        user.role === "admin"
+          ? [
+              { path: "customerId", select: "name email phoneNumber photo" },
+              {
+                path: "companyId",
+                select: "name city status customCommissionRate",
+              },
+              {
+                path: "bookingId",
+                populate: { path: "vehicleId", select: "make model year" },
+              },
+            ]
+          : undefined,
+    },
   );
 
   return { payments: docs, pagination };

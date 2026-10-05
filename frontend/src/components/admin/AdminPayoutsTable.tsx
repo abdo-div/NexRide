@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import {
   CalendarClock,
@@ -7,22 +7,23 @@ import {
   MoreHorizontal,
   Wallet,
 } from "lucide-react";
-import type { AdminPayoutRow } from "../../types/admin";
+import type { AdminPayoutRow, PaginationMeta } from "../../types/admin";
 import { formatDate, formatLYD } from "../../lib/bookingView";
 import {
   effectiveRateOf,
   payoutCodeOf,
 } from "../../lib/commissionView";
 import { PayoutStatusChip } from "./PayoutStatusChip";
+import { AdminPagination } from "./AdminPagination";
 
 export interface AdminPayoutsTableProps {
   rows: AdminPayoutRow[];
   selectedId: string;
   onSelect: (row: AdminPayoutRow) => void;
   openDossier: (row: AdminPayoutRow) => void;
-  page: number;
-  pageSize?: number;
+  pagination: PaginationMeta;
   onPageChange: (page: number) => void;
+  loading?: boolean;
   emptyLabel: string;
 }
 
@@ -32,19 +33,12 @@ export const AdminPayoutsTable: React.FC<AdminPayoutsTableProps> = ({
   selectedId,
   onSelect,
   openDossier,
-  page,
-  pageSize = 8,
+  pagination,
   onPageChange,
+  loading = false,
   emptyLabel,
 }) => {
   const { t, i18n } = useTranslation();
-
-  const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
-  const safePage = Math.min(page, totalPages);
-  const slice = useMemo(
-    () => rows.slice((safePage - 1) * pageSize, safePage * pageSize),
-    [rows, safePage, pageSize],
-  );
 
   if (rows.length === 0) {
     return (
@@ -62,13 +56,13 @@ export const AdminPayoutsTable: React.FC<AdminPayoutsTableProps> = ({
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="text-xs text-[#565E74]">
           {t("admin.commissions.table.showingOf", {
-            from: Math.min(rows.length, (safePage - 1) * pageSize + 1),
-            to: Math.min(rows.length, safePage * pageSize),
-            total: rows.length,
+            from: Math.min(pagination.total, (pagination.page - 1) * pagination.limit + 1),
+            to: Math.min(pagination.total, pagination.page * pagination.limit),
+            total: pagination.total,
           })}
         </div>
         <div className="inline-flex items-center gap-1.5 rounded-lg bg-[#EFF4FF] px-2.5 py-1 text-[11px] font-semibold text-[#565E74]">
-          {t("admin.commissions.table.activeRuns", { count: rows.length })}
+          {t("admin.commissions.table.activeRuns", { count: pagination.total })}
         </div>
       </div>
 
@@ -91,7 +85,7 @@ export const AdminPayoutsTable: React.FC<AdminPayoutsTableProps> = ({
             </tr>
           </thead>
           <tbody className="text-sm">
-            {slice.map((row) => {
+            {rows.map((row) => {
               const code = payoutCodeOf(row);
               const selected = row.companyId === selectedId;
               const rate = row.company?.customCommissionRate ?? effectiveRateOf(row);
@@ -229,43 +223,15 @@ export const AdminPayoutsTable: React.FC<AdminPayoutsTableProps> = ({
         </table>
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-3 text-xs text-[#565E74]">
-        <span>{t("admin.commissions.table.currencyLabel")} {t("admin.commissions.table.currency")}</span>
-        {totalPages > 1 && (
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              disabled={safePage <= 1}
-              onClick={() => onPageChange(safePage - 1)}
-              className="rounded-lg bg-[#EFF4FF] px-3 py-1.5 font-semibold text-[#565E74] transition-colors enabled:hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-            >
-              {t("admin.table.prev")}
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => onPageChange(p)}
-                className={`rounded-lg px-3 py-1.5 font-semibold transition-colors cursor-pointer ${
-                  p === safePage
-                    ? "bg-[#2563EB] text-white shadow-sm"
-                    : "bg-[#EFF4FF] text-[#565E74] hover:bg-[#E5EEFF]"
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-            <button
-              type="button"
-              disabled={safePage >= totalPages}
-              onClick={() => onPageChange(safePage + 1)}
-              className="rounded-lg bg-[#EFF4FF] px-3 py-1.5 font-semibold text-[#565E74] transition-colors enabled:hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-            >
-              {t("admin.table.next")}
-            </button>
-          </div>
-        )}
+      <div className="mt-4 text-xs text-[#565E74]">
+        {t("admin.commissions.table.currencyLabel")} {t("admin.commissions.table.currency")}
       </div>
+      <AdminPagination
+        pagination={pagination}
+        onPageChange={onPageChange}
+        shownCount={rows.length}
+        loading={loading}
+      />
     </div>
   );
 };
