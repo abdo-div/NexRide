@@ -36,7 +36,7 @@ The full list of supported names and secret placeholders is in [`.env.example`](
 
 | Variable(s) | Purpose |
 | --- | --- |
-| `JWT_SECRET` | Secret used to sign and verify session tokens. Set a strong private value for every non-test environment; the code has an insecure development fallback. |
+| `JWT_SECRET` | Required private secret used to sign and verify session tokens. It must be at least 32 bytes; startup fails if it is missing or too short. |
 | `MONGODB_URI` | MongoDB connection URI. Alternatives supported by the code are `MONGO_URI`, `DATABASE_URI`, `DATABASE_URL`, and `DATABASE`. If none is set, the local replica-set URI above is used. |
 | `REDIS_URL` | Redis connection URI. Without it, configure `REDIS_HOST`, `REDIS_PORT`, and `REDIS_PASSWORD`; defaults are `127.0.0.1:6379`. Other URL aliases are read by the code, but use `REDIS_URL` for URI-based deployments. |
 | `PORT`, `NODE_ENV` | HTTP port and runtime mode. `PORT` defaults to `3000`; set `NODE_ENV` to `development` or `production` as appropriate. |

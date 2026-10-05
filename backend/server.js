@@ -3,6 +3,7 @@ import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 import { configureDnsServers } from "./config/dnsConfig.js";
+import { validateJwtSecret } from "./config/jwt.js";
 
 // Load the environment file wherever it actually lives, regardless of the
 // working directory the server is started from. Candidates are checked in
@@ -19,6 +20,7 @@ if (envFile) {
   dotenv.config({ path: envFile });
 }
 
+validateJwtSecret();
 configureDnsServers(process.env.DNS_SERVERS);
 
 const { default: mongoose } = await import("mongoose");

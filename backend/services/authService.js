@@ -3,12 +3,13 @@ import jwt from "jsonwebtoken";
 import User from "../models/User_model.js";
 import AppError from "../utils/appError.js";
 import Email from "../utils/email.js";
+import { getJwtSecret } from "../config/jwt.js";
 
 /**
  * Sign JWT Token
  */
 export const signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+  return jwt.sign({ id }, getJwtSecret(), {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };

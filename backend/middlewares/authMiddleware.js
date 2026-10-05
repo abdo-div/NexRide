@@ -5,6 +5,7 @@ import User from "../models/User_model.js";
 import Company from "../models/Company_model.js";
 import AppError from "../utils/appError.js";
 import catchAsync from "../utils/catchAsync.js";
+import { getJwtSecret } from "../config/jwt.js";
 
 const ACTIVE_USER_STATUS = User.schema
   .path("status")
@@ -36,7 +37,7 @@ export const protect = catchAsync(async (req, res, next) => {
 
   const decoded = await promisify(jwt.verify)(
     token,
-    process.env.JWT_SECRET || "fallback-super-secret-key-change-this",
+    getJwtSecret(),
   );
 
   const currentUser = await User.findById(decoded.id);
@@ -110,7 +111,7 @@ export const isLoggedIn = async (req, res, next) => {
     try {
       const decoded = await promisify(jwt.verify)(
         req.cookies.jwt,
-        process.env.JWT_SECRET || "fallback-super-secret-key-change-this",
+        getJwtSecret(),
       );
       const currentUser = await User.findById(decoded.id);
 
