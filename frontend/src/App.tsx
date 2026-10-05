@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router";
 import { LoaderCircle } from "lucide-react";
 import NavBar from "./components/layouts/NavBar";
@@ -6,17 +6,23 @@ import { Footer } from "./components/layouts/Footer";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import HomePage from "./pages/HomePage";
-import { FleetPage } from "./pages/FleetPage";
-import VehicleDetailPage from "./pages/VehicleDetailPage";
-import CheckoutPage from "./pages/CheckoutPage";
-import BookingConfirmationPage from "./pages/BookingConfirmationPage";
-import PaymentPage from "./pages/PaymentPage";
-import AuthPage from "./pages/AuthPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import MyBookingsPage from "./pages/MyBookingsPage";
-import BookingDetailsPage from "./pages/BookingDetailsPage";
 import { AdminRoute } from "./components/admin/AdminRoute";
 import { AdminLayout } from "./components/admin/AdminLayout";
+
+// Only the landing page is needed for the initial public load. Browsing, auth,
+// booking, checkout and payment screens are separate chunks so a first-time
+// visitor never downloads the booking/payment code.
+const FleetPage = lazy(() => import("./pages/FleetPage"));
+const VehicleDetailPage = lazy(() => import("./pages/VehicleDetailPage"));
+const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
+const BookingConfirmationPage = lazy(() =>
+  import("./pages/BookingConfirmationPage"),
+);
+const PaymentPage = lazy(() => import("./pages/PaymentPage"));
+const AuthPage = lazy(() => import("./pages/AuthPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+const MyBookingsPage = lazy(() => import("./pages/MyBookingsPage"));
+const BookingDetailsPage = lazy(() => import("./pages/BookingDetailsPage"));
 
 const AdminOverviewPage = lazy(() =>
   import("./pages/admin/AdminOverviewPage").then((module) => ({
@@ -87,6 +93,15 @@ function RouteLoadingFallback() {
 }
 
 /**
+ * Gives a single lazily loaded route its own Suspense boundary. The fallback is
+ * identical to the admin one, so navigating between public pages keeps the same
+ * loading treatment instead of flashing a blank screen.
+ */
+function LazyRoute({ children }: { children: ReactNode }) {
+  return <Suspense fallback={<RouteLoadingFallback />}>{children}</Suspense>;
+}
+
+/**
  * Public site chrome: shared navbar on top and footer at the bottom. Admin
  * routes intentionally render OUTSIDE this shell so the dashboard's own
  * topbar/sidebar are not buried under the consumer-facing navigation.
@@ -110,15 +125,45 @@ function App() {
         <Routes>
           <Route element={<PublicShell />}>
             <Route path="/" element={<HomePage />} />
-            <Route path="/FleetPage" element={<FleetPage />} />
-            <Route path="/fleet" element={<FleetPage />} />
-            <Route path="/cars/:vehicleId" element={<VehicleDetailPage />} />
-            <Route path="/vehicles/:vehicleId" element={<VehicleDetailPage />} />
+            <Route
+              path="/FleetPage"
+              element={
+                <LazyRoute>
+                  <FleetPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="/fleet"
+              element={
+                <LazyRoute>
+                  <FleetPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="/cars/:vehicleId"
+              element={
+                <LazyRoute>
+                  <VehicleDetailPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="/vehicles/:vehicleId"
+              element={
+                <LazyRoute>
+                  <VehicleDetailPage />
+                </LazyRoute>
+              }
+            />
             <Route
               path="/checkout/:vehicleId"
               element={
                 <ProtectedRoute>
-                  <CheckoutPage />
+                  <LazyRoute>
+                    <CheckoutPage />
+                  </LazyRoute>
                 </ProtectedRoute>
               }
             />
@@ -126,7 +171,9 @@ function App() {
               path="/payment/:bookingId"
               element={
                 <ProtectedRoute>
-                  <PaymentPage />
+                  <LazyRoute>
+                    <PaymentPage />
+                  </LazyRoute>
                 </ProtectedRoute>
               }
             />
@@ -134,18 +181,43 @@ function App() {
               path="/booking-confirmed/:vehicleId"
               element={
                 <ProtectedRoute>
-                  <BookingConfirmationPage />
+                  <LazyRoute>
+                    <BookingConfirmationPage />
+                  </LazyRoute>
                 </ProtectedRoute>
               }
             />
-            <Route path="/login" element={<AuthPage />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+            <Route
+              path="/login"
+              element={
+                <LazyRoute>
+                  <AuthPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="/auth"
+              element={
+                <LazyRoute>
+                  <AuthPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="/reset-password/:token"
+              element={
+                <LazyRoute>
+                  <ResetPasswordPage />
+                </LazyRoute>
+              }
+            />
             <Route
               path="/my-bookings"
               element={
                 <ProtectedRoute>
-                  <MyBookingsPage />
+                  <LazyRoute>
+                    <MyBookingsPage />
+                  </LazyRoute>
                 </ProtectedRoute>
               }
             />
@@ -153,7 +225,9 @@ function App() {
               path="/my-bookings/:bookingId"
               element={
                 <ProtectedRoute>
-                  <BookingDetailsPage />
+                  <LazyRoute>
+                    <BookingDetailsPage />
+                  </LazyRoute>
                 </ProtectedRoute>
               }
             />

@@ -47,9 +47,18 @@ The full list of supported names and secret placeholders is in [`.env.example`](
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USERNAME`, `SMTP_PASSWORD` | Production SMTP configuration. |
 | `MOAMALAT_ENV`, `MOAMALAT_MID`, `MOAMALAT_TID`, `MOAMALAT_SECURE_KEY` | Optional Moamalat environment and merchant credentials. Payment initiation requires the merchant ID, terminal ID, and signing key. |
 | `JWT_EXPIRES_IN`, `JWT_COOKIE_EXPIRES_IN` | Token and cookie expiration configuration. |
-| `REDIS_PROBE_TIMEOUT_MS`, `LOG_LEVEL`, `SENTRY_DSN` | Optional Redis probe timeout and logging level. `SENTRY_DSN` is read by the Sentry config module, but startup does not currently initialize Sentry. |
+| `REDIS_PROBE_TIMEOUT_MS`, `LOG_LEVEL` | Optional Redis probe timeout and logging level. |
 
-All payment, mail, and monitoring credentials are optional for features that do not use those integrations. Never place real credentials in the example file.
+All payment and mail credentials are optional for features that do not use those integrations. Never place real credentials in the example file.
+
+### Observability
+
+The API emits structured logs through `pino` (`utils/logger.js`) and handles
+`unhandledRejection` / `uncaughtException` in `server.js`. There is no external
+error-reporting service integrated. If you add one, wire it in `app.js` /
+`server.js` at startup behind an environment variable, add the dependency to
+`package.json`, and strip authorization headers, cookies, JWTs, request bodies
+and payment credentials from the payloads you send.
 
 ## Run locally
 
