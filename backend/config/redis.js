@@ -1,5 +1,6 @@
 import Redis from "ioredis";
 import logger from "../utils/logger.js";
+import { resolveRedisConnection } from "./redisConnection.js";
 
 const baseRedisOptions = {
   lazyConnect: true,
@@ -13,9 +14,6 @@ const baseRedisOptions = {
   retryStrategy(times) {
     return times < 2 ? 100 : null;
   },
-  tls: {
-    rejectUnauthorized: false,
-  },
 };
 
 /**
@@ -24,35 +22,22 @@ const baseRedisOptions = {
  */
 const PROBE_TIMEOUT_MS = Number(process.env.REDIS_PROBE_TIMEOUT_MS) || 1500;
 
-const resolveRedisUrl = () => {
-  const hostedRedisUrl =
-    process.env.REDIS_URL ||
-    process.env.UPSTASH_REDIS_URL ||
-    process.env.REDIS_CONNECTION_STRING ||
-    process.env.UPSTASH_URL;
-
-  if (hostedRedisUrl) return hostedRedisUrl;
-
-  return {
-    host: process.env.REDIS_HOST || "127.0.0.1",
-    port: Number(process.env.REDIS_PORT) || 6379,
-    password: process.env.REDIS_PASSWORD || undefined,
+const redisConnection = resolveRedisConnection();
+const createRedisClient = (options) => {
+  const clientOptions = {
+    ...baseRedisOptions,
+    ...redisConnection.options,
+    ...options,
   };
+
+  return typeof redisConnection.connection === "string"
+    ? new Redis(redisConnection.connection, clientOptions)
+    : new Redis({ ...redisConnection.connection, ...clientOptions });
 };
 
 // ─── Main App Redis Client ────────────────────────────────────────────────────
 // Used for: cache, idempotency, tenant resolution, redlock
-const appRedisOptions = {
-  keyPrefix: "nexride:",
-  ...baseRedisOptions,
-};
-
-const redisClient = process.env.REDIS_URL
-  ? new Redis(process.env.REDIS_URL, appRedisOptions)
-  : new Redis({
-      ...resolveRedisUrl(),
-      ...appRedisOptions,
-    });
+const redisClient = createRedisClient({ keyPrefix: "nexride:" });
 
 redisClient.on("connect", () => {
   logger.redis("App client connected (Namespaced: nexride:*)");
@@ -68,17 +53,7 @@ redisClient.on("error", (err) => {
 
 // ─── BullMQ Redis Connection ──────────────────────────────────────────────────
 // BullMQ requires a plain ioredis connection WITHOUT keyPrefix.
-const bullmqRedisOptions = {
-  ...baseRedisOptions,
-  maxRetriesPerRequest: null,
-};
-
-const bullmqConnection = process.env.REDIS_URL
-  ? new Redis(process.env.REDIS_URL, bullmqRedisOptions)
-  : new Redis({
-      ...resolveRedisUrl(),
-      ...bullmqRedisOptions,
-    });
+const bullmqConnection = createRedisClient({ maxRetriesPerRequest: null });
 
 bullmqConnection.on("connect", () => {
   logger.redis("BullMQ client connected");
