@@ -1932,7 +1932,6 @@
           "cash": "Cash on delivery",
           "moamalat": "Moamalat",
           "localCard": "Local card",
-          "stripe": "Stripe",
           "wallet": "Wallet",
           "unknownMethod": "Unknown method"
         },

@@ -176,7 +176,7 @@ const PaymentPage: React.FC = () => {
     );
   }
 
-  // Booking already settled elsewhere (e.g. cash/Stripe or a previous attempt).
+  // Booking already settled elsewhere (e.g. cash or a previous attempt).
   const alreadyPaid = booking.paymentStatus === "PAID";
 
   const vehicleTitle = vehicleTitleOf(booking) || t("payment.vehicle");

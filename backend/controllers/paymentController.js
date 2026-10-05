@@ -65,14 +65,6 @@ export const settleCompanyPayout = catchAsync(async (req, res, next) => {
   });
 });
 
-export const handleStripeWebhook = catchAsync(async (req, res, next) => {
-  const signature = req.headers["stripe-signature"];
-
-  await paymentService.processStripeWebhookEvent(req.body, signature);
-
-  res.status(200).json({ received: true });
-});
-
 export const downloadInvoicePDF = catchAsync(async (req, res, next) => {
   const payment = req.payment;
 

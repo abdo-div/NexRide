@@ -8,7 +8,7 @@ The NexRide backend is an Express API for the vehicle-rental marketplace and its
 - MongoDB with Mongoose
 - Redis with ioredis and BullMQ for cache, idempotency, reservation coordination, and queued email
 - JWT authentication, role-based authorization, request validation with Zod
-- Moamalat payment gateway and optional Stripe webhook integration
+- Moamalat payment gateway integration
 
 ## Prerequisites
 
@@ -46,7 +46,6 @@ The full list of supported names and secret placeholders is in [`.env.example`](
 | `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USERNAME`, `EMAIL_PASSWORD`, `EMAIL_FROM`, `EMAIL_FROM_NAME` | Local/development SMTP and sender configuration. Development defaults to a local SMTP server at `127.0.0.1:1025`. |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USERNAME`, `SMTP_PASSWORD` | Production SMTP configuration. |
 | `MOAMALAT_ENV`, `MOAMALAT_MID`, `MOAMALAT_TID`, `MOAMALAT_SECURE_KEY` | Optional Moamalat environment and merchant credentials. Payment initiation requires the merchant ID, terminal ID, and signing key. |
-| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Optional Stripe payment/webhook integration credentials. |
 | `JWT_EXPIRES_IN`, `JWT_COOKIE_EXPIRES_IN` | Token and cookie expiration configuration. |
 | `REDIS_PROBE_TIMEOUT_MS`, `LOG_LEVEL`, `SENTRY_DSN` | Optional Redis probe timeout and logging level. `SENTRY_DSN` is read by the Sentry config module, but startup does not currently initialize Sentry. |
 
