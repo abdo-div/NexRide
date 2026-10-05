@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Banknote,
@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useAdminHub } from "../../context/adminHub";
 import { useAdminMaintenance } from "../../hooks/useAdminMaintenance";
+import { usePaginatedList } from "../../hooks/usePaginatedList";
 import { adminApi } from "../../lib/adminApi";
 import { maintenanceCsv } from "../../lib/adminMetrics";
 import { saveBlobAsFile } from "../../lib/bookingView";
@@ -35,7 +36,7 @@ import type {
   MaintenanceEventDto,
 } from "../../types/admin";
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 20;
 const STATUS_OPTIONS: MaintenanceDispatchStatus[] = [
   "SCHEDULED",
   "IN_PROGRESS",
@@ -50,10 +51,15 @@ const formatCount = (value: number): string =>
   new Intl.NumberFormat("en-US").format(Math.round(value));
 
 export const AdminMaintenancePage: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { hub } = useAdminHub();
-  const { data, loading, error, reload } = useAdminMaintenance();
-  const { events, vehicles, summary } = data;
+  const {
+    data,
+    loading: registryLoading,
+    error: registryError,
+    reload: reloadRegistry,
+  } = useAdminMaintenance();
+  const { events: referenceEvents, vehicles, summary } = data;
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("ALL");
@@ -78,11 +84,11 @@ export const AdminMaintenancePage: React.FC = () => {
   };
 
   // -------------------------------------------------------------------------
-  // Hub-scoped events (global hub selector) → client-side filters
+  // Lookup options from a bounded registry; table rows come from the paged API.
   // -------------------------------------------------------------------------
   const scoped = useMemo(
-    () => (hub ? events.filter((e) => cityOf(e) === hub) : events),
-    [events, hub],
+    () => (hub ? referenceEvents.filter((e) => cityOf(e) === hub) : referenceEvents),
+    [referenceEvents, hub],
   );
 
   // -------------------------------------------------------------------------
@@ -126,11 +132,13 @@ export const AdminMaintenancePage: React.FC = () => {
   const {
     rows: filtered,
     pagination,
-    loading,
-    error,
+    loading: pageLoading,
+    error: pageError,
     reload: reloadPage,
   } = usePaginatedList<MaintenanceEventDto>(fetchPage, queryKey);
 
+  const loading = registryLoading || pageLoading;
+  const error = registryError || pageError;
   /** Refresh both the page window and the registries behind the dropdowns/KPIs. */
   const reload = useCallback(() => {
     reloadPage();
@@ -511,7 +519,7 @@ export const AdminMaintenancePage: React.FC = () => {
               {t("admin.maintenance.table.title")}
             </span>
             <span className="rounded-full bg-[#E5EEFF] px-2 py-0.5 text-xs font-bold text-[#2563EB]">
-              {t("admin.maintenance.count", { count: filtered.length })}
+              {t("admin.maintenance.count", { count: pagination.total })}
             </span>
           </div>
           <div className="flex items-center gap-1 text-xs text-[#565E74]">
@@ -552,9 +560,9 @@ export const AdminMaintenancePage: React.FC = () => {
               openDossier={(event) => openDossier(event)}
               completeEvent={(event) => handleComplete(event)}
               busy={busy}
-              page={page}
-              pageSize={PAGE_SIZE}
+              pagination={pagination}
               onPageChange={setPage}
+              loading={pageLoading}
               emptyLabel={t("admin.maintenance.table.empty")}
             />
           </div>

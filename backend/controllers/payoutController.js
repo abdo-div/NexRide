@@ -20,12 +20,14 @@ export const getPayoutSummary = catchAsync(async (req, res, next) => {
  * register. Optional ?companyId= narrows to a single partner dossier.
  */
 export const getPayoutLedger = catchAsync(async (req, res, next) => {
-  const { companyId, search, page, limit } = req.query;
+  const { companyId, search, page, limit, status, cycle } = req.query;
   const { ledger, pagination } = await buildPayoutLedger({
     companyId: companyId || undefined,
     search,
     page,
     limit,
+    status,
+    cycle,
   });
   res.status(200).json({
     status: "success",

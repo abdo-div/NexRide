@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import {
   CreditCard,
@@ -10,6 +10,7 @@ import type {
   AdminCompanyDto,
   AdminCustomerDto,
   AdminPaymentDto,
+  PaginationMeta,
 } from "../../types/admin";
 import type { BookingDto } from "../../types/booking";
 import {
@@ -28,6 +29,7 @@ import {
 import { userPhotoUrl } from "../../lib/customerView";
 import { initialsFrom } from "../../lib/vehicleMapper";
 import { StatusPill } from "./StatusPill";
+import { AdminPagination } from "./AdminPagination";
 
 export interface AdminPaymentsTableProps {
   payments: AdminPaymentDto[];
@@ -38,9 +40,9 @@ export interface AdminPaymentsTableProps {
   onSelect: (payment: AdminPaymentDto) => void;
   openDossier: (payment: AdminPaymentDto) => void;
   viewBooking: (payment: AdminPaymentDto) => void;
-  page: number;
-  pageSize?: number;
+  pagination: PaginationMeta;
   onPageChange: (page: number) => void;
+  loading?: boolean;
   emptyLabel: string;
 }
 
@@ -54,19 +56,12 @@ export const AdminPaymentsTable: React.FC<AdminPaymentsTableProps> = ({
   onSelect,
   openDossier,
   viewBooking,
-  page,
-  pageSize = 8,
+  pagination,
   onPageChange,
+  loading = false,
   emptyLabel,
 }) => {
   const { t, i18n } = useTranslation();
-
-  const totalPages = Math.max(1, Math.ceil(payments.length / pageSize));
-  const safePage = Math.min(page, totalPages);
-  const slice = useMemo(
-    () => payments.slice((safePage - 1) * pageSize, safePage * pageSize),
-    [payments, safePage, pageSize],
-  );
 
   if (payments.length === 0) {
     return (
@@ -99,7 +94,7 @@ export const AdminPaymentsTable: React.FC<AdminPaymentsTableProps> = ({
             </tr>
           </thead>
           <tbody className="text-sm">
-            {slice.map((payment) => {
+            {payments.map((payment) => {
               const booking = bookingOfPayment(bookings, payment);
               const customer = customerOfPayment(customers, payment);
               const company = companyOfPayment(companies, payment);
@@ -254,48 +249,12 @@ export const AdminPaymentsTable: React.FC<AdminPaymentsTableProps> = ({
         </table>
       </div>
 
-      <div className="mt-4 flex flex-col items-center justify-between gap-3 border-t border-slate-100 pt-4 text-xs text-[#565E74] sm:flex-row">
-        <div>
-          {t("admin.payments.table.showingOf", {
-            shown: slice.length,
-            total: payments.length,
-          })}
-        </div>
-        {totalPages > 1 && (
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              disabled={safePage <= 1}
-              onClick={() => onPageChange(safePage - 1)}
-              className="rounded-lg bg-[#EFF4FF] px-3 py-1.5 font-semibold text-[#565E74] transition-colors enabled:hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-            >
-              {t("admin.table.prev")}
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => onPageChange(p)}
-                className={`rounded-lg px-3 py-1.5 font-semibold transition-colors cursor-pointer ${
-                  p === safePage
-                    ? "bg-[#2563EB] text-white shadow-sm"
-                    : "bg-[#EFF4FF] text-[#565E74] hover:bg-[#E5EEFF]"
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-            <button
-              type="button"
-              disabled={safePage >= totalPages}
-              onClick={() => onPageChange(safePage + 1)}
-              className="rounded-lg bg-[#EFF4FF] px-3 py-1.5 font-semibold text-[#565E74] transition-colors enabled:hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-            >
-              {t("admin.table.next")}
-            </button>
-          </div>
-        )}
-      </div>
+      <AdminPagination
+        pagination={pagination}
+        onPageChange={onPageChange}
+        shownCount={payments.length}
+        loading={loading}
+      />
     </div>
   );
 };

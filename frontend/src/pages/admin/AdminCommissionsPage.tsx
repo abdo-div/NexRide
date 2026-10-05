@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Banknote,
@@ -16,9 +16,8 @@ import {
   Wallet,
 } from "lucide-react";
 import { useAdminCommissions } from "../../hooks/useAdminCommissions";
-import {
-  adminApi,
-} from "../../lib/adminApi";
+import { usePaginatedList } from "../../hooks/usePaginatedList";
+import { adminApi } from "../../lib/adminApi";
 import { payoutsCsv, paymentsCsv } from "../../lib/adminMetrics";
 import { saveBlobAsFile } from "../../lib/bookingView";
 import {
@@ -31,7 +30,7 @@ import { AdminPayoutDossier } from "../../components/admin/AdminPayoutDossier";
 import { CommissionFlow } from "../../components/admin/CommissionFlow";
 import type { AdminPayoutRow } from "../../types/admin";
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 20;
 const STATUS_OPTIONS = [
   "PENDING",
   "PROCESSING",
@@ -42,10 +41,22 @@ const STATUS_OPTIONS = [
 const CYCLE_OPTIONS = ["monthly", "biweekly", "week"] as const;
 
 export const AdminCommissionsPage: React.FC = () => {
-  const { t, i18n } = useTranslation();
-  const { data, loading, error, reload } = useAdminCommissions();
-  const { payments, bookings, companies, customers, vehicles, summary, ledger } = data;
-
+  const { t } = useTranslation();
+  const {
+    data,
+    loading: registryLoading,
+    error: registryError,
+    reload: reloadRegistry,
+  } = useAdminCommissions();
+  const {
+    payments,
+    bookings,
+    companies,
+    customers,
+    vehicles,
+    summary,
+    ledger: registryLedger,
+  } = data;
   const [search, setSearch] = useState("");
   const [partner, setPartner] = useState("ALL");
   const [status, setStatus] = useState("ALL");
@@ -58,6 +69,41 @@ export const AdminCommissionsPage: React.FC = () => {
   const dossierRef = useRef<HTMLDivElement>(null);
   const toastTimer = useRef<number | undefined>(undefined);
 
+  const queryKey = useMemo(
+    () => ({ page, limit: PAGE_SIZE, search, partner, status, cycle }),
+    [page, search, partner, status, cycle],
+  );
+  const fetchPage = useCallback(
+    async (signal: AbortSignal) => {
+      const res = await adminApi.payoutLedger(
+        {
+          page,
+          limit: PAGE_SIZE,
+          search: search.trim() || undefined,
+          companyId: partner,
+          status,
+          cycle,
+        },
+        signal,
+      );
+      return { rows: res.data.ledger ?? [], pagination: res.pagination };
+    },
+    [page, search, partner, status, cycle],
+  );
+  const {
+    rows: ledger,
+    pagination,
+    loading: pageLoading,
+    error: pageError,
+    reload: reloadPage,
+  } = usePaginatedList<AdminPayoutRow>(fetchPage, queryKey);
+  const loading = registryLoading || pageLoading;
+  const error = registryError || pageError;
+  const reload = useCallback(() => {
+    reloadRegistry();
+    reloadPage();
+  }, [reloadRegistry, reloadPage]);
+
   const resetPage = () => setPage(1);
 
   const showToast = (message: string) => {
@@ -66,30 +112,7 @@ export const AdminCommissionsPage: React.FC = () => {
     toastTimer.current = window.setTimeout(() => setToast(""), 3000);
   };
 
-  // -------------------------------------------------------------------------
-  // Filtered clearing ledger (search + real filters or derived windows)
-  // -------------------------------------------------------------------------
-  const filtered = useMemo(() => {
-    const needle = search.trim().toLocaleLowerCase(i18n.language);
-    return ledger
-      .filter((row) => status === "ALL" || row.payoutStatus === status)
-      .filter(
-        (row) =>
-          partner === "ALL" ||
-          rowCompanyIdOf(row) === partner,
-      )
-      .filter((row) => inCycle(row, cycle))
-      .filter((row) => {
-        if (!needle) return true;
-        const company = row.company?.name ?? "";
-        const city = row.company?.city ?? "";
-        const code = payoutCodeOf(row).toLocaleLowerCase(i18n.language);
-        const hay = [company, city, code]
-          .join(" ")
-          .toLocaleLowerCase(i18n.language);
-        return hay.includes(needle);
-      });
-  }, [ledger, status, partner, cycle, search, i18n.language]);
+  const filtered = ledger;
 
   // -------------------------------------------------------------------------
   // Selected settlement run (remembered, else most recent)
@@ -178,14 +201,18 @@ export const AdminCommissionsPage: React.FC = () => {
   };
 
   const partnerOptions = useMemo(
-    () =>
-      ledger
+    () => {
+      const options = new Map<string, string>();
+      [...registryLedger, ...ledger]
         .map((row) => ({
           value: rowCompanyIdOf(row),
           label: row.company?.name ?? payoutCodeOf(row),
         }))
-        .filter((o) => o.value),
-    [ledger],
+        .filter((option) => option.value)
+        .forEach((option) => options.set(option.value, option.label));
+      return Array.from(options, ([value, label]) => ({ value, label }));
+    },
+    [registryLedger, ledger],
   );
 
   return (
@@ -410,7 +437,7 @@ export const AdminCommissionsPage: React.FC = () => {
               {t("admin.commissions.table.title")}
             </span>
             <span className="rounded-full bg-[#E5EEFF] px-2 py-0.5 text-xs font-bold text-[#2563EB]">
-              {t("admin.commissions.count", { count: filtered.length })}
+              {t("admin.commissions.count", { count: pagination.total })}
             </span>
           </div>
           <div className="flex items-center gap-1 text-xs text-[#565E74]">
@@ -446,12 +473,12 @@ export const AdminCommissionsPage: React.FC = () => {
           <div className="p-6 pt-0">
             <AdminPayoutsTable
               rows={filtered}
+              pagination={pagination}
               selectedId={selected?.companyId ?? ""}
               onSelect={handleSelect}
               openDossier={(row) => openDossier(row)}
-              page={page}
-              pageSize={PAGE_SIZE}
               onPageChange={setPage}
+              loading={pageLoading}
               emptyLabel={t("admin.commissions.table.empty")}
             />
           </div>
@@ -497,17 +524,6 @@ export const AdminCommissionsPage: React.FC = () => {
 
 const pct = (part: number, total: number): number =>
   total > 0 ? Math.round((part / total) * 100) : 0;
-
-/** Whether a settlement run falls inside the selected derived window. */
-const inCycle = (row: AdminPayoutRow, cycle: string): boolean => {
-  if (cycle === "ALL") return true;
-  const at = new Date(
-    row.lastPayoutSetAt ?? row.lastPaidAt ?? "",
-  ).getTime();
-  if (!at) return false;
-  const span = cycle === "monthly" ? 30 : cycle === "biweekly" ? 14 : 7;
-  return at >= Date.now() - span * 86400000;
-};
 
 const formatLydCompact = (value: number): string =>
   new Intl.NumberFormat("en-US", {
