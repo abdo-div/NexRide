@@ -5,35 +5,64 @@ import rateLimit from "express-rate-limit";
 
 const DEFAULT_ORIGINS = [
   "http://localhost:5173",
+  "http://localhost:5174",
   "http://127.0.0.1:5173",
   "http://localhost:3000",
   "http://lvh.me:3000",
 ];
 
-/**
- * FRONTEND_DOMAIN accepts a comma-separated list so staging/prod origins can be
- * whitelisted without touching code (e.g. "https://nexride.ly,https://app.nexride.ly").
- */
-const allowedOrigins = [
+export const normalizeOrigin = (value) => {
+  if (typeof value !== "string" || !value.trim()) return null;
+
+  try {
+    const url = new URL(value.trim());
+    if (
+      !["http:", "https:"].includes(url.protocol) ||
+      url.username ||
+      url.password ||
+      url.pathname !== "/" ||
+      url.search ||
+      url.hash
+    ) {
+      return null;
+    }
+    return url.origin;
+  } catch {
+    return null;
+  }
+};
+
+const configuredOrigins = [
   ...DEFAULT_ORIGINS,
   ...(process.env.FRONTEND_DOMAIN || "")
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean),
-];
+]
+  .map(normalizeOrigin)
+  .filter(Boolean);
+const allowedOrigins = new Set(configuredOrigins);
 
+/**
+ * FRONTEND_DOMAIN accepts a comma-separated list so staging/prod origins can be
+ * whitelisted without touching code. Values are normalized to URL origins and
+ * compared exactly; paths, credentials, query strings, and fragments are not
+ * valid origin configuration.
+ */
 export const securityCors = cors({
   origin: (origin, callback) => {
-    if (
-      !origin ||
-      allowedOrigins.some(
-        (domain) => domain && origin.endsWith(domain.replace("http://", "")),
-      )
-    ) {
+    if (!origin) {
       callback(null, true);
-    } else {
-      callback(new Error("cors policy restriction : origin not allowed"));
+      return;
     }
+
+    const normalizedOrigin = normalizeOrigin(origin);
+    callback(
+      null,
+      normalizedOrigin && allowedOrigins.has(normalizedOrigin)
+        ? origin
+        : false,
+    );
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],

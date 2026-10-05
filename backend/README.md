@@ -41,7 +41,8 @@ The full list of supported names and secret placeholders is in [`.env.example`](
 | `REDIS_URL` | Redis connection URI. Without it, configure `REDIS_HOST`, `REDIS_PORT`, and `REDIS_PASSWORD`; defaults are `127.0.0.1:6379`. Other URL aliases are read by the code, but use `REDIS_URL` for URI-based deployments. |
 | `PORT`, `NODE_ENV` | HTTP port and runtime mode. `PORT` defaults to `3000`; set `NODE_ENV` to `development` or `production` as appropriate. |
 | `DNS_SERVERS` | Optional comma-separated IP addresses used to override Node DNS resolution when the host resolver cannot resolve MongoDB Atlas/SRV records. For example, `DNS_SERVERS=8.8.8.8,1.1.1.1`. Omit it to use the host/system resolver. |
-| `FRONTEND_DOMAIN`, `FRONTEND_URL`, `CLIENT_URL` | Frontend origin allowlist for CORS, frontend URL used in auth links, and client URL used in booking emails, respectively. |
+| `FRONTEND_DOMAIN` | Optional comma-separated exact origins allowed by CORS. Development defaults include `http://localhost:5173` and `http://localhost:5174`; configure deployment origins explicitly, for example `FRONTEND_DOMAIN=https://app.example.com,https://admin.example.com`. |
+| `FRONTEND_URL`, `CLIENT_URL` | Frontend URL used in auth links and client URL used in booking emails, respectively. |
 | `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USERNAME`, `EMAIL_PASSWORD`, `EMAIL_FROM`, `EMAIL_FROM_NAME` | Local/development SMTP and sender configuration. Development defaults to a local SMTP server at `127.0.0.1:1025`. |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USERNAME`, `SMTP_PASSWORD` | Production SMTP configuration. |
 | `MOAMALAT_ENV`, `MOAMALAT_MID`, `MOAMALAT_TID`, `MOAMALAT_SECURE_KEY` | Optional Moamalat environment and merchant credentials. Payment initiation requires the merchant ID, terminal ID, and signing key. |
