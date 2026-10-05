@@ -1,8 +1,61 @@
 import Booking from "../models/booking_model.js";
 import Vehicle from "../models/vehicle_model.js";
+import Company from "../models/Company_model.js";
 import AppError from "../utils/appError.js";
 import * as factory from "./serviceFactory.js";
+import { runPaginatedQuery } from "../utils/paginatedQuery.js";
 import Email from "../utils/email.js";
+
+// The search allowlist is deliberately limited to fields stored on the booking
+// document. Populated references (vehicle make/model, customer and partner
+// names) cannot be regex-matched from the parent collection, so searching by
+// those stays the client's registry job.
+const BOOKING_SEARCH_FIELDS = ["pickupLocation", "bookingStatus", "paymentStatus"];
+
+// `hub` is resolved into real Mongo conditions below, so it must never be
+// re-applied as a literal field filter (the schema has no `hub` field).
+const BOOKING_DERIVED_FILTER_FIELDS = ["hub"];
+
+const escapeRegExp = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * DB-side equivalent of the former in-memory hub scoping: a booking belongs to a
+ * hub when its partner company is based there or when the pickup location names
+ * the hub. Resolving the partner ids up front keeps the scope inside MongoDB, so
+ * the window can still be paginated and counted without loading the register.
+ */
+const buildBookingHubFilter = async (hub) => {
+  if (!hub) return null;
+
+  const pattern = new RegExp(escapeRegExp(hub), "i");
+  const companyIds = await Company.distinct("_id", { city: pattern });
+
+  return {
+    $or: [{ companyId: { $in: companyIds } }, { pickupLocation: pattern }],
+  };
+};
+
+/**
+ * Paginated booking register for administration.
+ *
+ * Filters, the hub scope and ordering all run in MongoDB, so the returned page
+ * and `pagination.total` describe the same result set — previously the 100-row
+ * window was loaded first and the hub/derived filters ran on top of it, which
+ * both truncated the register and produced misleading counts.
+ */
+export const listBookings = async (query = {}) => {
+  const hubFilter = await buildBookingHubFilter(query.hub);
+
+  return await runPaginatedQuery(
+    Booking,
+    hubFilter ?? {},
+    query,
+    {
+      searchFields: BOOKING_SEARCH_FIELDS,
+      excludeFields: BOOKING_DERIVED_FILTER_FIELDS,
+    },
+  );
+};
 
 export const getAllBookings = factory.getAll(Booking);
 export const getBookingById = factory.getOne(Booking);

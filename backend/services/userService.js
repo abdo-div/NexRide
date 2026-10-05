@@ -1,5 +1,8 @@
 import User from "../models/User_model.js";
 import AppError from "../utils/appError.js";
+import { runPaginatedQuery } from "../utils/paginatedQuery.js";
+
+const USER_SEARCH_FIELDS = ["name", "email", "phoneNumber", "role", "status"];
 
 /**
  * Filter out disallowed fields from req.body
@@ -13,10 +16,21 @@ export const filterAllowedFields = (obj, ...allowedFields) => {
 };
 
 /**
- * Fetch all users with optional filtering
+ * Fetch all users with optional filtering (platform-admin register).
+ *
+ * Previously this loaded the entire collection into memory, so the admin
+ * customer register grew without bound. It now runs a real server-side page
+ * (skip/limit pushed to MongoDB) plus a matching count, and returns pagination
+ * metadata. Schema filters such as `role`/`status` keep working unchanged;
+ * `page`/`limit`/`sort`/`search`/`fields` are now reserved query controls
+ * consistent with every other list endpoint.
  */
 export const fetchAllUsers = async (query = {}) => {
-  return await User.find(query);
+  const { docs, pagination } = await runPaginatedQuery(User, {}, query, {
+    searchFields: USER_SEARCH_FIELDS,
+  });
+
+  return { users: docs, pagination };
 };
 
 /**

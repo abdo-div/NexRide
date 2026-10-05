@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
 import Payment from "../models/payment_model.js";
+import {
+  buildPaginationMeta,
+  resolvePagination,
+} from "../utils/pagination.js";
+
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /**
  * Platform-wide settlement KPIs. Everything is aggregated live from the real
@@ -117,13 +123,26 @@ const payoutStatusOf = (row) => {
  * live aggregate of that partner's payment ledger (gross GMV, NexRide fee, net
  * share, pending/settled balances) joined with the company record for naming.
  */
-export const buildPayoutLedger = async ({ companyId } = {}) => {
+export const buildPayoutLedger = async ({ companyId, search, ...paginationQuery } = {}) => {
   const match = { status: { $in: ["COMPLETED", "REFUNDED"] } };
   if (companyId) {
     match.companyId = new mongoose.Types.ObjectId(companyId);
   }
 
-  const rows = await Payment.aggregate([
+  const { page, limit, skip } = resolvePagination(paginationQuery);
+
+  const searchTerm = typeof search === "string" ? search.trim() : "";
+  const searchFilter =
+    searchTerm.length > 0
+      ? {
+          $or: [
+            { "company.name": new RegExp(escapeRegExp(searchTerm), "i") },
+            { "company.city": new RegExp(escapeRegExp(searchTerm), "i") },
+          ],
+        }
+      : null;
+
+  const pipeline = [
     { $match: match },
     {
       $group: {
@@ -212,13 +231,38 @@ export const buildPayoutLedger = async ({ companyId } = {}) => {
         lastPaidAt: 1,
       },
     },
-    { $sort: { gross: -1 } },
+  ];
+
+  if (searchFilter) {
+    pipeline.push({ $match: searchFilter });
+  }
+
+  // The ledger is aggregated to one row per fleet operator, so the window is
+  // applied with $facet: one branch returns the requested page, the other the
+  // total row count for the very same pipeline (so filters and total agree).
+  const [facet] = await Payment.aggregate([
+    ...pipeline,
+    {
+      $facet: {
+        rows: [
+          { $sort: { gross: -1, "_id": 1 } },
+          { $skip: skip },
+          { $limit: limit },
+        ],
+        meta: [{ $count: "total" }],
+      },
+    },
   ]);
 
-  return rows.map((row) => ({
-    ...row,
-    payoutStatus: payoutStatusOf(row),
-  }));
+  const total = facet?.meta?.[0]?.total ?? 0;
+
+  return {
+    ledger: (facet?.rows ?? []).map((row) => ({
+      ...row,
+      payoutStatus: payoutStatusOf(row),
+    })),
+    pagination: buildPaginationMeta({ page, limit, total }),
+  };
 };
 
 /**

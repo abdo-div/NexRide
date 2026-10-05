@@ -140,7 +140,7 @@ router.get("/payouts/summary", getPayoutSummary);
  *       403:
  *         description: Admin role required
  */
-router.get("/payouts/ledger", getPayoutLedger);
+router.get("/payouts/ledger", safePagination(20, 100), getPayoutLedger);
 
 /**
  * @openapi

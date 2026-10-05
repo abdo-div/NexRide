@@ -1,7 +1,11 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { BadgeCheck, Building2, Mail, MoreHorizontal, Phone } from "lucide-react";
-import type { AdminCompanyDto, AdminPaymentDto } from "../../types/admin";
+import type {
+  AdminCompanyDto,
+  AdminPaymentDto,
+  PaginationMeta,
+} from "../../types/admin";
 import type { BookingDto } from "../../types/booking";
 import type { VehicleDto } from "../../types/vehicle";
 import { formatDate, formatLYD } from "../../lib/bookingView";
@@ -16,9 +20,11 @@ import {
   vehiclesOf,
 } from "../../lib/companyView";
 import { initialsFrom } from "../../lib/vehicleMapper";
+import { AdminPagination } from "./AdminPagination";
 import { StatusPill } from "./StatusPill";
 
 export interface AdminCompaniesTableProps {
+  /** Exactly the rows the server selected for the current page. */
   companies: AdminCompanyDto[];
   vehicles: VehicleDto[];
   bookings: BookingDto[];
@@ -26,10 +32,11 @@ export interface AdminCompaniesTableProps {
   selectedId: string;
   onSelect: (company: AdminCompanyDto) => void;
   openDossier: (company: AdminCompanyDto) => void;
-  page: number;
-  pageSize?: number;
+  /** Server-resolved pagination block; drives the "showing X of Y" + controls. */
+  pagination: PaginationMeta;
   onPageChange: (page: number) => void;
   emptyLabel: string;
+  loading?: boolean;
 }
 
 /** Operator management table (real data only) for the Rental Companies page. */
@@ -41,19 +48,12 @@ export const AdminCompaniesTable: React.FC<AdminCompaniesTableProps> = ({
   selectedId,
   onSelect,
   openDossier,
-  page,
-  pageSize = 8,
+  pagination,
   onPageChange,
   emptyLabel,
+  loading = false,
 }) => {
   const { t, i18n } = useTranslation();
-
-  const totalPages = Math.max(1, Math.ceil(companies.length / pageSize));
-  const safePage = Math.min(page, totalPages);
-  const slice = useMemo(
-    () => companies.slice((safePage - 1) * pageSize, safePage * pageSize),
-    [companies, safePage, pageSize],
-  );
 
   if (companies.length === 0) {
     return (
@@ -86,7 +86,7 @@ export const AdminCompaniesTable: React.FC<AdminCompaniesTableProps> = ({
             </tr>
           </thead>
           <tbody className="text-sm">
-            {slice.map((c) => {
+            {companies.map((c) => {
               const fleet = vehiclesOf(vehicles, c);
               const ready = fleet.filter(
                 (v) => v.operationalStatus === "AVAILABLE",
@@ -262,48 +262,12 @@ export const AdminCompaniesTable: React.FC<AdminCompaniesTableProps> = ({
         </table>
       </div>
 
-      <div className="mt-4 flex flex-col items-center justify-between gap-3 border-t border-slate-100 pt-4 text-xs text-[#565E74] sm:flex-row">
-        <div>
-          {t("admin.companies.table.showingOf", {
-            shown: slice.length,
-            total: companies.length,
-          })}
-        </div>
-        {totalPages > 1 && (
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              disabled={safePage <= 1}
-              onClick={() => onPageChange(safePage - 1)}
-              className="rounded-lg bg-[#EFF4FF] px-3 py-1.5 font-semibold text-[#565E74] transition-colors enabled:hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-            >
-              {t("admin.table.prev")}
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => onPageChange(p)}
-                className={`rounded-lg px-3 py-1.5 font-semibold transition-colors cursor-pointer ${
-                  p === safePage
-                    ? "bg-[#2563EB] text-white shadow-sm"
-                    : "bg-[#EFF4FF] text-[#565E74] hover:bg-[#E5EEFF]"
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-            <button
-              type="button"
-              disabled={safePage >= totalPages}
-              onClick={() => onPageChange(safePage + 1)}
-              className="rounded-lg bg-[#EFF4FF] px-3 py-1.5 font-semibold text-[#565E74] transition-colors enabled:hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-            >
-              {t("admin.table.next")}
-            </button>
-          </div>
-        )}
-      </div>
+      <AdminPagination
+        pagination={pagination}
+        onPageChange={onPageChange}
+        shownCount={companies.length}
+        loading={loading}
+      />
     </div>
   );
 };

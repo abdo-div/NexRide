@@ -49,12 +49,13 @@ export const getOne=(Model,popOptions)=>catchAsync(async(req,res,next)=>{
 });
 
 
-export const getAll=(Model)=>catchAsync(async(req,res,next)=>{
-    const {results,data}=await serviceFactory.getAll(Model)(req.query);
+export const getAll=(Model,searchFields)=>catchAsync(async(req,res,next)=>{
+    const {results,data,pagination}=await serviceFactory.getAll(Model,searchFields)(req.query);
 
     res.status(200).json({
         status:'success',
         results,
+        pagination,
         data:{
             data
         }

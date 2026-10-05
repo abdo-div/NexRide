@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { adminApi } from "../lib/adminApi";
+import { adminApi, REGISTRY_LIMIT } from "../lib/adminApi";
 import type {
   AdminCompanyDto,
   AdminCustomerDto,
@@ -65,6 +65,7 @@ export const useAdminCommissions = (): {
       setError(false);
 
       try {
+        const registry = { limit: REGISTRY_LIMIT, sort: "-createdAt" };
         const [
           commissionsRes,
           bookingsRes,
@@ -74,13 +75,13 @@ export const useAdminCommissions = (): {
           summaryRes,
           ledgerRes,
         ] = await Promise.all([
-          adminApi.listCommissions(controller.signal),
-          adminApi.listBookings(controller.signal),
-          adminApi.listCompanies(controller.signal),
-          adminApi.listCustomers(controller.signal),
-          adminApi.listVehicles(controller.signal),
+          adminApi.listCommissions(registry, controller.signal),
+          adminApi.listBookings(registry, controller.signal),
+          adminApi.listCompanies(registry, controller.signal),
+          adminApi.listCustomers(registry, controller.signal),
+          adminApi.listVehicles(registry, controller.signal),
           adminApi.payoutSummary(controller.signal),
-          adminApi.payoutLedger(undefined, controller.signal),
+          adminApi.payoutLedger(registry, controller.signal),
         ]);
         if (!active) return;
         setData({

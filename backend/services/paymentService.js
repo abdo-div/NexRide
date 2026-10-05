@@ -2,7 +2,9 @@ import mongoose from "mongoose";
 import Payment from "../models/payment_model.js";
 import Booking from "../models/booking_model.js";
 import AppError from "../utils/appError.js";
-import APIFeatures from "../utils/APIFeatures.js";
+import { runPaginatedQuery } from "../utils/paginatedQuery.js";
+
+const PAYMENT_SEARCH_FIELDS = ["status", "paymentMethod", "payoutStatus"];
 
 /**
  * Execute payment intent inside a Mongoose ACID Transaction
@@ -86,6 +88,10 @@ export const fetchPaymentById = async (paymentId) => {
 };
 /**
  * Fetch all payments with filtering for Tenants/Admins
+ *
+ * Returns the requested page plus pagination metadata. The total is counted
+ * against the identical filter, so a company or admin can page through its whole
+ * ledger instead of silently stopping at the per-page cap.
  */
 export const fetchAllPayments = async (queryParams, user) => {
   let filter = {};
@@ -95,13 +101,14 @@ export const fetchAllPayments = async (queryParams, user) => {
     filter.companyId = user.company;
   }
 
-  const features = new APIFeatures(Payment.find(filter), queryParams)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
+  const { docs, pagination } = await runPaginatedQuery(
+    Payment,
+    filter,
+    queryParams,
+    { searchFields: PAYMENT_SEARCH_FIELDS },
+  );
 
-  return await features.query;
+  return { payments: docs, pagination };
 };
 
 /**

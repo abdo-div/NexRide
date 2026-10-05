@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { adminApi } from "../lib/adminApi";
+import { adminApi, REGISTRY_LIMIT } from "../lib/adminApi";
 import type {
   AdminCompanyDto,
   MaintenanceEventDto,
@@ -53,11 +53,12 @@ export const useAdminMaintenance = (): {
       setError(false);
 
       try {
+        const registry = { limit: REGISTRY_LIMIT, sort: "-createdAt" };
         const [eventsRes, vehiclesRes, companiesRes, summaryRes] =
           await Promise.all([
-            adminApi.listMaintenance(controller.signal),
-            adminApi.listVehicles(controller.signal),
-            adminApi.listCompanies(controller.signal),
+            adminApi.listMaintenance(registry, controller.signal),
+            adminApi.listVehicles(registry, controller.signal),
+            adminApi.listCompanies(registry, controller.signal),
             adminApi.maintenanceSummary(controller.signal),
           ]);
         if (!active) return;

@@ -1,23 +1,27 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { BadgeCheck, Car, MoreHorizontal, MapPin } from "lucide-react";
+import type { PaginationMeta } from "../../types/admin";
 import type { BookingDto } from "../../types/booking";
 import type { VehicleDto } from "../../types/vehicle";
 import { formatDate, referenceCodeFrom } from "../../lib/bookingView";
 import { companyOf, stagingBooking } from "../../lib/fleetView";
 import { photoUrl } from "../../lib/vehicleMapper";
+import { AdminPagination } from "./AdminPagination";
 import { StatusPill } from "./StatusPill";
 
 export interface AdminFleetTableProps {
+  /** Exactly the rows the server selected for the current page. */
   vehicles: VehicleDto[];
   bookings: BookingDto[];
   selectedId: string;
   onSelect: (vehicle: VehicleDto) => void;
   onViewBooking: (bookingId: string) => void;
-  page: number;
-  pageSize?: number;
+  /** Server-resolved pagination block; drives the "showing X of Y" + controls. */
+  pagination: PaginationMeta;
   onPageChange: (page: number) => void;
   emptyLabel: string;
+  loading?: boolean;
 }
 
 /** Shared fleet table used by the Fleet & Vehicles page (real data only). */
@@ -27,19 +31,12 @@ export const AdminFleetTable: React.FC<AdminFleetTableProps> = ({
   selectedId,
   onSelect,
   onViewBooking,
-  page,
-  pageSize = 8,
+  pagination,
   onPageChange,
   emptyLabel,
+  loading = false,
 }) => {
   const { t, i18n } = useTranslation();
-
-  const totalPages = Math.max(1, Math.ceil(vehicles.length / pageSize));
-  const safePage = Math.min(page, totalPages);
-  const slice = useMemo(
-    () => vehicles.slice((safePage - 1) * pageSize, safePage * pageSize),
-    [vehicles, safePage, pageSize],
-  );
 
   if (vehicles.length === 0) {
     return (
@@ -69,7 +66,7 @@ export const AdminFleetTable: React.FC<AdminFleetTableProps> = ({
             </tr>
           </thead>
           <tbody className="text-sm">
-            {slice.map((v) => {
+            {vehicles.map((v) => {
               const company = companyOf(v);
               const staged = stagingBooking(bookings, v);
               const photo = photoUrl(v.photos?.[0]);
@@ -205,48 +202,12 @@ export const AdminFleetTable: React.FC<AdminFleetTableProps> = ({
         </table>
       </div>
 
-      <div className="mt-4 flex flex-col items-center justify-between gap-3 border-t border-slate-100 pt-4 text-xs text-[#565E74] sm:flex-row">
-        <div>
-          {t("admin.fleet.table.showingOf", {
-            shown: slice.length,
-            total: vehicles.length,
-          })}
-        </div>
-        {totalPages > 1 && (
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              disabled={safePage <= 1}
-              onClick={() => onPageChange(safePage - 1)}
-              className="rounded-lg bg-[#EFF4FF] px-3 py-1.5 font-semibold text-[#565E74] transition-colors enabled:hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-            >
-              {t("admin.table.prev")}
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => onPageChange(p)}
-                className={`rounded-lg px-3 py-1.5 font-semibold transition-colors cursor-pointer ${
-                  p === safePage
-                    ? "bg-[#2563EB] text-white shadow-sm"
-                    : "bg-[#EFF4FF] text-[#565E74] hover:bg-[#E5EEFF]"
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-            <button
-              type="button"
-              disabled={safePage >= totalPages}
-              onClick={() => onPageChange(safePage + 1)}
-              className="rounded-lg bg-[#EFF4FF] px-3 py-1.5 font-semibold text-[#565E74] transition-colors enabled:hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-            >
-              {t("admin.table.next")}
-            </button>
-          </div>
-        )}
-      </div>
+      <AdminPagination
+        pagination={pagination}
+        onPageChange={onPageChange}
+        shownCount={vehicles.length}
+        loading={loading}
+      />
     </div>
   );
 };

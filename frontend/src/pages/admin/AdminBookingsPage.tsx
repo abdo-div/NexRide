@@ -1,24 +1,22 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { CalendarDays, Download, RefreshCw, Search } from "lucide-react";
 import { useAdminData } from "../../hooks/useAdminData";
+import { usePaginatedList } from "../../hooks/usePaginatedList";
+import { adminApi } from "../../lib/adminApi";
 import { filterByHub, bookingsCsv } from "../../lib/adminMetrics";
-import {
-  referenceCodeFrom,
-  saveBlobAsFile,
-  vehicleTitle,
-} from "../../lib/bookingView";
+import { saveBlobAsFile } from "../../lib/bookingView";
 import { useAdminHub } from "../../context/adminHub";
 import { AdminBookingsTable } from "../../components/admin/AdminBookingsTable";
 import type { BookingDto } from "../../types/booking";
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 20;
 
 export const AdminBookingsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { data, loading, error, reload } = useAdminData();
+  const { data } = useAdminData();
   const { hub } = useAdminHub();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -34,51 +32,68 @@ export const AdminBookingsPage: React.FC = () => {
     setSearchParams(next, { replace: true });
   };
 
-  const filtered = useMemo(() => {
-    const base = filterByHub(data, hub).bookings;
-    const needle = search.trim().toLocaleLowerCase(i18n.language);
-    return base
-      .filter((b) => status === "ALL" || b.bookingStatus === status)
-      .filter((b) => company === "ALL" || providerName(b) === company)
-      .filter((b) => {
-        if (!needle) return true;
-        const haystack = [
-          referenceCodeFrom(b._id),
-          vehicleTitle(b),
-          b.pickupLocation,
-          customerName(b),
-          providerName(b),
-        ]
-          .join(" ")
-          .toLocaleLowerCase(i18n.language);
-        return haystack.includes(needle);
-      })
-      .slice()
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
-  }, [data, hub, search, status, company, i18n.language]);
+  /**
+   * The table rows come straight from the server: filtering, ordering and the
+   * page window all happen in MongoDB, so the rendered page and the reported
+   * total always describe the same result set.
+   */
+  const queryKey = useMemo(
+    () => ({ page, limit: PAGE_SIZE, search, status, company, hub }),
+    [page, search, status, company, hub],
+  );
+
+  const fetchPage = useCallback(
+    async (signal: AbortSignal) => {
+      const params = {
+        page,
+        limit: PAGE_SIZE,
+        search: search.trim() || undefined,
+        bookingStatus: status,
+        companyId: company,
+        hub,
+      };
+      const res = await adminApi.listBookings(params, signal);
+      return { rows: res.data.data ?? [], pagination: res.pagination };
+    },
+    [page, search, status, company, hub],
+  );
+
+  const {
+    rows,
+    pagination,
+    loading,
+    error,
+    reload,
+  } = usePaginatedList<BookingDto>(fetchPage, queryKey);
+
+  /** Bookings outside the active hub stay available for the filter dropdowns. */
+  const scoped = useMemo(() => filterByHub(data, hub).bookings, [data, hub]);
 
   const statusOptions = useMemo(() => {
     const seen = new Set<string>();
-    data.bookings.forEach((b) => seen.add(b.bookingStatus));
+    scoped.forEach((b) => seen.add(b.bookingStatus));
     return ["ALL", ...Array.from(seen)].sort((a, b) =>
       a.localeCompare(b, i18n.language),
     );
-  }, [data.bookings, i18n.language]);
+  }, [scoped, i18n.language]);
 
+  /**
+   * Company filter options, keyed by id because the backend filters on
+   * `companyId`. Ids are resolved from the reference registry rather than the
+   * current page, so the dropdown stays complete while the table pages.
+   */
   const companyOptions = useMemo(() => {
-    const seen = new Set<string>();
-    data.bookings.forEach((b) => {
-      const name = providerName(b);
-      if (name) seen.add(name);
+    const byId = new Map<string, string>();
+    data.companies.forEach((c) => byId.set(c._id, c.name));
+    scoped.forEach((b) => {
+      if (typeof b.companyId === "object" && b.companyId?._id) {
+        byId.set(b.companyId._id, b.companyId.name ?? byId.get(b.companyId._id) ?? "");
+      }
     });
-    data.companies.forEach((c) => seen.add(c.name));
-    return ["ALL", ...Array.from(seen)].sort(
-      (a, b) => a.localeCompare(b, i18n.language),
-    );
-  }, [data.bookings, data.companies, i18n.language]);
+    return Array.from(byId.entries())
+      .filter(([, name]) => name)
+      .sort((a, b) => a[1].localeCompare(b[1], i18n.language));
+  }, [scoped, data.companies, i18n.language]);
 
   const resetPage = () => setPage(1);
 
@@ -86,10 +101,11 @@ export const AdminBookingsPage: React.FC = () => {
     navigate(`/admin/bookings/${booking._id}`);
   };
 
+  /** Exports the rows the operator is currently looking at. */
   const handleExport = () => {
-    if (filtered.length === 0) return;
+    if (rows.length === 0) return;
     saveBlobAsFile(
-      new Blob([bookingsCsv(filtered)], { type: "text/csv;charset=utf-8" }),
+      new Blob([bookingsCsv(rows)], { type: "text/csv;charset=utf-8" }),
       `nexride-admin-bookings-${new Date().toISOString().slice(0, 10)}.csv`,
     );
   };
@@ -117,7 +133,7 @@ export const AdminBookingsPage: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-3">
           <span className="rounded-full bg-[#EFF4FF] px-3 py-1 text-xs font-bold text-[#2563EB]">
-            {t("admin.bookings.count", { count: filtered.length })}
+            {t("admin.bookings.count", { count: pagination.total })}
           </span>
           <button
             type="button"
@@ -131,7 +147,7 @@ export const AdminBookingsPage: React.FC = () => {
           <button
             type="button"
             onClick={handleExport}
-            disabled={filtered.length === 0}
+            disabled={rows.length === 0}
             className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.28)] transition-all hover:bg-[#1D4ED8] disabled:opacity-50 cursor-pointer"
           >
             <Download className="h-4 w-4" />
@@ -185,13 +201,11 @@ export const AdminBookingsPage: React.FC = () => {
               className="max-w-[220px] cursor-pointer rounded-xl bg-[#EFF4FF] px-3 py-2 text-sm font-semibold text-[#0B1C30] outline-none"
             >
               <option value="ALL">{t("admin.bookings.allCompanies")}</option>
-              {companyOptions
-                .filter((c) => c !== "ALL")
-                .map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
+              {companyOptions.map(([id, name]) => (
+                <option key={id} value={id}>
+                  {name}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -222,24 +236,17 @@ export const AdminBookingsPage: React.FC = () => {
       ) : (
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
           <AdminBookingsTable
-            bookings={filtered}
-            page={page}
-            pageSize={PAGE_SIZE}
+            bookings={rows}
+            pagination={pagination}
             onPageChange={setPage}
             onView={handleView}
             emptyLabel={t("admin.bookings.empty")}
+            loading={loading}
           />
         </section>
       )}
     </div>
   );
 };
-
-// Extracted so the filter memos stay tidy and reusable.
-const customerName = (booking: BookingDto): string =>
-  typeof booking.customerId === "object" ? booking.customerId.name ?? "" : "";
-
-const providerName = (booking: BookingDto): string =>
-  typeof booking.companyId === "object" ? booking.companyId.name ?? "" : "";
 
 export default AdminBookingsPage;

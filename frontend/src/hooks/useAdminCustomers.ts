@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { adminApi } from "../lib/adminApi";
+import { adminApi, REGISTRY_LIMIT } from "../lib/adminApi";
 import type {
   AdminCompanyDto,
   AdminCustomerDto,
@@ -34,8 +34,12 @@ const EMPTY_RESPONSES = {
 
 /**
  * Pulls the registered renter accounts (role=customer) in parallel with the
- * shared admin datasets used to derive each customer's real activity (bookings,
- * payments, fleet). No client-side mock data is ever introduced.
+ * reference registries used to derive each customer's real activity (bookings,
+ * payments, fleet).
+ *
+ * IMPORTANT: the customer *table* renders from its own server-paginated request
+ * via `usePaginatedList`; this hook only supplies the join/KPI registries. No
+ * client-side mock data is ever introduced.
  */
 export const useAdminCustomers = (): {
   data: AdminCustomersData;
@@ -57,13 +61,14 @@ export const useAdminCustomers = (): {
       setError(false);
 
       try {
+        const registry = { limit: REGISTRY_LIMIT, sort: "-createdAt" };
         const [customersRes, bookingsRes, vehiclesRes, companiesRes, commissionsRes] =
           await Promise.all([
-            adminApi.listCustomers(controller.signal),
-            adminApi.listBookings(controller.signal),
-            adminApi.listVehicles(controller.signal),
-            adminApi.listCompanies(controller.signal),
-            adminApi.listCommissions(controller.signal),
+            adminApi.listCustomers(registry, controller.signal),
+            adminApi.listBookings(registry, controller.signal),
+            adminApi.listVehicles(registry, controller.signal),
+            adminApi.listCompanies(registry, controller.signal),
+            adminApi.listCommissions(registry, controller.signal),
           ]);
         if (!active) return;
         setData({

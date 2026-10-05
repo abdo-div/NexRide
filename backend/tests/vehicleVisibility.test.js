@@ -164,9 +164,14 @@ test("public list applies immutable visibility filters while preserving legitima
     limit() { return this; },
     populate: async () => [],
   };
+  const countFilters = [];
   t.mock.method(Vehicle, "find", (filter) => {
     initialFilters.push(filter);
     return query;
+  });
+  t.mock.method(Vehicle, "countDocuments", async (filter) => {
+    countFilters.push(filter);
+    return 0;
   });
 
   await fetchAllVehicles(
@@ -186,6 +191,11 @@ test("public list applies immutable visibility filters while preserving legitima
 
   assert.deepEqual(initialFilters[0], buildPublicVehicleFilter([approvedCompanyId]));
   assert.deepEqual(clientFilters[0], { type: "SUV" });
+  // The immutable visibility scope is counted too, so the total cannot leak
+  // vehicles a caller may not see.
+  assert.deepEqual(countFilters[0], {
+    $and: [buildPublicVehicleFilter([approvedCompanyId]), { type: "SUV" }],
+  });
 });
 
 test("public availability search keeps fixed visibility despite custom status filters", async (t) => {
@@ -245,11 +255,19 @@ test("admin vehicle listing remains broad and behind the existing admin guard", 
     limit() { return this; },
     populate: async () => [],
   };
+  const countFilters = [];
   t.mock.method(Vehicle, "find", (filter) => {
     initialFilter = filter;
     return query;
   });
+  t.mock.method(Vehicle, "countDocuments", async (filter) => {
+    countFilters.push(filter);
+    return 0;
+  });
 
-  await fetchAllVehicles({ listingStatus: "DRAFT", limit: "10" });
+  const { pagination } = await fetchAllVehicles({ listingStatus: "DRAFT", limit: "10" });
   assert.deepEqual(initialFilter, {});
+  // The admin listing stays broad, and its total counts the same broad scope.
+  assert.deepEqual(countFilters, [{ listingStatus: "DRAFT" }]);
+  assert.equal(pagination.limit, 10);
 });

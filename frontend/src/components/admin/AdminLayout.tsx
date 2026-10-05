@@ -64,7 +64,8 @@ export const AdminLayout: React.FC = () => {
   useEffect(() => {
     const controller = new AbortController();
     adminApi
-      .listVehicles(controller.signal)
+      // Hub options are a lookup list, so it asks for the widest allowed page.
+      .listVehicles({ limit: 100 }, controller.signal)
       .then((res) => {
         const cities = Array.from(
           new Set(res.data.vehicles.map((v) => v.city).filter(Boolean)),

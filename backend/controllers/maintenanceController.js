@@ -11,7 +11,7 @@ export const getMaintenanceSummary = catchAsync(async (req, res, next) => {
 });
 
 export const getMaintenanceEvents = catchAsync(async (req, res, next) => {
-  const events = await maintenanceService.listMaintenanceEvents({
+  const { events, pagination } = await maintenanceService.listMaintenanceEvents({
     ...req.query,
     hub: req.query.hub,
   });
@@ -19,6 +19,7 @@ export const getMaintenanceEvents = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     results: events.length,
+    pagination,
     data: { events },
   });
 });

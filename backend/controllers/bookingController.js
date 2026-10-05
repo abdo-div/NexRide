@@ -13,8 +13,21 @@ import {
   holdVehicleForCheckout,
   releaseVehicleHold,
 } from "../services/reservationHold.service.js";
-// Administrative & General Lookup
-export const getAllBookings = factory.getAll(Booking);
+// Administrative register.
+//
+// The search allowlist lives in the service (`BOOKING_SEARCH_FIELDS`) because the
+// hub scope is resolved there as well; both have to be applied before the page is
+// sliced and counted.
+export const getAllBookings = catchAsync(async (req, res) => {
+  const { docs, pagination } = await bookingService.listBookings(req.query);
+
+  res.status(200).json({
+    status: "success",
+    results: docs.length,
+    pagination,
+    data: { data: docs },
+  });
+});
 
 // GET /:id must answer with `{ data: { booking } }` — the same envelope used by
 // POST / (create) and GET /my-bookings — so the frontend bookingApi.get contract

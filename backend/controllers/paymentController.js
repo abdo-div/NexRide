@@ -33,11 +33,15 @@ export const getPaymentById = catchAsync(async (req, res, next) => {
 });
 
 export const getAllPayments = catchAsync(async (req, res, next) => {
-  const payments = await paymentService.fetchAllPayments(req.query, req.user);
+  const { payments, pagination } = await paymentService.fetchAllPayments(
+    req.query,
+    req.user,
+  );
 
   res.status(200).json({
     status: "success",
     results: payments.length,
+    pagination,
     data: { payments },
   });
 });

@@ -15,50 +15,129 @@ import type {
   PayoutSettleResult,
   PlatformSettingsPatch,
   PlatformSettingsResponseData,
+  PaginationMeta,
   ReportPeriod,
   ReportsSummary,
   UserStatus,
 } from "../types/admin";
 
 // -----------------------------------------------------------------------------
-// Response envelopes (mirror backend/routes/admin.routes.js)
+// Response envelopes (mirror backend/controllers/*.js)
 // - bookings list reuses the shared factory envelope: data.data[]
 // - vehicles / companies / commissions answer data.{collection}[]
-// Each service runs APIFeatures (default sort -createdAt, bounded pagination).
+// Every listing also answers a top-level `pagination` block produced by the
+// backend's shared resolver, so the tables page through the real result set
+// instead of slicing an arbitrarily capped first page in the browser.
 // -----------------------------------------------------------------------------
+
+/**
+ * Query parameters shared by every paginated admin listing. Only keys the
+ * endpoint actually understands are forwarded, so the server stays the single
+ * source of truth for filtering.
+ */
+export interface AdminListParams {
+  page?: number;
+  limit?: number;
+  sort?: string;
+  /** Free-text search; each endpoint maps it onto an allowlisted field set. */
+  search?: string;
+  /** Booking status filter (GET /admin/bookings). */
+  bookingStatus?: string;
+  companyId?: string;
+  /** Company city scope (GET /admin/companies). */
+  city?: string;
+  /** Vehicle operational status (GET /admin/vehicles). */
+  operationalStatus?: string;
+  /** Vehicle class/body type (GET /admin/vehicles). */
+  type?: string;
+  category?: string;
+  priority?: string;
+  status?: string;
+  hub?: string;
+  /** Account role scope; the customers register is locked to `customer`. */
+  role?: string;
+}
+
+const listQuery = (params: AdminListParams = {}): string => {
+  const query = new URLSearchParams();
+
+  if (params.page !== undefined) query.set("page", String(params.page));
+  if (params.limit !== undefined) query.set("limit", String(params.limit));
+  if (params.sort) query.set("sort", params.sort);
+  if (params.search) query.set("search", params.search);
+  if (params.bookingStatus && params.bookingStatus !== "ALL") {
+    query.set("bookingStatus", params.bookingStatus);
+  }
+  if (params.companyId && params.companyId !== "ALL") {
+    query.set("companyId", params.companyId);
+  }
+  if (params.city && params.city !== "ALL") query.set("city", params.city);
+  if (params.operationalStatus && params.operationalStatus !== "ALL") {
+    query.set("operationalStatus", params.operationalStatus);
+  }
+  if (params.type && params.type !== "ALL") query.set("type", params.type);
+  if (params.category && params.category !== "ALL") {
+    query.set("category", params.category);
+  }
+  if (params.priority && params.priority !== "ALL") {
+    query.set("priority", params.priority);
+  }
+  if (params.status && params.status !== "ALL") query.set("status", params.status);
+  if (params.hub && params.hub !== "ALL") query.set("hub", params.hub);
+  if (params.role) query.set("role", params.role);
+
+  const queryString = query.toString();
+  return queryString ? `?${queryString}` : "";
+};
+
+/**
+ * Window used for the *reference* registries the admin pages keep in memory to
+ * resolve foreign keys (company/vehicle/customer names) and derive KPIs.
+ *
+ * These are deliberately NOT the primary table source: every admin listing table
+ * pages through its own endpoint via `usePaginatedList`. This bounded window
+ * only exists so a page can label a row or fill a filter dropdown, which is why
+ * it asks for the largest page the routes allow instead of a single row.
+ */
+export const REGISTRY_LIMIT = 100;
 
 interface AdminBookingsResponse {
   status: string;
   results: number;
+  pagination: PaginationMeta;
   data: { data: BookingDto[] };
 }
 
 interface AdminVehiclesResponse {
   status: string;
   results: number;
+  pagination: PaginationMeta;
   data: { vehicles: VehicleDto[] };
 }
 
 interface AdminCompaniesResponse {
   status: string;
   results: number;
+  pagination: PaginationMeta;
   data: { companies: AdminCompanyDto[] };
 }
 
 interface AdminCommissionsResponse {
   status: string;
   results: number;
+  pagination: PaginationMeta;
   data: { payments: AdminPaymentDto[] };
 }
 
 /**
  * Envelope returned by the shared user controller (userController.getAllUsers).
- * NOTE: this route passes req.query straight into User.find(), so only real
- * schema-field filters may be sent (e.g. role) — never limit/sort/page.
+ * The user service now applies APIFeatures, so page/limit/sort/search and real
+ * schema-field filters may be sent alongside the mandatory `role` scope.
  */
 interface AdminCustomersResponse {
   status: string;
   results: number;
+  pagination: PaginationMeta;
   data: { users: AdminCustomerDto[] };
 }
 
@@ -70,6 +149,7 @@ interface PayoutSummaryResponse {
 interface PayoutLedgerResponse {
   status: string;
   results: number;
+  pagination: PaginationMeta;
   data: { ledger: AdminPayoutRow[] };
 }
 
@@ -91,6 +171,7 @@ interface MaintenanceSummaryResponse {
 interface MaintenanceEventsResponse {
   status: string;
   results: number;
+  pagination: PaginationMeta;
   data: { events: MaintenanceEventDto[] };
 }
 
@@ -116,34 +197,36 @@ interface PlatformSettingsResponse {
 
 /** The platform admin endpoints are JWT-gated (protect + restrictTo("admin")). */
 export const adminApi = {
-  listBookings: (signal?: AbortSignal) =>
-    request<AdminBookingsResponse>(`/admin/bookings?sort=-createdAt&limit=100`, {
-      signal,
-    }),
+  listBookings: (params: AdminListParams = {}, signal?: AbortSignal) =>
+    request<AdminBookingsResponse>(
+      `/admin/bookings${listQuery({ sort: "-createdAt", ...params })}`,
+      { signal },
+    ),
 
-  listVehicles: (signal?: AbortSignal) =>
-    request<AdminVehiclesResponse>(`/admin/vehicles?sort=-createdAt&limit=100`, {
-      signal,
-    }),
+  listVehicles: (params: AdminListParams = {}, signal?: AbortSignal) =>
+    request<AdminVehiclesResponse>(
+      `/admin/vehicles${listQuery({ sort: "-createdAt", ...params })}`,
+      { signal },
+    ),
 
-  listCompanies: (signal?: AbortSignal) =>
+  listCompanies: (params: AdminListParams = {}, signal?: AbortSignal) =>
     request<AdminCompaniesResponse>(
-      `/admin/companies?sort=-createdAt&limit=100`,
+      `/admin/companies${listQuery({ sort: "-createdAt", ...params })}`,
       { signal },
     ),
 
-  listCommissions: (signal?: AbortSignal) =>
+  listCommissions: (params: AdminListParams = {}, signal?: AbortSignal) =>
     request<AdminCommissionsResponse>(
-      `/admin/commissions?sort=-createdAt&limit=100`,
+      `/admin/commissions${listQuery({ sort: "-createdAt", ...params })}`,
       { signal },
     ),
 
-  /**
-   * Registered renter accounts (GET /api/v1/users?role=customer). No limit or
-   * sort is passed: the user service feeds req.query directly to User.find().
-   */
-  listCustomers: (signal?: AbortSignal) =>
-    request<AdminCustomersResponse>(`/users?role=customer`, { signal }),
+  /** Registered renter accounts (GET /api/v1/users?role=customer). */
+  listCustomers: (params: AdminListParams = {}, signal?: AbortSignal) =>
+    request<AdminCustomersResponse>(
+      `/users${listQuery({ role: "customer", sort: "-createdAt", ...params })}`,
+      { signal },
+    ),
 
   /** Platform operator status transition for a renter account. */
   updateUserStatus: (
@@ -176,14 +259,15 @@ export const adminApi = {
 
   /**
    * Clearing ledger — one aggregated settlement run per fleet operator.
-   * Optional ?companyId=? narrows to a single partner dossier.
+   * Optional companyId/search narrow the page server-side; the response carries
+   * pagination metadata because the ledger is a full aggregation, not a slice.
    */
   payoutLedger: (
-    companyId?: string,
+    params: AdminListParams = {},
     signal?: AbortSignal,
   ): Promise<PayoutLedgerResponse> =>
     request<PayoutLedgerResponse>(
-      `/admin/payouts/ledger${companyId ? `?companyId=${encodeURIComponent(companyId)}` : ""}`,
+      `/admin/payouts/ledger${listQuery(params)}`,
       { signal },
     ),
 
@@ -226,13 +310,15 @@ export const adminApi = {
 
   /**
    * Maintenance-event ledger, newest first. dispatchStatus (incl. derived
-   * OVERDUE) is computed server-side from estReturnDate.
+   * OVERDUE) is computed server-side from estReturnDate, and the OVERDUE/hub
+   * scopes are real Mongo filters — so the page and its total always agree.
    */
   listMaintenance: (
+    params: AdminListParams = {},
     signal?: AbortSignal,
   ): Promise<MaintenanceEventsResponse> =>
     request<MaintenanceEventsResponse>(
-      `/admin/maintenance?sort=-createdAt&limit=100`,
+      `/admin/maintenance${listQuery({ sort: "-createdAt", ...params })}`,
       { signal },
     ),
 

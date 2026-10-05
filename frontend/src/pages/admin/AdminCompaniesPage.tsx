@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -21,6 +21,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useAdminData } from "../../hooks/useAdminData";
+import { usePaginatedList } from "../../hooks/usePaginatedList";
 import { companiesCsv } from "../../lib/adminMetrics";
 import { adminApi } from "../../lib/adminApi";
 import { saveBlobAsFile } from "../../lib/bookingView";
@@ -41,7 +42,7 @@ import type {
   CompanyStatus,
 } from "../../types/admin";
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 20;
 
 const STATUS_OPTIONS: CompanyStatus[] = [
   "PENDING",
@@ -98,7 +99,14 @@ const richnessOf = (
 export const AdminCompaniesPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { data, loading, error, reload } = useAdminData();
+  // KPI/dossier sections read the bounded registries, so they follow the
+  // registry's own load state rather than the table's page state.
+  const {
+    data,
+    loading: registryLoading,
+    error: registryError,
+    reload: reloadRegistry,
+  } = useAdminData();
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("ALL");
@@ -169,43 +177,43 @@ export const AdminCompaniesPage: React.FC = () => {
   }, [companies, payments, vehicles]);
 
   // -------------------------------------------------------------------------
-  // Filtered rows (search + status + city), newest first
+  // Server-paginated rows (search + status + city), newest first
   // -------------------------------------------------------------------------
-  const filtered = useMemo(() => {
-    const needle = search.trim().toLocaleLowerCase(i18n.language);
-    const list = companies
-      .filter((c) => status === "ALL" || c.status === status)
-      .filter(
-        (c) =>
-          hubFilter === "ALL" ||
-          c.city.toLocaleLowerCase(i18n.language) ===
-            hubFilter.toLocaleLowerCase(i18n.language),
-      )
-      .filter((c) => {
-        if (!needle) return true;
-        const haystack = [
-          c.name,
-          c.city,
-          c.address,
-          c.email,
-          c.phone,
-          c.subdomain,
-          c.slug,
-          c.description,
-          c.status,
-        ]
-          .join(" ")
-          .toLocaleLowerCase(i18n.language);
-        return haystack.includes(needle);
-      })
-      .slice();
-    list.sort(
-      (a, b) =>
-        new Date(b.createdAt ?? 0).getTime() -
-        new Date(a.createdAt ?? 0).getTime(),
-    );
-    return list;
-  }, [companies, status, hubFilter, search, i18n.language]);
+  const queryKey = useMemo(
+    () => ({ page, limit: PAGE_SIZE, search, status, hubFilter }),
+    [page, search, status, hubFilter],
+  );
+
+  const fetchPage = useCallback(
+    async (signal: AbortSignal) => {
+      const res = await adminApi.listCompanies(
+        {
+          page,
+          limit: PAGE_SIZE,
+          search: search.trim() || undefined,
+          status,
+          city: hubFilter === "ALL" ? undefined : hubFilter,
+        },
+        signal,
+      );
+      return { rows: res.data.companies ?? [], pagination: res.pagination };
+    },
+    [page, search, status, hubFilter],
+  );
+
+  const {
+    rows: filtered,
+    pagination,
+    loading,
+    error,
+    reload: reloadPage,
+  } = usePaginatedList<AdminCompanyDto>(fetchPage, queryKey);
+
+  /** Refresh both the page window and the bounded registries behind the KPIs. */
+  const reload = useCallback(() => {
+    reloadPage();
+    reloadRegistry();
+  }, [reloadPage, reloadRegistry]);
 
   // -------------------------------------------------------------------------
   // Selected operator: remember the clicked row, otherwise use the richest
@@ -255,7 +263,6 @@ export const AdminCompaniesPage: React.FC = () => {
 
   const handleSelect = (company: AdminCompanyDto) => {
     setSelectedId(company._id);
-    setPage((p) => p);
   };
 
   const openDossier = (company: AdminCompanyDto, tab?: CompanyTab) => {
@@ -272,6 +279,7 @@ export const AdminCompaniesPage: React.FC = () => {
   const handleViewBooking = (bookingId: string) =>
     navigate(`/admin/bookings/${bookingId}`);
 
+  /** Exports the rows the operator is currently looking at. */
   const handleExport = () => {
     if (filtered.length === 0) return;
     saveBlobAsFile(
@@ -313,7 +321,7 @@ export const AdminCompaniesPage: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-3">
           <span className="rounded-full bg-[#EFF4FF] px-3 py-1 text-xs font-bold text-[#2563EB]">
-            {t("admin.companies.count", { count: filtered.length })}
+            {t("admin.companies.count", { count: pagination.total })}
           </span>
           <button
             type="button"
@@ -337,7 +345,7 @@ export const AdminCompaniesPage: React.FC = () => {
       </div>
 
       {/* Pending approval banner (top-2 newest pending operators) */}
-      {!loading && !error && pendingStack.length > 0 && (
+      {!registryLoading && !registryError && pendingStack.length > 0 && (
         <div className="mb-6 rounded-2xl bg-gradient-to-r from-[#FEF6E7] to-[#FDF1F3] p-6 shadow-[0_4px_20px_-2px_rgba(180,83,9,0.08)] ring-1 ring-[#FCD9A0]/40">
           <div className="flex items-start gap-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-[#B45309]">
@@ -430,7 +438,7 @@ export const AdminCompaniesPage: React.FC = () => {
       )}
 
       {/* KPI bento (5 cards) */}
-      {!loading && !error && companies.length > 0 && (
+      {!registryLoading && !registryError && companies.length > 0 && (
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <KpiCard
             label={t("admin.companies.kpis.registered")}
@@ -564,7 +572,9 @@ export const AdminCompaniesPage: React.FC = () => {
                 value: s,
                 label: t(`admin.status.${s}`),
               }))}
-              allLabel={t("admin.companies.filterStatusAll", { count: companies.length })}
+              allLabel={t("admin.companies.filterStatusAll", {
+                count: pagination.total,
+              })}
             />
             <FilterSelect
               label={t("admin.companies.filterHub")}
@@ -599,7 +609,9 @@ export const AdminCompaniesPage: React.FC = () => {
               {t("admin.companies.table.title")}
             </span>
             <span className="rounded-full bg-[#E5EEFF] px-2 py-0.5 text-xs font-bold text-[#2563EB]">
-              {t("admin.companies.table.records", { count: filtered.length })}
+              {t("admin.companies.table.records", {
+                count: pagination.total,
+              })}
             </span>
           </div>
           <div className="flex items-center gap-1 text-xs text-[#565E74]">
@@ -640,10 +652,10 @@ export const AdminCompaniesPage: React.FC = () => {
             selectedId={selected?._id ?? ""}
             onSelect={handleSelect}
             openDossier={(c) => openDossier(c)}
-            page={page}
-            pageSize={PAGE_SIZE}
+            pagination={pagination}
             onPageChange={setPage}
             emptyLabel={t("admin.companies.table.empty")}
+            loading={loading}
           />
         )}
       </section>
@@ -675,7 +687,7 @@ export const AdminCompaniesPage: React.FC = () => {
       </div>
 
       {/* Compliance strip */}
-      {!loading && !error && companies.length > 0 && (
+      {!registryLoading && !registryError && companies.length > 0 && (
         <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_2px_12px_rgba(15,23,42,0.03)] md:flex-row">
           <div className="flex items-start gap-4">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E5EEFF] text-[#2563EB]">

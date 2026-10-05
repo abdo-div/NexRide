@@ -1,6 +1,19 @@
 import Company from "../models/Company_model.js";
 import AppError from "../utils/appError.js";
 import APIFeatures from "../utils/APIFeatures.js";
+import { runPaginatedQuery } from "../utils/paginatedQuery.js";
+
+const COMPANY_SEARCH_FIELDS = [
+  "name",
+  "city",
+  "address",
+  "email",
+  "phone",
+  "subdomain",
+  "slug",
+  "description",
+  "status",
+];
 
 /** Fetch approved, non-deleted companies for the public directory. */
 export const fetchAllCompanies = async (queryParams) => {
@@ -18,13 +31,14 @@ export const fetchAllCompanies = async (queryParams) => {
 
 /** Fetch every company for platform administration, including inactive records. */
 export const fetchAllAdminCompanies = async (queryParams) => {
-  const features = new APIFeatures(Company.find(), queryParams)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
+  const { docs, pagination } = await runPaginatedQuery(
+    Company,
+    {},
+    queryParams,
+    { searchFields: COMPANY_SEARCH_FIELDS },
+  );
 
-  return await features.query;
+  return { companies: docs, pagination };
 };
 
 /**

@@ -1,5 +1,5 @@
-import APIFeatures from "../utils/APIFeatures.js";
 import AppError from "../utils/appError.js";
+import { runPaginatedQuery } from "../utils/paginatedQuery.js";
 
 export const deleteOne = (model) => async (id) => {
   const doc = await model.findByIdAndDelete(id);
@@ -38,17 +38,17 @@ export const getOne = (model, popOptions) => async (id) => {
   return doc;
 };
 
-export const getAll = (model) => async (queryString) => {
-  const features = new APIFeatures(model.find(), queryString)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-
-  const docs = await features.query;
+export const getAll = (model, searchFields = []) => async (queryString) => {
+  const { docs, pagination } = await runPaginatedQuery(
+    model,
+    {},
+    queryString,
+    { searchFields },
+  );
 
   return {
     results: docs.length,
     data: docs,
+    pagination,
   };
 };
