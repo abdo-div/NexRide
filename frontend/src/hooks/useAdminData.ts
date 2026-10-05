@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { adminApi } from "../lib/adminApi";
+import { adminApi, REGISTRY_LIMIT } from "../lib/adminApi";
 import type { AdminCompanyDto } from "../types/admin";
 import type { AdminPaymentDto } from "../types/admin";
 import type { BookingDto } from "../types/booking";
@@ -27,10 +27,18 @@ const EMPTY_RESPONSES = {
 };
 
 /**
- * Pulls the four admin listings in parallel (each capped at 100 rows by the
- * backend's safePagination). No client-side mock data is ever introduced —
- * everything renders from these responses. Mirrors the useHomeData fetch
- * pattern (function defined inside the effect) so React 19 lint stays green.
+ * Pulls the reference registries the admin pages use to resolve foreign keys and
+ * derive KPIs (company/vehicle/customer names, per-row joins).
+ *
+ * IMPORTANT: this is a *lookup cache*, not a table source. Each admin listing
+ * page renders its rows from its own server-paginated endpoint via
+ * `usePaginatedList`, so no listing silently stops at this window. The bound is
+ * declared in `adminApi.REGISTRY_LIMIT` and every response still carries
+ * pagination metadata, so callers can tell how much more exists.
+ *
+ * No client-side mock data is ever introduced — everything renders from these
+ * responses. Mirrors the useHomeData fetch pattern (function defined inside the
+ * effect) so React 19 lint stays green.
  */
 export const useAdminData = (): {
   data: AdminData;
@@ -52,12 +60,13 @@ export const useAdminData = (): {
       setError(false);
 
       try {
+        const registry = { limit: REGISTRY_LIMIT, sort: "-createdAt" };
         const [bookingsRes, vehiclesRes, companiesRes, commissionsRes] =
           await Promise.all([
-            adminApi.listBookings(controller.signal),
-            adminApi.listVehicles(controller.signal),
-            adminApi.listCompanies(controller.signal),
-            adminApi.listCommissions(controller.signal),
+            adminApi.listBookings(registry, controller.signal),
+            adminApi.listVehicles(registry, controller.signal),
+            adminApi.listCompanies(registry, controller.signal),
+            adminApi.listCommissions(registry, controller.signal),
           ]);
         if (!active) return;
         setData({

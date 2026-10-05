@@ -5,6 +5,23 @@ import type { VehicleOperationalStatus, VehicleDto } from "./vehicle";
 export type CompanyStatus = "PENDING" | "APPROVED" | "SUSPENDED" | "REJECTED";
 
 /**
+ * Server-side pagination envelope returned by every admin listing endpoint.
+ * Mirrors backend/utils/pagination.js `buildPaginationMeta`.
+ */
+export interface PaginationMeta {
+  /** Current page as the server resolved it (never below 1). */
+  page: number;
+  /** Effective page size after clamping (never above the route maximum). */
+  limit: number;
+  /** Total records matching the active filters, across every page. */
+  total: number;
+  /** Number of pages the current limit yields; 0 when there are no rows. */
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+/**
  * Account lifecycle status used by the platform operator for renter accounts.
  * Mirrors the User model enum (ACTIVE | SUSPENDED | BANNED).
  */

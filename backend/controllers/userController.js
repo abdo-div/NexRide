@@ -84,11 +84,12 @@ export const deleteMe = catchAsync(async (req, res, next) => {
 });
 
 export const getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await userService.fetchAllUsers(req.query);
+  const { users, pagination } = await userService.fetchAllUsers(req.query);
 
   res.status(200).json({
     status: "success",
     results: users.length,
+    pagination,
     data: { users },
   });
 });

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -26,6 +26,8 @@ import {
   Wrench,
 } from "lucide-react";
 import { useAdminData } from "../../hooks/useAdminData";
+import { usePaginatedList } from "../../hooks/usePaginatedList";
+import { adminApi } from "../../lib/adminApi";
 import { filterByHub, fleetCsv } from "../../lib/adminMetrics";
 import { useAdminHub } from "../../context/adminHub";
 import {
@@ -51,10 +53,18 @@ import { AdminFleetTable } from "../../components/admin/AdminFleetTable";
 import type { BookingDto } from "../../types/booking";
 import type { VehicleDto } from "../../types/vehicle";
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 20;
 
 type Segment = "ALL" | "AVAILABLE" | "MAINTENANCE" | "UNAVAILABLE";
 type SortKey = "created" | "priceLow" | "priceHigh" | "name";
+
+/** Client sort chips translated into the endpoint's `sort` contract. */
+const FLEET_SORTS: Record<SortKey, string> = {
+  created: "-createdAt",
+  priceLow: "dailyPrice",
+  priceHigh: "-dailyPrice",
+  name: "make model",
+};
 
 const markedReserved = (b: BookingDto): boolean =>
   (RESERVED_BOOKING_STATUSES as readonly string[]).includes(b.bookingStatus);
@@ -70,7 +80,14 @@ const vehicleHoldsBooking = (
 export const AdminFleetPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { data, loading, error, reload } = useAdminData();
+  // KPI/dossier sections read the bounded registries, so they follow the
+  // registry's own load state rather than the table's page state.
+  const {
+    data,
+    loading: registryLoading,
+    error: registryError,
+    reload: reloadRegistry,
+  } = useAdminData();
   const { hub } = useAdminHub();
 
   const [search, setSearch] = useState("");
@@ -161,11 +178,17 @@ export const AdminFleetPage: React.FC = () => {
     [fleetVehicles],
   );
 
+  /**
+   * Company options are keyed by id because the fleet endpoint filters on
+   * `companyId`; the registry supplies the labels so the dropdown stays
+   * complete while the table itself pages through the server.
+   */
   const companyOptions = useMemo(
     () =>
-      Array.from(new Set(companies.map((c) => c.name).filter(Boolean))).sort((a, b) =>
-        a.localeCompare(b, i18n.language),
-      ),
+      companies
+        .filter((c) => Boolean(c.name))
+        .slice()
+        .sort((a, b) => a.name.localeCompare(b.name, i18n.language)),
     [companies, i18n.language],
   );
 
@@ -186,40 +209,85 @@ export const AdminFleetPage: React.FC = () => {
   );
 
   // -------------------------------------------------------------------------
-  // Filtered + sorted rows (search, segments, dropdowns)
+  // Server-paginated + server-sorted rows (search, segments, dropdowns)
   // -------------------------------------------------------------------------
-  const filtered = useMemo(() => {
-    const needle = search.trim().toLocaleLowerCase(i18n.language);
-    const list = fleetVehicles
-      .filter((v) => segment === "ALL" || v.operationalStatus === segment)
-      .filter((v) => status === "ALL" || v.operationalStatus === status)
-      .filter((v) => hubFilter === "ALL" || v.city === hubFilter)
-      .filter((v) => classType === "ALL" || v.type === classType)
-      .filter((v) => {
-        const name = companyOf(v)?.name ?? "";
-        return company === "ALL" || name === company;
-      })
-      .filter((v) => {
-        if (!needle) return true;
-        const haystack = [
-          v.make,
-          v.model,
-          String(v.year),
-          v.type,
-          v.city,
-          v.pickupLocation,
-          companyOf(v)?.name ?? "",
-          v.operationalStatus,
-          v.listingStatus,
-        ]
-          .join(" ")
-          .toLocaleLowerCase(i18n.language);
-        return haystack.includes(needle);
-      })
-      .slice();
-    list.sort(compareVehicles(sortKey));
-    return list;
-  }, [fleetVehicles, segment, status, hubFilter, classType, company, search, sortKey, i18n.language]);
+  const sortParam = FLEET_SORTS[sortKey];
+
+  /**
+   * The local city dropdown wins over the global dispatch-hub selector; both used
+   * to be applied together, which meant a non-matching pair simply produced an
+   * empty table. The endpoint filters on the vehicle's own `city`.
+   */
+  const cityParam = hubFilter === "ALL" ? hub : hubFilter;
+
+  const queryKey = useMemo(
+    () => ({
+      page,
+      limit: PAGE_SIZE,
+      search,
+      segment,
+      status,
+      city: cityParam,
+      classType,
+      company,
+      sort: sortParam,
+    }),
+    [
+      page,
+      search,
+      segment,
+      status,
+      cityParam,
+      classType,
+      company,
+      sortParam,
+    ],
+  );
+
+  const fetchPage = useCallback(
+    async (signal: AbortSignal) => {
+      const res = await adminApi.listVehicles(
+        {
+          page,
+          limit: PAGE_SIZE,
+          sort: sortParam,
+          search: search.trim() || undefined,
+          // The segment chips and the status dropdown both narrow the same
+          // operational status, so they collapse into one server-side filter.
+          operationalStatus: segment !== "ALL" ? segment : status,
+          city: cityParam || undefined,
+          type: classType === "ALL" ? undefined : classType,
+          companyId: company === "ALL" ? undefined : company,
+        },
+        signal,
+      );
+      return { rows: res.data.vehicles ?? [], pagination: res.pagination };
+    },
+    [
+      page,
+      search,
+      segment,
+      status,
+      cityParam,
+      classType,
+      company,
+      sortParam,
+    ],
+  );
+
+  const {
+    rows: filtered,
+    pagination,
+    loading,
+    error,
+    reload: reloadPage,
+  } = usePaginatedList<VehicleDto>(fetchPage, queryKey);
+
+  /** Refresh both the page window and the bounded registries behind the KPIs. */
+  const reload = useCallback(() => {
+    reloadPage();
+    reloadRegistry();
+  }, [reloadPage, reloadRegistry]);
 
   const selected: VehicleDto | undefined =
     filtered.find((v) => v._id === selectedId) ?? filtered[0];
@@ -276,7 +344,7 @@ export const AdminFleetPage: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-3">
           <span className="rounded-full bg-[#EFF4FF] px-3 py-1 text-xs font-bold text-[#2563EB]">
-            {t("admin.fleet.count", { count: filtered.length })}
+            {t("admin.fleet.count", { count: pagination.total })}
           </span>
           <button
             type="button"
@@ -300,7 +368,7 @@ export const AdminFleetPage: React.FC = () => {
       </div>
 
       {/* KPI bento (5 cards) */}
-      {!loading && !error && fleetVehicles.length > 0 && (
+      {!registryLoading && !registryError && fleetVehicles.length > 0 && (
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <KpiCard
             label={t("admin.fleet.kpis.totalFleet")}
@@ -391,7 +459,7 @@ export const AdminFleetPage: React.FC = () => {
       )}
 
       {/* Search + segments + filter ribbon */}
-      {!loading && !error && (
+      {!registryLoading && !registryError && (
         <section className="mb-6 space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
           <div className="flex flex-col justify-between gap-4 2xl:flex-row 2xl:items-center">
             <div className="relative min-w-[280px] flex-1">
@@ -458,9 +526,9 @@ export const AdminFleetPage: React.FC = () => {
                 setCompany(v);
                 resetPage();
               }}
-              options={companyOptions.map((name) => ({
-                value: name,
-                label: name,
+              options={companyOptions.map((c) => ({
+                value: c._id,
+                label: c.name,
               }))}
               allLabel={t("admin.fleet.filterCompanyAll", { count: companies.length })}
             />
@@ -528,7 +596,7 @@ export const AdminFleetPage: React.FC = () => {
                   {t("admin.fleet.table.registered")}
                 </span>
                 <span className="rounded-full bg-[#E5EEFF] px-2 py-0.5 text-xs font-bold text-[#2563EB]">
-                  {t("admin.fleet.table.records", { count: filtered.length })}
+                  {t("admin.fleet.table.records", { count: pagination.total })}
                 </span>
               </div>
               <div className="flex items-center gap-1 text-xs text-[#565E74]">
@@ -580,10 +648,10 @@ export const AdminFleetPage: React.FC = () => {
                 selectedId={selected?._id ?? ""}
                 onSelect={handleSelect}
                 onViewBooking={handleViewBooking}
-                page={page}
-                pageSize={PAGE_SIZE}
+                pagination={pagination}
                 onPageChange={setPage}
                 emptyLabel={t("admin.fleet.empty")}
+                loading={loading}
               />
             )}
           </section>
@@ -613,7 +681,7 @@ export const AdminFleetPage: React.FC = () => {
       </div>
 
       {/* Compliance strip */}
-      {!loading && !error && fleetVehicles.length > 0 && (
+      {!registryLoading && !registryError && fleetVehicles.length > 0 && (
         <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_2px_12px_rgba(15,23,42,0.03)] md:flex-row">
           <div className="flex items-start gap-4">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E5EEFF] text-[#2563EB]">
@@ -640,22 +708,6 @@ export const AdminFleetPage: React.FC = () => {
 
 const pct = (part: number, total: number): number =>
   total > 0 ? Math.round((part / total) * 100) : 0;
-
-const compareVehicles = (sortKey: SortKey) => {
-  switch (sortKey) {
-    case "priceLow":
-      return (a: VehicleDto, b: VehicleDto) => a.dailyPrice - b.dailyPrice;
-    case "priceHigh":
-      return (a: VehicleDto, b: VehicleDto) => b.dailyPrice - a.dailyPrice;
-    case "name":
-      return (a: VehicleDto, b: VehicleDto) =>
-        `${a.make} ${a.model}`.localeCompare(`${b.make} ${b.model}`);
-    default:
-      return (a: VehicleDto, b: VehicleDto) =>
-        new Date(b.createdAt ?? 0).getTime() -
-        new Date(a.createdAt ?? 0).getTime();
-  }
-};
 
 const transmissionLabel = (value: string): string =>
   value === "MANUAL" ? "Manual" : "Automatic";

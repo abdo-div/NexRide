@@ -29,16 +29,26 @@ test("admin company listing includes records marked inactive", async (t) => {
       return Promise.resolve(companies).then(resolve, reject);
     },
   };
+  const countFilters = [];
   t.mock.method(Company, "find", (...args) => {
     initialQueryArgs = args;
     return query;
   });
+  t.mock.method(Company, "countDocuments", async (filter) => {
+    countFilters.push(filter);
+    return companies.length;
+  });
 
-  const result = await companyService.fetchAllAdminCompanies({});
+  const { companies: listed, pagination } = await companyService.fetchAllAdminCompanies({});
 
-  assert.deepEqual(result, companies);
-  assert.deepEqual(initialQueryArgs, []);
+  // Inactive records stay in the admin listing, and the page reports its total.
+  assert.deepEqual(listed, companies);
+  assert.equal(pagination.total, companies.length);
+  assert.equal(pagination.totalPages, 1);
+  assert.deepEqual(initialQueryArgs, [{}]);
   assert.deepEqual(filters, [{}]);
+  // The total is counted against the very same filter the page used.
+  assert.deepEqual(countFilters, [{}]);
 });
 
 test("public company listing follows approval status instead of legacy active flag", async (t) => {

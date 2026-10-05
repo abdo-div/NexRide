@@ -53,7 +53,7 @@ export const resizeVehicleImages = catchAsync(async (req, res, next) => {
 
 export const getAllVehicles = catchAsync(async (req, res, next) => {
   const publicOnly = req.user?.role !== "admin";
-  const vehicles = await vehicleService.fetchAllVehicles(
+  const { vehicles, pagination } = await vehicleService.fetchAllVehicles(
     req.query,
     req.tenantId,
     publicOnly,
@@ -62,6 +62,7 @@ export const getAllVehicles = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     results: vehicles.length,
+    pagination,
     data: { vehicles },
   });
 });

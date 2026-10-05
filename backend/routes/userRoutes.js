@@ -8,6 +8,7 @@ import {
   updatePassword,
 } from "../controllers/authController.js";
 import { protect, restrictTo } from "../middlewares/authMiddleware.js";
+import { safePagination } from "../middlewares/pagination.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import {
   signupSchema,
@@ -302,7 +303,10 @@ router.use(restrictTo("admin"));
  *       403:
  *         description: Admin role required
  */
-router.route("/").get(getAllUsers).post(validate(signupSchema), signup);
+router
+  .route("/")
+  .get(safePagination(20, 100), getAllUsers)
+  .post(validate(signupSchema), signup);
 
 /**
  * @openapi

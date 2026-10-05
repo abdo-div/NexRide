@@ -85,32 +85,57 @@ export const AdminMaintenancePage: React.FC = () => {
     [events, hub],
   );
 
-  const filtered = useMemo(() => {
-    const effectiveHub = hub ? hub : hubFilter !== "ALL" ? hubFilter : "";
-    const needle = search.trim().toLocaleLowerCase(i18n.language);
-    return scoped
-      .filter((e) => effectiveHub === "" || cityOf(e) === effectiveHub)
-      .filter((e) => status === "ALL" || e.dispatchStatus === status)
-      .filter((e) => category === "ALL" || e.category === category)
-      .filter((e) => partner === "ALL" || companyOf(e)?._id === partner)
-      .filter((e) => {
-        if (!needle) return true;
-        const vehicle = vehicleOf(e);
-        const company = companyOf(e);
-        const hay = [
-          vehicle?.make ?? "",
-          vehicle?.model ?? "",
-          eventVehicleRef(e),
-          e.workshop ?? "",
-          company?.name ?? "",
-          e.triggerReason,
-          t(`admin.maintenance.categories.${e.category}`),
-        ]
-          .join(" ")
-          .toLocaleLowerCase(i18n.language);
-        return hay.includes(needle);
-      });
-  }, [scoped, hub, hubFilter, search, status, category, partner, t, i18n.language]);
+  // -------------------------------------------------------------------------
+  // Server-paginated rows (search + status + category + partner + hub)
+  // -------------------------------------------------------------------------
+  /** The global dispatch-hub selector wins over the page-local city dropdown. */
+  const effectiveHub = hub ? hub : hubFilter !== "ALL" ? hubFilter : "";
+
+  const queryKey = useMemo(
+    () => ({
+      page,
+      limit: PAGE_SIZE,
+      search,
+      status,
+      category,
+      partner,
+      hub: effectiveHub,
+    }),
+    [page, search, status, category, partner, effectiveHub],
+  );
+
+  const fetchPage = useCallback(
+    async (signal: AbortSignal) => {
+      const res = await adminApi.listMaintenance(
+        {
+          page,
+          limit: PAGE_SIZE,
+          search: search.trim() || undefined,
+          status,
+          category,
+          companyId: partner,
+          hub: effectiveHub || undefined,
+        },
+        signal,
+      );
+      return { rows: res.data.events ?? [], pagination: res.pagination };
+    },
+    [page, search, status, category, partner, effectiveHub],
+  );
+
+  const {
+    rows: filtered,
+    pagination,
+    loading,
+    error,
+    reload: reloadPage,
+  } = usePaginatedList<MaintenanceEventDto>(fetchPage, queryKey);
+
+  /** Refresh both the page window and the registries behind the dropdowns/KPIs. */
+  const reload = useCallback(() => {
+    reloadPage();
+    reloadRegistry();
+  }, [reloadPage, reloadRegistry]);
 
   const hubOptions = useMemo(() => {
     const seen = new Map<string, string>();

@@ -3,6 +3,7 @@ import Booking from "../models/booking_model.js";
 import Company from "../models/Company_model.js";
 import AppError from "../utils/appError.js";
 import APIFeatures from "../utils/APIFeatures.js";
+import { runPaginatedQuery } from "../utils/paginatedQuery.js";
 import { saveVehicleImage } from "../utils/vehicleImages.js";
 
 // A booking blocks a vehicle while it is paid or active on the customer's side.
@@ -28,6 +29,21 @@ const PUBLIC_QUERY_CONTROLS = new Set([
   "fields",
   "search",
 ]);
+
+// Free-text search surfaces for the fleet listings. The admin registry exposes
+// the wider set (owner name included via the populated company) while the public
+// catalogue is limited to the customer-facing descriptive fields.
+const VEHICLE_SEARCH_FIELDS = [
+  "make",
+  "model",
+  "year",
+  "type",
+  "city",
+  "pickupLocation",
+  "operationalStatus",
+  "listingStatus",
+];
+const PUBLIC_SEARCH_FIELDS = VEHICLE_SEARCH_FIELDS;
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -66,6 +82,10 @@ export const getPublicVehicleFilter = async (vehicleId = null, tenantId = null) 
 /**
  * Fetch all vehicles matching search/filter/pagination criteria
  * Automatically enforces tenant isolation when req.tenantId is provided
+ *
+ * Returns the requested page together with pagination metadata. The count is
+ * derived from the identical filter, so `pagination.total` matches the rows the
+ * caller would reach by paging through the registry.
  */
 export const fetchAllVehicles = async (
   queryParams,
@@ -82,19 +102,22 @@ export const fetchAllVehicles = async (
     ? sanitizePublicVehicleQuery(queryParams)
     : queryParams;
 
-  const features = new APIFeatures(Vehicle.find(filter), effectiveQuery)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-
   // The public fleet listing must expose the owning company so the client can
   // show a real operator name, logo and accreditation instead of a bare id.
-  const vehicles = await features.query.populate(
-    "companyId",
-    "name logo city status",
+  const { docs, pagination } = await runPaginatedQuery(
+    Vehicle,
+    filter,
+    effectiveQuery,
+    {
+      searchFields: publicOnly ? PUBLIC_SEARCH_FIELDS : VEHICLE_SEARCH_FIELDS,
+      populate: {
+        path: "companyId",
+        select: "name logo city status",
+      },
+    },
   );
-  return vehicles;
+
+  return { vehicles: docs, pagination };
 };
 
 /**

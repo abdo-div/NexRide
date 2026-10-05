@@ -1535,6 +1535,11 @@
       "daysAgo": "قبل {{count}} يوم",
       "openLog": "فتح سجل الحجوزات الكامل"
     },
+    "pagination": {
+      "showingOf": "عرض {{from}}–{{to}} من {{total}}",
+      "prev": "السابق",
+      "next": "التالي"
+    },
     "table": {
       "recentTitle": "أحدث حجوزات العمليات",
       "recentSubtitle": "تتبّع المعاملات المباشرة عبر المراكز",

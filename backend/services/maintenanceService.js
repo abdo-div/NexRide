@@ -1,12 +1,39 @@
 import mongoose from "mongoose";
 import Vehicle from "../models/vehicle_model.js";
+import Company from "../models/Company_model.js";
 import AppError from "../utils/appError.js";
+import { runPaginatedQuery } from "../utils/paginatedQuery.js";
 import MaintenanceEvent, {
   dispatchStatusOf,
 } from "../models/Maintenance_model.js";
 
 const EVENT_POPULATE =
   "make model year type city pickupLocation operationalStatus photos dailyPrice companyId";
+
+const MAINTENANCE_SEARCH_FIELDS = [
+  "category",
+  "priority",
+  "status",
+  "triggerReason",
+  "detail",
+  "workshop",
+  "technician",
+];
+
+/**
+ * Query keys that `listMaintenanceEvents` interprets itself (the OVERDUE derived
+ * state and the hub scope) or that it already expressed in Mongo conditions.
+ * They are removed from the raw passthrough filter.
+ */
+const MAINTENANCE_DERIVED_FILTER_FIELDS = [
+  "category",
+  "priority",
+  "companyId",
+  "status",
+  "hub",
+];
+
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /**
  * Fleet Health summary — every figure is computed live from the real Vehicle
@@ -112,30 +139,32 @@ export const buildMaintenanceSummary = async () => {
   };
 };
 
-const applyDispatchFilter = (events, status) => {
-  if (!status || status === "ALL") return events;
-  return events.filter((e) => dispatchStatusOf(e) === status);
-};
+/**
+ * DB-side equivalent of the former in-memory `applyHubFilter`: an event belongs
+ * to a hub when either its vehicle or its owning company is based there.
+ * Resolving the ids up front keeps the scoping inside MongoDB so the window can
+ * still be paginated and counted without loading the ledger.
+ */
+const buildHubFilter = async (hub) => {
+  if (!hub) return null;
 
-const applyHubFilter = (events, hub) => {
-  if (!hub) return events;
-  return events.filter((e) => {
-    const vehicle = e.vehicleId;
-    const company = typeof e.companyId === "object" ? e.companyId : null;
-    const city = typeof vehicle === "object"
-      ? vehicle.city
-      : null;
-    return (
-      (city ?? "").toLocaleLowerCase() === hub.toLocaleLowerCase() ||
-      (company?.city ?? "").toLocaleLowerCase() === hub.toLocaleLowerCase()
-    );
-  });
+  const pattern = new RegExp(escapeRegExp(String(hub)), "i");
+  const [vehicleIds, companyIds] = await Promise.all([
+    Vehicle.distinct("_id", { city: pattern }),
+    Company.distinct("_id", { city: pattern }),
+  ]);
+
+  return {
+    $or: [{ vehicleId: { $in: vehicleIds } }, { companyId: { $in: companyIds } }],
+  };
 };
 
 /**
- * Maintenance-event ledger. DB-side filters first (category / priority /
- * partner / stored status), then the derived OVERDUE dispatch state and the
- * hub scoping in JS because those need the populated vehicle/company refs.
+ * Maintenance-event ledger. Every filter is now expressed as a Mongo query —
+ * including the derived OVERDUE state and the hub scope — so the page, the total
+ * count and the OVERDUE/hub filters can no longer drift apart. Previously the
+ * 100-row cap was applied *before* those derived filters ran, which truncated the
+ * ledger and produced meaningless counts.
  */
 export const listMaintenanceEvents = async (query = {}) => {
   const dbFilter = {};
@@ -148,30 +177,44 @@ export const listMaintenanceEvents = async (query = {}) => {
   if (query.companyId && query.companyId !== "ALL") {
     dbFilter.companyId = new mongoose.Types.ObjectId(query.companyId);
   }
-  if (
-    query.status &&
-    query.status !== "ALL" &&
-    query.status !== "OVERDUE"
-  ) {
-    dbFilter.status = query.status;
+
+  if (query.status && query.status !== "ALL") {
+    if (query.status === "OVERDUE") {
+      // Derived state: an open event past its estimated return date.
+      dbFilter.status = { $ne: "COMPLETED" };
+      dbFilter.estReturnDate = { $ne: null, $lt: new Date() };
+    } else {
+      dbFilter.status = query.status;
+    }
   }
 
-  const limit = Math.min(Number(query.limit) || 100, 100);
-  let events = await MaintenanceEvent.find(dbFilter)
-    .sort("-createdAt")
-    .limit(limit)
-    .populate("vehicleId", EVENT_POPULATE)
-    .populate("companyId", "name city phone logo");
+  const hubFilter = await buildHubFilter(query.hub);
 
-  if (query.status === "OVERDUE") {
-    events = applyDispatchFilter(events, "OVERDUE");
-  }
-  events = applyHubFilter(events, query.hub || "");
+  const { docs, pagination } = await runPaginatedQuery(
+    MaintenanceEvent,
+    hubFilter ? { $and: [dbFilter, hubFilter] } : dbFilter,
+    query,
+    {
+      searchFields: MAINTENANCE_SEARCH_FIELDS,
+      // These are already translated into Mongo conditions above. Re-applying
+      // them as raw field filters would re-add the literal "OVERDUE" status (a
+      // value the schema never stores) and the non-existent `hub` field, which
+      // silently emptied the result set and broke the total.
+      excludeFields: MAINTENANCE_DERIVED_FILTER_FIELDS,
+      populate: [
+        { path: "vehicleId", select: EVENT_POPULATE },
+        { path: "companyId", select: "name city phone logo" },
+      ],
+    },
+  );
 
-  return events.map((event) => ({
-    ...event.toObject(),
-    dispatchStatus: dispatchStatusOf(event),
-  }));
+  return {
+    events: docs.map((event) => ({
+      ...event.toObject(),
+      dispatchStatus: dispatchStatusOf(event),
+    })),
+    pagination,
+  };
 };
 
 const populateEvent = (event) =>

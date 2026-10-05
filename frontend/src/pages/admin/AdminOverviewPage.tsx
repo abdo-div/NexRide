@@ -379,7 +379,17 @@ export const AdminOverviewPage: React.FC = () => {
 
             <AdminBookingsTable
               bookings={recent}
-              page={1}
+              // The Overview shows a fixed "recent activity" preview rather than
+              // a full register, so it reports its own single-window metadata
+              // and hides the page controls.
+              pagination={{
+                page: 1,
+                limit: recent.length,
+                total: recent.length,
+                totalPages: 1,
+                hasNextPage: false,
+                hasPreviousPage: false,
+              }}
               onPageChange={() => undefined}
               onView={setViewing}
               emptyLabel={t("admin.table.empty")}

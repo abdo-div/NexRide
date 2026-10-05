@@ -1,22 +1,26 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { CalendarDays, Eye, MoreHorizontal } from "lucide-react";
 import type { BookingDto } from "../../types/booking";
+import type { PaginationMeta } from "../../types/admin";
 import {
   formatLYD,
   referenceCodeFrom,
   vehicleTitle,
 } from "../../lib/bookingView";
 import { photoUrl } from "../../lib/vehicleMapper";
+import { AdminPagination } from "./AdminPagination";
 import { StatusPill } from "./StatusPill";
 
 export interface AdminBookingsTableProps {
+  /** Exactly the rows the server selected for the current page. */
   bookings: BookingDto[];
-  page: number;
-  pageSize?: number;
+  /** Server-resolved pagination block; drives the "showing X of Y" + controls. */
+  pagination: PaginationMeta;
   onPageChange: (page: number) => void;
   onView: (booking: BookingDto) => void;
   emptyLabel: string;
+  loading?: boolean;
 }
 
 const customerName = (booking: BookingDto): string =>
@@ -36,20 +40,13 @@ const providerCity = (booking: BookingDto): string =>
 /** The shared bookings table used by the Overview and Bookings pages. */
 export const AdminBookingsTable: React.FC<AdminBookingsTableProps> = ({
   bookings,
-  page,
-  pageSize = 8,
+  pagination,
   onPageChange,
   onView,
   emptyLabel,
+  loading = false,
 }) => {
   const { t } = useTranslation();
-
-  const totalPages = Math.max(1, Math.ceil(bookings.length / pageSize));
-  const safePage = Math.min(page, totalPages);
-  const slice = useMemo(
-    () => bookings.slice((safePage - 1) * pageSize, safePage * pageSize),
-    [bookings, safePage, pageSize],
-  );
 
   if (bookings.length === 0) {
     return (
@@ -78,7 +75,7 @@ export const AdminBookingsTable: React.FC<AdminBookingsTableProps> = ({
             </tr>
           </thead>
           <tbody className="text-sm">
-            {slice.map((booking) => {
+            {bookings.map((booking) => {
               const vehicle = typeof booking.vehicleId === "object" ? booking.vehicleId : null;
               const photo = photoUrl(vehicle?.photos?.[0]);
               return (
@@ -165,48 +162,12 @@ export const AdminBookingsTable: React.FC<AdminBookingsTableProps> = ({
         </table>
       </div>
 
-      <div className="mt-4 flex flex-col items-center justify-between gap-3 border-t border-slate-100 pt-4 text-xs text-[#565E74] sm:flex-row">
-        <div>
-          {t("admin.table.showingOf", {
-            shown: slice.length,
-            total: bookings.length,
-          })}
-        </div>
-        {totalPages > 1 && (
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              disabled={safePage <= 1}
-              onClick={() => onPageChange(safePage - 1)}
-              className="rounded-lg bg-[#EFF4FF] px-3 py-1.5 font-semibold text-[#565E74] transition-colors enabled:hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-            >
-              {t("admin.table.prev")}
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => onPageChange(p)}
-                className={`rounded-lg px-3 py-1.5 font-semibold transition-colors cursor-pointer ${
-                  p === safePage
-                    ? "bg-[#2563EB] text-white shadow-sm"
-                    : "bg-[#EFF4FF] text-[#565E74] hover:bg-[#E5EEFF]"
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-            <button
-              type="button"
-              disabled={safePage >= totalPages}
-              onClick={() => onPageChange(safePage + 1)}
-              className="rounded-lg bg-[#EFF4FF] px-3 py-1.5 font-semibold text-[#565E74] transition-colors enabled:hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-            >
-              {t("admin.table.next")}
-            </button>
-          </div>
-        )}
-      </div>
+      <AdminPagination
+        pagination={pagination}
+        onPageChange={onPageChange}
+        shownCount={bookings.length}
+        loading={loading}
+      />
     </div>
   );
 };
