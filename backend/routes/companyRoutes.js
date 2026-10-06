@@ -10,6 +10,10 @@ import {
   deleteCompany,
 } from "../controllers/companyController.js";
 import { registerCompanyOwner } from "../controllers/companyRegistrationController.js";
+import { getCompanyDashboard } from "../controllers/companyDashboardController.js";
+import { getCompanyBookings } from "../controllers/companyBookingsController.js";
+import { getCompanyFleet } from "../controllers/companyFleetController.js";
+import { getCompanyVehicleDetail } from "../controllers/companyVehicleController.js";
 import { protect, restrictTo } from "../middlewares/authMiddleware.js";
 import { validateSubdomain } from "../middlewares/subdomainValidator.js";
 import { validate } from "../middlewares/validate.middleware.js";
@@ -56,6 +60,224 @@ router.get("/", getAllCompanies);
  *         description: Storefront not found
  */
 router.get("/storefront/:identifier", getCompanyByStorefrontIdentifier);
+
+/**
+ * @openapi
+ * /companies/dashboard:
+ *   get:
+ *     tags: [Companies]
+ *     summary: Tenant-scoped operations dashboard for the authenticated company
+ *     description: >-
+ *       Aggregates the operator's own fleet, bookings, revenue and payout
+ *       posture from the real ledgers. The tenant is resolved from the session
+ *       (never from the query string); crafted before /:id so "dashboard" is
+ *       not captured as a company identifier.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: period
+ *         schema:
+ *           type: string
+ *           enum: [7d, 30d, 3m, 12m]
+ *     responses:
+ *       200:
+ *         description: Company dashboard summary
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Company or admin role required
+ */
+router.get(
+  "/dashboard",
+  protect,
+  restrictTo("company", "admin"),
+  getCompanyDashboard,
+);
+
+/**
+ * @openapi
+ * /companies/bookings:
+ *   get:
+ *     tags: [Companies]
+ *     summary: Tenant-scoped bookings & dispatches register for the authenticated company
+ *     description: >-
+ *       Returns the tenant's booking summary deck, fleet filter options and a
+ *       paginated, searchable list of its own bookings. The tenant is resolved
+ *       from the session (never from the query string); crafted before /:id so
+ *       "bookings" is not captured as a company identifier.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: view
+ *         schema:
+ *           type: string
+ *           enum: [ALL, UPCOMING, HANDOVER]
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [PENDING, CONFIRMED, ACTIVE, COMPLETED, CANCELLED]
+ *       - in: query
+ *         name: payment
+ *         schema:
+ *           type: string
+ *           enum: [PAID, PENDING, FAILED, REFUNDED]
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: vehicleId
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: fromDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Company bookings summary + page
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Company or admin role required
+ */
+router.get(
+  "/bookings",
+  protect,
+  restrictTo("company", "admin"),
+  getCompanyBookings,
+);
+
+/**
+ * @openapi
+ * /companies/fleet:
+ *   get:
+ *     tags: [Companies]
+ *     summary: Tenant-scoped fleet register for the authenticated company
+ *     description: >-
+ *       Returns the fleet operator's own vehicle register — fleet posture
+ *       deck (total / available / rented / maintenance / draft) plus a
+ *       searchable, filtered, paginated list. The tenant is resolved from the
+ *       session, never from the query string, so "fleet" is not captured as a
+ *       company identifier. Admins may target another company via ?companyId=.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Free-text search over make, model, pickup location, city or registry code (NR-VH-...)
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [rented, maintenance, draft, available]
+ *         description: Fleet display-state filter
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *           enum: [sedan, suv, luxury, commercial]
+ *       - in: query
+ *         name: transmission
+ *         schema:
+ *           type: string
+ *           enum: [automatic, manual]
+ *       - in: query
+ *         name: fuel
+ *         schema:
+ *           type: string
+ *           enum: [petrol, hybrid, diesel, electric]
+ *       - in: query
+ *         name: city
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Company fleet summary + page
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Company or admin role required
+ */
+router.get(
+  "/fleet",
+  protect,
+  restrictTo("company", "admin"),
+  getCompanyFleet,
+);
+
+/**
+ * @openapi
+ * /companies/fleet/{vehicleId}:
+ *   get:
+ *     tags: [Companies]
+ *     summary: Tenant-scoped vehicle dossier for the authenticated company
+ *     description: >-
+ *       Returns the full, real operations dossier for one of the operator's
+ *       own vehicles — specs and pricing from the vehicle document, and
+ *       revenue, utilization, dispatch calendar and trip history computed from
+ *       the vehicle's own booking ledger. Re-scoped to the session tenant, so
+ *       a company can never read another operator's unit. Admins may target
+ *       another company via ?companyId=.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: vehicleId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Free-text search over the vehicle's own trips (customer, pickup, NX-... reference)
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Vehicle dossier
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Company or admin role required
+ *       404:
+ *         description: Vehicle not found in this tenant's fleet
+ */
+router.get(
+  "/fleet/:vehicleId",
+  protect,
+  restrictTo("company", "admin"),
+  getCompanyVehicleDetail,
+);
 
 /**
  * @openapi
