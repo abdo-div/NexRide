@@ -31,16 +31,16 @@ const NAV_ENTRIES: NavEntry[] = [
   { path: "/company/maintenance", labelKey: "company.layout.navMaintenance", icon: Wrench, enabled: true },
   { path: "/company/bookings", labelKey: "company.layout.navBookings", icon: CalendarDays, enabled: true },
   { path: "/company/messages", labelKey: "company.layout.navMessages", icon: MessageSquareText, enabled: false },
-  { path: "/company/payouts", labelKey: "company.layout.navPayouts", icon: Banknote, enabled: false },
-  { path: "/company/reviews", labelKey: "company.layout.navReviews", icon: Star, enabled: false },
-  { path: "/company/settings", labelKey: "company.layout.navSettings", icon: Settings, enabled: false },
+  { path: "/company/payouts", labelKey: "company.layout.navPayouts", icon: Banknote, enabled: true },
+  { path: "/company/reviews", labelKey: "company.layout.navReviews", icon: Star, enabled: true },
+  { path: "/company/settings", labelKey: "company.layout.navSettings", icon: Settings, enabled: true },
 ];
 
 /**
  * Fleet-operator shell: fixed sidebar + topbar, mirrors the admin layout so the
  * operator area gets the same workspace chrome instead of the consumer navbar.
- * Only the overview, fleet, maintenance and bookings entries are live today;
- * the rest are marked as coming soon.
+ * Only the overview, fleet, maintenance, bookings, payouts, reviews and settings
+ * entries are live today; the rest are marked as coming soon.
  */
 export const CompanyLayout: React.FC = () => {
   const { t, i18n } = useTranslation();

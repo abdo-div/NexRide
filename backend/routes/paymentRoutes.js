@@ -4,6 +4,7 @@ import {
   getPaymentById,
   getAllPayments,
   getCompanyPayoutSummary,
+  getCompanyEarnings,
   settleCompanyPayout,
   collectCashPayment,
   downloadInvoicePDF,
@@ -101,6 +102,47 @@ router.get(
   ["/tenant/payout-summary", "/tenant/payoutSummary"],
   restrictTo("company", "admin"),
   getCompanyPayoutSummary,
+);
+
+/**
+ * @openapi
+ * /payments/tenant/earnings:
+ *   get:
+ *     tags: [Payments]
+ *     summary: Tenant-scoped earnings & transactions workspace
+ *     description: >-
+ *       Live analytics deck (gross revenue, platform take, net company earnings,
+ *       payout liquidity split) plus a paginated transaction register, both
+ *       recomputed from the authenticated company's own Payment ledger.
+ *     parameters:
+ *       - in: query
+ *         name: range
+ *         schema: { type: string }
+ *       - in: query
+ *         name: chartRange
+ *         schema: { type: string }
+ *       - in: query
+ *         name: search
+ *         schema: { type: string }
+ *       - in: query
+ *         name: status
+ *         schema: { type: string }
+ *       - in: query
+ *         name: vehicleId
+ *         schema: { type: string }
+ *       - in: query
+ *         name: method
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Earnings deck + register page
+ *       403:
+ *         description: Company or admin role required
+ */
+router.get(
+  "/tenant/earnings",
+  restrictTo("company", "admin"),
+  getCompanyEarnings,
 );
 
 /**

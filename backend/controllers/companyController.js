@@ -124,6 +124,44 @@ export const updateMyCompany = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Resolve the tenant for a company settings request. For a company session the
+ * tenant always comes from the session (protect() => req.tenantId), never from
+ * the query string, so an operator cannot read another partner's profile.
+ * Only an admin may explicitly target another company via ?companyId=,
+ * mirroring getCompanyFleet / getCompanyDashboard.
+ */
+const resolveTenant = (req, next) => {
+  const companyId =
+    req.user.role === "company"
+      ? req.tenantId || req.user.company
+      : req.query.companyId;
+
+  if (req.user.role === "company" && !companyId) {
+    next(new AppError("No company tenant is linked to this user account.", 403));
+    return null;
+  }
+
+  return companyId;
+};
+
+/**
+ * GET /companies/settings — tenant-scoped settings deck: the operator's own
+ * profile (including the private commercial-registry number) plus a live
+ * readiness summary counted from the real vehicle register.
+ */
+export const getCompanySettings = catchAsync(async (req, res, next) => {
+  const companyId = resolveTenant(req, next);
+  if (!companyId) return;
+
+  const settings = await companyService.fetchCompanySettings(companyId);
+
+  res.status(200).json({
+    status: "success",
+    data: { settings },
+  });
+});
+
 export const updateCompanyCommission = catchAsync(async (req, res, next) => {
   const company = await companyService.updateCompanyCommissionRate(
     req.params.id,

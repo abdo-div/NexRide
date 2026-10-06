@@ -112,6 +112,24 @@ const CompanyMaintenancePage = lazy(() =>
   })),
 );
 
+const CompanySettingsPage = lazy(() =>
+  import("./pages/company/CompanySettingsPage").then((module) => ({
+    default: module.CompanySettingsPage,
+  })),
+);
+
+const CompanyReviewsPage = lazy(() =>
+  import("./pages/company/CompanyReviewsPage").then((module) => ({
+    default: module.CompanyReviewsPage,
+  })),
+);
+
+const CompanyEarningsPage = lazy(() =>
+  import("./pages/company/CompanyEarningsPage").then((module) => ({
+    default: module.CompanyEarningsPage,
+  })),
+);
+
 function RouteLoadingFallback() {
   return (
     <div
@@ -305,6 +323,9 @@ function App() {
             <Route path="fleet/:vehicleId" element={<CompanyVehiclePage />} />
             <Route path="fleet/:vehicleId/edit" element={<CompanyVehicleEditPage />} />
             <Route path="maintenance" element={<CompanyMaintenancePage />} />
+            <Route path="reviews" element={<CompanyReviewsPage />} />
+            <Route path="payouts" element={<CompanyEarningsPage />} />
+            <Route path="settings" element={<CompanySettingsPage />} />
           </Route>
         </Routes>
       </AuthProvider>

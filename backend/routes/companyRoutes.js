@@ -8,10 +8,12 @@ import {
   updateCompanyCommission,
   toggleCompanyVerification,
   deleteCompany,
+  getCompanySettings,
 } from "../controllers/companyController.js";
 import { registerCompanyOwner } from "../controllers/companyRegistrationController.js";
 import { getCompanyDashboard } from "../controllers/companyDashboardController.js";
 import { getCompanyBookings } from "../controllers/companyBookingsController.js";
+import { getCompanyReviews, replyToCompanyReview } from "../controllers/companyReviewsController.js";
 import { getCompanyFleet } from "../controllers/companyFleetController.js";
 import { getCompanyVehicleDetail } from "../controllers/companyVehicleController.js";
 import { protect, restrictTo } from "../middlewares/authMiddleware.js";
@@ -30,6 +32,7 @@ import {
   updateCommissionSchema,
   toggleVerificationSchema,
 } from "../validations/company.validation.js";
+import { companyResponseSchema } from "../validations/review.validation.js";
 
 const router = express.Router();
 
@@ -412,6 +415,136 @@ router.post(
 
 /**
  * @openapi
+ * /companies/settings:
+ *   get:
+ *     tags: [Companies]
+ *     summary: Tenant-scoped settings deck for the authenticated company
+ *     description: >-
+ *       Returns the operator's own profile (including the private commercial
+ *       registry number) plus a live readiness deck — verification state,
+ *       profile completeness, pickup-hub count and fleet posture — derived from
+ *       real records. The tenant is resolved from the session (never from the
+ *       query string); crafted before /:id so "settings" is not captured as a
+ *       company identifier.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Company settings deck
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Company or admin role required
+ */
+router.get(
+  "/settings",
+  protect,
+  restrictTo("company", "admin"),
+  getCompanySettings,
+);
+
+/**
+ * @openapi
+ * /companies/reviews:
+ *   get:
+ *     tags: [Companies]
+ *     summary: Tenant-scoped reviews & ratings workspace for the authenticated company
+ *     description: >-
+ *       Returns the operator's own reviews analytics deck (KPI summary, star
+ *       distribution, monthly trend, fleet leaderboard and filter options)
+ *       plus a paginated register of its reviews with customer, vehicle and
+ *       booking context. Every number is recomputed from the tenant's own
+ *       Review documents; the tenant is resolved from the session, never from
+ *       the query string. Crafted before /:id so "reviews" is not captured as
+ *       a company identifier.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: star
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 5
+ *       - in: query
+ *         name: vehicleId
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [responded, awaiting]
+ *       - in: query
+ *         name: period
+ *         schema:
+ *           type: string
+ *           enum: [30d, 90d, year]
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Company reviews deck + page
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Company or admin role required
+ */
+router.get(
+  "/reviews",
+  protect,
+  restrictTo("company", "admin"),
+  getCompanyReviews,
+);
+
+/**
+ * @openapi
+ * /companies/reviews/{id}/reply:
+ *   post:
+ *     tags: [Companies]
+ *     summary: Reply to one of the tenant's own reviews
+ *     description: Powerling the partner's public reply on a review left on its
+ *       own fleet vehicles; ownership is re-verified inside the service.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [response]
+ *             properties:
+ *               response:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Reply stored
+ *       403:
+ *         description: Company or admin role required / not this tenant's review
+ */
+router.post(
+  "/reviews/:id/reply",
+  protect,
+  restrictTo("company", "admin"),
+  validate(companyResponseSchema),
+  replyToCompanyReview,
+);
+
+/**
+ * @openapi
  * /companies/{id}:
  *   get:
  *     tags: [Companies]
@@ -477,10 +610,10 @@ router.post(
 
 /**
  * @openapi
- * /companies/update-my-company:
+ * /companies/settings:
  *   patch:
  *     tags: [Companies]
- *     summary: Update the authenticated company's profile
+ *     summary: Update the authenticated company's profile (settings save)
  *     responses:
  *       200:
  *         description: Company updated
@@ -488,7 +621,7 @@ router.post(
  *         description: Company role required
  */
 router.patch(
-  ["/update-my-company", "/updateMyCompany"],
+  ["/settings", "/update-my-company", "/updateMyCompany"],
   restrictTo("company"),
   validateSubdomain,
   validate(updateCompanySchema),

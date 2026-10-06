@@ -1,6 +1,7 @@
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
 import * as paymentService from "../services/paymentService.js";
+import { buildCompanyEarnings } from "../services/companyEarningsService.js";
 import { streamInvoiceForPayment } from "../services/invoiceService.js";
 
 export const processPayment = catchAsync(async (req, res, next) => {
@@ -66,6 +67,42 @@ export const getCompanyPayoutSummary = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     data: { summary },
+  });
+});
+
+/**
+ * GET /payments/tenant/earnings — tenant-scoped earnings & transactions
+ * workspace. The analytics deck and the paginated register are both recomputed
+ * from the tenant's own Payment ledger; a company session cannot pivot onto
+ * another operator's earnings.
+ */
+export const getCompanyEarnings = catchAsync(async (req, res, next) => {
+  const companyId =
+    req.user.role === "company"
+      ? req.tenantId || req.user.company
+      : req.query.companyId;
+
+  if (req.user.role === "company" && !companyId) {
+    return next(
+      new AppError("No company tenant is linked to this user account.", 403),
+    );
+  }
+
+  const earnings = await buildCompanyEarnings({
+    companyId,
+    page: req.query.page,
+    limit: req.query.limit,
+    range: req.query.range,
+    chartRange: req.query.chartRange,
+    search: req.query.search,
+    status: req.query.status,
+    vehicleId: req.query.vehicleId,
+    method: req.query.method,
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: earnings,
   });
 });
 
