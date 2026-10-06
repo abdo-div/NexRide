@@ -16,6 +16,7 @@ import {
   verifyTenantAccess,
 } from "../middlewares/authMiddleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
+import { idParamSchema } from "../validations/common.validation.js";
 import {
   createBookingSchema,
   checkAvailabilitySchema,
@@ -204,7 +205,12 @@ router.get("/", restrictTo("admin"), getAllBookings);
  *       404:
  *         description: Booking not found
  */
-router.get("/:id", verifyTenantAccess("Booking"), getBookingById);
+router.get(
+  "/:id",
+  validate(idParamSchema()),
+  verifyTenantAccess("Booking"),
+  getBookingById,
+);
 
 /**
  * @openapi
@@ -224,7 +230,12 @@ router.get("/:id", verifyTenantAccess("Booking"), getBookingById);
  *       403:
  *         description: Tenant access denied
  */
-router.get("/:id/invoice", verifyTenantAccess("Booking"), downloadBookingInvoice);
+router.get(
+  "/:id/invoice",
+  validate(idParamSchema()),
+  verifyTenantAccess("Booking"),
+  downloadBookingInvoice,
+);
 
 /**
  * @openapi
@@ -245,7 +256,12 @@ router.get("/:id/invoice", verifyTenantAccess("Booking"), downloadBookingInvoice
  *       403:
  *         description: Tenant access denied
  */
-router.patch("/:id/cancel", verifyTenantAccess("Booking"), cancelBooking);
+router.patch(
+  "/:id/cancel",
+  validate(idParamSchema()),
+  verifyTenantAccess("Booking"),
+  cancelBooking,
+);
 
 /**
  * @openapi
@@ -281,6 +297,7 @@ router.patch("/:id/cancel", verifyTenantAccess("Booking"), cancelBooking);
 router.patch(
   "/:id/status",
   restrictTo("company", "admin"),
+  validate(idParamSchema()),
   verifyTenantAccess("Booking"),
   updateBookingStatus,
 );

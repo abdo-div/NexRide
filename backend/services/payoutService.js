@@ -15,21 +15,72 @@ const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
  */
 export const buildPayoutSummary = async () => {
   const [totals] = await Payment.aggregate([
-    { $match: { status: { $in: ["COMPLETED", "REFUNDED"] } } },
+    { $match: { status: { $in: ["COMPLETED", "REFUNDED", "PARTIALLY_REFUNDED"] } } },
+    {
+      $addFields: {
+        // Revenue actually earned after a cancellation refund: a
+        // PARTIALLY_REFUNDED row keeps (amount - refundAmount), a REFUNDED row
+        // earned nothing, and a COMPLETED row keeps everything.
+        kept: {
+          $switch: {
+            branches: [
+              {
+                case: { $eq: ["$status", "PARTIALLY_REFUNDED"] },
+                then: {
+                  $subtract: ["$amount", { $ifNull: ["$refundAmount", 0] }],
+                },
+              },
+              { case: { $eq: ["$status", "REFUNDED"] }, then: 0 },
+            ],
+            default: "$amount",
+          },
+        },
+        keepsRevenue: { $in: ["$status", ["COMPLETED", "PARTIALLY_REFUNDED"]] },
+        keptFraction: {
+          $switch: {
+            branches: [
+              {
+                case: { $gt: ["$amount", 0] },
+                then: { $divide: ["$kept", "$amount"] },
+              },
+            ],
+            default: 0,
+          },
+        },
+        refundedPortion: {
+          $switch: {
+            branches: [
+              { case: { $eq: ["$status", "REFUNDED"] }, then: "$amount" },
+              {
+                case: { $eq: ["$status", "PARTIALLY_REFUNDED"] },
+                then: { $ifNull: ["$refundAmount", 0] },
+              },
+            ],
+            default: 0,
+          },
+        },
+      },
+    },
     {
       $group: {
         _id: null,
-        gross: {
-          $sum: { $cond: [{ $eq: ["$status", "COMPLETED"] }, "$amount", 0] },
-        },
+        gross: { $sum: { $cond: ["$keepsRevenue", "$kept", 0] } },
         platformTake: {
           $sum: {
-            $cond: [{ $eq: ["$status", "COMPLETED"] }, "$commissionAmount", 0],
+            $cond: [
+              "$keepsRevenue",
+              { $multiply: ["$commissionAmount", "$keptFraction"] },
+              0,
+            ],
           },
         },
         companyEarnings: {
           $sum: {
-            $cond: [{ $eq: ["$status", "COMPLETED"] }, "$companyShare", 0],
+            $cond: [
+              "$keepsRevenue",
+              { $multiply: ["$companyShare", "$keptFraction"] },
+              0,
+            ],
           },
         },
         unsettled: {
@@ -37,18 +88,27 @@ export const buildPayoutSummary = async () => {
             $cond: [
               {
                 $and: [
-                  { $eq: ["$status", "COMPLETED"] },
+                  "$keepsRevenue",
                   { $eq: ["$payoutStatus", "UNSETTLED"] },
                 ],
               },
-              "$amount",
+              "$kept",
               0,
             ],
           },
         },
         processing: {
           $sum: {
-            $cond: [{ $eq: ["$payoutStatus", "PROCESSING"] }, "$amount", 0],
+            $cond: [
+              {
+                $and: [
+                  "$keepsRevenue",
+                  { $eq: ["$payoutStatus", "PROCESSING"] },
+                ],
+              },
+              "$kept",
+              0,
+            ],
           },
         },
         settled: {
@@ -56,21 +116,17 @@ export const buildPayoutSummary = async () => {
             $cond: [
               {
                 $and: [
-                  { $eq: ["$status", "COMPLETED"] },
+                  "$keepsRevenue",
                   { $eq: ["$payoutStatus", "SETTLED"] },
                 ],
               },
-              "$amount",
+              "$kept",
               0,
             ],
           },
         },
-        adjustments: {
-          $sum: { $cond: [{ $eq: ["$status", "REFUNDED"] }, "$amount", 0] },
-        },
-        bookings: {
-          $sum: { $cond: [{ $eq: ["$status", "COMPLETED"] }, 1, 0] },
-        },
+        adjustments: { $sum: "$refundedPortion" },
+        bookings: { $sum: { $cond: ["$keepsRevenue", 1, 0] } },
         partners: { $addToSet: "$companyId" },
       },
     },
@@ -130,7 +186,7 @@ export const buildPayoutLedger = async ({
   cycle,
   ...paginationQuery
 } = {}) => {
-  const match = { status: { $in: ["COMPLETED", "REFUNDED"] } };
+  const match = { status: { $in: ["COMPLETED", "REFUNDED", "PARTIALLY_REFUNDED"] } };
   if (companyId) {
     match.companyId = new mongoose.Types.ObjectId(companyId);
   }
@@ -169,22 +225,73 @@ export const buildPayoutLedger = async ({
   const pipeline = [
     { $match: match },
     {
+      $addFields: {
+        // Revenue actually earned after a cancellation refund (see summary).
+        kept: {
+          $switch: {
+            branches: [
+              {
+                case: { $eq: ["$status", "PARTIALLY_REFUNDED"] },
+                then: {
+                  $subtract: ["$amount", { $ifNull: ["$refundAmount", 0] }],
+                },
+              },
+              { case: { $eq: ["$status", "REFUNDED"] }, then: 0 },
+            ],
+            default: "$amount",
+          },
+        },
+        keepsRevenue: { $in: ["$status", ["COMPLETED", "PARTIALLY_REFUNDED"]] },
+        keptFraction: {
+          $switch: {
+            branches: [
+              {
+                case: { $gt: ["$amount", 0] },
+                then: { $divide: ["$kept", "$amount"] },
+              },
+            ],
+            default: 0,
+          },
+        },
+        refundedPortion: {
+          $switch: {
+            branches: [
+              { case: { $eq: ["$status", "REFUNDED"] }, then: "$amount" },
+              {
+                case: { $eq: ["$status", "PARTIALLY_REFUNDED"] },
+                then: { $ifNull: ["$refundAmount", 0] },
+              },
+            ],
+            default: 0,
+          },
+        },
+      },
+    },
+    {
       $group: {
         _id: "$companyId",
         bookings: {
-          $sum: { $cond: [{ $eq: ["$status", "COMPLETED"] }, 1, 0] },
+          $sum: { $cond: ["$keepsRevenue", 1, 0] },
         },
         gross: {
-          $sum: { $cond: [{ $eq: ["$status", "COMPLETED"] }, "$amount", 0] },
+          $sum: { $cond: ["$keepsRevenue", "$kept", 0] },
         },
         fee: {
           $sum: {
-            $cond: [{ $eq: ["$status", "COMPLETED"] }, "$commissionAmount", 0],
+            $cond: [
+              "$keepsRevenue",
+              { $multiply: ["$commissionAmount", "$keptFraction"] },
+              0,
+            ],
           },
         },
         net: {
           $sum: {
-            $cond: [{ $eq: ["$status", "COMPLETED"] }, "$companyShare", 0],
+            $cond: [
+              "$keepsRevenue",
+              { $multiply: ["$companyShare", "$keptFraction"] },
+              0,
+            ],
           },
         },
         unsettled: {
@@ -192,35 +299,44 @@ export const buildPayoutLedger = async ({
             $cond: [
               {
                 $and: [
-                  { $eq: ["$status", "COMPLETED"] },
+                  "$keepsRevenue",
                   { $eq: ["$payoutStatus", "UNSETTLED"] },
                 ],
               },
-              "$amount",
+              "$kept",
               0,
             ],
           },
         },
         processing: {
-          $sum: { $cond: [{ $eq: ["$payoutStatus", "PROCESSING"] }, "$amount", 0] },
+          $sum: {
+            $cond: [
+              {
+                $and: [
+                  "$keepsRevenue",
+                  { $eq: ["$payoutStatus", "PROCESSING"] },
+                ],
+              },
+              "$kept",
+              0,
+            ],
+          },
         },
         settled: {
           $sum: {
             $cond: [
               {
                 $and: [
-                  { $eq: ["$status", "COMPLETED"] },
+                  "$keepsRevenue",
                   { $eq: ["$payoutStatus", "SETTLED"] },
                 ],
               },
-              "$amount",
+              "$kept",
               0,
             ],
           },
         },
-        adjustments: {
-          $sum: { $cond: [{ $eq: ["$status", "REFUNDED"] }, "$amount", 0] },
-        },
+        adjustments: { $sum: "$refundedPortion" },
         lastPayoutSetAt: { $max: "$payoutSettledAt" },
         lastPaidAt: { $max: "$paidAt" },
       },

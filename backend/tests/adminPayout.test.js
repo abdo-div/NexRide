@@ -27,7 +27,11 @@ test("payout summary calculates completed totals and excludes pending cash ledge
 
   const summary = await buildPayoutSummary();
 
-  assert.deepEqual(aggregatePipeline[0].$match.status.$in, ["COMPLETED", "REFUNDED"]);
+  assert.deepEqual(aggregatePipeline[0].$match.status.$in, [
+    "COMPLETED",
+    "REFUNDED",
+    "PARTIALLY_REFUNDED",
+  ]);
   assert.equal(summary.gross, 1000);
   assert.equal(summary.effectiveRate, 8);
   assert.equal(summary.pendingPayouts, 600);

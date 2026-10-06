@@ -1,11 +1,18 @@
 import mongoose from "mongoose";
 import Vehicle from "../models/vehicle_model.js";
 import Company from "../models/Company_model.js";
+import Booking from "../models/booking_model.js";
+import Payment from "../models/payment_model.js";
 import AppError from "../utils/appError.js";
 import { runPaginatedQuery } from "../utils/paginatedQuery.js";
 import MaintenanceEvent, {
   dispatchStatusOf,
 } from "../models/Maintenance_model.js";
+import {
+  DATE_BLOCKING_BOOKING_STATUSES,
+  buildDateOverlapFilter,
+} from "../utils/bookingStatus.js";
+import { notifyBookingCancellation } from "./bookingService.js";
 
 const EVENT_POPULATE =
   "make model year type city pickupLocation operationalStatus photos dailyPrice companyId";
@@ -19,6 +26,11 @@ const MAINTENANCE_SEARCH_FIELDS = [
   "workshop",
   "technician",
 ];
+
+// P1-2b: what counts as a hard conflict that must block maintenance scheduling,
+// versus an unpaid/unconfirmed reservation that may be auto-cancelled.
+const HARD_CONFLICT_BOOKING_STATUSES = ["PAID", "CONFIRMED", "ACTIVE"];
+const AUTO_CANCEL_BOOKING_STATUSES = ["PENDING_PAYMENT"];
 
 /**
  * Query keys that `listMaintenanceEvents` interprets itself (the OVERDUE derived
@@ -222,10 +234,85 @@ const populateEvent = (event) =>
     .populate("vehicleId", EVENT_POPULATE)
     .populate("companyId", "name city phone logo");
 
+/**
+ * P1-2b: bookings that conflict with a maintenance window.
+ *
+ * The window is half-open like rentals: everything starting before the return
+ * date and ending after the intake date. An event with no estimated return is
+ * treated as open-ended (any future booking conflicts). Only
+ * DATE_BLOCKING_BOOKING_STATUSES hold dates, so COMPLETED/CANCELLED/EXPIRED
+ * rows are ignored.
+ */
+const findMaintenanceConflicts = (vehicleId, windowStart, windowEnd) =>
+  Booking.find({
+    vehicleId,
+    bookingStatus: { $in: DATE_BLOCKING_BOOKING_STATUSES },
+    ...(windowEnd
+      ? { $or: buildDateOverlapFilter(windowStart, windowEnd) }
+      : { endDate: { $gt: windowStart } }),
+  });
+
 export const createMaintenanceEvent = async (payload, userId) => {
   const vehicle = await Vehicle.findById(payload.vehicleId);
   if (!vehicle) {
     throw new AppError("Vehicle not found", 404);
+  }
+
+  if (payload.status !== "COMPLETED") {
+    const windowStart = payload.intakeDate
+      ? new Date(payload.intakeDate)
+      : new Date();
+    const windowEnd = payload.estReturnDate
+      ? new Date(payload.estReturnDate)
+      : null;
+
+    const conflicts = await findMaintenanceConflicts(
+      vehicle._id,
+      windowStart,
+      windowEnd,
+    );
+
+    // Paid / confirmed / active rentals cannot be bumped; reject scheduling
+    // rather than strand a customer's confirmed trip.
+    const hardConflicts = conflicts.filter((booking) =>
+      HARD_CONFLICT_BOOKING_STATUSES.includes(booking.bookingStatus),
+    );
+    if (hardConflicts.length > 0) {
+      const statuses = [
+        ...new Set(hardConflicts.map((b) => b.bookingStatus)),
+      ].join(", ");
+      throw new AppError(
+        `Vehicle has ${hardConflicts.length} active/confirmed booking(s) (${statuses}) overlapping the maintenance window. Resolve or reschedule them before scheduling maintenance.`,
+        409,
+      );
+    }
+
+    // Unpaid, unconfirmed reservations are safe to cancel outright - they were
+    // only holding dates, no money has moved. Nudge the customer by email.
+    for (const booking of conflicts.filter((booking) =>
+      AUTO_CANCEL_BOOKING_STATUSES.includes(booking.bookingStatus),
+    )) {
+      booking.bookingStatus = "CANCELLED";
+      booking.paymentStatus = "UNPAID";
+      booking.cancelledBy = userId ?? null;
+      booking.cancelledAt = new Date();
+      booking.cancellationReason =
+        "Cancelled automatically: vehicle scheduled for maintenance.";
+      await booking.save({ validateBeforeSave: false });
+
+      // Retire any dangling PENDING cash ledger row for the cancelled booking.
+      await Payment.updateMany(
+        { bookingId: booking._id, status: "PENDING" },
+        {
+          $set: {
+            status: "FAILED",
+            refundReason: "Booking cancelled for scheduled maintenance",
+          },
+        },
+      );
+
+      notifyBookingCancellation(booking, "scheduled maintenance");
+    }
   }
 
   const event = await MaintenanceEvent.create({
@@ -261,8 +348,18 @@ export const completeMaintenanceEvent = async (eventId) => {
 
     const vehicle = await Vehicle.findById(event.vehicleId);
     if (vehicle && vehicle.operationalStatus !== "AVAILABLE") {
-      vehicle.operationalStatus = "AVAILABLE";
-      await vehicle.save();
+      // A second open event on the same unit keeps the maintenance lock;
+      // completing one event must not return a still-quarantined vehicle to
+      // the market.
+      const otherOpenEvent = await MaintenanceEvent.exists({
+        vehicleId: vehicle._id,
+        _id: { $ne: event._id },
+        status: { $ne: "COMPLETED" },
+      });
+      if (!otherOpenEvent) {
+        vehicle.operationalStatus = "AVAILABLE";
+        await vehicle.save();
+      }
     }
   }
 

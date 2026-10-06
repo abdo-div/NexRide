@@ -5,6 +5,7 @@ import {
   getAllPayments,
   getCompanyPayoutSummary,
   settleCompanyPayout,
+  collectCashPayment,
   downloadInvoicePDF,
 } from "../controllers/paymentController.js";
 import {
@@ -158,6 +159,46 @@ router.get(
   validate(idParamSchema()),
   verifyTenantAccess("Payment"),
   getPaymentById,
+);
+
+// -----------------------------------------------------------------------------
+// TENANT & ADMIN CASH COLLECTION
+// -----------------------------------------------------------------------------
+/**
+ * @openapi
+ * /payments/{id}/collect-cash:
+ *   patch:
+ *     tags: [Payments]
+ *     summary: Mark a cash-on-delivery payment as collected
+ *     description: >-
+ *       Cash has no gateway callback, so the owning company (or a platform
+ *       admin) attests the hand-off at pick-up. Transitions the ledger row
+ *       from PENDING to COMPLETED and marks the booking as paid, which is what
+ *       moves it into revenue analytics and the payout ledger.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Cash collection recorded
+ *       400:
+ *         description: Payment method is not cash
+ *       403:
+ *         description: Company or admin role required
+ *       404:
+ *         description: Payment not found
+ *       409:
+ *         description: Payment is not pending (already collected or refunded)
+ */
+router.patch(
+  "/:id/collect-cash",
+  restrictTo("company", "admin"),
+  validate(idParamSchema()),
+  verifyTenantAccess("Payment"),
+  collectCashPayment,
 );
 
 // -----------------------------------------------------------------------------

@@ -295,14 +295,20 @@ export const createVehicleListing = async (bodyData, files, tenantCompanyId) => 
  * the field, but the service is also reachable from other callers and from
  * seeded data, so the guarantee is enforced here too. Passing the field must
  * never be able to move a vehicle between tenants.
+ *
+ * When a company session supplies `tenantId`, the write filter carries
+ * `companyId`, so a non-admin caller can never patch another tenant's vehicle
+ * even if the route gate is bypassed. Admins pass no tenantId and stay
+ * unscoped, which preserves the cross-tenant platform view.
  */
-export const updateVehicleRecord = async (vehicleId, updateData) => {
+export const updateVehicleRecord = async (vehicleId, updateData, tenantId = null) => {
   const { companyId: _ignoredCompanyId, ...safeUpdateData } = updateData ?? {};
 
-  const vehicle = await Vehicle.findByIdAndUpdate(vehicleId, safeUpdateData, {
-    new: true,
-    runValidators: true,
-  });
+  const vehicle = await Vehicle.findOneAndUpdate(
+    { _id: vehicleId, ...(tenantId ? { companyId: tenantId } : {}) },
+    safeUpdateData,
+    { new: true, runValidators: true },
+  );
 
   if (!vehicle) {
     throw new AppError("No vehicle found with that ID", 404);
@@ -313,8 +319,16 @@ export const updateVehicleRecord = async (vehicleId, updateData) => {
 
 /**
  * Update vehicle operational or listing status
+ *
+ * Scoped to the caller's tenant when `tenantId` is supplied so a company user
+ * can never flip another tenant's vehicle state.
  */
-export const updateVehicleStatusById = async (vehicleId, statusType, status) => {
+export const updateVehicleStatusById = async (
+  vehicleId,
+  statusType,
+  status,
+  tenantId = null,
+) => {
   const operationalStatuses = ["AVAILABLE", "MAINTENANCE", "UNAVAILABLE"];
   const listingStatuses = ["DRAFT", "PUBLISHED", "SUSPENDED"];
 
@@ -332,10 +346,11 @@ export const updateVehicleStatusById = async (vehicleId, statusType, status) => 
     );
   }
 
-  const vehicle = await Vehicle.findByIdAndUpdate(vehicleId, updateField, {
-    new: true,
-    runValidators: true,
-  });
+  const vehicle = await Vehicle.findOneAndUpdate(
+    { _id: vehicleId, ...(tenantId ? { companyId: tenantId } : {}) },
+    updateField,
+    { new: true, runValidators: true },
+  );
 
   if (!vehicle) {
     throw new AppError("No vehicle found with that ID", 404);
@@ -346,12 +361,15 @@ export const updateVehicleStatusById = async (vehicleId, statusType, status) => 
 
 /**
  * Soft delete vehicle listing to maintain booking record history
+ *
+ * Scoped to the caller's tenant when `tenantId` is supplied so a company user
+ * can never remove another tenant's unit.
  */
-export const softDeleteVehicleById = async (vehicleId) => {
-  const vehicle = await Vehicle.findByIdAndUpdate(
-    vehicleId,
+export const softDeleteVehicleById = async (vehicleId, tenantId = null) => {
+  const vehicle = await Vehicle.findOneAndUpdate(
+    { _id: vehicleId, ...(tenantId ? { companyId: tenantId } : {}) },
     { deletedAt: new Date() },
-    { new: true }
+    { new: true },
   );
 
   if (!vehicle) {

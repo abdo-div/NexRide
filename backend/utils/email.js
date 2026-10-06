@@ -107,6 +107,27 @@ export default class Email {
       return this._getLayout("NexRide — Password Reset", content);
     }
 
+    if (template === "bookingCancellation") {
+      const { vehicleName, startDate, endDate, reason } = extraData;
+      const content = `
+        <h2 style="color:#1a1a2e;margin:0 0 16px;font-size:22px;">Booking Cancelled</h2>
+        <p style="color:#4a5568;line-height:1.7;margin:0 0 16px;">Hello <strong>${this.firstName}</strong>,</p>
+        <p style="color:#4a5568;line-height:1.7;margin:0 0 20px;">
+          Your reservation below was cancelled${reason ? ` (${reason})` : ""}. If you were charged, any eligible
+          refund will be processed back to your original payment method.
+        </p>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:20px;margin:0 0 24px;">
+          <p style="margin:0 0 8px;color:#334155;"><strong>Vehicle:</strong> ${vehicleName || "Vehicle Listing"}</p>
+          <p style="margin:0 0 8px;color:#334155;"><strong>Dates:</strong> ${startDate} to ${endDate}</p>
+          <p style="margin:0;color:#334155;"><strong>Cancelled:</strong> ${new Date().toLocaleDateString()}</p>
+        </div>
+        <a href="${this.url}" style="display:inline-block;background:linear-gradient(135deg,#e94560,#c0392b);color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px;">
+          View Booking Details &rarr;
+        </a>
+      `;
+      return this._getLayout("Booking Cancelled — NexRide", content);
+    }
+
     if (template === "bookingConfirmation") {
       const { vehicleName, startDate, endDate, totalPrice } = extraData;
       const content = `
@@ -185,6 +206,14 @@ export default class Email {
     await this.send(
       "bookingConfirmation",
       "Your NexRide Reservation Confirmation",
+      bookingData
+    );
+  }
+
+  async sendBookingCancellation(bookingData) {
+    await this.send(
+      "bookingCancellation",
+      "Your NexRide Booking Was Cancelled",
       bookingData
     );
   }
