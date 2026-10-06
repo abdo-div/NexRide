@@ -226,9 +226,17 @@ export const assertInvoiceAccess = (payment, user, tenantId = null) => {
  * against the identical filter, so a company or admin can page through its whole
  * ledger instead of silently stopping at the per-page cap.
  */
-export const fetchAllPayments = async (queryParams, user) => {
+export const fetchAllPayments = async (queryParams, user, tenantId = null) => {
+  const callerTenantId = tenantId ?? user.company;
+  if (user.role === "company" && !callerTenantId) {
+    throw new AppError(
+      "No company tenant is linked to this user account.",
+      403,
+    );
+  }
+
   const filter = combineFilters(
-    user.role === "company" ? { companyId: user.company } : null,
+    user.role === "company" ? { companyId: callerTenantId } : null,
     paymentRangeFilter(queryParams.range),
     await buildPaymentSearchFilter(queryParams.search),
   );
@@ -315,4 +323,159 @@ export const settlePaymentPayout = async (paymentId) => {
   }
 
   return payment;
+};
+
+// Cash is settled by hand at pick-up. Only these methods may be marked
+// collected manually; card and wallet rows must settle through their own
+// gateway callback, otherwise a gateway capture and a manual collection could
+// both land on the same booking.
+const CASH_PAYMENT_METHODS = new Set(["CASH_ON_DELIVERY", "CASH"]);
+
+// Bookings that have already ended in a terminal, non-rented state. Marking
+// their payment COMPLETED would book revenue for a trip that never happened,
+// so manual collection is refused rather than silently allowed.
+const CLOSED_BOOKING_STATUSES = new Set(["CANCELLED", "EXPIRED"]);
+
+/**
+ * Guard for manual cash collection.
+ *
+ * Cash has no gateway callback proving who was paid, so the company that owns
+ * the booking (or a platform admin) must be the one attesting the hand-off.
+ * Admins may collect anything; anyone else must be a company user matching
+ * payment.companyId. The tenant is taken from the resolved request tenant
+ * first, because `req.tenantId` is what protect() derived from the session.
+ *
+ * Thrown as 403 rather than 404 so a missing relationship is never reported as
+ * "not found", which would let callers probe other tenants' payment IDs.
+ */
+export const assertCashCollectionAccess = (payment, actorUser, tenantId = null) => {
+  if (!payment) {
+    throw new AppError("No payment record found with that ID", 404);
+  }
+
+  if (!actorUser) {
+    throw new AppError("You are not logged in! Please log in to get access.", 401);
+  }
+
+  if (actorUser.role === "admin") return payment;
+
+  if (actorUser.role !== "company") {
+    throw new AppError(
+      "Only the owning rental company or a platform admin can collect cash payments.",
+      403,
+    );
+  }
+
+  // A company session without a resolvable company must fail closed.
+  const callerTenantId = (tenantId ?? actorUser.company)?.toString();
+  const companyId = resolveId(payment.companyId);
+
+  if (companyId && callerTenantId && companyId === callerTenantId) {
+    return payment;
+  }
+
+  throw new AppError(
+    "Access Denied. You are not permitted to collect this payment.",
+    403,
+  );
+};
+
+/**
+ * Mark a cash-on-delivery payment as collected at pick-up.
+ *
+ * Cash bookings are created PENDING and would otherwise stay PENDING forever:
+ * they never receive a gateway callback, so they never reached revenue
+ * analytics or the payout ledger. This is the manual attestation that closes
+ * the loop.
+ *
+ * Both writes run in one transaction, and the payment flip is guarded on
+ * `status: "PENDING"` so two clerks racing on the same payment cannot collect
+ * it twice.
+ *
+ * Returns `{ payment, booking }` so the caller can show the settled ledger row
+ * alongside the booking it belongs to.
+ */
+export const markCashPaymentCompleted = async ({
+  paymentId,
+  actorUser,
+  tenantId = null,
+}) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const payment = await Payment.findById(paymentId).session(session);
+    if (!payment) {
+      throw new AppError("No payment record found with that ID", 404);
+    }
+
+    // Authorization runs before method/status so a foreign company can never
+    // probe whether another tenant's payment is pending, completed or refunded.
+    assertCashCollectionAccess(payment, actorUser, tenantId);
+
+    if (!CASH_PAYMENT_METHODS.has(String(payment.paymentMethod).toUpperCase())) {
+      throw new AppError(
+        "Only cash payments can be marked as collected manually.",
+        400,
+      );
+    }
+
+    if (payment.status !== "PENDING") {
+      throw new AppError(
+        `This payment has already been ${String(payment.status).toLowerCase()}.`,
+        409,
+      );
+    }
+
+    const booking = await Booking.findById(payment.bookingId).session(session);
+    if (!booking) {
+      throw new AppError("No booking found with that ID", 404);
+    }
+
+    if (CLOSED_BOOKING_STATUSES.has(booking.bookingStatus)) {
+      throw new AppError(
+        "This booking is no longer active, so its payment cannot be collected.",
+        409,
+      );
+    }
+
+    const collectedAt = new Date();
+    const collectedBy = actorUser._id ?? actorUser.id;
+
+    const updatedPayment = await Payment.findOneAndUpdate(
+      { _id: payment._id, status: "PENDING" },
+      {
+        $set: {
+          status: "COMPLETED",
+          paidAt: collectedAt,
+          collectedBy,
+          collectedAt,
+        },
+      },
+      { new: true, runValidators: true, session },
+    );
+
+    if (!updatedPayment) {
+      throw new AppError("This payment has already been collected.", 409);
+    }
+
+    if (booking.paymentStatus !== "PAID") {
+      booking.paymentStatus = "PAID";
+      // Promote, never demote: a rental already CONFIRMED/ACTIVE keeps its
+      // state, while one still waiting on money stops waiting.
+      if (booking.bookingStatus === "PENDING_PAYMENT") {
+        booking.bookingStatus = "PAID";
+      }
+      await booking.save({ session, validateBeforeSave: false });
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return { payment: updatedPayment, booking };
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
 };

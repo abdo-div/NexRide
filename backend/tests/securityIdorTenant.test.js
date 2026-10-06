@@ -371,14 +371,14 @@ test("updateVehicleRecord discards an injected companyId", async () => {
   const captured = [];
   const original = vehicleService.updateVehicleRecord;
   const vehicleModel = mongoose.model("Vehicle");
-  const originalFindByIdAndUpdate = vehicleModel.findByIdAndUpdate;
+  const originalFindOneAndUpdate = vehicleModel.findOneAndUpdate;
 
-  vehicleModel.findByIdAndUpdate = (id, update, options) => {
-    captured.push({ id, update });
+  vehicleModel.findOneAndUpdate = (filter, update, options) => {
+    captured.push({ filter, update, options });
     return {
       then: (resolve) =>
         resolve({
-          _id: id,
+          _id: filter._id,
           companyId: companyA,
           ...update,
         }),
@@ -399,7 +399,7 @@ test("updateVehicleRecord discards an injected companyId", async () => {
     );
     assert.equal(captured[0].update.dailyPrice, 120);
   } finally {
-    vehicleModel.findByIdAndUpdate = originalFindByIdAndUpdate;
+    vehicleModel.findOneAndUpdate = originalFindOneAndUpdate;
     assert.equal(vehicleService.updateVehicleRecord, original);
   }
 });
@@ -407,13 +407,13 @@ test("updateVehicleRecord discards an injected companyId", async () => {
 test("a company user cannot move a vehicle into another tenant via the handler", async () => {
   const captured = [];
   const vehicleModel = mongoose.model("Vehicle");
-  const originalFindByIdAndUpdate = vehicleModel.findByIdAndUpdate;
+  const originalFindOneAndUpdate = vehicleModel.findOneAndUpdate;
 
-  vehicleModel.findByIdAndUpdate = (id, update) => {
-    captured.push({ id, update });
+  vehicleModel.findOneAndUpdate = (filter, update) => {
+    captured.push({ filter, update });
     return {
       then: (resolve) =>
-        resolve({ _id: id, companyId: companyA, ...update }),
+        resolve({ _id: filter._id, companyId: companyA, ...update }),
     };
   };
 
@@ -429,6 +429,7 @@ test("a company user cannot move a vehicle into another tenant via the handler",
 
     assert.equal(outcome.statusCode, 200);
     assert.equal(captured.length, 1);
+    assert.deepEqual(captured[0].filter, { _id: vehicleId, companyId: companyA });
     assert.equal(
       Object.hasOwn(captured[0].update, "companyId"),
       false,
@@ -440,7 +441,7 @@ test("a company user cannot move a vehicle into another tenant via the handler",
       "ownership must remain with the original company",
     );
   } finally {
-    vehicleModel.findByIdAndUpdate = originalFindByIdAndUpdate;
+    vehicleModel.findOneAndUpdate = originalFindOneAndUpdate;
   }
 });
 
@@ -449,13 +450,13 @@ test("the vehicle patch route refuses to touch another tenant's vehicle", async 
 
   const vehicleModel = mongoose.model("Vehicle");
   const originalFindById = vehicleModel.findById;
-  const originalFindByIdAndUpdate = vehicleModel.findByIdAndUpdate;
+  const originalFindOneAndUpdate = vehicleModel.findOneAndUpdate;
   let writes = 0;
 
   vehicleModel.findById = () => ({
     then: (resolve) => resolve({ _id: vehicleId, companyId: companyB }),
   });
-  vehicleModel.findByIdAndUpdate = () => {
+  vehicleModel.findOneAndUpdate = () => {
     writes += 1;
     return { then: (resolve) => resolve({ _id: vehicleId, companyId: companyB }) };
   };
@@ -482,7 +483,7 @@ test("the vehicle patch route refuses to touch another tenant's vehicle", async 
     );
   } finally {
     vehicleModel.findById = originalFindById;
-    vehicleModel.findByIdAndUpdate = originalFindByIdAndUpdate;
+    vehicleModel.findOneAndUpdate = originalFindOneAndUpdate;
   }
 });
 

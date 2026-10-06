@@ -200,17 +200,50 @@ export const createBooking = catchAsync(async (req, res, next) => {
   session.startTransaction();
 
   try {
-    const vehicle = await Vehicle.findOne({
-      _id: vehicleId,
-      listingStatus: "PUBLISHED",
-      operationalStatus: "AVAILABLE",
-    }).session(session);
-
-    if (!vehicle) {
+    // Distinguish a missing/unpublished listing (404) from a vehicle that is
+    // simply not rentable right now (409), so a vehicle in MAINTENANCE
+    // surfaces a clear conflict instead of a misleading "not found".
+    const vehicle = await Vehicle.findById(vehicleId).session(session);
+    if (!vehicle || vehicle.listingStatus !== "PUBLISHED") {
       throw new AppError("Vehicle is not available for rental.", 404);
     }
+    if (vehicle.operationalStatus !== "AVAILABLE") {
+      throw new AppError(
+        "Vehicle is currently unavailable for rental (maintenance or already out of service).",
+        409,
+      );
+    }
 
-    // 2. Double-booking collision check within database transaction session
+    // 2. Atomic row-level claim on the vehicle document (P1-1 race fix).
+    //
+    // The overlap check below is read-then-insert: two concurrent transactions
+    // can both observe "no overlap" and both insert. Latching onto the vehicle
+    // row with a conditional findOneAndUpdate makes the vehicle document the
+    // mutex - the second concurrent checkout either finds it non-AVAILABLE
+    // (clean 409) or contends for the in-flight transaction's write lock, which
+    // MongoDB reports as a WriteConflict (translated to 409 below). The claim
+    // is rolled back to AVAILABLE inside the same transaction, so it can never
+    // leak after a crash.
+    const claimed = await Vehicle.findOneAndUpdate(
+      {
+        _id: vehicleId,
+        listingStatus: "PUBLISHED",
+        operationalStatus: "AVAILABLE",
+      },
+      { $set: { operationalStatus: "UNAVAILABLE" } },
+      { session, new: true },
+    );
+
+    if (!claimed) {
+      throw new AppError(
+        "Vehicle is currently being booked by another customer.",
+        409,
+      );
+    }
+
+    // 3. Double-booking collision check within the database transaction
+    // session. Serialized on the vehicle row above, so a losing concurrent
+    // writer can no longer slip past this check.
     const existingCollision = await Booking.findOne(
       buildBookingCollisionQuery(vehicleId, start, end),
     ).session(session);
@@ -220,7 +253,7 @@ export const createBooking = catchAsync(async (req, res, next) => {
     }
 
     const rentalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-    const totalAmount = rentalDays * vehicle.dailyPrice;
+    const totalAmount = rentalDays * claimed.dailyPrice;
     const commissionAmount = totalAmount * 0.08;
     const companyShare = totalAmount - commissionAmount;
 
@@ -265,6 +298,16 @@ export const createBooking = catchAsync(async (req, res, next) => {
       );
     }
 
+    // 4. Release the checkout claim inside the same transaction. Conditionally
+    // matches only a unit still in the transient UNAVAILABLE state, so it can
+    // never override an admin that moved the vehicle to MAINTENANCE mid-checkout.
+    // The committed booking row is what blocks overlapping dates from here on.
+    await Vehicle.findOneAndUpdate(
+      { _id: vehicleId, operationalStatus: "UNAVAILABLE" },
+      { $set: { operationalStatus: "AVAILABLE" } },
+      { session },
+    );
+
     await session.commitTransaction();
     session.endSession();
 
@@ -293,6 +336,23 @@ export const createBooking = catchAsync(async (req, res, next) => {
     await safelyRelease(() =>
       bookingConcurrency.releaseVehicleHold(vehicleId),
     );
+
+    // Two transactions that contended for the same vehicle row abort one of
+    // them with MongoDB's WriteConflict before any writes are visible. Surface
+    // that as the same "already being booked" 409 the collision check would
+    // have produced, never as a 500.
+    if (
+      error?.code === 112 ||
+      /WriteConflict|TransientTransactionError/i.test(error?.message ?? "")
+    ) {
+      return next(
+        new AppError(
+          "Vehicle is already being booked during these dates. Please retry.",
+          409,
+        ),
+      );
+    }
+
     next(error);
   }
 });
@@ -314,16 +374,25 @@ export const getMyBookings = catchAsync(async (req, res, next) => {
  * Fetch tenant company bookings
  */
 export const getCompanyBookings = catchAsync(async (req, res, next) => {
-  let companyId = req.tenantId || req.user.company;
-  if (!companyId && req.user?.id) {
-    const mongoose = (await import("mongoose")).default;
+  // Company sessions are bound to their own tenant: `req.tenantId` comes from
+  // protect() (req.user.company). A caller-supplied ?companyId= is never
+  // honoured for company accounts - that would let one operator read another
+  // operator's booking ledger. Admins may still scope to any tenant via the
+  // query param (or see the full platform ledger when it is omitted).
+  const isAdmin = req.user?.role === "admin";
+  let companyId = isAdmin ? req.query.companyId || null : req.tenantId || null;
+
+  if (!companyId && !isAdmin && req.user?.id) {
     const ownedCompany = await mongoose
       .model("Company")
       .findOne({ ownerId: req.user.id });
     if (ownedCompany) companyId = ownedCompany._id;
   }
-  if (!companyId && req.query.companyId) {
-    companyId = req.query.companyId;
+
+  if (!companyId) {
+    return next(
+      new AppError("No company tenant is linked to this user account.", 403),
+    );
   }
 
   const bookings = await bookingService.fetchCompanyFleetBookings(
@@ -345,6 +414,7 @@ export const cancelBooking = catchAsync(async (req, res, next) => {
   const booking = await bookingService.cancelBookingById(
     req.params.id,
     req.user,
+    { reason: req.body?.reason ?? null },
   );
 
   res.status(200).json({

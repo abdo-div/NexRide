@@ -99,13 +99,60 @@ const paymentSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: {
-        values: ["PENDING", "COMPLETED", "FAILED", "REFUNDED"],
+        values: [
+          "PENDING",
+          "COMPLETED",
+          "FAILED",
+          "REFUNDED",
+          "PARTIALLY_REFUNDED",
+        ],
         message: "Invalid payment status",
       },
       default: "PENDING",
       index: true,
     },
     paidAt: Date,
+
+    // -------------------------------------------------------------------------
+    // Refund Audit
+    // -------------------------------------------------------------------------
+    // Cancellation refunds mark the ledger row REFUNDED / PARTIALLY_REFUNDED
+    // instead of deleting it, so revenue that will never pay out stays visible
+    // and attributable. `refundAmount` is what the customer actually gets back;
+    // the payout pipelines subtract it from what a company can be paid.
+    refundAmount: {
+      type: Number,
+      min: [0, "Refund amount cannot be negative"],
+      default: null,
+    },
+    refundedAt: {
+      type: Date,
+      default: null,
+    },
+    refundedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    refundReason: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+
+    // -------------------------------------------------------------------------
+    // Cash Collection Audit
+    // -------------------------------------------------------------------------
+    // Cash has no gateway callback, so the settlement is attested by a human
+    // rather than by the processor. These two fields record who took the money
+    // and when, so a COMPLETED cash row is attributable in the ledger instead of
+    // being indistinguishable from a card capture. Undefined (not null) when the
+    // money has not been collected yet.
+    collectedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    collectedAt: Date,
 
     // -------------------------------------------------------------------------
     // Company Payout Settlement Lifecycle

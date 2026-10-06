@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import MaintenanceEvent from "../models/Maintenance_model.js";
 import Vehicle from "../models/vehicle_model.js";
+import Booking from "../models/booking_model.js";
 import AppError from "../utils/appError.js";
 import * as maintenanceService from "../services/maintenanceService.js";
 
@@ -48,6 +49,7 @@ test("creating maintenance inherits the vehicle company and removes available ve
   const event = makeEvent();
   let createPayload;
   t.mock.method(Vehicle, "findById", async () => vehicle);
+  t.mock.method(Booking, "find", async () => []);
   t.mock.method(MaintenanceEvent, "create", async (payload) => {
     createPayload = payload;
     return event;
@@ -86,6 +88,7 @@ test("completing a maintenance event marks it complete and restores vehicle avai
     findByIdCalls++ === 0 ? event : populatedEventQuery(event),
   );
   t.mock.method(Vehicle, "findById", async () => vehicle);
+  t.mock.method(MaintenanceEvent, "exists", async () => null);
 
   const result = await maintenanceService.completeMaintenanceEvent(event.id);
 

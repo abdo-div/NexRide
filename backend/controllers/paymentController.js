@@ -36,6 +36,7 @@ export const getAllPayments = catchAsync(async (req, res, next) => {
   const { payments, pagination } = await paymentService.fetchAllPayments(
     req.query,
     req.user,
+    req.tenantId ?? req.user?.company,
   );
 
   res.status(200).json({
@@ -52,6 +53,14 @@ export const getCompanyPayoutSummary = catchAsync(async (req, res, next) => {
       ? req.tenantId || req.user.company
       : req.query.companyId;
 
+  // A company account without a resolvable tenant must fail closed: with a null
+  // companyId the aggregation below would match every tenant's ledger.
+  if (req.user.role === "company" && !companyId) {
+    return next(
+      new AppError("No company tenant is linked to this user account.", 403),
+    );
+  }
+
   const summary = await paymentService.calculateCompanyPayoutSummary(companyId);
 
   res.status(200).json({
@@ -66,6 +75,19 @@ export const settleCompanyPayout = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     data: { payment },
+  });
+});
+
+export const collectCashPayment = catchAsync(async (req, res, next) => {
+  const { payment, booking } = await paymentService.markCashPaymentCompleted({
+    paymentId: req.params.id,
+    actorUser: req.user,
+    tenantId: req.tenantId ?? req.user?.company,
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: { payment, booking },
   });
 });
 

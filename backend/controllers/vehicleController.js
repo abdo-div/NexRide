@@ -1,6 +1,7 @@
 import multer from "multer";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
+import Company from "../models/Company_model.js";
 import { saveVehicleImage } from "../utils/vehicleImages.js";
 import * as vehicleService from "../services/vehicleService.js";
 
@@ -95,16 +96,22 @@ export const getVehicleById = catchAsync(async (req, res, next) => {
 });
 
 export const getCompanyVehicles = catchAsync(async (req, res, next) => {
-  let companyId = req.tenantId || req.user.company;
-  if (!companyId && req.user?.id) {
-    const mongoose = (await import("mongoose")).default;
-    const ownedCompany = await mongoose
-      .model("Company")
-      .findOne({ ownerId: req.user.id });
+  // Company sessions are rigidly bound to their own tenant: `req.tenantId` is
+  // populated by protect() from req.user.company, and a missing link fails
+  // closed instead of trusting a caller-supplied ?companyId=. Admins may scope
+  // to any tenant via the query param (or see the whole fleet when omitted).
+  const isAdmin = req.user?.role === "admin";
+  let companyId = isAdmin ? req.query.companyId || null : req.tenantId || null;
+
+  if (!companyId && !isAdmin && req.user?.id) {
+    const ownedCompany = await Company.findOne({ ownerId: req.user.id });
     if (ownedCompany) companyId = ownedCompany._id;
   }
-  if (!companyId && req.query.companyId) {
-    companyId = req.query.companyId;
+
+  if (!companyId) {
+    return next(
+      new AppError("No company tenant is linked to this user account.", 403),
+    );
   }
 
   const vehicles = await vehicleService.fetchCompanyVehicles(
@@ -120,16 +127,27 @@ export const getCompanyVehicles = catchAsync(async (req, res, next) => {
 });
 
 export const createVehicle = catchAsync(async (req, res, next) => {
-  let companyId = req.tenantId || req.user?.company;
-  if (!companyId && req.body.companyId) {
-    companyId = req.body.companyId;
-  }
+  // A company session is never allowed to choose its tenant from the payload:
+  // ownership comes from req.tenantId (populated by protect() from
+  // req.user.company) or the user's owned company. Only admins may assign a
+  // listing to an arbitrary companyId through the body.
+  const isAdmin = req.user?.role === "admin";
+  let companyId = isAdmin ? req.body.companyId || null : req.tenantId || null;
+
   if (!companyId && req.user?.id) {
-    const mongoose = (await import("mongoose")).default;
-    const ownedCompany = await mongoose
-      .model("Company")
-      .findOne({ ownerId: req.user.id });
+    const ownedCompany = await Company.findOne({ ownerId: req.user.id });
     if (ownedCompany) companyId = ownedCompany._id;
+  }
+
+  if (!companyId) {
+    return next(
+      new AppError(
+        isAdmin
+          ? "companyId is required when an admin creates a vehicle listing."
+          : "No company tenant is linked to this user account.",
+        400,
+      ),
+    );
   }
 
   const vehicle = await vehicleService.createVehicleListing(
@@ -145,7 +163,11 @@ export const createVehicle = catchAsync(async (req, res, next) => {
 });
 
 export const updateVehicle = catchAsync(async (req, res, next) => {
-  const vehicle = await vehicleService.updateVehicleRecord(req.params.id, req.body);
+  const vehicle = await vehicleService.updateVehicleRecord(
+    req.params.id,
+    req.body,
+    req.tenantId,
+  );
 
   res.status(200).json({
     status: "success",
@@ -157,7 +179,8 @@ export const updateVehicleStatus = catchAsync(async (req, res, next) => {
   const vehicle = await vehicleService.updateVehicleStatusById(
     req.params.id,
     req.body.statusType, // "operational" or "listing"
-    req.body.status
+    req.body.status,
+    req.tenantId,
   );
 
   res.status(200).json({
@@ -167,7 +190,7 @@ export const updateVehicleStatus = catchAsync(async (req, res, next) => {
 });
 
 export const deleteVehicle = catchAsync(async (req, res, next) => {
-  await vehicleService.softDeleteVehicleById(req.params.id);
+  await vehicleService.softDeleteVehicleById(req.params.id, req.tenantId);
 
   res.status(204).json({
     status: "success",
