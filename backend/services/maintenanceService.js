@@ -47,15 +47,25 @@ const MAINTENANCE_DERIVED_FILTER_FIELDS = [
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+/** Normalise an optional tenant scoper into a Mongo filter (or an empty one). */
+const tenantFilterOf = (companyId) =>
+  companyId ? { companyId: new mongoose.Types.ObjectId(String(companyId)) } : {};
+
 /**
  * Fleet Health summary — every figure is computed live from the real Vehicle
  * registry and the MaintenanceEvent ledger. Overdue is derived from scheduled
  * events that have blown past their estimated return date; nothing is mocked.
+ * Pass an optional companyId to scope every figure to one fleet operator (the
+ * company maintenance surface); omit it for the platform-wide admin deck.
  */
-export const buildMaintenanceSummary = async () => {
-  const totalFleet = await Vehicle.countDocuments({});
+export const buildMaintenanceSummary = async (companyId) => {
+  const tenantFilter = tenantFilterOf(companyId);
+  const totalFleet = await Vehicle.countDocuments(tenantFilter);
 
   const statusCounts = await Vehicle.aggregate([
+    ...(companyId
+      ? [{ $match: { companyId: tenantFilter.companyId } }]
+      : []),
     {
       $group: {
         _id: "$operationalStatus",
@@ -72,6 +82,9 @@ export const buildMaintenanceSummary = async () => {
   const now = Date.now();
   const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
   const [stats] = await MaintenanceEvent.aggregate([
+    ...(companyId
+      ? [{ $match: { companyId: tenantFilter.companyId } }]
+      : []),
     {
       $group: {
         _id: null,
@@ -113,6 +126,7 @@ export const buildMaintenanceSummary = async () => {
 
   const pending = await MaintenanceEvent.find({
     status: { $ne: "COMPLETED" },
+    ...tenantFilter,
   });
 
   const scheduledNext7d = pending.filter((e) => {
@@ -252,10 +266,20 @@ const findMaintenanceConflicts = (vehicleId, windowStart, windowEnd) =>
       : { endDate: { $gt: windowStart } }),
   });
 
-export const createMaintenanceEvent = async (payload, userId) => {
+export const createMaintenanceEvent = async (payload, userId, tenantCompanyId) => {
   const vehicle = await Vehicle.findById(payload.vehicleId);
   if (!vehicle) {
     throw new AppError("Vehicle not found", 404);
+  }
+
+  // Tenant isolation: a company-scoped caller may only schedule an event on a
+  // unit owned by its own fleet. A mismatch is reported as 404 so an operator
+  // cannot probe for the existence of another partner's vehicle ids.
+  if (
+    tenantCompanyId &&
+    String(vehicle.companyId) !== String(tenantCompanyId)
+  ) {
+    throw new AppError("Vehicle not found in this tenant's fleet.", 404);
   }
 
   if (payload.status !== "COMPLETED") {
@@ -335,9 +359,16 @@ export const createMaintenanceEvent = async (payload, userId) => {
   };
 };
 
-export const completeMaintenanceEvent = async (eventId) => {
+export const completeMaintenanceEvent = async (eventId, tenantCompanyId) => {
   const event = await MaintenanceEvent.findById(eventId);
   if (!event) {
+    throw new AppError("Maintenance event not found", 404);
+  }
+
+  if (
+    tenantCompanyId &&
+    String(event.companyId) !== String(tenantCompanyId)
+  ) {
     throw new AppError("Maintenance event not found", 404);
   }
 
@@ -375,9 +406,16 @@ export const completeMaintenanceEvent = async (eventId) => {
  * the unit and lifts the availability lock, returning the vehicle to the
  * rental marketplace. High-privilege action guarded by the admin gate.
  */
-export const releaseVehicleFromQuarantine = async (vehicleId) => {
+export const releaseVehicleFromQuarantine = async (vehicleId, tenantCompanyId) => {
   const vehicle = await Vehicle.findById(vehicleId);
   if (!vehicle) {
+    throw new AppError("Vehicle not found", 404);
+  }
+
+  if (
+    tenantCompanyId &&
+    String(vehicle.companyId) !== String(tenantCompanyId)
+  ) {
     throw new AppError("Vehicle not found", 404);
   }
 

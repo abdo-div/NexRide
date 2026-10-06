@@ -6,12 +6,12 @@ import type {
   MaintenanceCategory,
   MaintenancePriority,
   MaintenanceStoredStatus,
+  MaintenanceVehicleOption,
 } from "../../types/admin";
-import type { VehicleDto } from "../../types/vehicle";
 import { categoryOptions, priorityOptions } from "../../lib/maintenanceView";
 
 export interface LogMaintenanceModalProps {
-  vehicles: VehicleDto[];
+  vehicles: MaintenanceVehicleOption[];
   busy: boolean;
   onClose: () => void;
   onSubmit: (payload: CreateMaintenancePayload) => void;

@@ -253,6 +253,15 @@ export interface MaintenanceSummary {
   monthLabel: string;
 }
 
+/** Minimal vehicle descriptor consumed by maintenance create pickers. */
+export interface MaintenanceVehicleOption {
+  _id: string;
+  make: string;
+  model: string;
+  year?: number | null;
+  city?: string | null;
+}
+
 /** Payload for the "+ Log Maintenance Event" action. */
 export interface CreateMaintenancePayload {
   vehicleId: string;

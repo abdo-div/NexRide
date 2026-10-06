@@ -18,6 +18,13 @@ import { protect, restrictTo } from "../middlewares/authMiddleware.js";
 import { validateSubdomain } from "../middlewares/subdomainValidator.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import {
+  getCompanyMaintenanceEvents,
+  getCompanyMaintenanceSummary,
+  createCompanyMaintenance,
+  completeCompanyMaintenance,
+  releaseCompanyMaintenanceVehicle,
+} from "../controllers/companyMaintenanceController.js";
+import {
   createCompanySchema,
   updateCompanySchema,
   updateCommissionSchema,
@@ -277,6 +284,130 @@ router.get(
   protect,
   restrictTo("company", "admin"),
   getCompanyVehicleDetail,
+);
+
+/**
+ * @openapi
+ * /companies/maintenance:
+ *   get:
+ *     tags: [Companies]
+ *     summary: Tenant-scoped maintenance ledger for the authenticated company
+ *     description: >-
+ *       Returns the operator's own maintenance-event ledger — every record is
+ *       scoped to the session tenant, never read from the query string. Crafted
+ *       before /:id so "maintenance" is not captured as a company identifier.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema: { type: string }
+ *       - in: query
+ *         name: status
+ *         schema: { type: string, enum: [SCHEDULED, IN_PROGRESS, COMPLETED, OVERDUE, ALL] }
+ *       - in: query
+ *         name: category
+ *         schema: { type: string }
+ *       - in: query
+ *         name: priority
+ *         schema: { type: string }
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Maintenance events + pagination
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Company or admin role required
+ */
+router.get(
+  "/maintenance",
+  protect,
+  restrictTo("company", "admin"),
+  getCompanyMaintenanceEvents,
+);
+
+/**
+ * @openapi
+ * /companies/maintenance/summary:
+ *   get:
+ *     tags: [Companies]
+ *     summary: Tenant-scoped fleet health + maintenance summary
+ *     responses:
+ *       200:
+ *         description: Maintenance summary deck
+ *       403:
+ *         description: Company or admin role required
+ */
+router.get(
+  "/maintenance/summary",
+  protect,
+  restrictTo("company", "admin"),
+  getCompanyMaintenanceSummary,
+);
+
+/**
+ * @openapi
+ * /companies/maintenance:
+ *   post:
+ *     tags: [Companies]
+ *     summary: Schedule a maintenance event for the tenant's own fleet
+ *     responses:
+ *       201:
+ *         description: Maintenance event created
+ *       404:
+ *         description: Vehicle not found in this tenant's fleet
+ *       409:
+ *         description: Conflicting confirmed booking overlaps the window
+ */
+router.post(
+  "/maintenance",
+  protect,
+  restrictTo("company", "admin"),
+  createCompanyMaintenance,
+);
+
+/**
+ * @openapi
+ * /companies/maintenance/{id}/complete:
+ *   patch:
+ *     tags: [Companies]
+ *     summary: Complete one of the tenant's maintenance events
+ *     responses:
+ *       200:
+ *         description: Maintenance event completed
+ *       404:
+ *         description: Maintenance event not found
+ */
+router.patch(
+  "/maintenance/:id/complete",
+  protect,
+  restrictTo("company", "admin"),
+  completeCompanyMaintenance,
+);
+
+/**
+ * @openapi
+ * /companies/maintenance/{vehicleId}/release:
+ *   post:
+ *     tags: [Companies]
+ *     summary: Re-enable one of the tenant's quarantined vehicles
+ *     responses:
+ *       200:
+ *         description: Vehicle released
+ *       404:
+ *         description: Vehicle not found
+ */
+router.post(
+  "/maintenance/:vehicleId/release",
+  protect,
+  restrictTo("company", "admin"),
+  releaseCompanyMaintenanceVehicle,
 );
 
 /**

@@ -14,6 +14,7 @@ import {
   Settings,
   ShieldCheck,
   Star,
+  Wrench,
 } from "lucide-react";
 import { useAuth } from "../../context/useAuth";
 
@@ -27,6 +28,7 @@ interface NavEntry {
 const NAV_ENTRIES: NavEntry[] = [
   { path: "/company", labelKey: "company.layout.navOverview", icon: LayoutDashboard, enabled: true },
   { path: "/company/fleet", labelKey: "company.layout.navFleet", icon: Car, enabled: true },
+  { path: "/company/maintenance", labelKey: "company.layout.navMaintenance", icon: Wrench, enabled: true },
   { path: "/company/bookings", labelKey: "company.layout.navBookings", icon: CalendarDays, enabled: true },
   { path: "/company/messages", labelKey: "company.layout.navMessages", icon: MessageSquareText, enabled: false },
   { path: "/company/payouts", labelKey: "company.layout.navPayouts", icon: Banknote, enabled: false },
@@ -37,8 +39,8 @@ const NAV_ENTRIES: NavEntry[] = [
 /**
  * Fleet-operator shell: fixed sidebar + topbar, mirrors the admin layout so the
  * operator area gets the same workspace chrome instead of the consumer navbar.
- * Only the overview, fleet and bookings entries are live today; the rest are
- * marked as coming soon.
+ * Only the overview, fleet, maintenance and bookings entries are live today;
+ * the rest are marked as coming soon.
  */
 export const CompanyLayout: React.FC = () => {
   const { t, i18n } = useTranslation();
