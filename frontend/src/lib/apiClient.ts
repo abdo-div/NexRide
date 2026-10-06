@@ -59,11 +59,13 @@ export async function request<T>(
   path: string,
   { method = "GET", body, auth = true, signal, headers: extraHeaders }: RequestOptions = {},
 ): Promise<T> {
+  const isFormData =
+    typeof FormData !== "undefined" && body instanceof FormData;
   const headers: Record<string, string> = {
     Accept: "application/json",
     ...extraHeaders,
   };
-  if (body !== undefined) headers["Content-Type"] = "application/json";
+  if (body !== undefined && !isFormData) headers["Content-Type"] = "application/json";
 
   if (auth) {
     const token = getToken();
@@ -75,7 +77,7 @@ export async function request<T>(
     response = await fetch(`${API_BASE_URL}${path}`, {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
       credentials: "include",
       signal,
     });

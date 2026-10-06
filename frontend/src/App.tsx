@@ -8,6 +8,8 @@ import { AuthProvider } from "./context/AuthContext";
 import HomePage from "./pages/HomePage";
 import { AdminRoute } from "./components/admin/AdminRoute";
 import { AdminLayout } from "./components/admin/AdminLayout";
+import { CompanyRoute } from "./components/company/CompanyRoute";
+import { CompanyLayout } from "./components/company/CompanyLayout";
 
 // Only the landing page is needed for the initial public load. Browsing, auth,
 // booking, checkout and payment screens are separate chunks so a first-time
@@ -77,6 +79,31 @@ const AdminReportsPage = lazy(() =>
 const AdminSettingsPage = lazy(() =>
   import("./pages/admin/AdminSettingsPage").then((module) => ({
     default: module.AdminSettingsPage,
+  })),
+);
+const CompanyDashboardPage = lazy(() =>
+  import("./pages/company/CompanyDashboardPage").then((module) => ({
+    default: module.CompanyDashboardPage,
+  })),
+);
+const CompanyBookingsPage = lazy(() =>
+  import("./pages/company/CompanyBookingsPage").then((module) => ({
+    default: module.CompanyBookingsPage,
+  })),
+);
+const CompanyFleetPage = lazy(() =>
+  import("./pages/company/CompanyFleetPage").then((module) => ({
+    default: module.CompanyFleetPage,
+  })),
+);
+const CompanyVehiclePage = lazy(() =>
+  import("./pages/company/CompanyVehiclePage").then((module) => ({
+    default: module.CompanyVehiclePage,
+  })),
+);
+const CompanyVehicleEditPage = lazy(() =>
+  import("./pages/company/CompanyVehicleEditPage").then((module) => ({
+    default: module.CompanyVehicleEditPage,
   })),
 );
 
@@ -255,6 +282,23 @@ function App() {
             <Route path="maintenance" element={<AdminMaintenancePage />} />
             <Route path="reports" element={<AdminReportsPage />} />
             <Route path="settings" element={<AdminSettingsPage />} />
+          </Route>
+
+          <Route
+            path="/company"
+            element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <CompanyRoute>
+                  <CompanyLayout />
+                </CompanyRoute>
+              </Suspense>
+            }
+          >
+            <Route index element={<CompanyDashboardPage />} />
+            <Route path="bookings" element={<CompanyBookingsPage />} />
+            <Route path="fleet" element={<CompanyFleetPage />} />
+            <Route path="fleet/:vehicleId" element={<CompanyVehiclePage />} />
+            <Route path="fleet/:vehicleId/edit" element={<CompanyVehicleEditPage />} />
           </Route>
         </Routes>
       </AuthProvider>
