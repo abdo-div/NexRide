@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import Company from "../models/Company_model.js";
+import Vehicle from "../models/vehicle_model.js";
 import AppError from "../utils/appError.js";
 import APIFeatures from "../utils/APIFeatures.js";
 import { runPaginatedQuery } from "../utils/paginatedQuery.js";
@@ -119,6 +121,115 @@ export const updateCompanyProfileByOwner = async (companyId, updateData) => {
   }
 
   return company;
+};
+
+const SETTINGS_PROFILE_FIELDS = [
+  "name",
+  "email",
+  "phone",
+  "city",
+  "address",
+  "description",
+  "logo",
+];
+
+/** Percentage of the public-facing profile fields that are actually filled in. */
+const profileCompleteness = (company) => {
+  const filled = SETTINGS_PROFILE_FIELDS.filter(
+    (field) =>
+      company[field] && String(company[field]).trim().length > 0,
+  ).length;
+  return Math.min(100, Math.round((filled / SETTINGS_PROFILE_FIELDS.length) * 100));
+};
+
+/**
+ * Tenant-scoped settings payload. Returns the operator's own profile — including
+ * the normally private commercial-registry number — plus a live readiness deck
+ * derived from real records: fleet posture from the vehicle register and pickup
+ * hubs from the distinct pickup locations actually in use today.
+ */
+export const fetchCompanySettings = async (companyId) => {
+  if (!companyId) {
+    throw new AppError("Please provide a valid company tenant.", 400);
+  }
+
+  const company = await Company.findById(companyId).select(
+    "+commercialRegisterNumber +deletedAt",
+  );
+
+  if (!company) {
+    throw new AppError("No company found for this tenant.", 404);
+  }
+
+  const scope = {
+    companyId: new mongoose.Types.ObjectId(String(companyId)),
+    deletedAt: null,
+  };
+
+  const [report] = await Vehicle.aggregate([
+    { $match: scope },
+    {
+      $facet: {
+        posture: [
+          {
+            $group: {
+              _id: null,
+              total: { $sum: 1 },
+              published: {
+                $sum: { $cond: [{ $eq: ["$listingStatus", "PUBLISHED"] }, 1, 0] },
+              },
+            },
+          },
+        ],
+        hubs: [
+          {
+            $group: {
+              _id: "$pickupLocation",
+              city: { $first: "$city" },
+              vehicles: { $sum: 1 },
+            },
+          },
+          { $sort: { vehicles: -1 } },
+        ],
+      },
+    },
+  ]);
+
+  const posture = report?.posture?.[0] ?? { total: 0, published: 0 };
+  const rawHubs = Array.isArray(report?.hubs) ? report.hubs : [];
+
+  return {
+    profile: {
+      _id: company._id,
+      name: company.name,
+      subdomain: company.subdomain,
+      slug: company.slug,
+      description: company.description ?? "",
+      logo: company.logo ?? "",
+      email: company.email,
+      phone: company.phone,
+      city: company.city,
+      address: company.address,
+      commercialRegisterNumber: company.commercialRegisterNumber ?? "",
+      status: company.status,
+      approvedAt: company.approvedAt ?? null,
+      createdAt: company.createdAt ?? null,
+      customCommissionRate: company.customCommissionRate ?? null,
+    },
+    readiness: {
+      verified: company.status === "APPROVED",
+      completeness: profileCompleteness(company),
+      hubs: rawHubs.length,
+      fleet: posture.total,
+      published: posture.published,
+    },
+    hubs: rawHubs.map((hub, index) => ({
+      name: hub._id,
+      city: hub.city,
+      vehicles: hub.vehicles,
+      primary: index === 0,
+    })),
+  };
 };
 
 /**

@@ -53,6 +53,23 @@ const reviewSchema = new mongoose.Schema(
       trim: true,
       maxlength: [1000, "Review text cannot exceed 1000 characters"],
     },
+
+    // -------------------------------------------------------------------------
+    // Company Response
+    // -------------------------------------------------------------------------
+    companyResponse: {
+      response: {
+        type: String,
+        trim: true,
+        maxlength: [1000, "Company response cannot exceed 1000 characters"],
+        default: null,
+      },
+      respondedAt: {
+        type: Date,
+        default: null,
+      },
+      _id: false,
+    },
   },
   {
     timestamps: true,
