@@ -1452,6 +1452,7 @@
       "tripoliHub": "Tripoli Hub",
       "navOverview": "Overview",
       "navFleet": "Fleet",
+      "navMaintenance": "Maintenance",
       "navBookings": "Bookings",
       "navMessages": "Messages",
       "navPayouts": "Payouts",
@@ -1860,6 +1861,119 @@
         "titleAr": "لا توجد مركبات بعد",
         "subtitle": "Vehicles added to your program will appear in the fleet register once they are listed.",
         "hint": "Tip: adjust or clear the filters to widen the register."
+      }
+    },
+    "maintenance": {
+      "title": "Maintenance & Inspection",
+      "titleAr": "الصيانة والفحص",
+      "scopedTenant": "Tenant-scoped live ledger",
+      "subtitle": "Live maintenance ledger",
+      "subtitleAr": "سجل الصيانة المباشر",
+      "liveChip": "Live Data",
+      "refresh": "Refresh",
+      "scheduleInspection": "Schedule Inspection",
+      "addRecord": "+ Add Maintenance Record",
+      "recordCount": "{{count}} records",
+      "soon": "Coming soon",
+      "loadError": "Could not load the maintenance ledger. Check your connection and try again.",
+      "retry": "Try again",
+      "disclaimer": "Safe dispatch is enforced with real quarantine locks. Record {{code}} is part of a live sequence of {{count}} service events.",
+      "toasts": {
+        "created": "Maintenance record created and vehicle locked from dispatch.",
+        "completed": "Work marked complete.",
+        "released": "Vehicle released back to the fleet.",
+        "error": "Something went wrong. Check the record and try again."
+      },
+      "kpis": {
+        "inService": "In-Service Fleet",
+        "units": "units",
+        "inServiceSub": "{{inProgress}} in service · {{quarantined}} quarantined",
+        "dueInspection": "Due for Inspection",
+        "soon": "Inspection is coming soon",
+        "upcoming": "Upcoming in 7 Days",
+        "upcomingSub": "{{count}} in next 7 days",
+        "mtd": "Maintenance MTD",
+        "mtdSub": "{{monthLabel}} · avg {{avg}}",
+        "loading": "Loading…",
+        "overdueLock": "{{count}} overdue & locked"
+      },
+      "deck": {
+        "title": "Fleet Operational Health",
+        "available": "Available",
+        "inService": "In Service",
+        "unavailable": "Unavailable",
+        "overdue": "Overdue",
+        "totalUnits": "of {{count}} fleet units",
+        "actionRequired": "Action required: {{count}} backlogged service units are unavailable.",
+        "noAction": "All cleared — no service backlog.",
+        "openRecord": "View record"
+      },
+      "expenses": {
+        "title": "Maintenance Expenses",
+        "mtd": "MTD Spend",
+        "avgPerUnit": "Avg per Unit",
+        "completed": "Completed",
+        "inProgress": "In Progress",
+        "trendSoon": "Monthly trend arrives with inspection history — coming soon.",
+        "asOf": "As of {{monthLabel}}",
+        "loading": "Loading…"
+      },
+      "filters": {
+        "searchPlaceholder": "Search by vehicle, ref or scope…",
+        "status": "Service Status",
+        "statusAll": "All Statuses",
+        "category": "Maintenance Type",
+        "categoryAll": "All Types",
+        "inspection": "Inspection Result",
+        "soonLabel": "Inspection — coming soon",
+        "simulateEmpty": "Preview empty state",
+        "simulateEmptyHint": "Developer preview: render the ledger as if no records existed",
+        "reset": "Reset"
+      },
+      "table": {
+        "title": "Maintenance Records",
+        "serialized": "Serialized per tenant",
+        "vehicle": "Vehicle & ID",
+        "scope": "Type & Scope",
+        "serviceDate": "Service Date",
+        "nextService": "Next Service",
+        "cost": "Cost",
+        "status": "Service Status",
+        "inspection": "Inspection Result",
+        "actions": "Actions",
+        "empty": "No maintenance records match this view yet.",
+        "completeWork": "Mark work complete",
+        "details": "Details"
+      },
+      "drawer": {
+        "inspectionTag": "Inspection",
+        "dispatchBlocked": "Quarantine active — dispatch locked",
+        "dispatchBlockedSub": "Release the vehicle from quarantine or complete the work to restore dispatch eligibility.",
+        "serviceType": "Service Type",
+        "serviceDate": "Service Date",
+        "nextService": "Next Service",
+        "location": "Location & Bay",
+        "technician": "Lead Technician",
+        "costTitle": "Cost Breakdown",
+        "estimated": "Estimated",
+        "total": "Total",
+        "notes": "Technician Notes",
+        "invoices": "Attached Invoices",
+        "close": "Close",
+        "completeWork": "Complete Work",
+        "release": "Release & Re-Enable",
+        "releaseConfirm": "Release this vehicle from quarantine? It becomes dispatchable again immediately.",
+        "saving": "Saving…",
+        "completed": "Work Completed"
+      },
+      "upcoming": {
+        "title": "Upcoming Scheduled Maintenance",
+        "empty": "No pending service records inside the upcoming window."
+      },
+      "mot": {
+        "title": "Safety & MoT Inspection Registry",
+        "subtitle": "Centralized annual inspection scheduling, certificate storage and roadside-compliance health is not exposed yet.",
+        "download": "Download Registry"
       }
     },
     "vehiclePage": {

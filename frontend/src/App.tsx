@@ -106,6 +106,11 @@ const CompanyVehicleEditPage = lazy(() =>
     default: module.CompanyVehicleEditPage,
   })),
 );
+const CompanyMaintenancePage = lazy(() =>
+  import("./pages/company/CompanyMaintenancePage").then((module) => ({
+    default: module.CompanyMaintenancePage,
+  })),
+);
 
 function RouteLoadingFallback() {
   return (
@@ -299,6 +304,7 @@ function App() {
             <Route path="fleet" element={<CompanyFleetPage />} />
             <Route path="fleet/:vehicleId" element={<CompanyVehiclePage />} />
             <Route path="fleet/:vehicleId/edit" element={<CompanyVehicleEditPage />} />
+            <Route path="maintenance" element={<CompanyMaintenancePage />} />
           </Route>
         </Routes>
       </AuthProvider>

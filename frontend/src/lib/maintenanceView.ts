@@ -21,6 +21,21 @@ export const eventVehicleRef = (event: MaintenanceEventDto): string =>
     ? `#VR-${(vehicleOf(event)?._id ?? "").slice(-6).toUpperCase()}`
     : `#VR-${(event.vehicleId ?? "").toString().slice(-6).toUpperCase()}`;
 
+/** "Make Model (Year)" title for a populated event, falling back to its ref. */
+export const vehicleTitleOf = (event: MaintenanceEventDto): string => {
+  const vehicle = vehicleOf(event);
+  const base = [vehicle?.make, vehicle?.model].filter(Boolean).join(" ");
+  const title = base || eventVehicleRef(event);
+  return vehicle?.year ? `${title} (${vehicle.year})` : title;
+};
+
+/** "Make Model" without the year, for dense table cells. */
+export const vehicleShortTitle = (event: MaintenanceEventDto): string => {
+  const vehicle = vehicleOf(event);
+  const base = [vehicle?.make, vehicle?.model].filter(Boolean).join(" ");
+  return base || eventVehicleRef(event);
+};
+
 export const eventCodeOf = (event: MaintenanceEventDto): string =>
   `MNT-${event._id.slice(-6).toUpperCase()}`;
 
