@@ -47,6 +47,7 @@ export interface AdminCompanyDto {
   slug?: string;
   description?: string;
   logo?: string;
+  applicationRef?: string;
   email?: string;
   phone?: string;
   city: string;

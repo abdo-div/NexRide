@@ -181,6 +181,7 @@ app.use(
     "/api/v1/users/login",
     "/api/v1/users/forgot-password",
     "/api/v1/users/reset-password",
+    "/api/v1/companies/apply",
   ],
   authLimiter,
 );

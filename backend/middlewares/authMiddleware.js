@@ -15,9 +15,14 @@ const APPROVED_COMPANY_STATUS = Company.schema
   .enumValues.find((status) => status === "APPROVED");
 
 /**
- * 1. PROTECT: Authenticates JWT token and populates user & tenant context
+ * Shared JWT authentication + tenant resolution. `enforceCompanyApproval`
+ * reproduces the historical contract: company-role users are only admitted to
+ * protected routes once their company is APPROVED. The lenient variant keeps
+ * the exact same identity/account checks but lets PENDING or REJECTED owners
+ * through so they can reach their application-status screen.
  */
-export const protect = catchAsync(async (req, res, next) => {
+const authenticate = async (req, res, next, options) => {
+  const { enforceCompanyApproval = true } = options;
   let token;
 
   if (
@@ -71,7 +76,13 @@ export const protect = catchAsync(async (req, res, next) => {
       ? await Company.findById(currentUser.company)
       : await Company.findOne({ ownerId: currentUser._id });
 
-    if (!company || company.status !== APPROVED_COMPANY_STATUS) {
+    if (!company) {
+      return next(
+        new AppError("Your company profile was not found.", 404),
+      );
+    }
+
+    if (enforceCompanyApproval && company.status !== APPROVED_COMPANY_STATUS) {
       return next(
         new AppError(
           "Your company is not approved or is suspended.",
@@ -87,7 +98,22 @@ export const protect = catchAsync(async (req, res, next) => {
   res.locals.user = currentUser;
 
   next();
-});
+};
+
+/**
+ * Standard protected-route guard: company-role users need an APPROVED company.
+ */
+export const protect = catchAsync((req, res, next) =>
+  authenticate(req, res, next, { enforceCompanyApproval: true }),
+);
+
+/**
+ * Lenient guard for application-status self-service: the owner may read their
+ * own application even while it is PENDING or REJECTED.
+ */
+export const protectAllowPendingCompany = catchAsync((req, res, next) =>
+  authenticate(req, res, next, { enforceCompanyApproval: false }),
+);
 
 /**
  * 2. RESTRICT TO: Role-Based Access Control (RBAC)

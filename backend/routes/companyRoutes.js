@@ -11,12 +11,17 @@ import {
   getCompanySettings,
 } from "../controllers/companyController.js";
 import { registerCompanyOwner } from "../controllers/companyRegistrationController.js";
+import {
+  uploadApplicationDocuments,
+  applyCompany,
+  getMyApplicationStatus,
+} from "../controllers/companyApplicationController.js";
 import { getCompanyDashboard } from "../controllers/companyDashboardController.js";
 import { getCompanyBookings } from "../controllers/companyBookingsController.js";
 import { getCompanyReviews, replyToCompanyReview } from "../controllers/companyReviewsController.js";
 import { getCompanyFleet } from "../controllers/companyFleetController.js";
 import { getCompanyVehicleDetail } from "../controllers/companyVehicleController.js";
-import { protect, restrictTo } from "../middlewares/authMiddleware.js";
+import { protect, restrictTo, protectAllowPendingCompany } from "../middlewares/authMiddleware.js";
 import { validateSubdomain } from "../middlewares/subdomainValidator.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import {
@@ -70,6 +75,71 @@ router.get("/", getAllCompanies);
  *         description: Storefront not found
  */
 router.get("/storefront/:identifier", getCompanyByStorefrontIdentifier);
+
+/**
+ * @openapi
+ * /companies/apply:
+ *   post:
+ *     tags: [Companies]
+ *     summary: Public partner-application wizard submission (self-registration)
+ *     description: >-
+ *       Creates the applicant's company-role account plus a PENDING operator
+ *       company in one submission. Accepts `multipart/form-data` with the
+ *       structured wizard fields in a `data` JSON part and the verification
+ *       documents as `documents` file parts. Signs the applicant in on success.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-encoded wizard payload (applicant, company, fleet, hubs, policy, payout, documents)
+ *               documents:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       201:
+ *         description: Applicant account + PENDING company created; session started
+ *       400:
+ *         description: Validation error or invalid payload
+ *       409:
+ *         description: Email or company name already taken
+ */
+router.post("/apply", uploadApplicationDocuments, applyCompany);
+
+/**
+ * @openapi
+ * /companies/me/application:
+ *   get:
+ *     tags: [Companies]
+ *     summary: Authenticated owner's partner-application status
+ *     description: >-
+ *       Returns the application record for the signed-in fleet operator, even
+ *       while the company is PENDING or REJECTED, so the applicant can track
+ *       the compliance review, see rejection notes, and revisit the submitted
+ *       entity specification. Mounted before /:id so the literal path is not
+ *       captured as a company identifier; uses a lenient auth guard on purpose.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: The owner's application DTO
+ *       401:
+ *         description: Not authenticated
+ *       404:
+ *         description: No application found for this account
+ */
+router.get(
+  "/me/application",
+  protectAllowPendingCompany,
+  getMyApplicationStatus,
+);
 
 /**
  * @openapi

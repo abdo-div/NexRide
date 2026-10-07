@@ -162,6 +162,118 @@ const companySchema = new mongoose.Schema(
     },
 
     // -------------------------------------------------------------------------
+    // Partner Application & Onboarding Profile (public application wizard)
+    // -------------------------------------------------------------------------
+    // Human-readable application reference shown on the applicant's status page.
+    applicationRef: {
+      type: String,
+      uppercase: true,
+      trim: true,
+      unique: true,
+      sparse: true,
+      index: true,
+    },
+    // Fleet size band declared during onboarding.
+    fleetSizeTier: {
+      type: String,
+      enum: {
+        values: ["BOUTIQUE", "MIDTIER", "SELECTED", "MAJOR", "ENTERPRISE"],
+        message: "Fleet tier must be BOUTIQUE, MIDTIER, SELECTED, MAJOR, or ENTERPRISE",
+      },
+      default: null,
+    },
+    // Vehicle categories the operator plans to offer through NexRide.
+    vehicleCategories: {
+      type: [
+        {
+          type: String,
+          enum: {
+            values: [
+              "ECONOMY",
+              "COMPACT",
+              "SEDAN",
+              "SUV",
+              "LUXURY_EXECUTIVE",
+              "PASSENGER_VAN",
+              "PICKUP_UTILITY",
+              "CHAFFEURED_ARMORED",
+            ],
+            message: "Invalid vehicle category",
+          },
+        },
+      ],
+      default: [],
+    },
+    // Libyan cities where the operator is active.
+    operatingHubs: {
+      type: [String],
+      default: [],
+    },
+    // Depot & handover locations where customers collect or inspect vehicles.
+    depots: {
+      type: [
+        {
+          name: { type: String, trim: true, required: false },
+          address: { type: String, trim: true, required: false },
+          hubType: {
+            type: String,
+            enum: ["PRIMARY", "AIRPORT_TERMINAL", "BRANCH"],
+            default: "BRANCH",
+          },
+          phone: { type: String, trim: true, default: "" },
+          hours: { type: String, trim: true, default: "" },
+        },
+      ],
+      default: [],
+    },
+    // Commercial rental policies agreed during onboarding.
+    rentalPolicy: {
+      type: {
+        minDurationDays: Number,
+        maxDurationDays: Number,
+        minDriverAge: Number,
+        cancellationPolicy: {
+          type: String,
+          enum: ["FLEXIBLE", "MODERATE", "STRICT"],
+          default: "MODERATE",
+        },
+        depositAmountLYD: Number,
+        additionalDriverAllowed: Boolean,
+        inVehicleSmokingAllowed: Boolean,
+      },
+      default: {},
+    },
+    // Bank settlement rail selected during onboarding (direct RTGS payout).
+    payout: {
+      type: {
+        bankName: { type: String, trim: true, default: "" },
+        iban: { type: String, trim: true, uppercase: true, default: "" },
+        accountName: { type: String, trim: true, default: "" },
+      },
+      default: {},
+    },
+    // Documents uploaded as part of the partner application.
+    applicationDocuments: {
+      type: [
+        {
+          name: { type: String, trim: true, default: "" },
+          kind: {
+            type: String,
+            enum: {
+              values: ["COMMERCIAL_REGISTRY", "OWNER_ID", "TRANSPORT_LICENSE", "INSURANCE", "OTHER"],
+              message: "Invalid document kind",
+            },
+            default: "OTHER",
+          },
+          mimeType: { type: String, default: "" },
+          size: { type: Number, default: 0 },
+          url: { type: String, default: "" },
+        },
+      ],
+      default: [],
+    },
+
+    // -------------------------------------------------------------------------
     // Soft Delete & Operational State
     // -------------------------------------------------------------------------
     deletedAt: {

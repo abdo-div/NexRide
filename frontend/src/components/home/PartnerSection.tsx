@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 import { Rocket, ArrowRight, BookOpen } from "lucide-react";
 import { PartnerDashboardMock } from "./PartnerDashboardMock";
 import { PartnerMetrics } from "./PartnerMetrics";
@@ -37,13 +38,13 @@ export const PartnerSection: React.FC = () => {
 
           {/* Action Buttons */}
           <div className="flex flex-wrap items-center gap-4">
-            <a
-              href="#list-fleet"
+            <Link
+              to="/partner/apply"
               className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-extrabold text-xs shadow-lg shadow-amber-500/20 flex items-center gap-2 transition-all active:scale-95"
             >
               <span>{t("home.partners.listYourFleet")}</span>
               <ArrowRight className="w-4 h-4 rtl:rotate-180" />
-            </a>
+            </Link>
 
             <a
               href="#partner-guidelines"

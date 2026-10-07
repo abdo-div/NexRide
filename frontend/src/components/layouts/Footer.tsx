@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 import { Globe, Share2, MessageSquare, Phone } from "lucide-react";
 import type { FooterSection } from "../../types/footer";
 import {
@@ -27,6 +28,7 @@ export const Footer: React.FC = () => {
   const PARTNER_LINKS: FooterSection = {
     title: t("footer.forPartners"),
     links: [
+      { label: t("footer.partnerLinks.becomePartner"), href: "/partner/apply" },
       { label: t("footer.partnerLinks.fleetSaaS"), href: "#saas" },
       { label: t("footer.partnerLinks.partnerPortal"), href: "#login" },
       { label: t("footer.partnerLinks.agencyGuidelines"), href: "#guidelines" },
@@ -103,12 +105,21 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2.5">
               {PARTNER_LINKS.links.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-xs text-slate-400 hover:text-white font-medium transition-colors"
-                  >
-                    {link.label}
-                  </a>
+                  {link.href.startsWith("/") ? (
+                    <Link
+                      to={link.href}
+                      className="text-xs text-slate-400 hover:text-white font-medium transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a
+                      href={link.href}
+                      className="text-xs text-slate-400 hover:text-white font-medium transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>

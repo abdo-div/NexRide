@@ -22,6 +22,10 @@ const BookingConfirmationPage = lazy(() =>
 );
 const PaymentPage = lazy(() => import("./pages/PaymentPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
+const PartnerApplyPage = lazy(() => import("./pages/partner/PartnerApplyPage"));
+const CompanyApplicationStatusPage = lazy(
+  () => import("./pages/company/CompanyApplicationStatusPage"),
+);
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 const MyBookingsPage = lazy(() => import("./pages/MyBookingsPage"));
 const BookingDetailsPage = lazy(() => import("./pages/BookingDetailsPage"));
@@ -251,6 +255,24 @@ function App() {
                 <LazyRoute>
                   <AuthPage />
                 </LazyRoute>
+              }
+            />
+            <Route
+              path="/partner/apply"
+              element={
+                <LazyRoute>
+                  <PartnerApplyPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="/company/application-status"
+              element={
+                <CompanyRoute>
+                  <LazyRoute>
+                    <CompanyApplicationStatusPage />
+                  </LazyRoute>
+                </CompanyRoute>
               }
             />
             <Route
