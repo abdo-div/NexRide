@@ -117,6 +117,11 @@ const CompanyVehicleEditPage = lazy(() =>
     default: module.CompanyVehicleEditPage,
   })),
 );
+const CompanyVehicleAddPage = lazy(() =>
+  import("./pages/company/CompanyVehicleAddPage").then((module) => ({
+    default: module.CompanyVehicleAddPage,
+  })),
+);
 const CompanyMaintenancePage = lazy(() =>
   import("./pages/company/CompanyMaintenancePage").then((module) => ({
     default: module.CompanyMaintenancePage,
@@ -362,6 +367,7 @@ function App() {
             <Route index element={<CompanyDashboardPage />} />
             <Route path="bookings" element={<CompanyBookingsPage />} />
             <Route path="fleet" element={<CompanyFleetPage />} />
+            <Route path="fleet/new" element={<CompanyVehicleAddPage />} />
             <Route path="fleet/:vehicleId" element={<CompanyVehiclePage />} />
             <Route path="fleet/:vehicleId/edit" element={<CompanyVehicleEditPage />} />
             <Route path="maintenance" element={<CompanyMaintenancePage />} />

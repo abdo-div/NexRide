@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 import { ChevronRight, Download, Plus, ShieldCheck } from "lucide-react";
 import type { CompanyFleetData } from "../../types/companyFleet";
 
@@ -78,18 +79,16 @@ export const CompanyFleetHeader: React.FC<CompanyFleetHeaderProps> = ({
               ({t("company.fleetPage.exportAr")})
             </span>
           </button>
-          <button
-            type="button"
-            disabled
-            title={t("company.fleetPage.soon")}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-all hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-60"
+          <Link
+            to="/company/fleet/new"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-all hover:bg-[#1D4ED8]"
           >
             <Plus className="h-[18px] w-[18px]" aria-hidden="true" />
             {t("company.fleetPage.addVehicle")}
             <span className="text-xs font-normal text-white/80">
               ({t("company.fleetPage.addVehicleAr")})
             </span>
-          </button>
+          </Link>
         </div>
       </div>
     </div>

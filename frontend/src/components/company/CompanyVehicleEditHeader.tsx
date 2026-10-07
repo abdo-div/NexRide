@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { BadgeCheck, ChevronRight, PenLine, Plus } from "lucide-react";
 import type { CompanyVehicleData } from "../../types/companyVehicle";
 import { categoryLabel } from "./companyFleetUi";
@@ -107,18 +107,16 @@ export const CompanyVehicleEditHeader: React.FC<CompanyVehicleEditHeaderProps> =
                 ({t("company.editVehiclePage.editModeAr")})
               </span>
             </span>
-            <button
-              type="button"
-              disabled
-              title={t("company.vehiclePage.soon")}
-              className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold text-[#565E74] transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+            <Link
+              to="/company/fleet/new"
+              className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold text-[#565E74] transition-colors hover:bg-white hover:text-[#2563EB]"
             >
               <Plus className="h-4 w-4" aria-hidden="true" />
               {t("company.editVehiclePage.addMode")}
               <span className="text-[11px] font-normal text-[#9AA4B5]">
                 ({t("company.editVehiclePage.addModeAr")})
               </span>
-            </button>
+            </Link>
           </div>
         </div>
       </div>

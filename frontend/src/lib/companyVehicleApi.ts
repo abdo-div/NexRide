@@ -14,6 +14,11 @@ export interface CompanyVehicleUpdateResponse {
   data: { vehicle: CompanyVehicleProfile };
 }
 
+export interface CompanyVehicleCreateResponse {
+  status: string;
+  data: { vehicle: CompanyVehicleProfile };
+}
+
 /** JSON patch body for PATCH /cars/:id; a FormData body triggers image upload. */
 export type CompanyVehicleUpdateBody = Record<string, unknown> | FormData;
 
@@ -43,6 +48,15 @@ export const companyVehicleApi = {
       `/companies/fleet/${vehicleId}?${buildQuery(query)}`,
       { signal },
     ),
+  /**
+   * Create a new vehicle (POST /cars). Accepts a FormData body so that images
+   * can be attached alongside the structured fields in a single multipart request.
+   */
+  create: (body: FormData) =>
+    request<CompanyVehicleCreateResponse>("/cars", {
+      method: "POST",
+      body,
+    }),
   /**
    * Update a vehicle (PATCH /cars/:id). The tenant is resolved server-side and
    * the write is scoped to the caller's own fleet. Pass a JSON body of only the
