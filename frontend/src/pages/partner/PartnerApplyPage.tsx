@@ -11,6 +11,7 @@ import {
 } from "../../lib/partnerApplicationView";
 import {
   EMPTY_APPLICATION_DRAFT,
+  type ApplicationStatusCompany,
   type DocumentDraft,
   type PartnerApplicationDraft,
 } from "../../types/companyApplication";
@@ -110,11 +111,43 @@ export const PartnerApplyPage: React.FC = () => {
       const files = documents
         .filter((doc) => doc.file)
         .map((doc) => doc.file as File);
-      await companyApplicationApi.apply(payload, files);
-      // The applicant is NOT signed in: a company account only becomes usable
-      // after an admin approves the request, so they go back to the home page
-      // as a guest instead of landing inside the company dashboard.
-      navigate("/", { replace: true });
+      const response = await companyApplicationApi.apply(payload, files);
+
+      // Build a minimal ApplicationStatusCompany so the status page can render
+      // the full "Application Submitted Successfully" banner immediately, without
+      // requiring an authenticated session (new applicants are NOT signed in).
+      const submittedCompany: ApplicationStatusCompany = {
+        _id: response.data.company._id,
+        applicationRef: response.data.company.applicationRef,
+        status: "PENDING",
+        name: draft.company.name,
+        email: draft.applicant.email,
+        phone: draft.applicant.phoneNumber,
+        city: draft.company.city,
+        address: draft.company.address,
+        commercialRegisterNumber: draft.company.commercialRegisterNumber,
+        fleetSizeTier: draft.fleet.tier ?? null,
+        vehicleCategories: draft.fleet.categories ?? [],
+        operatingHubs: draft.hubs.active ?? [],
+        depots: draft.hubs.depots ?? [],
+        rentalPolicy: draft.policy ?? null,
+        payout: draft.payout.iban
+          ? {
+              bankName: draft.payout.bankName,
+              iban: draft.payout.iban,
+              accountName: draft.payout.accountName,
+            }
+          : null,
+        applicationDocuments: [],
+        rejectionReason: null,
+        createdAt: new Date().toISOString(),
+        approvedAt: null,
+      };
+
+      navigate("/company/application-status", {
+        replace: true,
+        state: { company: submittedCompany },
+      });
     } catch (error) {
       if (error instanceof ApiError && error.fieldErrors.length > 0) {
         // Server-side validation: point the applicant at the exact fields in

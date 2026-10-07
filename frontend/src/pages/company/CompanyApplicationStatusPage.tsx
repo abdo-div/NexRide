@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -42,23 +42,23 @@ const TRIPOLI_TIME_ZONE = "Africa/Tripoli";
 const submissionDateLabel = (value: string | null | undefined): string =>
   value
     ? `${new Intl.DateTimeFormat("en-LY", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-        timeZone: TRIPOLI_TIME_ZONE,
-      }).format(new Date(value))} (UTC+2)`
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      timeZone: TRIPOLI_TIME_ZONE,
+    }).format(new Date(value))} (UTC+2)`
     : "—";
 
 const approvedDateLabel = (value: string | null | undefined): string =>
   value
     ? new Intl.DateTimeFormat("en-LY", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-        timeZone: TRIPOLI_TIME_ZONE,
-      }).format(new Date(value))
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      timeZone: TRIPOLI_TIME_ZONE,
+    }).format(new Date(value))
     : "—";
 
 const queuePosition = (id: string): number => {
@@ -87,14 +87,27 @@ type StepState = "done" | "passed" | "active" | "error" | "queued" | "upcoming";
 export const CompanyApplicationStatusPage: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const location = useLocation();
 
-  const [company, setCompany] = useState<ApplicationStatusCompany | null>(null);
-  const [loading, setLoading] = useState(true);
+  // When PartnerApplyPage navigates here after a successful submission it passes
+  // the freshly-created company object in router state so the page can render
+  // the "Application Submitted Successfully!" banner immediately without
+  // requiring an authenticated API call (new applicants are NOT signed in).
+  const stateCompany = (
+    location.state as { company?: ApplicationStatusCompany } | null
+  )?.company ?? null;
+
+  const [company, setCompany] = useState<ApplicationStatusCompany | null>(stateCompany);
+  const [loading, setLoading] = useState<boolean>(!stateCompany);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
 
   useEffect(() => {
+    // Only fetch from the API if we don't already have data from navigation
+    // state and the user is authenticated (returning company owner).
+    if (stateCompany || !user) return;
+
     let active = true;
     companyApplicationApi
       .myApplication()
@@ -116,9 +129,10 @@ export const CompanyApplicationStatusPage: React.FC = () => {
     return () => {
       active = false;
     };
-  }, [t]);
+  }, [t, user, stateCompany]);
 
   const retry = (): void => {
+    if (!user) return;
     setLoading(true);
     setLoadError(null);
     companyApplicationApi
@@ -239,15 +253,14 @@ export const CompanyApplicationStatusPage: React.FC = () => {
       desc:
         stepStates[1] === "active"
           ? t("partner.status.step2DescActive", {
-              cr: company.commercialRegisterNumber || "—",
-            })
+            cr: company.commercialRegisterNumber || "—",
+          })
           : stepStates[1] === "passed"
             ? t("partner.status.step2DescPassed")
-            : `${t("partner.status.step2DescError")}${
-                company.rejectionReason
-                  ? ` ${company.rejectionReason}`
-                  : ""
-              }`,
+            : `${t("partner.status.step2DescError")}${company.rejectionReason
+              ? ` ${company.rejectionReason}`
+              : ""
+            }`,
       state: stepStates[1] as StepState,
       badge:
         stepStates[1] === "active"
@@ -436,8 +449,8 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                     ? t("partner.status.bannerActionSuspendedDesc")
                     : company.rejectionReason
                       ? t("partner.status.bannerActionNote", {
-                          reason: company.rejectionReason,
-                        })
+                        reason: company.rejectionReason,
+                      })
                       : t("partner.status.bannerActionFallback")}
                 </p>
               </div>
@@ -651,8 +664,8 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                           .join(" & ")}
                         {company.vehicleCategories.length > 2
                           ? ` ${t("partner.status.bentoFleetMore", {
-                              count: company.vehicleCategories.length - 2,
-                            })}`
+                            count: company.vehicleCategories.length - 2,
+                          })}`
                           : ""}
                       </p>
                     </div>
