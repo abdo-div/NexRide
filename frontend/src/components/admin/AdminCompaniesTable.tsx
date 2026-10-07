@@ -215,6 +215,11 @@ export const AdminCompaniesTable: React.FC<AdminCompaniesTableProps> = ({
                     </span>
                   </td>
                   <td className="px-4 py-3.5 whitespace-nowrap">
+                    {c.status === "PENDING" && c.applicationRef ? (
+                      <div className="mb-1 inline-flex items-center rounded-md bg-amber-50 px-1.5 py-0.5 font-mono text-[11px] font-bold text-amber-700">
+                        {c.applicationRef}
+                      </div>
+                    ) : null}
                     <div className="text-sm font-semibold text-[#0B1C30]">
                       {c.createdAt ? formatDate(c.createdAt, i18n.language) : "—"}
                     </div>

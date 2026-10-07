@@ -3,7 +3,7 @@ import { test } from "node:test";
 import jwt from "jsonwebtoken";
 import Company from "../models/Company_model.js";
 import User from "../models/User_model.js";
-import { protect } from "../middlewares/authMiddleware.js";
+import { protect, protectAllowPendingCompany } from "../middlewares/authMiddleware.js";
 
 const userId = "aaaaaaaaaaaaaaaaaaaaaaaa";
 const companyId = "bbbbbbbbbbbbbbbbbbbbbbbb";
@@ -135,6 +135,30 @@ test("suspended or pending companies cannot use old company-user tokens", async 
 
       assert.equal(error.statusCode, 403);
       assert.equal(error.message, "Your company is not approved or is suspended.");
+    });
+  }
+});
+
+test("pending or rejected companies may pass the lenient application-status guard", async (t) => {
+  for (const status of ["PENDING", "REJECTED"]) {
+    await t.test(`company status ${status} is admitted`, async (t) => {
+      withJwtSecret(t);
+      const user = makeUser({ role: "company", company: companyId });
+      const company = { _id: companyId, status };
+      t.mock.method(User, "findById", async () => user);
+      t.mock.method(Company, "findById", async () => company);
+
+      const token = jwt.sign({ id: userId }, jwtSecret, { expiresIn: "1h" });
+      const req = { headers: { authorization: `Bearer ${token}` }, cookies: {} };
+
+      const result = await new Promise((resolve) =>
+        protectAllowPendingCompany(req, { locals: {} }, (error) =>
+          resolve({ error, req }),
+        ),
+      );
+
+      assert.equal(result.error, undefined);
+      assert.equal(result.req.tenantId, companyId);
     });
   }
 });

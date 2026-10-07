@@ -282,6 +282,7 @@
     },
     "forPartners": "FOR PARTNERS",
     "partnerLinks": {
+      "becomePartner": "Become a Partner",
       "fleetSaaS": "Fleet SaaS OS",
       "partnerPortal": "Partner Portal Login",
       "agencyGuidelines": "Agency Guidelines",
@@ -1442,6 +1443,399 @@
     "alreadyPaidTitle": "Booking already paid",
     "alreadyPaidDesc": "This booking has already been settled. View your confirmation below.",
     "viewConfirmation": "View booking confirmation"
+  },
+  "partner": {
+    "breadcrumb": {
+      "home": "Home",
+      "becomePartner": "Become a Partner",
+      "application": "Partner Application"
+    },
+    "hero": {
+      "badge": "B2B Fleet Program",
+      "title": "Grow Your Fleet With NexRide",
+      "titleAr": "انضم لعائلة نيكس رايد",
+      "subtitle": "Publish your rental fleet on the NexRide network, receive reservations across Libya, and get settled weekly to your partner bank account.",
+      "registry": "Verified by DRT & Ministry of Economy"
+    },
+    "benefits": {
+      "reach": {
+        "title": "40K+ Monthly Inquiries",
+        "desc": "Your cars get exposure in front of travellers, companies, and VIP offices."
+      },
+      "manage": {
+        "title": "One Dashboard",
+        "desc": "Track availability, pricing, and reservations from one unified operations panel."
+      },
+      "payouts": {
+        "title": "Weekly Settlements",
+        "desc": "Automated payouts to your bank account with full escrow protection."
+      }
+    },
+    "steps": {
+      "label": "{{n}}. {{title}}",
+      "applicant": "Applicant Details",
+      "company": "Company Records",
+      "rental": "Rental Business",
+      "verification": "Verification",
+      "payouts": "Payout Setup",
+      "submit": "Confirmation",
+      "active": "Active Section",
+      "config": "Config: {{step}}/6",
+      "completed": "Completed",
+      "upcoming": "Upcoming",
+      "edit": "Edit"
+    },
+    "toolbar": {
+      "backStart": "Back to Start",
+      "back": "Back to Step {{n}}",
+      "continueTo": "Continue to Step {{n}}",
+      "autoSaved": "Auto-saved as draft {{time}} ago"
+    },
+    "step1": {
+      "title": "Applicant Basic Details",
+      "subtitle": "Who will be the point of contact for this partnership?",
+      "name": "Full Name",
+      "namePlaceholder": "e.g. Ahmed Ali Al-Mabrouk",
+      "email": "Primary Email",
+      "emailPlaceholder": "you@company.com",
+      "phone": "Phone Number",
+      "phonePlaceholder": "+218 91 234 5678",
+      "password": "Create Password",
+      "passwordHint": "8+ characters, letters & numbers",
+      "passwordConfirm": "Confirm Password",
+      "error": {
+        "name": "Please enter your full name",
+        "email": "Enter a valid email address",
+        "phone": "Enter a valid phone number",
+        "password": "Password must be at least 8 characters",
+        "passwordConfirm": "Passwords do not match"
+      }
+    },
+    "step2": {
+      "title": "Company Official Records",
+      "subtitle": "Legal entity details matching your DRT commercial registry.",
+      "companyName": "Company Legal Name",
+      "companyNamePlaceholder": "e.g. Al-Safwa Rent A Car",
+      "crNumber": "Commercial Register No.",
+      "crNumberPlaceholder": "e.g. CR 4018",
+      "city": "Headquarters City",
+      "cityPlaceholder": "e.g. Tripoli",
+      "address": "Registered HQ Address",
+      "addressPlaceholder": "Airport Road Km 4.5, Industrial District, Tripoli",
+      "error": {
+        "companyName": "Please enter the company legal name",
+        "crNumber": "Please enter the commercial register number",
+        "city": "Please enter the headquarters city",
+        "address": "Please enter the registered address"
+      }
+    },
+    "step3": {
+      "title": "Your Rental Business",
+      "subtitle": "Fleet size, vehicle categories, operating hubs, depots, and rental policies.",
+      "fleetSize": "Fleet Size",
+      "fleetHint": "Total vehicles today",
+      "tiers": {
+        "BOUTIQUE": "Boutique",
+        "MIDTIER": "Mid-Tier",
+        "SELECTED": "Selected",
+        "MAJOR": "Major",
+        "ENTERPRISE": "Enterprise"
+      },
+      "tierValues": {
+        "BOUTIQUE": "1–5 vehicles",
+        "MIDTIER": "6–20 vehicles",
+        "SELECTED": "21–50 vehicles",
+        "MAJOR": "51–100 vehicles",
+        "ENTERPRISE": "100+ vehicles"
+      },
+      "categories": "Vehicle Categories",
+      "categoryOptions": {
+        "ECONOMY": "Economy",
+        "COMPACT": "Compact",
+        "SEDAN": "Sedan",
+        "SUV": "SUV",
+        "LUXURY_EXECUTIVE": "Luxury / Executive",
+        "PASSENGER_VAN": "Passenger Van",
+        "PICKUP_UTILITY": "Pickup / Utility",
+        "CHAFFEURED_ARMORED": "Chauffeur / Armored"
+      },
+      "hubs": "Operating Hubs",
+      "cities": {
+        "TRIPOLI": "Tripoli",
+        "BENGHAZI": "Benghazi",
+        "MISRATA": "Misrata",
+        "ZAWIA": "Zawiya",
+        "TOBRUK": "Tobruk"
+      },
+      "cityAr": {
+        "TRIPOLI": "طرابلس",
+        "BENGHAZI": "بنغازي",
+        "MISRATA": "مصراتة",
+        "ZAWIA": "الزاوية",
+        "TOBRUK": "طبرق"
+      },
+      "depots": "Pickup Depots & Branches",
+      "depotsHint": "Physical locations where renters collect and return vehicles.",
+      "addDepot": "Add a Depot",
+      "depotName": "Depot",
+      "depotNamePlaceholder": "e.g. Tripoli Central Depot",
+      "depotType": "Depot Type",
+      "depotTypes": {
+        "PRIMARY": "Primary Hub",
+        "AIRPORT_TERMINAL": "Airport Terminal",
+        "BRANCH": "Branch"
+      },
+      "depotAddress": "Address",
+      "depotAddressPlaceholder": "Airport Road Km 4.5, Industrial District",
+      "depotPhone": "Depot Phone",
+      "depotHours": "Working Hours",
+      "delete": "Remove depot",
+      "policies": "Rental Policies",
+      "minDuration": "Minimum Rental Duration",
+      "maxDuration": "Maximum Rental Duration",
+      "durations": {
+        "1": "1 day",
+        "7": "7 days",
+        "14": "14 days",
+        "30": "30 days",
+        "60": "60 days",
+        "90": "90 days"
+      },
+      "minAge": "Minimum Driver Age",
+      "ages": {
+        "21": "21 years",
+        "23": "23 years",
+        "25": "25 years",
+        "27": "27 years",
+        "30": "30 years"
+      },
+      "cancellation": "Cancellation Policy",
+      "cancellations": {
+        "FLEXIBLE": "Flexible",
+        "MODERATE": "Moderate",
+        "STRICT": "Strict"
+      },
+      "deposit": "Security Deposit",
+      "depositHint": "Refundable deposit per rental (LYD).",
+      "additionalDriver": "Additional Driver",
+      "additionalDriverHint": "Allow renters to add a co-driver",
+      "smoking": "In-Vehicle Smoking",
+      "smokingHint": "Allow smoking inside the vehicle",
+      "error": {
+        "categories": "Select at least one vehicle category",
+        "hubs": "Select at least one operating hub",
+        "depots": "Add at least one pickup depot",
+        "depotName": "Enter the depot name",
+        "depotAddress": "Enter the depot address",
+        "policyRange": "Max duration cannot be less than min duration"
+      }
+    },
+    "step4": {
+      "title": "Licenses & Documents",
+      "subtitle": "Upload Commercial Registry, Transport License, Insurance, or Owner ID.",
+      "documentLabel": "File Name",
+      "kindLabel": "Document Type",
+      "kinds": {
+        "COMMERCIAL_REGISTRY": "Commercial Registry",
+        "OWNER_ID": "Owner National ID",
+        "TRANSPORT_LICENSE": "Transport License",
+        "INSURANCE": "Insurance Certificate",
+        "OTHER": "Other"
+      },
+      "selectFile": "Choose File",
+      "remove": "Remove document",
+      "add": "Add Another Document",
+      "fileHint": "PDF, JPG, PNG, or WebP · up to 5 MB each · max 4 files",
+      "error": {
+        "documents": "Upload at least one verification document",
+        "name": "Enter a file name"
+      }
+    },
+    "step5": {
+      "title": "Payout Details",
+      "subtitle": "Bank account for weekly escrow settlements.",
+      "bankName": "Bank Name",
+      "bankNamePlaceholder": "e.g. Bank of Jamahiriya",
+      "iban": "IBAN / Account Number",
+      "ibanPlaceholder": "LY12 3456 7890 1234 5678",
+      "accountName": "Account Name",
+      "accountNamePlaceholder": "e.g. Al-Safwa Rent A Car LLC",
+      "note": "Settlements are processed weekly via local RTGS. Funds are escrowed until the booking completes, then released within 1 business day.",
+      "error": {
+        "bankName": "Please enter the bank name",
+        "iban": "Enter a valid IBAN / account number",
+        "accountName": "Please enter the account name"
+      }
+    },
+    "step6": {
+      "title": "Review & Legal Confirmation",
+      "subtitle": "Double-check your details and accept the partner agreement.",
+      "submit": "Submit Application",
+      "summary": {
+        "applicant": "Applicant",
+        "company": "Company",
+        "rentalBusiness": "Rental Business",
+        "categories": "Categories",
+        "hubs": "Operating Hubs",
+        "hubsCount_one": "{{count}} hub",
+        "hubsCount_other": "{{count}} hubs",
+        "depots": "Pickup Depots",
+        "depotsCount_one": "{{count}} depot",
+        "depotsCount_other": "{{count}} depots",
+        "policy": "Policy",
+        "payout": "Payout",
+        "documents": "Documents",
+        "documentCount_one": "{{count}} document",
+        "documentCount_other": "{{count}} documents"
+      },
+      "agreementLabel": "I confirm the above details are accurate, and accept the NexRide Partner Agreement, commission schedule, and escrow settlement terms.",
+      "error": {
+        "agreement": "Please accept the partner agreement to submit"
+      }
+    },
+    "rail": {
+      "status": "Application Status",
+      "stepOf": "Step {{n}} of 6",
+      "percent": "{{p}}%",
+      "editing": "Currently editing details",
+      "listItems": {
+        "1": "Applicant Basic Details",
+        "2": "Company Official Records",
+        "3": "Fleet & Operational Hubs",
+        "4": "Licenses & Documents",
+        "5": "Payout Details",
+        "6": "Legal Confirmation"
+      },
+      "stepDetails": {
+        "1": "Full applicant & contact details",
+        "2": "Commercial registry + HQ city records",
+        "3": "Fleet size, categories, hubs & depots",
+        "4": "Registry certificates and ID scans",
+        "5": "Bank escrow account details",
+        "6": "Declarations & e-signature"
+      },
+      "requirements": "Mandatory Requirements",
+      "requirementItems": {
+        "0": "Active Commercial Registry (DRT)",
+        "1": "Transport License & Insurance",
+        "2": "Minimum 3 dedicated vehicles",
+        "3": "Tripoli or Benghazi hub presence"
+      },
+      "conciergeTitle": "Fleet Concierge Desk",
+      "conciergeSub": "Business hours: Sat–Thu, 9:00–18:00",
+      "conciergeDesc": "Prefer one-on-one guidance? Our partner managers walk you through onboarding and go-live in one week.",
+      "conciergePhone": "+218 91 000 8820",
+      "conciergeWhatsApp": "WhatsApp the Concierge"
+    },
+    "success": {
+      "title": "Application received, {{name}}!",
+      "subtitle": "{{company}} is now under review. Our onboarding team typically responds within two business days.",
+      "eta": "Under Review",
+      "etaDesc": "Average decision time 2 business days",
+      "support": "Dedicated Support",
+      "supportDesc": "Your partner manager contacts you within 24h",
+      "home": "Back to Home",
+      "myAccount": "Go to My Account"
+    },
+    "status": {
+      "breadcrumbHome": "Home",
+      "breadcrumbBecomePartner": "Become a Partner",
+      "breadcrumbCurrent": "Application Status",
+      "pillPending": "PENDING COMPLIANCE REVIEW",
+      "pillApproved": "APPLICATION APPROVED & ACTIVATED",
+      "pillRejected": "ACTION REQUIRED: DOCUMENT REJECTED",
+      "pillSuspended": "ACCOUNT SUSPENDED – CONTACT SUPPORT",
+      "queueLabel": "Queue Position",
+      "queueValue": "#{{position}} in {{hub}} Hub",
+      "bannerPendingTitle": "Application Submitted Successfully!",
+      "bannerPendingSubtitle": "Under review",
+      "bannerPendingDesc": "Thank you for applying to become a NexRide rental fleet partner. Your corporate credentials and depot declaration are securely logged and undergoing legal compliance review.",
+      "bannerApprovedBadge": "APPROVED & LICENSED",
+      "bannerApprovedValidated": "Validated on {{date}}",
+      "bannerApprovedTitle": "Congratulations! Your Partner Account is Active",
+      "bannerApprovedDesc": "Your company has been verified. You can now onboard vehicles, configure dynamic rates, and assign depot dispatchers.",
+      "bannerApprovedCta": "Go to Partner Dashboard",
+      "bannerActionBadge": "ACTION REQUIRED",
+      "bannerActionSuspendedTitle": "Account Suspended",
+      "bannerActionSuspendedDesc": "Your partner account has been suspended. Contact the partner desk to understand the next steps and restore access.",
+      "bannerActionTitle": "Your application needs your attention",
+      "bannerActionNote": "Compliance officer note: \"{{reason}}\"",
+      "bannerActionFallback": "Please review the compliance officer's comments and contact the partner desk to correct your submission.",
+      "bannerActionCta": "Upload Renewed Extract",
+      "refLabel": "Official Application Reference",
+      "refCopyHint": "Copy reference code",
+      "refCopy": "Application ID copied",
+      "metaCompanyName": "Registered Company Name",
+      "metaDirector": "Designated Managing Director",
+      "metaSubmitted": "Submission Timestamp",
+      "metaReviewWindow": "Expected Review Window",
+      "reviewWindowValue": "1–2 Business Days (Fast-Track)",
+      "stepperTitle": "Compliance Verification Stepper",
+      "stepperSubtitle": "Live audit progress across NexRide legal and transport protocols",
+      "stepperStep": "Step {{current}} of {{total}}",
+      "stepDone": "Completed",
+      "stepPassed": "Passed (100% Score)",
+      "stepActive": "In Progress",
+      "stepError": "Correction Needed",
+      "stepQueued": "Queued",
+      "stepUpcoming": "Upcoming",
+      "step1Title": "Application Received & Digitized",
+      "step1Desc": "Encrypted package stored in the Tripoli regional registry • {{date}}",
+      "step2Title": "Commercial Registry & Chamber of Commerce Check",
+      "step2DescActive": "Under verification with the Libyan Ministry of Economy registry ({{cr}}) by the compliance desk.",
+      "step2DescPassed": "Corporate charter registered and valid. Account credentials generated.",
+      "step2DescError": "The Commercial Registry certificate scan is illegible or expired.",
+      "step3Title": "Fleet Safety & Depot Protocol Check",
+      "step3Desc": "Physical depot check ({{address}}) & vehicle GPS tracking hardware validation.",
+      "step4Title": "Partner Agreement & Portal Token Dispatch",
+      "step4Desc": "Digital signature of the master consignment pact & generation of Master Fleet Manager credentials.",
+      "bentoTitle": "Submitted Entity Specification",
+      "bentoHqLabel": "Headquarters & Operating Hubs",
+      "bentoHqValue": "{{hubs}} Hub",
+      "bentoHqSub": "Primary depot: {{depot}} • {{address}}",
+      "bentoHqBays_one": "{{count}} verified dispatch bay",
+      "bentoHqBays_other": "{{count}} verified dispatch bays",
+      "bentoFleetLabel": "Fleet Volume Declaration",
+      "bentoFleetValue": "{{range}} Premium Vehicles",
+      "bentoFleetMore": "+{{count}} more",
+      "bentoFleetCategories": "categories",
+      "bentoDocsLabel": "Compliance Documents",
+      "bentoDocsValue_one": "{{count}} File Attached",
+      "bentoDocsValue_other": "{{count}} Files Attached",
+      "bentoDocsEmpty": "No documents attached",
+      "bentoDocsChecksum": "SHA-256 Checksum Verified",
+      "bentoPayoutLabel": "Disbursement Clearing",
+      "bentoPayoutIban": "IBAN Account: {{iban}}",
+      "bentoPayoutCurrency": "Currency: LYD / USD Dual Settlement Enabled",
+      "bentoPayoutLock": "End-to-end encrypted bank rail",
+      "nextTitle": "What happens while we review?",
+      "next1Title": "Ministry Compliance Audit",
+      "next1Desc": "Our compliance officer validates your commercial registry status, taxi/rental permits, and municipal licenses.",
+      "next2Title": "Depot Inspection Contact",
+      "next2Desc": "NexRide field coordinator will message you on WhatsApp ({{phone}}) to verify your facility address and gate security.",
+      "next3Title": "Portal Activation",
+      "next3Desc": "Upon clearance, you receive credentials to your Fleet Dashboard to import cars, set chauffeur rosters, and take reservations.",
+      "nextTurnaroundLabel": "Average Turnaround Notice",
+      "nextTurnaroundDesc": "92% of partner filings are finalized within 18 working hours. Check your inbox at {{email}}.",
+      "scanLabel": "Submitted Document Scans",
+      "scanSeal": "Verified Seal • Libyan Registry",
+      "scanEncrypted": "Encrypted with AES-GCM 256",
+      "scanValid": "Validated on submission",
+      "supportLabel": "Partner Desk",
+      "supportTitle": "Direct Auditor Assistance",
+      "supportDesc": "Have questions regarding your documentation or want to prioritize an airport fleet? Speak with our Tripoli intake officers:",
+      "supportHotline": "Partner Hotline (Tripoli)",
+      "supportHotlineValue": "+218 21 000 8820",
+      "supportEmail": "Official Compliance Email",
+      "supportEmailValue": "partner-support@nexride.ly",
+      "supportHours": "Available Sun–Thu, 08:30 – 17:30 Libya Standard Time",
+      "printCta": "View Application Summary (PDF)",
+      "homeCta": "Return to NexRide Home",
+      "loadError": "Could not load your application status. Check that you are connected to the backend and try again.",
+      "retry": "Retry"
+    },
+    "formError": "Something went wrong while submitting. Please retry.",
+    "submitFailed": "Submission failed"
   },
   "company": {
     "layout": {
