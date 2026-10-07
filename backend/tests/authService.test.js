@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import Email from "../utils/email.js";
 import User from "../models/User_model.js";
+import Company from "../models/Company_model.js";
 import * as authService from "../services/authService.js";
 import { getClientUrl, resolveClientUrl } from "../config/clientUrl.js";
 import { forgotPassword } from "../controllers/authController.js";
@@ -251,4 +252,69 @@ test("P1-7 signup no longer accepts request host data", async (t) => {
     welcomeUrl === null || String(welcomeUrl).startsWith("https://app.nexride.example"),
     `welcome mail must use the configured origin, received: ${welcomeUrl}`,
   );
+});
+
+const companyUser = () => ({
+  role: "company",
+  company: "600000000000000000000000",
+  async correctPassword() {
+    return true;
+  },
+});
+
+test("partner sign-in is blocked while the company application is PENDING or REJECTED", async (t) => {
+  for (const status of ["PENDING", "REJECTED", "SUSPENDED"]) {
+    t.mock.method(User, "findOne", () => ({ select: async () => companyUser() }));
+    t.mock.method(Company, "findById", () => ({
+      select: () => ({ lean: async () => ({ status }) }),
+    }));
+
+    await assert.rejects(
+      authService.authenticateUser("partner@example.com", "password123"),
+      (err) =>
+        err.statusCode === 403 && /still under review/.test(err.message),
+      `company status ${status} must be blocked from signing in`,
+    );
+  }
+});
+
+test("partner sign-in is blocked when no company record exists yet", async (t) => {
+  t.mock.method(User, "findOne", () => ({ select: async () => companyUser() }));
+  t.mock.method(Company, "findById", () => ({
+    select: () => ({ lean: async () => null }),
+  }));
+
+  await assert.rejects(
+    authService.authenticateUser("partner@example.com", "password123"),
+    (err) => err.statusCode === 403,
+  );
+});
+
+test("partner sign-in is allowed only after the admin approves the company", async (t) => {
+  t.mock.method(User, "findOne", () => ({ select: async () => companyUser() }));
+  t.mock.method(Company, "findById", () => ({
+    select: () => ({ lean: async () => ({ status: "APPROVED" }) }),
+  }));
+
+  const user = await authService.authenticateUser(
+    "partner@example.com",
+    "password123",
+  );
+  assert.equal(user.role, "company");
+});
+
+test("customer sign-in is unaffected by the partner approval gate", async (t) => {
+  const customer = {
+    role: "customer",
+    async correctPassword() {
+      return true;
+    },
+  };
+  t.mock.method(User, "findOne", () => ({ select: async () => customer }));
+
+  const user = await authService.authenticateUser(
+    "customer@example.com",
+    "password123",
+  );
+  assert.equal(user.role, "customer");
 });

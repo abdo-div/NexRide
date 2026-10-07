@@ -1,16 +1,25 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Star, ArrowRight, ShieldCheck } from "lucide-react";
+import { motion } from "framer-motion";
 import type { FleetOperator } from "../../types/operators";
 
 interface OperatorCardProps {
   operator: FleetOperator;
+  index?: number;
 }
 
-export const OperatorCard: React.FC<OperatorCardProps> = ({ operator }) => {
+export const OperatorCard: React.FC<OperatorCardProps> = ({ operator, index = 0 }) => {
   const { t } = useTranslation();
   return (
-    <div className="bg-white rounded-3xl border border-slate-200/80 p-6 flex flex-col justify-between hover:shadow-xl transition-all duration-300 group hover:border-slate-300">
+    <motion.div
+      initial={{ opacity: 0, y: 25 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
+      whileHover={{ y: -6, transition: { duration: 0.2 } }}
+      className="bg-white rounded-3xl border border-slate-200/80 p-6 flex flex-col justify-between hover:shadow-xl hover:shadow-blue-500/5 transition-shadow duration-300 group hover:border-blue-200"
+    >
       <div>
         {/* Header: Logo Initials & Verified Badge */}
         <div className="flex items-center justify-between mb-5">
@@ -73,11 +82,13 @@ export const OperatorCard: React.FC<OperatorCardProps> = ({ operator }) => {
       {/* View Agency Fleet Button */}
       <a
         href={`#operator-${operator.id}`}
-        className="w-full mt-4 py-2.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors group/btn"
+        className="w-full mt-4 py-2.5 rounded-xl bg-slate-100/80 hover:bg-blue-600 hover:text-white text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors group/btn"
       >
         <span>{t("home.operators.viewFleet")}</span>
-        <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 rtl:rotate-180 rtl:group-hover/btn:-translate-x-1 transition-transform text-slate-600" />
+        <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 rtl:rotate-180 rtl:group-hover/btn:-translate-x-1 transition-transform" />
       </a>
-    </div>
+    </motion.div>
   );
 };
+
+export default OperatorCard;

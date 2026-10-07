@@ -29,7 +29,7 @@ export const PartnerHero: React.FC = () => {
 
   return (
     <>
-      <section className="w-full bg-[#EFF4FF] px-6 lg:px-12 pt-24">
+      <section className="w-full bg-[#EFF4FF] px-6 lg:px-12 pt-8 pb-6">
         <div className="max-w-7xl mx-auto flex flex-col gap-4">
           <nav className="flex items-center gap-1 text-xs font-semibold text-[#434655]" aria-label="Breadcrumb">
             <Link to="/" className="hover:text-[#004AC6] transition-colors">
@@ -70,7 +70,7 @@ export const PartnerHero: React.FC = () => {
         </div>
       </section>
 
-      <section className="w-full px-6 lg:px-12 -mt-4">
+      <section className="w-full px-6 lg:px-12 mt-6">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
           {benefits.map((benefit) => (
             <div

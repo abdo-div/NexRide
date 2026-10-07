@@ -81,8 +81,8 @@ export const TrendingRentals: React.FC<TrendingRentalsProps> = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCars.map((car) => (
-            <TrendingCard key={car.id} car={car} />
+          {filteredCars.map((car, index) => (
+            <TrendingCard key={car.id} car={car} index={index} />
           ))}
         </div>
       )}

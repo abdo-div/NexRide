@@ -1,5 +1,12 @@
-import { lazy, Suspense, type ReactNode } from "react";
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router";
+import { lazy, Suspense, useEffect, type ReactNode } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  Outlet,
+  useLocation,
+} from "react-router";
 import { LoaderCircle } from "lucide-react";
 import NavBar from "./components/layouts/NavBar";
 import { Footer } from "./components/layouts/Footer";
@@ -156,6 +163,20 @@ function LazyRoute({ children }: { children: ReactNode }) {
 }
 
 /**
+ * Resets the window scroll position on every route change so a navigation from
+ * a long page (e.g. fleet) never opens the next route half-way down.
+ */
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
+/**
  * Public site chrome: shared navbar on top and footer at the bottom. Admin
  * routes intentionally render OUTSIDE this shell so the dashboard's own
  * topbar/sidebar are not buried under the consumer-facing navigation.
@@ -175,6 +196,7 @@ function PublicShell() {
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <Routes>
           <Route element={<PublicShell />}>

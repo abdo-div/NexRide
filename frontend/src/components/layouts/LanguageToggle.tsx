@@ -7,13 +7,7 @@ import {
   type LanguageKey,
 } from "../../i18n";
 
-interface LanguageToggleProps {
-  onDark?: boolean;
-}
-
-export const LanguageToggle: React.FC<LanguageToggleProps> = ({
-  onDark = false,
-}) => {
+export const LanguageToggle: React.FC = () => {
   const { i18n } = useTranslation();
   const current = (i18n.language in LANGUAGES
     ? i18n.language
@@ -23,18 +17,14 @@ export const LanguageToggle: React.FC<LanguageToggleProps> = ({
     changeLanguage(current === "ar" ? "en" : "ar");
   };
 
-  const base = onDark
-    ? "text-white hover:text-blue-300 [text-shadow:0_1px_3px_rgba(0,0,0,0.35)] border-white/20"
-    : "text-slate-700 hover:text-blue-600 border-[#E2E8F0]";
-
   return (
     <button
       type="button"
       onClick={toggle}
       aria-label={`Switch to ${current === "ar" ? "English" : "العربية"}`}
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-sm font-semibold transition-colors shrink-0 cursor-pointer ${base}`}
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200/80 text-xs sm:text-sm font-semibold text-slate-700 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50/50 transition-colors shrink-0 cursor-pointer"
     >
-      <Languages className="w-4 h-4" />
+      <Languages className="w-3.5 h-3.5 text-slate-500" />
       <span>{LANGUAGES[current].label}</span>
     </button>
   );

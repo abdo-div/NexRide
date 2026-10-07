@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { AlertTriangle } from "lucide-react";
-import { useAuth } from "../../context/useAuth";
 import { companyApplicationApi } from "../../lib/companyApplicationApi";
+import { ApiError } from "../../lib/apiClient";
 import {
   buildApplicationPayload,
+  mapServerFieldErrors,
   validateStep,
 } from "../../lib/partnerApplicationView";
 import {
@@ -22,7 +23,6 @@ const STEP_COUNT = 6;
 export const PartnerApplyPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { adoptSession } = useAuth();
 
   const [draft, setDraft] = useState<PartnerApplicationDraft>(
     EMPTY_APPLICATION_DRAFT,
@@ -63,23 +63,71 @@ export const PartnerApplyPage: React.FC = () => {
     if (activeStep > 1) setActiveStep((step) => step - 1);
   };
 
+  /**
+   * Re-runs every step's validation right before the request. The tab bar lets
+   * visitors jump straight to step 6, which used to let an incomplete draft be
+   * submitted to the server only to be bounced back with an opaque "invalid
+   * request data" banner. Surfacing the offending steps here keeps the fixes
+   * inline and prevents useless round trips.
+   */
+  const mergeValidationErrors = (
+    serverSteps: Record<number, Record<string, string>> = {},
+  ): number | null => {
+    const combined: Record<number, Record<string, string>> = {};
+    for (let step = 1; step <= STEP_COUNT; step += 1) {
+      const stepErrors = validateStep(step, draft, documents, t, { agreed });
+      if (Object.keys(stepErrors).length > 0) {
+        combined[step] = { ...stepErrors, ...(serverSteps[step] ?? {}) };
+      } else if (serverSteps[step]) {
+        combined[step] = serverSteps[step];
+      }
+    }
+    const stepNumbers = Object.keys(combined).map(Number).sort((a, b) => a - b);
+    if (stepNumbers.length === 0) {
+      setErrors((current) => ({ ...current, ...serverSteps }));
+      return null;
+    }
+    const first = stepNumbers[0];
+    setErrors((current) => ({ ...current, ...combined }));
+    setSubmitError(t("partner.needFixes", { n: first }));
+    setActiveStep(first);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return first;
+  };
+
   const handleSubmit = async (): Promise<void> => {
     setSubmitting(true);
     setSubmitError(null);
+
+    const firstInvalid = mergeValidationErrors();
+    if (firstInvalid !== null) {
+      setSubmitting(false);
+      return;
+    }
+
     try {
       const payload = buildApplicationPayload(draft, documents);
       const files = documents
         .filter((doc) => doc.file)
         .map((doc) => doc.file as File);
-      const response = await companyApplicationApi.apply(payload, files);
-      adoptSession(response.token, response.data.user);
-      navigate("/company/application-status", { replace: true });
+      await companyApplicationApi.apply(payload, files);
+      // The applicant is NOT signed in: a company account only becomes usable
+      // after an admin approves the request, so they go back to the home page
+      // as a guest instead of landing inside the company dashboard.
+      navigate("/", { replace: true });
     } catch (error) {
-      setSubmitError(
-        error instanceof Error ? error.message : t("partner.formError"),
-      );
-      setActiveStep(6);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (error instanceof ApiError && error.fieldErrors.length > 0) {
+        // Server-side validation: point the applicant at the exact fields in
+        // their step rather than showing one generic banner per error.
+        const serverSteps = mapServerFieldErrors(error.fieldErrors);
+        mergeValidationErrors(serverSteps);
+      } else {
+        setSubmitError(
+          error instanceof Error ? error.message : t("partner.formError"),
+        );
+        setActiveStep(6);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     } finally {
       setSubmitting(false);
     }
@@ -87,7 +135,7 @@ export const PartnerApplyPage: React.FC = () => {
 
   return (
     <div className="bg-[#F8FAFC] min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-28 pb-16">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-24 pb-16">
         <PartnerHero />
 
         {submitError ? (

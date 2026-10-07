@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import { CategoryCard } from "./CategoryCard";
 import { HomeSectionError } from "./HomeSectionError";
 import type { VehicleCategory } from "../../types/category";
@@ -21,9 +22,15 @@ export const VehicleCategories: React.FC<VehicleCategoriesProps> = ({
   const showError = error !== null && !loading;
 
   return (
-    <section className="w-full py-16 px-6 lg:px-12 bg-white border-b border-slate-100">
+    <section className="w-full py-16 px-6 lg:px-12 bg-white border-b border-slate-100 overflow-hidden">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.6 }}
+        className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10"
+      >
         <div>
           <span className="text-xs font-bold text-blue-600 uppercase tracking-widest block mb-2">
             {t("home.categories.eyebrow")}
@@ -36,7 +43,7 @@ export const VehicleCategories: React.FC<VehicleCategoriesProps> = ({
         <p className="text-xs sm:text-sm text-slate-500 font-medium max-w-sm leading-relaxed">
           {t("home.categories.subtitle")}
         </p>
-      </div>
+      </motion.div>
 
       {/* Categories Grid */}
       {loading ? (
@@ -52,11 +59,13 @@ export const VehicleCategories: React.FC<VehicleCategoriesProps> = ({
         <HomeSectionError onRetry={onRetry} />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {categories.map((category) => (
-            <CategoryCard key={category.id} category={category} />
+          {categories.map((category, index) => (
+            <CategoryCard key={category.id} category={category} index={index} />
           ))}
         </div>
       )}
     </section>
   );
 };
+
+export default VehicleCategories;

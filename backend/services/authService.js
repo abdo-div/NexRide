@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import User from "../models/User_model.js";
+import Company from "../models/Company_model.js";
 import AppError from "../utils/appError.js";
 import Email from "../utils/email.js";
 import { getJwtSecret } from "../config/jwt.js";
@@ -117,6 +118,20 @@ export const authenticateUser = async (identifier, password) => {
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     throw new AppError("Incorrect email or password", 401);
+  }
+
+  // A partner account only becomes usable once an admin approves the company.
+  // The application wizard no longer signs the applicant in, so a company-role
+  // user whose record is not APPROVED (PENDING/REJECTED/SUSPENDED, or missing)
+  // must not be able to open a session or reach the company dashboard yet.
+  if (user.role === "company") {
+    const company = await Company.findById(user.company).select("status").lean();
+    if (company?.status !== "APPROVED") {
+      throw new AppError(
+        "Your partner application is still under review by NexRide. You will be able to sign in once it is approved.",
+        403
+      );
+    }
   }
 
   return user;

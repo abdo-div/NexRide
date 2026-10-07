@@ -92,6 +92,62 @@ export const buildApplicationPayload = (
     .map((doc) => ({ name: doc.file?.name ?? doc.name, kind: doc.kind })),
 });
 
+/**
+ * Translates the backend's zod field-error paths (e.g. `applicant.email`,
+ * `hubs.depots.0.address`) into the per-step error map the wizard renders
+ * inline, so a rejected submission points the applicant at the exact field
+ * instead of a single baffling banner. Fields the wizard cannot render
+ * (unknown paths) fall back to the submission step.
+ */
+export const mapServerFieldErrors = (
+  fieldErrors: { field: string; message: string }[],
+): Record<number, Record<string, string>> => {
+  const result: Record<number, Record<string, string>> = {};
+  const assign = (
+    step: number,
+    field: string,
+    message: string,
+  ): void => {
+    if (!result[step]) result[step] = {};
+    result[step][field] = message;
+  };
+
+  for (const { field, message } of fieldErrors) {
+    const [section, ...rest] = field.split(".");
+    const tail = rest.join(".");
+
+    switch (section) {
+      case "applicant":
+        assign(1, tail, message);
+        break;
+      case "company":
+        assign(2, tail === "name" ? "companyName" : tail, message);
+        break;
+      case "fleet":
+        assign(3, tail === "categories" ? "categories" : "tier", message);
+        break;
+      case "hubs":
+        if (tail.startsWith("depots.")) assign(3, tail, message);
+        else if (tail === "active") assign(3, "hubs", message);
+        break;
+      case "policy":
+        assign(3, "policyRange", message);
+        break;
+      case "payout":
+        assign(5, tail, message);
+        break;
+      case "documents":
+        assign(4, tail.endsWith(".name") ? tail : "documents", message);
+        break;
+      default:
+        assign(6, "agreement", message);
+        break;
+    }
+  }
+
+  return result;
+};
+
 export const decimalsToLydd = (value: number): string =>
   new Intl.NumberFormat("en-LY", { maximumFractionDigits: 0 }).format(value);
 

@@ -1,41 +1,39 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Car } from "lucide-react";
+import { Zap } from "lucide-react";
 import { Link } from "react-router";
 
 interface NavBarLogoProps {
   onDark?: boolean;
 }
 
-export const NavBarLogo: React.FC<NavBarLogoProps> = ({ onDark = false }) => {
-  const { t } = useTranslation();
+export const NavBarLogo: React.FC<NavBarLogoProps> = () => {
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
+
   return (
-    <div className="flex items-center gap-8 shrink-0">
-      <Link to="/" className="flex items-center gap-2 group">
-        <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-500/20">
-          <Car className="w-5 h-5 text-white" />
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span
-            className={`font-bold text-2xl tracking-tight transition-colors ${
-              onDark
-                ? "text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]"
-                : "text-slate-900"
-            }`}
-          >
-            Nex<span className="text-blue-600">Ride</span>
+    <Link to="/" className="flex items-center gap-2.5 group shrink-0">
+      {/* Brand Icon Circle */}
+      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/25 shrink-0 group-hover:scale-105 transition-transform">
+        <Zap className="w-5 h-5 fill-white text-white" />
+      </div>
+
+      {/* Brand Text & Tagline */}
+      <div className="flex flex-col">
+        <div className="flex items-center gap-1.5 leading-none">
+          <span className="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
+            NexRide
           </span>
-          <span
-            className={`px-1.5 py-0.5 rounded border text-[10px] font-bold tracking-wider transition-colors ${
-              onDark
-                ? "bg-white/15 border-white/25 text-white"
-                : "bg-blue-50 border-blue-200 text-blue-700"
-            }`}
-          >
+          <span className="px-1.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[10px] font-bold text-blue-600 tracking-wide">
             {t("nav.libya")}
           </span>
         </div>
-      </Link>
-    </div>
+        <span className="text-[10px] text-slate-400 font-medium tracking-tight mt-0.5 leading-none">
+          {isAr ? "نَبْضٌ للتنقل الفاخر" : "Pulse of Luxury Mobility"}
+        </span>
+      </div>
+    </Link>
   );
 };
+
+export default NavBarLogo;
