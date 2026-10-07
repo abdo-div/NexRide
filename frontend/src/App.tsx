@@ -290,11 +290,9 @@ function App() {
             <Route
               path="/company/application-status"
               element={
-                <CompanyRoute>
-                  <LazyRoute>
-                    <CompanyApplicationStatusPage />
-                  </LazyRoute>
-                </CompanyRoute>
+                <LazyRoute>
+                  <CompanyApplicationStatusPage />
+                </LazyRoute>
               }
             />
             <Route
