@@ -2,10 +2,12 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Heart, Star, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 import type { TrendingCar } from "../../types/trendingCar";
 
 interface TrendingCardProps {
   car: TrendingCar;
+  index?: number;
 }
 
 const SPEC_LABEL_KEYS: Record<string, string> = {
@@ -28,10 +30,17 @@ const BADGE_KEYS: Record<string, string> = {
   "Best Price": "home.trending.badges.bestPrice",
 };
 
-export const TrendingCard: React.FC<TrendingCardProps> = ({ car }) => {
+export const TrendingCard: React.FC<TrendingCardProps> = ({ car, index = 0 }) => {
   const { t } = useTranslation();
   return (
-    <div className="bg-white rounded-3xl border border-slate-200/80 overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
+    <motion.div
+      initial={{ opacity: 0, y: 25 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
+      whileHover={{ y: -6, transition: { duration: 0.2 } }}
+      className="bg-white rounded-3xl border border-slate-200/80 overflow-hidden hover:shadow-xl hover:shadow-blue-500/5 transition-shadow duration-300 group flex flex-col justify-between"
+    >
       {/* Top Image Box */}
       <div className="relative w-full h-56 bg-slate-900 overflow-hidden">
         <img
@@ -60,7 +69,7 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car }) => {
         <button
           type="button"
           aria-label={t("data.common.saveCar")}
-          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-slate-700 hover:text-rose-500 hover:bg-white shadow-xs transition-colors"
+          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-slate-700 hover:text-rose-500 hover:bg-white shadow-xs transition-colors cursor-pointer"
         >
           <Heart className="w-4 h-4" />
         </button>
@@ -130,6 +139,8 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car }) => {
           </Link>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
+
+export default TrendingCard;

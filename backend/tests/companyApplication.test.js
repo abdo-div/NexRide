@@ -7,6 +7,7 @@ import Company from "../models/Company_model.js";
 import AppError from "../utils/appError.js";
 import {
   applyForCompany,
+  companyRecordSlug,
   generateApplicationRef,
   slugify,
 } from "../services/companyApplicationService.js";
@@ -84,6 +85,125 @@ test("slugify mirrors the Company model name transform (Arabic and symbols dropp
     "al-safwa-elite-car-rental-llc",
   );
   assert.equal(slugify("  NexRide -- Partner  "), "nexride-partner");
+});
+
+test("companyRecordSlug matches the slug the Company model actually stores", () => {
+  // The stored slug DROPS hyphens and punctuation (they are not word chars
+  // or spaces), unlike `slugify` which keeps them as separators. This exact
+  // discrepancy let a brand-new company collide with an existing tenant.
+  assert.equal(companyRecordSlug("Al-Safwa Rent A Car"), "alsafwa-rent-a-car");
+  assert.equal(companyRecordSlug("Tripoli Cars, LLC"), "tripoli-cars-llc");
+});
+
+test("application rejects when the stored slug would collide with an existing tenant", async (t) => {
+  t.mock.method(User, "findOne", async () => null);
+  t.mock.method(Company, "exists", async () => null);
+  t.mock.method(Company, "findOne", async (filter) => {
+    const probe = Array.isArray(filter?.$or) ? JSON.stringify(filter.$or) : "";
+    // Any probe that mentions the stored slug finds the colliding tenant.
+    return probe.includes("alsafwa-rent-a-car")
+      ? { _id: "cccccccccccccccccccccccc" }
+      : null;
+  });
+
+  const data = validApplication();
+  // The service slug ("al-safwa-rent-a-car") preserves the hyphen and would
+  // miss the existing tenant, but the STORED slug ("alsafwa-rent-a-car")
+  // collides — exactly the mismatch this guard now catches.
+  data.company.name = "Al-Safwa Rent A Car";
+
+  await assert.rejects(
+    () => applyForCompany({ data }),
+    (error) =>
+      error instanceof AppError && error.statusCode === 409,
+  );
+});
+
+test("a slug collision raced after the pre-check surfaces as a clean 409 and rolls back the user", async (t) => {
+  const deletedUserIds = [];
+  let userCreated = false;
+
+  t.mock.method(User, "findOne", async () => null);
+  t.mock.method(User, "find", () => ({ select: () => ({ lean: async () => [] }) }));
+  t.mock.method(Company, "exists", async () => null);
+  t.mock.method(Company, "findOne", async () => null);
+  t.mock.method(User, "create", async () => {
+    userCreated = true;
+    const user = userDouble();
+    return user;
+  });
+  t.mock.method(Company, "create", async () => {
+    const error = new Error("E11000 duplicate key");
+    error.code = 11000;
+    throw error;
+  });
+  t.mock.method(User, "deleteOne", async (filter) => {
+    deletedUserIds.push(String(filter._id));
+  });
+
+  await assert.rejects(
+    () => applyForCompany({ data: validApplication() }),
+    (error) =>
+      error instanceof AppError && error.statusCode === 409,
+  );
+
+  assert.equal(userCreated, true);
+  assert.deepEqual(deletedUserIds, [userDouble()._id]);
+});
+
+test("a failed document write rolls back the company and user (no partial application)", async (t) => {
+  const deleted = [];
+
+  t.mock.method(User, "findOne", async () => null);
+  t.mock.method(User, "find", () => ({ select: () => ({ lean: async () => [] }) }));
+  t.mock.method(Company, "exists", async () => null);
+  t.mock.method(Company, "findOne", async () => null);
+  t.mock.method(User, "create", async () => {
+    const user = userDouble();
+    return user;
+  });
+  t.mock.method(Company, "create", async (companyData) => ({
+    ...companyData,
+    _id: "eeeeeeeeeeeeeeeeeeeeeeee",
+    async save() {
+      return this;
+    },
+  }));
+  t.mock.method(fs, "mkdir", async () => undefined);
+  t.mock.method(fs, "writeFile", async () => {
+    throw new Error("disk full");
+  });
+  t.mock.method(fs, "rm", async () => undefined);
+  t.mock.method(User, "deleteOne", async (filter) => {
+    deleted.push({ model: "user", id: String(filter._id) });
+  });
+  t.mock.method(Company, "deleteOne", async (filter) => {
+    deleted.push({ model: "company", id: String(filter._id) });
+  });
+
+  const data = validApplication();
+  data.documents = [{ name: "cr.pdf", kind: "COMMERCIAL_REGISTRY" }];
+
+  await assert.rejects(
+    () =>
+      applyForCompany({
+        data,
+        files: [
+          {
+            originalname: "cr.pdf",
+            mimetype: "application/pdf",
+            size: 10,
+            buffer: Buffer.from("x"),
+          },
+        ],
+      }),
+    (error) => error instanceof Error && error.message === "disk full",
+  );
+
+  assert.deepEqual(deleted, [
+    { model: "company", id: "eeeeeeeeeeeeeeeeeeeeeeee" },
+    { model: "user", id: userDouble()._id },
+  ]);
 });
 
 test("public application creates a company-role user and a PENDING company", async (t) => {
@@ -263,4 +383,58 @@ test("application status controller returns the owner application DTO", async (t
   assert.equal(company.commercialRegisterNumber, "LY-TRP-2024-88412");
   assert.equal(company.applicationDocuments[0].url, "/company-documents/d/cr_cert.pdf");
   assert.equal(company.rejectionReason, null);
+});
+
+test("applyCompany acknowledges the submission WITHOUT signing the applicant in", async (t) => {
+  const { applyCompany } = await import(
+    "../controllers/companyApplicationController.js"
+  );
+
+  const companyDoc = {
+    _id: "eeeeeeeeeeeeeeeeeeeeeeee",
+    ownerId: "aaaaaaaaaaaaaaaaaaaaaaaa",
+    name: "Al-Safwa Elite Rental LLC",
+    subdomain: "alsafwa-elite-rental-llc",
+    applicationRef: "NX-APP-8842",
+    status: "PENDING",
+    async save() {
+      return companyDoc;
+    },
+  };
+  t.mock.method(User, "findOne", async () => null);
+  t.mock.method(User, "find", () => ({
+    select: () => ({ lean: async () => [] }),
+  }));
+  t.mock.method(Company, "exists", async () => null);
+  t.mock.method(Company, "findOne", async () => null);
+  t.mock.method(User, "create", async () => userDouble("partner@example.com"));
+  t.mock.method(Company, "create", async () => companyDoc);
+
+  const res = {
+    statusCode: undefined,
+    body: undefined,
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
+    json(body) {
+      this.body = body;
+    },
+  };
+  const req = { body: { data: JSON.stringify(validApplication()) }, files: [] };
+
+  let nextError;
+  await applyCompany(req, res, (error) => {
+    nextError = error;
+  });
+  await new Promise((resolve) => setImmediate(resolve));
+  if (nextError) throw nextError;
+
+  assert.equal(res.statusCode, 201);
+  assert.equal(res.body.status, "success");
+  assert.equal(res.body.data.company._id, "eeeeeeeeeeeeeeeeeeeeeeee");
+  assert.ok(
+    !("token" in res.body) && !("cookie" in res),
+    "a PENDING partner must not receive a session token or cookie",
+  );
 });

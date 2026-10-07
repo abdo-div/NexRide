@@ -1835,7 +1835,8 @@
       "retry": "Retry"
     },
     "formError": "Something went wrong while submitting. Please retry.",
-    "submitFailed": "Submission failed"
+    "submitFailed": "Submission failed",
+    "needFixes": "Please review the highlighted fields (Step {{n}}) and try again."
   },
   "company": {
     "layout": {

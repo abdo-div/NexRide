@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import { RegionCard } from "./RegionCard";
 import { RegionFeaturesBanner } from "./RegionFeaturesBanner";
 import { HomeSectionError } from "./HomeSectionError";
@@ -22,9 +23,15 @@ export const NationwidePresence: React.FC<NationwidePresenceProps> = ({
   const showError = error !== null && !loading;
 
   return (
-    <section className="w-full py-20 px-6 lg:px-12 bg-[#030712] text-white border-b border-slate-900">
+    <section className="w-full py-20 px-6 lg:px-12 bg-[#030712] text-white border-b border-slate-900 overflow-hidden">
       {/* Section Header */}
-      <div className="text-center max-w-3xl mx-auto mb-12">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.6 }}
+        className="text-center max-w-3xl mx-auto mb-12"
+      >
         <span className="text-[11px] font-bold text-cyan-400 uppercase tracking-widest block mb-2">
           {t("home.nationwide.eyebrow")}
         </span>
@@ -34,7 +41,7 @@ export const NationwidePresence: React.FC<NationwidePresenceProps> = ({
         <p className="text-xs sm:text-sm text-slate-400 font-medium">
           {t("home.nationwide.subtitle")}
         </p>
-      </div>
+      </motion.div>
 
       {/* Region Grid */}
       {loading ? (
@@ -50,8 +57,8 @@ export const NationwidePresence: React.FC<NationwidePresenceProps> = ({
         <HomeSectionError onRetry={onRetry} />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {hubs.map((hub) => (
-            <RegionCard key={hub.id} hub={hub} />
+          {hubs.map((hub, index) => (
+            <RegionCard key={hub.id} hub={hub} index={index} />
           ))}
         </div>
       )}
@@ -61,3 +68,5 @@ export const NationwidePresence: React.FC<NationwidePresenceProps> = ({
     </section>
   );
 };
+
+export default NationwidePresence;

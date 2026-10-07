@@ -1,3 +1,5 @@
+import React from "react";
+import { motion } from "framer-motion";
 import { useHomeData } from "../hooks/useHomeData";
 import { Hero } from "../components/home/Hero";
 import { VehicleCategories } from "../components/home/VehicleCatigories";
@@ -13,7 +15,12 @@ export const HomePage: React.FC = () => {
   const home = useHomeData();
 
   return (
-    <>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className="w-full overflow-hidden"
+    >
       <Hero />
       <VehicleCategories
         categories={home.categories}
@@ -45,7 +52,7 @@ export const HomePage: React.FC = () => {
       />
       <UncompromisingStandards />
       <ReadyToHitTheRoad />
-    </>
+    </motion.div>
   );
 };
 

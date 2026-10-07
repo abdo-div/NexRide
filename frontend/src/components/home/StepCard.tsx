@@ -1,13 +1,15 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Search, Scale, Lock, Key } from "lucide-react";
+import { motion } from "framer-motion";
 import type { HowItWorksStep } from "../../types/step";
 
 interface StepCardProps {
   step: HowItWorksStep;
+  index?: number;
 }
 
-export const StepCard: React.FC<StepCardProps> = ({ step }) => {
+export const StepCard: React.FC<StepCardProps> = ({ step, index = 0 }) => {
   const { t } = useTranslation();
   const renderIcon = () => {
     switch (step.iconType) {
@@ -27,12 +29,19 @@ export const StepCard: React.FC<StepCardProps> = ({ step }) => {
   const isDriveStep = step.iconType === "drive";
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200/80 p-6 flex flex-col justify-between hover:shadow-lg transition-all duration-300 group">
+    <motion.div
+      initial={{ opacity: 0, y: 25 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
+      whileHover={{ y: -6, transition: { duration: 0.2 } }}
+      className="bg-white rounded-3xl border border-slate-200/80 p-6 flex flex-col justify-between hover:shadow-xl hover:shadow-blue-500/5 transition-shadow duration-300 group hover:border-blue-200"
+    >
       <div>
         {/* Header Row: Icon Box & Step Number */}
         <div className="flex items-center justify-between mb-6">
           <div
-            className={`w-10 h-10 rounded-2xl flex items-center justify-center border ${
+            className={`w-10 h-10 rounded-2xl flex items-center justify-center border transition-transform duration-300 group-hover:scale-110 ${
               isDriveStep
                 ? "bg-emerald-50/80 border-emerald-100"
                 : "bg-blue-50/80 border-blue-100"
@@ -41,13 +50,13 @@ export const StepCard: React.FC<StepCardProps> = ({ step }) => {
             {renderIcon()}
           </div>
 
-          <span className="text-3xl font-black text-slate-200 group-hover:text-slate-300 transition-colors tracking-tight">
+          <span className="text-3xl font-black text-slate-200 group-hover:text-blue-500/30 transition-colors tracking-tight">
             {step.stepNumber}
           </span>
         </div>
 
         {/* Title & Description */}
-        <h3 className="font-black text-base text-slate-900 tracking-tight uppercase mb-3">
+        <h3 className="font-black text-base text-slate-900 tracking-tight uppercase mb-3 group-hover:text-blue-600 transition-colors">
           {t(step.title)}
         </h3>
         <p className="text-xs text-slate-500 font-medium leading-relaxed min-h-[72px]">
@@ -65,6 +74,8 @@ export const StepCard: React.FC<StepCardProps> = ({ step }) => {
           {t(step.footerText)}
         </span>
       </div>
-    </div>
+    </motion.div>
   );
 };
+
+export default StepCard;

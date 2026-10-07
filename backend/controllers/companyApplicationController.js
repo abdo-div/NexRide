@@ -2,7 +2,6 @@ import multer from "multer";
 import { ZodError } from "zod";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
-import { signToken } from "../services/authService.js";
 import Company from "../models/Company_model.js";
 import { applyForCompany } from "../services/companyApplicationService.js";
 import { companyApplicationSchema } from "../validations/companyApplication.validation.js";
@@ -73,19 +72,13 @@ export const applyCompany = catchAsync(async (req, res, next) => {
     files: req.files ?? [],
   });
 
-  const token = signToken(user._id);
-  res.cookie("jwt", token, {
-    expires: new Date(
-      Date.now() +
-        (process.env.JWT_COOKIE_EXPIRES_IN || 90) * 24 * 60 * 60 * 1000,
-    ),
-    httpOnly: true,
-    secure: req.secure || req.headers["x-forwarded-proto"] === "https",
-  });
-
+  // The applicant is deliberately NOT signed in here. A company account only
+  // becomes usable after an admin approves the request; opening a session now
+  // would let a PENDING partner straight into the company dashboard.
   res.status(201).json({
     status: "success",
-    token,
+    message:
+      "Your partner application has been submitted. You will be able to sign in once NexRide approves it.",
     data: { user, company },
   });
 });

@@ -1,15 +1,24 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import type { RegionHub } from "../../types/region";
 
 interface RegionCardProps {
   hub: RegionHub;
+  index?: number;
 }
 
-export const RegionCard: React.FC<RegionCardProps> = ({ hub }) => {
+export const RegionCard: React.FC<RegionCardProps> = ({ hub, index = 0 }) => {
   const { t } = useTranslation();
   return (
-    <div className="bg-[#0b1329]/90 border border-slate-800 hover:border-slate-700 rounded-2xl p-6 flex flex-col justify-between transition-all duration-300">
+    <motion.div
+      initial={{ opacity: 0, y: 25 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
+      whileHover={{ y: -6, transition: { duration: 0.2 } }}
+      className="bg-[#0b1329]/90 border border-slate-800 hover:border-cyan-500/40 rounded-2xl p-6 flex flex-col justify-between transition-colors duration-300 group"
+    >
       <div>
         {/* Card Header Badges */}
         <div className="flex items-center justify-between text-xs mb-4">
@@ -22,7 +31,7 @@ export const RegionCard: React.FC<RegionCardProps> = ({ hub }) => {
         </div>
 
         {/* City Name & Subtitle */}
-        <h3 className="text-xl font-black text-white tracking-tight uppercase mb-1">
+        <h3 className="text-xl font-black text-white tracking-tight uppercase mb-1 group-hover:text-cyan-400 transition-colors">
           {hub.cityName}
         </h3>
         <p className="text-xs text-slate-400 font-medium leading-relaxed min-h-[36px]">
@@ -51,6 +60,8 @@ export const RegionCard: React.FC<RegionCardProps> = ({ hub }) => {
           ))}
         </ul>
       </div>
-    </div>
+    </motion.div>
   );
 };
+
+export default RegionCard;

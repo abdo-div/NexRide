@@ -1,13 +1,15 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Car, Star, Mountain, Zap } from "lucide-react";
+import { motion } from "framer-motion";
 import type { VehicleCategory } from "../../types/category";
 
 interface CategoryCardProps {
   category: VehicleCategory;
+  index?: number;
 }
 
-export const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
+export const CategoryCard: React.FC<CategoryCardProps> = ({ category, index = 0 }) => {
   const { t } = useTranslation();
   const renderIcon = () => {
     switch (category.iconName) {
@@ -23,7 +25,14 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
   };
 
   return (
-    <div className="bg-white/80 rounded-2xl border border-slate-200/80 p-5 flex flex-col justify-between hover:shadow-lg transition-all duration-300 group hover:border-slate-300">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
+      whileHover={{ y: -6, transition: { duration: 0.2 } }}
+      className="bg-white/80 rounded-2xl border border-slate-200/80 p-5 flex flex-col justify-between hover:shadow-xl hover:shadow-blue-500/5 transition-shadow duration-300 group hover:border-blue-200"
+    >
       <div>
         {/* Badges Bar */}
         <div className="flex items-center justify-between gap-2 mb-6">
@@ -39,12 +48,12 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
         </div>
 
         {/* Category Icon Wrapper */}
-        <div className="w-10 h-10 rounded-xl bg-blue-50/80 border border-blue-100 flex items-center justify-center mb-4">
+        <div className="w-10 h-10 rounded-xl bg-blue-50/80 border border-blue-100 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
           {renderIcon()}
         </div>
 
         {/* Title & Description */}
-        <h3 className="font-extrabold text-base text-slate-900 tracking-tight mb-1.5 uppercase">
+        <h3 className="font-extrabold text-base text-slate-900 tracking-tight mb-1.5 uppercase group-hover:text-blue-600 transition-colors">
           {t(category.title)}
         </h3>
         <p className="text-xs text-slate-500 font-medium leading-relaxed min-h-[36px]">
@@ -75,11 +84,13 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
         <a
           href={`#category-${category.id}`}
           aria-label={`${t("home.categories.explore")} ${t(category.title)}`}
-          className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:text-blue-600 group-hover:bg-blue-50 group-hover:border-blue-200 transition-all"
+          className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-blue-600 group-hover:border-blue-600 transition-all duration-200"
         >
           <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5 transition-transform" />
         </a>
       </div>
-    </div>
+    </motion.div>
   );
 };
+
+export default CategoryCard;

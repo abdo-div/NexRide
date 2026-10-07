@@ -7,7 +7,6 @@ import type {
 
 interface ApplicationResponse {
   status: string;
-  token: string;
   data: { user: CompanyApplicationResult["user"]; company: CompanyApplicationResult["company"] };
 }
 
