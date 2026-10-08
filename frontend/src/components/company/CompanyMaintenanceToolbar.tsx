@@ -18,16 +18,13 @@ interface CompanyMaintenanceToolbarProps {
   onStatusChange: (value: MaintenanceDispatchStatus | "ALL") => void;
   category: string;
   onCategoryChange: (value: string) => void;
-  simulateEmpty: boolean;
-  onSimulateEmptyChange: (value: boolean) => void;
   onReset: () => void;
 }
 
 /**
  * Live filters for the records ledger — free-text search, dispatch status and
  * maintenance category are all real server-side filters. The inspection
- * dropdown stays disabled (no inspection result model yet) and "simulate empty"
- * mirrors the sheet's preview toggle for the empty state.
+ * dropdown stays disabled (no inspection result model yet).
  */
 export const CompanyMaintenanceToolbar: React.FC<CompanyMaintenanceToolbarProps> = ({
   search,
@@ -36,8 +33,6 @@ export const CompanyMaintenanceToolbar: React.FC<CompanyMaintenanceToolbarProps>
   onStatusChange,
   category,
   onCategoryChange,
-  simulateEmpty,
-  onSimulateEmptyChange,
   onReset,
 }) => {
   const { t } = useTranslation();
@@ -56,7 +51,7 @@ export const CompanyMaintenanceToolbar: React.FC<CompanyMaintenanceToolbarProps>
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <FilterSelect
           label={t("company.maintenance.filters.status")}
           icon={<ListFilter className="h-4 w-4" />}
@@ -89,26 +84,6 @@ export const CompanyMaintenanceToolbar: React.FC<CompanyMaintenanceToolbarProps>
           disabled
           soonLabel={t("company.maintenance.soon")}
         />
-        <div className="flex items-end">
-          <button
-            type="button"
-            onClick={() => onSimulateEmptyChange(!simulateEmpty)}
-            title={t("company.maintenance.filters.simulateEmptyHint")}
-            className={`inline-flex w-full items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition-all cursor-pointer xl:h-[42px] ${
-              simulateEmpty
-                ? "border-[#2563EB] bg-[#EFF4FF] text-[#2563EB]"
-                : "border-[#E5E7EB] bg-white text-[#565E74] hover:bg-[#F8FAFF]"
-            }`}
-          >
-            <span
-              className={`h-2 w-2 rounded-full transition-colors ${
-                simulateEmpty ? "bg-[#2563EB]" : "bg-[#CBD5E1]"
-              }`}
-              aria-hidden="true"
-            />
-            {t("company.maintenance.filters.simulateEmpty")}
-          </button>
-        </div>
         <div className="flex items-end">
           <button
             type="button"

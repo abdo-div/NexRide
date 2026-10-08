@@ -17,11 +17,8 @@ export const Footer: React.FC = () => {
   const EXPLORE_LINKS: FooterSection = {
     title: t("footer.explore"),
     links: [
-      { label: t("footer.exploreLinks.fleetInventory"), href: "#inventory" },
-      { label: t("footer.exploreLinks.luxuryArmored"), href: "#armored" },
-      { label: t("footer.exploreLinks.libyanLocations"), href: "#locations" },
-      { label: t("footer.exploreLinks.airportDeals"), href: "#deals" },
-      { label: t("footer.exploreLinks.diplomaticChauffeur"), href: "#chauffeur" },
+      { label: t("footer.exploreLinks.fleetInventory"), href: "/fleet" },
+      { label: t("footer.exploreLinks.libyanLocations"), href: "/#locations" },
     ],
   };
 
@@ -29,11 +26,7 @@ export const Footer: React.FC = () => {
     title: t("footer.forPartners"),
     links: [
       { label: t("footer.partnerLinks.becomePartner"), href: "/partner/apply" },
-      { label: t("footer.partnerLinks.fleetSaaS"), href: "#saas" },
-      { label: t("footer.partnerLinks.partnerPortal"), href: "#login" },
-      { label: t("footer.partnerLinks.agencyGuidelines"), href: "#guidelines" },
-      { label: t("footer.partnerLinks.gpsApi"), href: "#api" },
-      { label: t("footer.partnerLinks.escrowTerms"), href: "#terms" },
+      { label: t("footer.partnerLinks.partnerPortal"), href: "/login" },
     ],
   };
 
@@ -46,7 +39,7 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="w-full bg-[#020617] text-white">
+    <footer id="contact" className="w-full bg-[#020617] text-white">
       {/* Main Navigation & Info Footer */}
       <section className="pt-16 pb-12 px-6 lg:px-12 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-12 border-b border-slate-800/80">

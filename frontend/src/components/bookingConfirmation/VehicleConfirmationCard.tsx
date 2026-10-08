@@ -10,7 +10,7 @@ export const VehicleConfirmationCard: React.FC<{ data: ConfirmationData }> = ({ 
   const { vehicleCard, operator } = meta;
   const chips = [
     { icon: "speed", text: vehicle.specs.engine },
-    { icon: "infinity", text: "AWD 4MATIC" },
+    { icon: "infinity", text: vehicle.specs.fuel },
     { icon: "seat", text: vehicle.specs.seats },
     { icon: "settings", text: vehicle.specs.gearbox },
   ] as const;
@@ -39,7 +39,9 @@ export const VehicleConfirmationCard: React.FC<{ data: ConfirmationData }> = ({ 
             <span className="text-[11px] uppercase tracking-wider text-[#2563EB] font-bold">
               {t(vehicleCard.category)}
             </span>
-            <span className="text-[11px] text-[#64748B] font-mono">{vehicleCard.vin}</span>
+            {vehicleCard.vin && (
+              <span className="text-[11px] text-[#64748B] font-mono">{vehicleCard.vin}</span>
+            )}
           </div>
           <h3 className="text-[26px] font-bold text-[#0F172A] mt-1">{vehicle.title}</h3>
         </div>

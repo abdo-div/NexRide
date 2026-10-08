@@ -5,6 +5,7 @@ import type {
   CompanySettingsData,
   CompanySettingsPasswordInput,
   CompanySettingsPatch,
+  CompanySettingsPayout,
   CompanySettingsProfile,
 } from "../types/companySettings";
 
@@ -24,7 +25,17 @@ const EMPTY_PROFILE: CompanySettingsProfile = {
   approvedAt: null,
   createdAt: null,
   customCommissionRate: null,
+  payout: null,
 };
+
+const EMPTY_PAYOUT: CompanySettingsPayout = {
+  bankName: "",
+  iban: "",
+  accountName: "",
+};
+
+const samePayout = (a: CompanySettingsPayout | null, b: CompanySettingsPayout) =>
+  a?.bankName === b.bankName && a?.iban === b.iban && a?.accountName === b.accountName;
 
 /** Fields the operator can actually persist via PATCH /companies/settings. */
 const EDITABLE_FIELDS = [
@@ -55,6 +66,7 @@ const errorMessage = (error: unknown): string =>
 export const useCompanySettings = () => {
   const [data, setData] = useState<CompanySettingsData | null>(null);
   const [draft, setDraft] = useState<CompanySettingsProfile>(EMPTY_PROFILE);
+  const [payoutDraft, setPayoutDraft] = useState<CompanySettingsPayout>(EMPTY_PAYOUT);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -73,6 +85,7 @@ export const useCompanySettings = () => {
         if (!active) return;
         setData(response.data?.settings ?? null);
         setDraft(response.data?.settings?.profile ?? EMPTY_PROFILE);
+        setPayoutDraft(response.data?.settings?.profile?.payout ?? EMPTY_PAYOUT);
       } catch {
         if (!active) return;
         setError(true);
@@ -127,6 +140,28 @@ export const useCompanySettings = () => {
     }
   }, [draft]);
 
+  const payoutDirty = useMemo(() => {
+    if (!data) return false;
+    return !samePayout(data.profile.payout, payoutDraft);
+  }, [payoutDraft, data]);
+
+  const updatePayoutDraft = useCallback((field: keyof CompanySettingsPayout, value: string) => {
+    setPayoutDraft((current) => ({ ...current, [field]: value }));
+  }, []);
+
+  const savePayout = useCallback(async (): Promise<SettingsMutationResult> => {
+    setBusy(true);
+    try {
+      await companySettingsApi.updateProfile({ payout: payoutDraft });
+      setAttempt((n) => n + 1);
+      return { ok: true, message: "" };
+    } catch (error) {
+      return { ok: false, message: errorMessage(error) };
+    } finally {
+      setBusy(false);
+    }
+  }, [payoutDraft]);
+
   const changePassword = useCallback(
     async (input: CompanySettingsPasswordInput): Promise<SettingsMutationResult> => {
       setBusy(true);
@@ -145,14 +180,18 @@ export const useCompanySettings = () => {
   return {
     data,
     draft,
+    payoutDraft,
     loading,
     error,
     busy,
     dirty,
     canSave,
+    payoutDirty,
     reload,
     updateDraft,
+    updatePayoutDraft,
     saveProfile,
+    savePayout,
     changePassword,
   };
 };

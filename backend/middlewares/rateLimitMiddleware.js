@@ -43,3 +43,25 @@ export const authLimiter = rateLimit({
     );
   },
 });
+
+/**
+ * Rate limiter for the gateway verification endpoints. Verification is the
+ * Moamalat callback surface (and the public replay target), so a tight window
+ * with the same strict 429 behaviour protects against callback storms and
+ * abusers probing the endpoint for booking state.
+ */
+export const paymentVerificationLimiter = rateLimit({
+  max: 30, // Max 30 verification calls per 15-minute window
+  windowMs: 15 * 60 * 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => isDevelopment(),
+  handler: (req, res, next) => {
+    next(
+      new AppError(
+        "Too many payment verification requests from this IP, please try again later!",
+        429
+      )
+    );
+  },
+});

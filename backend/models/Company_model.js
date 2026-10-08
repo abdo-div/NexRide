@@ -273,6 +273,14 @@ const companySchema = new mongoose.Schema(
       default: [],
     },
 
+    // Payout request intent raised from the partner dashboard. The actual
+    // disbursement is approved & dispatched by the platform, so this only
+    // records that the operator asked for their next settlement cycle.
+    lastPayoutRequestAt: {
+      type: Date,
+      default: null,
+    },
+
     // -------------------------------------------------------------------------
     // Soft Delete & Operational State
     // -------------------------------------------------------------------------

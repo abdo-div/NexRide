@@ -44,7 +44,7 @@ import {
 // RATE LIMITING
 // ============================================
 
-import { apiLimiter, authLimiter } from "./middlewares/rateLimitMiddleware.js";
+import { apiLimiter, authLimiter, paymentVerificationLimiter } from "./middlewares/rateLimitMiddleware.js";
 
 // ============================================
 // TENANT
@@ -222,7 +222,12 @@ app.post(
   validate(initiatePaymentSchema),
   createPayment,
 );
-app.post("/api/payment/verify", validate(verifyPaymentSchema), verifyPayment);
+app.post(
+  "/api/payment/verify",
+  paymentVerificationLimiter,
+  validate(verifyPaymentSchema),
+  verifyPayment,
+);
 
 app.use("/api/v1/admin", adminRouter);
 

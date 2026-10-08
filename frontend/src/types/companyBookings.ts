@@ -23,6 +23,14 @@ export type CompanyBookingChannel =
   | "cash"
   | "branch";
 
+/** The preferred payment-ledger row mirrored from the tenant's own payments. */
+export interface CompanyBookingLedger {
+  id: string;
+  status: string | null;
+  method: string | null;
+  amount: number | null;
+}
+
 export interface CompanyBookingsCompany {
   id: string;
   name: string;
@@ -103,6 +111,9 @@ export interface CompanyBookingRow {
   companyShare: number;
   payment: CompanyPaymentState;
   bookingStatus: BookingStatus;
+  /** Payment-ledger row id — required to attest a cash hand-off. */
+  paymentId: string | null;
+  ledger: CompanyBookingLedger | null;
   detail: CompanyBookingDetail;
 }
 

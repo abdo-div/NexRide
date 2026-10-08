@@ -175,7 +175,14 @@ export const CompanyMaintenanceTable: React.FC<CompanyMaintenanceTableProps> = (
                         }}
                         disabled={busy || !locked}
                         title={
-                          locked ? t("company.maintenance.table.completeWork") : undefined
+                          locked
+                            ? t("company.maintenance.table.completeWork")
+                            : t("company.maintenance.table.completed")
+                        }
+                        aria-label={
+                          locked
+                            ? t("company.maintenance.table.completeWork")
+                            : t("company.maintenance.table.completed")
                         }
                         className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
                           locked

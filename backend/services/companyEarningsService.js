@@ -7,6 +7,12 @@ import User from "../models/User_model.js";
 import PlatformSettings from "../models/PlatformSettings_model.js";
 import AppError from "../utils/appError.js";
 import { resolvePagination, buildPaginationMeta } from "../utils/pagination.js";
+import {
+  isCashExpr,
+  netContributionExpr,
+  keptFractionExpr,
+  netContributionOf,
+} from "../utils/payoutNetting.js";
 
 /**
  * Fleet-operator earnings & transactions workspace (/company/payouts).
@@ -157,29 +163,38 @@ const rangeCondition = (window) => {
 
 // Shared kept/keptFraction derivation (identical to payoutService so the
 // admin Commissions & Payouts ledger and this page agree on every figure).
-const keptFields = () => ({
-  $addFields: {
-    kept: {
-      $switch: {
-        branches: [
-          {
-            case: { $eq: ["$status", "PARTIALLY_REFUNDED"] },
-            then: { $subtract: ["$amount", { $ifNull: ["$refundAmount", 0] }] },
-          },
-          { case: { $eq: ["$status", "REFUNDED"] }, then: 0 },
-        ],
-        default: "$amount",
+// Two $addFields stages on purpose: this MongoDB does not resolve a field
+// added in the same stage, so `keptFraction`/`netContribution` must reference
+// `kept` from a stage earlier in the pipeline.
+const keptFields = () => [
+  {
+    $addFields: {
+      kept: {
+        $switch: {
+          branches: [
+            {
+              case: { $eq: ["$status", "PARTIALLY_REFUNDED"] },
+              then: { $subtract: ["$amount", { $ifNull: ["$refundAmount", 0] }] },
+            },
+            { case: { $eq: ["$status", "REFUNDED"] }, then: 0 },
+          ],
+          default: "$amount",
+        },
       },
-    },
-    keepsRevenue: { $in: ["$status", KEEP_STATUSES] },
-    keptFraction: {
-      $switch: {
-        branches: [{ case: { $gt: ["$amount", 0] }, then: { $divide: ["$kept", "$amount"] } }],
-        default: 0,
-      },
+      keepsRevenue: { $in: ["$status", KEEP_STATUSES] },
     },
   },
-});
+  {
+    $addFields: {
+      keptFraction: keptFractionExpr,
+      // Cash-vs-card payout netting (same rules as the admin payout ledger):
+      // cash already collected at the counter subtracts commission; every other
+      // rail adds the company's net share. See utils/payoutNetting.js.
+      isCash: isCashExpr,
+      netContribution: netContributionExpr,
+    },
+  },
+];
 
 const totalsGroup = () => ({
   $group: {
@@ -199,7 +214,7 @@ const totalsGroup = () => ({
       $sum: {
         $cond: [
           { $and: ["$keepsRevenue", { $eq: ["$payoutStatus", "UNSETTLED"] }] },
-          "$kept",
+          "$netContribution",
           0,
         ],
       },
@@ -208,7 +223,7 @@ const totalsGroup = () => ({
       $sum: {
         $cond: [
           { $and: ["$keepsRevenue", { $eq: ["$payoutStatus", "PROCESSING"] }] },
-          "$kept",
+          "$netContribution",
           0,
         ],
       },
@@ -217,7 +232,16 @@ const totalsGroup = () => ({
       $sum: {
         $cond: [
           { $and: ["$keepsRevenue", { $eq: ["$payoutStatus", "SETTLED"] }] },
-          "$kept",
+          "$netContribution",
+          0,
+        ],
+      },
+    },
+    cashCommission: {
+      $sum: {
+        $cond: [
+          { $and: ["$keepsRevenue", "$isCash"] },
+          { $multiply: ["$commissionAmount", "$keptFraction"] },
           0,
         ],
       },
@@ -342,7 +366,9 @@ const bucketize = (rows, chartRange) => {
     const fraction = fractionOf(row);
     totals[index].gross += kept;
     totals[index].fee += (row.commissionAmount ?? 0) * fraction;
-    totals[index].net += (row.companyShare ?? 0) * fraction;
+    // Netting twin of the ledger: cash subtracts commission, others add the
+    // company net share (refund-aware). Same figures as payoutService.
+    totals[index].net += netContributionOf(row);
     totals[index].tx += 1;
   });
 
@@ -582,6 +608,7 @@ export const buildCompanyEarnings = async ({
         companyShare: 1,
         status: 1,
         refundAmount: 1,
+        paymentMethod: 1,
         createdAt: 1,
         paidAt: 1,
       },
@@ -714,9 +741,20 @@ export const buildCompanyEarnings = async ({
       companyEarnings,
       effectiveRate: gross > 0 ? round2((platformTake / gross) * 100) : 0,
       grossDeltaPct,
-      available: round2(current?.unsettled ?? 0),
-      inEscrow: round2(current?.processing ?? 0),
+      // Cash-vs-card netting: cash commissions owe the platform, so the payout
+      // deck is bounded at zero and the uncovered balance is flagged instead
+      // of ever being shown as a negative "payout".
+      available: Math.max(0, round2(current?.unsettled ?? 0)),
+      inEscrow: Math.max(0, round2(current?.processing ?? 0)),
       disbursed: round2(current?.settled ?? 0),
+      cashCommission: round2(current?.cashCommission ?? 0),
+      nettedBalance: round2(
+        (current?.unsettled ?? 0) + (current?.processing ?? 0),
+      ),
+      outstandingCommission: Math.max(
+        0,
+        -round2((current?.unsettled ?? 0) + (current?.processing ?? 0)),
+      ),
     },
     chart: {
       range: chartCode,

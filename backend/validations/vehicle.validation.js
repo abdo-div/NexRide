@@ -27,7 +27,12 @@ const createVehicleBody = z.object({
   dailyPrice: z.coerce
     .number()
     .min(0, "daily rental price cannot be negative"),
-  weeklyPrice: z.coerce.number().min(0).nullable().optional(),
+  // Multipart form data cannot transport a literal JSON null, so a cleared
+  // weekly rate is also conveyed as an empty string and normalised here.
+  weeklyPrice: z.preprocess(
+    (v) => (v === "" ? null : v),
+    z.coerce.number().min(0).nullable().optional(),
+  ),
   city: z.string().trim().min(1, "city location is required").max(100),
   pickupLocation: z
     .string()

@@ -223,14 +223,14 @@ export const CompanyBookingsToolbar: React.FC<CompanyBookingsToolbarProps> = ({
         {/* View-as toggle + clear */}
         <div className="flex items-end justify-end gap-2">
           <div className="flex items-center gap-1 rounded-lg bg-[#F1F5F9] p-1">
-            <button
-              type="button"
+            <span
               title={t("company.bookingsPage.toolbar.viewTable")}
               aria-label={t("company.bookingsPage.toolbar.viewTable")}
+              aria-current="page"
               className="flex h-8 w-8 items-center justify-center rounded-md bg-white text-[#2563EB] shadow-sm"
             >
               <Table2 className="h-4 w-4" aria-hidden="true" />
-            </button>
+            </span>
             <button
               type="button"
               disabled

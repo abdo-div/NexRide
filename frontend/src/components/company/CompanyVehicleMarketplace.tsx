@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import { Globe2 } from "lucide-react";
 import { formatDate } from "../../lib/bookingView";
 import type { CompanyVehicleProfile } from "../../types/companyVehicle";
@@ -12,14 +13,15 @@ interface CompanyVehicleMarketplaceProps {
 
 /**
  * Marketplace visibility status — the listing state, dispatch readiness and
- * registry metadata, all read from the vehicle document. The "Manage"
- * action stays behind "coming soon".
+ * registry metadata, all read from the vehicle document. "Manage Listing"
+ * opens the real edit form for the vehicle profile.
  */
 export const CompanyVehicleMarketplace: React.FC<CompanyVehicleMarketplaceProps> = ({
   vehicle,
   lang,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const listing = vehicle.listingStatus;
   const listingNode =
@@ -88,9 +90,8 @@ export const CompanyVehicleMarketplace: React.FC<CompanyVehicleMarketplaceProps>
       </div>
       <button
         type="button"
-        disabled
-        title={t("company.vehiclePage.soon")}
-        className="mt-4 w-full rounded-xl bg-[#F1F5F9] py-2.5 text-sm font-semibold text-[#0B1C30] disabled:cursor-not-allowed disabled:opacity-60"
+        onClick={() => navigate(`/company/fleet/${vehicle.id}/edit`)}
+        className="mt-4 w-full rounded-xl bg-[#F1F5F9] py-2.5 text-sm font-semibold text-[#0B1C30] transition-colors hover:bg-[#E5EEFF] cursor-pointer"
       >
         {t("company.vehiclePage.mkt.manage")}
       </button>

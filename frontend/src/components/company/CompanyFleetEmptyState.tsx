@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Plus, Warehouse } from "lucide-react";
 
@@ -19,15 +20,13 @@ export const CompanyFleetEmptyState: React.FC = () => {
         </h3>
         <p className="text-sm text-[#565E74]">{t("company.fleetPage.empty.subtitle")}</p>
       </div>
-      <button
-        type="button"
-        disabled
-        title={t("company.fleetPage.soon")}
-        className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] disabled:cursor-not-allowed disabled:opacity-60"
+      <Link
+        to="/company/fleet/new"
+        className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-colors hover:bg-[#1D4ED8]"
       >
         <Plus className="h-[18px] w-[18px]" aria-hidden="true" />
         {t("company.fleetPage.addVehicle")}
-      </button>
+      </Link>
     </div>
   );
 };

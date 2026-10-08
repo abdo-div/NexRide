@@ -23,7 +23,11 @@ export const CompanyVehicleGallery: React.FC<CompanyVehicleGalleryProps> = ({
     return vehicle.photo ? [vehicle.photo] : [];
   }, [vehicle.photo, vehicle.photos]);
 
-  const current = activePhoto ?? photos[0] ?? null;
+  // A tapped thumbnail from a previous vehicle must never leak into this one:
+  // only trust activePhoto while it is actually part of the current album.
+  const current = photos.includes(activePhoto as string)
+    ? (activePhoto as string)
+    : photos[0] ?? null;
   const thumbs = photos.slice(1, 5);
 
   return (

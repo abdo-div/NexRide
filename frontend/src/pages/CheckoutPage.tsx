@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft } from "lucide-react";
-import { getCheckout, computeCheckoutTotals } from "../data/checkoutData";
-import { hasStaticDetail } from "../data/vehicleDetailData";
+import { getCheckoutMeta, computeCheckoutTotals } from "../data/checkoutData";
 import { useVehicleDetail } from "../hooks/useVehicleDetail";
 import { mapVehicle } from "../lib/vehicleMapper";
 import { bookingApi } from "../lib/bookingApi";
@@ -38,152 +37,13 @@ const toISODate = (date: Date): string => {
 };
 
 /**
- * Placeholder fleet (mock) ids have no real vehicle/document behind them, so
- * their checkout keeps the static demo. Real ids go through the live flow.
+ * Checkout always resolves the vehicle from the live API. An unknown id shows
+ * the clean "details could not be loaded" state instead of any static demo.
  */
 export const CheckoutPage: React.FC = () => {
   const { vehicleId } = useParams<{ vehicleId: string }>();
 
-  if (hasStaticDetail(vehicleId)) {
-    return <MockCheckout vehicleId={vehicleId} />;
-  }
   return <RealCheckout vehicleId={vehicleId ?? ""} />;
-};
-
-const MockCheckout: React.FC<{ vehicleId?: string }> = ({ vehicleId }) => {
-  const navigate = useNavigate();
-  const { vehicle, meta } = getCheckout(vehicleId);
-
-  const [selected, setSelected] = useState<Set<string>>(
-    () => new Set(meta.addons.filter((a) => a.defaultOn).map((a) => a.id)),
-  );
-  const [tab, setTab] = useState<"card" | "cash">("card");
-  const [phase, setPhase] = useState<"idle" | "processing" | "done">("idle");
-  const [submitError, setSubmitError] = useState<string | null>(null);
-
-  const totals = useMemo(() => computeCheckoutTotals(vehicle, meta, selected), [vehicle, meta, selected]);
-
-  const toggle = (id: string) =>
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-
-  const confirm = async () => {
-    if (phase !== "idle") return;
-    setSubmitError(null);
-    setPhase("processing");
-
-    if (tab === "cash") {
-      setPhase("done");
-      navigate(`/booking-confirmed/${vehicle.id}`);
-      return;
-    }
-
-    try {
-      await loadMoamalatLightbox();
-      const res = await moamalatApi.create({
-        amount: totals.total,
-        reference: `PAY-${vehicle.id.slice(0, 10).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`,
-      });
-
-      const params = res.data?.gateway?.params || {
-        MID: res.MID!,
-        TID: res.TID!,
-        AmountTrxn: res.AmountTrxn!,
-        MerchantReference: res.MerchantReference!,
-        TrxDateTime: res.TrxDateTime!,
-        SecureHash: res.SecureHash!,
-      };
-
-      openMoamalatLightbox(params, {
-        onComplete: async (response) => {
-          closeMoamalatLightbox();
-          setPhase("processing");
-          try {
-            const verifyRes = await moamalatApi.verify({
-              merchantReference: params.MerchantReference,
-              systemReference: response?.SystemReference || response?.systemReference,
-            });
-
-            if (verifyRes.verified || verifyRes.data?.verified) {
-              setPhase("done");
-              navigate(`/booking-confirmed/${vehicle.id}?paid=true&ref=${params.MerchantReference}`, {
-                replace: true,
-              });
-            } else {
-              setPhase("idle");
-              setSubmitError(
-                verifyRes.data?.reason ||
-                  "Moamalat payment verification failed. Please try again.",
-              );
-            }
-          } catch (err) {
-            setPhase("idle");
-            setSubmitError(
-              err instanceof Error ? err.message : "Unable to verify transaction.",
-            );
-          }
-        },
-        onError: () => {
-          closeMoamalatLightbox();
-          setPhase("idle");
-          setSubmitError("Moamalat payment gateway error. Please try again.");
-        },
-        onCancel: () => {
-          closeMoamalatLightbox();
-          setPhase("idle");
-          setSubmitError("Payment was cancelled in Moamalat LightBox.");
-        },
-      });
-    } catch (err) {
-      setPhase("idle");
-      setSubmitError(
-        err instanceof Error ? err.message : "Payment gateway could not be loaded.",
-      );
-    }
-  };
-
-  return (
-    <div className="bg-[#F8FAFC] min-h-screen">
-      <div className="pt-20">
-        <CheckoutHeader vehicleId={vehicle.id} meta={meta} />
-      </div>
-      <div className="max-w-[1360px] mx-auto px-4 lg:px-8 py-8 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <div className="lg:col-span-7 flex flex-col gap-6">
-            <ItinerarySection meta={meta} />
-            <DriverSection meta={meta} />
-            <OptionsSection meta={meta} selected={selected} onToggle={toggle} />
-            <PaymentSection
-              meta={meta}
-              tab={tab}
-              onTab={setTab}
-              vehicleTitle={vehicle.title}
-            />
-          </div>
-          <BookingSummary
-            vehicle={vehicle}
-            meta={meta}
-            totals={totals}
-            phase={phase}
-            onConfirm={confirm}
-            tab={tab}
-          />
-        </div>
-        {submitError && (
-          <div className="mt-6 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-[13px] font-semibold">
-            {submitError}
-          </div>
-        )}
-      </div>
-    </div>
-  );
 };
 
 const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
@@ -271,7 +131,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
       : "unavailable";
   const availabilityError = currentAvailability?.error ?? null;
 
-  const baseMeta = useMemo(() => getCheckout().meta, []);
+  const baseMeta = useMemo(() => getCheckoutMeta(), []);
 
   const meta = useMemo<CheckoutMeta>(() => {
     if (!vehicle) return baseMeta;

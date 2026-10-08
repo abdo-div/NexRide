@@ -62,13 +62,13 @@ export const PartnerSection: React.FC = () => {
             </motion.div>
 
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <a
-                href="#partner-guidelines"
+              <Link
+                to="/partner/apply"
                 className="px-6 py-3.5 rounded-2xl bg-[#0b1220] border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white font-extrabold text-xs flex items-center gap-2 transition-all"
               >
                 <span>{t("home.partners.partnerGuidelines")}</span>
                 <BookOpen className="w-4 h-4 text-slate-400" />
-              </a>
+              </Link>
             </motion.div>
           </div>
         </motion.div>

@@ -400,7 +400,11 @@ test("the owning company can collect a pending cash payment and settles the book
   assert.equal(result.payment.status, "COMPLETED");
   assert.equal(result.payment.collectedBy, actor._id);
   assert.equal(booking.paymentStatus, "PAID");
-  assert.equal(booking.bookingStatus, "PAID");
+  assert.equal(
+    booking.bookingStatus,
+    "CONFIRMED",
+    "collecting cash advances PENDING_PAYMENT to CONFIRMED per the lifecycle matrix",
+  );
   assert.deepEqual(updates[0].filter, { _id: payment._id, status: "PENDING" });
   assert.equal(updates[0].update.$set.status, "COMPLETED");
   assert.equal(updates[0].options.new, true);

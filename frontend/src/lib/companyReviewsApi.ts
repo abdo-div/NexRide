@@ -41,6 +41,6 @@ export const companyReviewsApi = {
   reply: (reviewId: string, response: string) =>
     request<CompanyReviewReplyResponse>(`/companies/reviews/${reviewId}/reply`, {
       method: "POST",
-      body: JSON.stringify({ response }),
+      body: { response },
     }),
 };

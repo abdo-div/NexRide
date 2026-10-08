@@ -68,4 +68,23 @@ export const companyVehicleApi = {
       method: "PATCH",
       body,
     }),
+  /**
+   * Flip a vehicle's operational or listing status (PATCH /cars/:id/status).
+   * The backend routes the value to operationalStatus (AVAILABLE / MAINTENANCE /
+   * UNAVAILABLE) or listingStatus (DRAFT / PUBLISHED / SUSPENDED) and scopes the
+   * write to the caller's own fleet.
+   */
+  updateStatus: (vehicleId: string, status: string) =>
+    request<CompanyVehicleUpdateResponse>(`/cars/${vehicleId}/status`, {
+      method: "PATCH",
+      body: { status },
+    }),
+  /**
+   * Archive (soft-delete) a vehicle, preserving its booking history
+   * (DELETE /cars/:id, tenant-scoped).
+   */
+  archive: (vehicleId: string) =>
+    request<{ status: string; data: Record<string, unknown> }>(`/cars/${vehicleId}`, {
+      method: "DELETE",
+    }),
 };

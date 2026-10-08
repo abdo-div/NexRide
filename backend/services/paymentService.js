@@ -390,7 +390,10 @@ export const assertCashCollectionAccess = (payment, actorUser, tenantId = null) 
  *
  * Both writes run in one transaction, and the payment flip is guarded on
  * `status: "PENDING"` so two clerks racing on the same payment cannot collect
- * it twice.
+ * it twice. Collecting stamps `collectedAt`/`collectedBy` and - when a booking
+ * was still waiting on money - advances `bookingStatus` PENDING_PAYMENT ->
+ * CONFIRMED and `paymentStatus` -> PAID, following the
+ * BOOKING_STATUS_TRANSITIONS matrix.
  *
  * Returns `{ payment, booking }` so the caller can show the settled ledger row
  * alongside the booking it belongs to.
@@ -461,10 +464,14 @@ export const markCashPaymentCompleted = async ({
 
     if (booking.paymentStatus !== "PAID") {
       booking.paymentStatus = "PAID";
-      // Promote, never demote: a rental already CONFIRMED/ACTIVE keeps its
-      // state, while one still waiting on money stops waiting.
+      // Advance, never demote: a rental already ACTIVE keeps its state, while
+      // one still waiting on money stops waiting. PENDING_PAYMENT -> CONFIRMED
+      // follows BOOKING_STATUS_TRANSITIONS (money confirmed = CONFIRMED); the
+      // counter later moves CONFIRMED -> ACTIVE when the rental actually
+      // starts. We do not go straight to ACTIVE so a future pickup is never
+      // presumed to have happened at the counter.
       if (booking.bookingStatus === "PENDING_PAYMENT") {
-        booking.bookingStatus = "PAID";
+        booking.bookingStatus = "CONFIRMED";
       }
       await booking.save({ session, validateBeforeSave: false });
     }

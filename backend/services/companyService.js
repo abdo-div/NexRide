@@ -4,6 +4,7 @@ import Vehicle from "../models/vehicle_model.js";
 import AppError from "../utils/appError.js";
 import APIFeatures from "../utils/APIFeatures.js";
 import { runPaginatedQuery } from "../utils/paginatedQuery.js";
+import { calculateCompanyPayoutSummary } from "./paymentService.js";
 
 const COMPANY_SEARCH_FIELDS = [
   "name",
@@ -123,6 +124,47 @@ export const updateCompanyProfileByOwner = async (companyId, updateData) => {
   return company;
 };
 
+/**
+ * Record the operator's request for their next payout cycle. Disbursements are
+ * approved & dispatched by the platform into the recorded bank rail, so this
+ * only stamps the intent on the Company document and returns the currently
+ * payable (unsettled) balance — never a synthetic payout.
+ */
+export const requestCompanyPayout = async (companyId) => {
+  if (!companyId) {
+    throw new AppError("Please provide a valid company tenant.", 400);
+  }
+
+  const company = await Company.findById(companyId);
+  if (!company) {
+    throw new AppError("No company found for this tenant.", 404);
+  }
+
+  if (!company.payout?.iban) {
+    throw new AppError(
+      "Add your settlement bank details (IBAN) in Settings before requesting a payout.",
+      400,
+    );
+  }
+
+  const { pendingPayouts } = await calculateCompanyPayoutSummary(companyId);
+  if (pendingPayouts <= 0) {
+    throw new AppError(
+      "Nothing is payable yet — earnings are still unsettled or escrowed.",
+      400,
+    );
+  }
+
+  company.lastPayoutRequestAt = new Date();
+  await company.save({ validateBeforeSave: false });
+
+  return {
+    requestedAt: company.lastPayoutRequestAt,
+    pendingPayouts,
+    payout: company.payout,
+  };
+};
+
 const SETTINGS_PROFILE_FIELDS = [
   "name",
   "email",
@@ -215,6 +257,7 @@ export const fetchCompanySettings = async (companyId) => {
       approvedAt: company.approvedAt ?? null,
       createdAt: company.createdAt ?? null,
       customCommissionRate: company.customCommissionRate ?? null,
+      payout: company.payout ?? null,
     },
     readiness: {
       verified: company.status === "APPROVED",

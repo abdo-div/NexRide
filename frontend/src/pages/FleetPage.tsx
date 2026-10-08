@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from "react-router";
 import { Car, ShieldCheck, ChevronLeft, ChevronRight, AlertTriangle } from "lucide-react";
@@ -9,16 +9,12 @@ import { CommandBar } from "../components/vehicles/CommandBar";
 import { FilterSideBar } from "../components/vehicles/FilterSideBar";
 import { VehicleCard } from "../components/vehicles/VehicleCard";
 import {
-  LOCATION_OPTIONS,
   BODY_PROFILES,
   DRIVETRAIN_OPTIONS,
   CERTIFIED_FLEETS,
   PERK_OPTIONS,
   SEGMENTS,
 } from "../data/vehicleData";
-
-const labelFor = (list: { id: string; label: string }[], ids: string[]) =>
-  list.filter((x) => ids.includes(x.id)).map((x) => x.label);
 
 const SKELETON_KEYS = ["a", "b", "c", "d", "e", "f"];
 
@@ -36,7 +32,7 @@ const VehicleCardSkeleton: React.FC = () => (
 
 export const FleetPage: React.FC = () => {
   const { t } = useTranslation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
   // Location + dates chosen in the home search console. Passed straight to the
@@ -61,9 +57,33 @@ export const FleetPage: React.FC = () => {
   );
 
   const filters = useVehicleFilters(allVehicles);
-  const { filteredVehicles, segmentCounts } = filters;
+  const { filteredVehicles, segmentCounts, locationOptions } = filters;
 
   const [sort, setSort] = useState("recommended");
+
+  // A single sidebar location selection is pushed back into the URL `location`
+  // param so the search API applies real booking availability server-side. The
+  // flag keeps the home-search context intact until the user actually touches
+  // the sidebar location filters.
+  const locationTouched = useRef(false);
+  const handleToggleLocation = (id: string) => {
+    locationTouched.current = true;
+    filters.toggleLocation(id);
+  };
+
+  useEffect(() => {
+    if (!locationTouched.current) return;
+    const desired =
+      filters.selectedLocations.length === 1
+        ? filters.selectedLocations[0]
+        : null;
+    const current = searchParams.get("location") ?? null;
+    if (desired === current) return;
+    const next = new URLSearchParams(searchParams);
+    if (desired) next.set("location", desired);
+    else next.delete("location");
+    setSearchParams(next, { replace: true });
+  }, [filters.selectedLocations, searchParams, setSearchParams]);
 
   const vehicles = useMemo(() => {
     const list = [...filteredVehicles];
@@ -80,7 +100,8 @@ export const FleetPage: React.FC = () => {
     return list;
   }, [filteredVehicles, sort]);
 
-  const singleLocation = labelFor(LOCATION_OPTIONS, filters.selectedLocations)[0];
+  const singleLocation =
+    filters.selectedLocations.length === 1 ? filters.selectedLocations[0] : "";
 
   const months = t("home.search.months").split(" ");
   const fmtShortDate = (iso: string) => {
@@ -92,11 +113,11 @@ export const FleetPage: React.FC = () => {
 
   const locationParam = searchLocation
     ? t("fleet.tokens.location", { name: searchLocation })
-    : filters.selectedLocations.length === 0
-      ? t("fleet.params.allHubs")
-      : filters.selectedLocations.length === 1 && singleLocation
-        ? t(singleLocation)
-        : t("fleet.params.locationsCount", { count: filters.selectedLocations.length });
+    : singleLocation
+      ? t("fleet.tokens.location", { name: singleLocation })
+      : filters.selectedLocations.length > 1
+        ? t("fleet.params.locationsCount", { count: filters.selectedLocations.length })
+        : t("fleet.params.allHubs");
 
   const scheduleParam =
     searchStart && searchEnd
@@ -123,13 +144,11 @@ export const FleetPage: React.FC = () => {
     });
   }
   filters.selectedLocations.forEach((id) => {
-    const l = LOCATION_OPTIONS.find((x) => x.id === id);
-    if (l) {
-      tokenRows.push({
-        label: t("fleet.tokens.location", { name: t(l.label) }),
-        onRemove: () => filters.removeLocation(id),
-      });
-    }
+    const l = locationOptions.find((x) => x.id === id);
+    tokenRows.push({
+      label: t("fleet.tokens.location", { name: l ? t(l.label) : id }),
+      onRemove: () => filters.removeLocation(id),
+    });
   });
   filters.selectedBodies.forEach((id) => {
     const b = BODY_PROFILES.find((x) => x.id === id);
@@ -207,8 +226,9 @@ export const FleetPage: React.FC = () => {
             <FilterSideBar
               maxPrice={filters.maxPrice}
               onMaxPriceChange={filters.setMaxPrice}
+              locations={locationOptions}
               selectedLocations={filters.selectedLocations}
-              onToggleLocation={filters.toggleLocation}
+              onToggleLocation={handleToggleLocation}
               selectedBodies={filters.selectedBodies}
               onToggleBody={filters.toggleBody}
               selectedDrives={filters.selectedDrives}
@@ -421,8 +441,7 @@ export const FleetPage: React.FC = () => {
                 </div>
               </div>
               <a
-                href="#"
-                onClick={(e) => e.preventDefault()}
+                href="#contact"
                 className="px-5 py-2.5 rounded-xl bg-white border border-[#E2E8F0] hover:bg-slate-50 text-slate-800 text-xs font-semibold transition-colors shrink-0 shadow-sm"
               >
                 {t("fleet.trust.learnMore")}

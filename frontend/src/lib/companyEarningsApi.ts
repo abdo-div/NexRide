@@ -10,6 +10,17 @@ interface CompanyEarningsResponse {
   data: CompanyEarningsData;
 }
 
+interface CompanyPayoutRequestData {
+  requestedAt: string;
+  pendingPayouts: number;
+  payout: { bankName: string; iban: string; accountName: string } | null;
+}
+
+interface CompanyPayoutRequestResponse {
+  status: string;
+  data: { payout: CompanyPayoutRequestData };
+}
+
 const buildQuery = (query: CompanyEarningsQuery): string => {
   const params = new URLSearchParams();
   params.set("page", String(query.page));
@@ -73,4 +84,16 @@ export const companyEarningsApi = {
 
     return response.blob();
   },
+
+  /**
+   * Ask the platform to run the tenant's next payout cycle into its recorded
+   * bank rail (POST /companies/payouts/request). Company sessions only; the
+   * tenant is resolved from the session. Disbursement stays admin-approved, so
+   * this only records the operator's request.
+   */
+  requestPayout: (signal?: AbortSignal) =>
+    request<CompanyPayoutRequestResponse>("/companies/payouts/request", {
+      method: "POST",
+      signal,
+    }),
 };

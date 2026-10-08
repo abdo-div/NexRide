@@ -122,6 +122,15 @@ const mapRow = (doc) => {
     reference: referenceOf(doc._id),
     channel: channelOf(doc),
     verified: paymentState === "PAID",
+    paymentId: ledger?._id ?? null,
+    ledger: ledger
+      ? {
+          id: String(ledger._id),
+          status: ledger.status ?? null,
+          method: ledger.paymentMethod ?? null,
+          amount: ledger.amount ?? null,
+        }
+      : null,
     customer: {
       initials: initialsOf(customer.name),
       name: customer.name ?? "Customer",

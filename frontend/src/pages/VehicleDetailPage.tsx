@@ -2,7 +2,6 @@ import React, { useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Car, ArrowLeft, AlertTriangle, RefreshCw } from "lucide-react";
-import { getVehicleDetail, hasStaticDetail } from "../data/vehicleDetailData";
 import { buildVehicleDetail } from "../lib/vehicleDetailMapper";
 import { useVehicleDetail } from "../hooks/useVehicleDetail";
 import { DetailBreadcrumbs } from "../components/vehicleDetail/DetailBreadcrumbs";
@@ -50,40 +49,12 @@ export const VehicleDetailPage: React.FC = () => {
   const { t } = useTranslation();
   const [saved, setSaved] = useState(true);
 
-  const isStatic = hasStaticDetail(vehicleId);
-  const { status, vehicle, similar, error, reload } = useVehicleDetail(vehicleId, isStatic);
+  const { status, vehicle, similar, error, reload } = useVehicleDetail(vehicleId, false);
 
   const realDetail = useMemo(
     () => (vehicle ? buildVehicleDetail(vehicle, similar) : null),
     [vehicle, similar],
   );
-
-  if (status === "static") {
-    const detail = getVehicleDetail(vehicleId);
-    return (
-      <div className="bg-[#F8FAFC] min-h-screen">
-        <div className="max-w-[1360px] mx-auto px-4 lg:px-8 pt-24 pb-20">
-          <DetailBreadcrumbs crumbs={detail.crumbs} saved={saved} onToggleSave={() => setSaved((s) => !s)} />
-          <DetailTitleBar detail={detail} />
-          <DetailGallery detail={detail} />
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div className="lg:col-span-8 flex flex-col gap-8">
-              <MetricHighlights metrics={detail.metrics} />
-              <VehicleDescription detail={detail} />
-              <SpecificationsTable groups={detail.specGroups} />
-              <RentalRequirements requirements={detail.requirements} meta={detail.policyMeta} />
-              <PickupHubs detail={detail} />
-              <OperatorProfile detail={detail} />
-              <CustomerReviews detail={detail} />
-              <SimilarVehicles detail={detail} />
-            </div>
-            <BookingSidebar detail={detail} />
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (status === "loading") {
     return (

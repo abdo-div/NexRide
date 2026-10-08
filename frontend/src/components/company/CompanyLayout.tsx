@@ -181,11 +181,12 @@ export const CompanyLayout: React.FC = () => {
 
           <button
             type="button"
+            disabled
             aria-label={t("company.layout.notifications")}
-            className="relative rounded-xl p-2 text-[#434655] transition-colors hover:bg-[#E5EEFF] cursor-pointer"
+            title={t("company.layout.soon")}
+            className="relative rounded-xl p-2 text-[#A6ACBE] cursor-not-allowed"
           >
             <Bell className="h-[22px] w-[22px]" />
-            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-[#2563EB] ring-2 ring-white" />
           </button>
 
           <div

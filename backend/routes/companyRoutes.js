@@ -9,6 +9,7 @@ import {
   toggleCompanyVerification,
   deleteCompany,
   getCompanySettings,
+  requestCompanyPayout,
 } from "../controllers/companyController.js";
 import { registerCompanyOwner } from "../controllers/companyRegistrationController.js";
 import {
@@ -481,6 +482,33 @@ router.post(
   protect,
   restrictTo("company", "admin"),
   releaseCompanyMaintenanceVehicle,
+);
+
+/**
+ * @openapi
+ * /companies/payouts/request:
+ *   post:
+ *     tags: [Companies]
+ *     summary: Request the next payout cycle into the recorded bank rail
+ *     description: >-
+ *       Records the operator's payout request on the Company document and returns
+ *       the currently payable (unsettled) balance. Disbursement itself is still
+ *       approved & dispatched by the platform, so this never moves money.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Payout request recorded
+ *       400:
+ *         description: Nothing payable or no bank rail configured
+ *       403:
+ *         description: Company role required
+ */
+router.post(
+  "/payouts/request",
+  protect,
+  restrictTo("company"),
+  requestCompanyPayout,
 );
 
 /**

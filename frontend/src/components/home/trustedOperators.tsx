@@ -22,7 +22,7 @@ export const TrustedOperators: React.FC<TrustedOperatorsProps> = ({
   const showError = error !== null && !loading;
 
   return (
-    <section className="w-full py-20 px-6 lg:px-12 bg-slate-50/60 border-b border-slate-200/80 overflow-hidden">
+    <section id="fleet-operators" className="w-full py-20 px-6 lg:px-12 bg-slate-50/60 border-b border-slate-200/80 overflow-hidden">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

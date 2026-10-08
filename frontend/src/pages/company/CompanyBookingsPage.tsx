@@ -1,7 +1,9 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Activity, Inbox } from "lucide-react";
 import { useCompanyBookings } from "../../hooks/useCompanyBookings";
+import { companyBookingsApi } from "../../lib/companyBookingsApi";
+import { ApiError } from "../../lib/apiClient";
 import { saveBlobAsFile } from "../../lib/bookingView";
 import { CompanyBookingsHeader } from "../../components/company/CompanyBookingsHeader";
 import { CompanyBookingKpiCards } from "../../components/company/CompanyBookingKpiCards";
@@ -72,15 +74,78 @@ export const CompanyBookingsPage: React.FC = () => {
   } = useCompanyBookings();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [actionBusy, setActionBusy] = useState(false);
+  const [toast, setToast] = useState("");
+  const toastTimer = useRef<number | undefined>(undefined);
 
+  const showToast = useCallback((message: string) => {
+    setToast(message);
+    if (toastTimer.current) window.clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(() => setToast(""), 3200);
+  }, []);
+
+  // A closed drawer must truly clear the selection. There is no silent fallback
+  // to "row 1" — that made the X button a no-op after the first render.
   const selected = useMemo(
-    () => data.list.find((row) => row.id === selectedId) ?? data.list[0] ?? null,
+    () => data.list.find((row) => row.id === selectedId) ?? null,
     [data.list, selectedId],
   );
 
   const handleSelect = useCallback((row: CompanyBookingRow) => {
     setSelectedId(row.id);
   }, []);
+
+  const errorMessage = useCallback(
+    (error: unknown) =>
+      error instanceof ApiError ? error.message : error instanceof Error ? error.message : "",
+    [],
+  );
+
+  const runAction = useCallback(
+    async (action: () => Promise<unknown>, successKey: string, errorKey: string) => {
+      setActionBusy(true);
+      try {
+        await action();
+        reload();
+        showToast(t(successKey));
+      } catch (error) {
+        showToast(`${t(errorKey)}: ${errorMessage(error)}`);
+      } finally {
+        setActionBusy(false);
+      }
+    },
+    [reload, showToast, t, errorMessage],
+  );
+
+  const handleAdvance = useCallback(
+    (status: string) =>
+      runAction(
+        () => (selectedId ? companyBookingsApi.updateStatus(selectedId, status) : Promise.reject()),
+        "company.bookingsPage.toasts.statusUpdated",
+        "company.bookingsPage.toasts.statusError",
+      ),
+    [runAction, selectedId],
+  );
+
+  const handleCollectCash = useCallback(
+    (paymentId: string) =>
+      runAction(
+        () => companyBookingsApi.collectCash(paymentId),
+        "company.bookingsPage.toasts.cashCollected",
+        "company.bookingsPage.toasts.statusError",
+      ),
+    [runAction],
+  );
+
+  const handleCancel = useCallback(
+    (reason: string) =>
+      runAction(
+        () => (selectedId ? companyBookingsApi.cancel(selectedId, reason) : Promise.reject()),
+        "company.bookingsPage.toasts.bookingCancelled",
+        "company.bookingsPage.toasts.statusError",
+      ),
+    [runAction, selectedId],
+  );
 
   const vehicles = useMemo(
     () =>
@@ -181,7 +246,14 @@ export const CompanyBookingsPage: React.FC = () => {
 
           {/* Quick Inspect column */}
           <div className="lg:col-span-4">
-            <CompanyBookingInspectDrawer row={selected} onClose={() => setSelectedId(null)} />
+            <CompanyBookingInspectDrawer
+              row={selected}
+              busy={actionBusy}
+              onClose={() => setSelectedId(null)}
+              onAdvance={handleAdvance}
+              onCollectCash={handleCollectCash}
+              onCancel={handleCancel}
+            />
           </div>
         </div>
 
@@ -192,6 +264,13 @@ export const CompanyBookingsPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Action toast */}
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-[#0B1C30] px-4 py-3 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(8,19,31,0.35)]">
+          {toast}
+        </div>
+      )}
     </div>
   );
 };

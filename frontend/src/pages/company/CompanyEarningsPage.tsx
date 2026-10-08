@@ -30,6 +30,7 @@ const csv = (data: CompanyEarningsData): string => {
     "Net (LYD)",
     "Payment Method",
     "Status",
+    "Payout",
   ];
   const rows = data.list.map((row) => [
     row.trxRef,
@@ -87,6 +88,7 @@ export const CompanyEarningsPage: React.FC = () => {
   const [toast, setToast] = useState("");
   const toastTimer = useRef<number | undefined>(undefined);
   const settlementsRef = useRef<HTMLDivElement | null>(null);
+  const registerRef = useRef<HTMLDivElement | null>(null);
 
   const showToast = (message: string) => {
     setToast(message);
@@ -126,6 +128,10 @@ export const CompanyEarningsPage: React.FC = () => {
 
   const scrollToSettlements = useCallback(() => {
     settlementsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
+
+  const scrollToRegister = useCallback(() => {
+    registerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
 
   return (
@@ -188,9 +194,7 @@ export const CompanyEarningsPage: React.FC = () => {
                 <CompanyPayoutSettlements
                   summary={summary}
                   settings={settings}
-                  onViewPayouts={() =>
-                    showToast(t("company.payoutsPage.toasts.payoutsSoon"))
-                  }
+                  onViewPayouts={scrollToRegister}
                   onOpenSettings={() => navigate("/company/settings")}
                 />
               </div>
@@ -205,7 +209,7 @@ export const CompanyEarningsPage: React.FC = () => {
             />
 
             {/* Recent Transactions register */}
-            <section className="flex flex-col gap-3">
+            <section ref={registerRef} className="flex scroll-mt-24 flex-col gap-3">
               <div className="flex flex-wrap items-end justify-between gap-2">
                 <div>
                   <div className="flex items-center gap-2">

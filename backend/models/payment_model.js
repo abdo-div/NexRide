@@ -99,12 +99,19 @@ const paymentSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: {
+        // EXPIRED: a checkout abandoned in PENDING_PAYMENT too long. The
+        // reconciliation reaper retires the booking and the still-PENDING
+        // ledger row together so a never-collected intent cannot sit in the
+        // ledger forever. Aggregations filter `status: "COMPLETED"` (and
+        // `bookingService` cancellation marks PENDING rows FAILED), so an
+        // EXPIRED row never reaches revenue, payouts or dashboards.
         values: [
           "PENDING",
           "COMPLETED",
           "FAILED",
           "REFUNDED",
           "PARTIALLY_REFUNDED",
+          "EXPIRED",
         ],
         message: "Invalid payment status",
       },

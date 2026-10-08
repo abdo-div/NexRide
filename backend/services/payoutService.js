@@ -4,6 +4,11 @@ import {
   buildPaginationMeta,
   resolvePagination,
 } from "../utils/pagination.js";
+import {
+  isCashExpr,
+  netContributionExpr,
+  keptFractionExpr,
+} from "../utils/payoutNetting.js";
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -36,17 +41,6 @@ export const buildPayoutSummary = async () => {
           },
         },
         keepsRevenue: { $in: ["$status", ["COMPLETED", "PARTIALLY_REFUNDED"]] },
-        keptFraction: {
-          $switch: {
-            branches: [
-              {
-                case: { $gt: ["$amount", 0] },
-                then: { $divide: ["$kept", "$amount"] },
-              },
-            ],
-            default: 0,
-          },
-        },
         refundedPortion: {
           $switch: {
             branches: [
@@ -59,6 +53,19 @@ export const buildPayoutSummary = async () => {
             default: 0,
           },
         },
+      },
+    },
+    {
+      $addFields: {
+        // Cash-vs-card payout netting: cash rows owe the platform their
+        // commission (company already holds the money), every other rail adds
+        // the company's net share. See utils/payoutNetting.js. This stage runs
+        // AFTER `kept` above: some MongoDB servers will not resolve a field
+        // added in the same $addFields stage, so the fraction-based fields
+        // reference `kept` from a stage earlier in the pipeline.
+        keptFraction: keptFractionExpr,
+        isCash: isCashExpr,
+        netContribution: netContributionExpr,
       },
     },
     {
@@ -92,7 +99,7 @@ export const buildPayoutSummary = async () => {
                   { $eq: ["$payoutStatus", "UNSETTLED"] },
                 ],
               },
-              "$kept",
+              "$netContribution",
               0,
             ],
           },
@@ -106,7 +113,7 @@ export const buildPayoutSummary = async () => {
                   { $eq: ["$payoutStatus", "PROCESSING"] },
                 ],
               },
-              "$kept",
+              "$netContribution",
               0,
             ],
           },
@@ -120,7 +127,18 @@ export const buildPayoutSummary = async () => {
                   { $eq: ["$payoutStatus", "SETTLED"] },
                 ],
               },
-              "$kept",
+              "$netContribution",
+              0,
+            ],
+          },
+        },
+        cashCommission: {
+          $sum: {
+            $cond: [
+              {
+                $and: ["$keepsRevenue", "$isCash"],
+              },
+              { $multiply: ["$commissionAmount", "$keptFraction"] },
               0,
             ],
           },
@@ -142,7 +160,13 @@ export const buildPayoutSummary = async () => {
     adjustments: 0,
     bookings: 0,
     partners: [],
+    cashCommission: 0,
   };
+
+  // Netted pipeline balance: card net earnings minus cash commissions owed.
+  // A company that owes more commission than it is owed shows zero payable and
+  // the uncovered commission is surfaced explicitly - never a negative payout.
+  const nettedPending = base.unsettled + base.processing;
 
   return {
     gross: base.gross,
@@ -151,7 +175,7 @@ export const buildPayoutSummary = async () => {
     companyEarnings: base.companyEarnings,
     effectiveRate:
       base.gross > 0 ? (base.platformTake / base.gross) * 100 : 0,
-    pendingPayouts: base.unsettled + base.processing,
+    pendingPayouts: Math.max(0, nettedPending),
     paidPayouts: base.settled,
     adjustments: base.adjustments,
     paidRatio:
@@ -163,6 +187,11 @@ export const buildPayoutSummary = async () => {
       status: "COMPLETED",
       payoutStatus: { $in: ["UNSETTLED", "PROCESSING"] },
     }),
+    // Netted-money detail (cash-vs-card settlement rules).
+    nettedBalance: nettedPending,
+    pendingNetted: nettedPending,
+    cashCommission: base.cashCommission,
+    outstandingCommission: Math.max(0, -nettedPending),
   };
 };
 
@@ -242,17 +271,6 @@ export const buildPayoutLedger = async ({
           },
         },
         keepsRevenue: { $in: ["$status", ["COMPLETED", "PARTIALLY_REFUNDED"]] },
-        keptFraction: {
-          $switch: {
-            branches: [
-              {
-                case: { $gt: ["$amount", 0] },
-                then: { $divide: ["$kept", "$amount"] },
-              },
-            ],
-            default: 0,
-          },
-        },
         refundedPortion: {
           $switch: {
             branches: [
@@ -265,6 +283,17 @@ export const buildPayoutLedger = async ({
             default: 0,
           },
         },
+      },
+    },
+    {
+      $addFields: {
+        // Cash-vs-card payout netting: cash rows owe the platform their
+        // commission (company already holds the money), every other rail adds
+        // the company's net share. See utils/payoutNetting.js (runs after the
+        // stage that materialises `kept`; see the summary pipeline note).
+        keptFraction: keptFractionExpr,
+        isCash: isCashExpr,
+        netContribution: netContributionExpr,
       },
     },
     {
@@ -286,13 +315,7 @@ export const buildPayoutLedger = async ({
           },
         },
         net: {
-          $sum: {
-            $cond: [
-              "$keepsRevenue",
-              { $multiply: ["$companyShare", "$keptFraction"] },
-              0,
-            ],
-          },
+          $sum: { $cond: ["$keepsRevenue", "$netContribution", 0] },
         },
         unsettled: {
           $sum: {
@@ -303,7 +326,7 @@ export const buildPayoutLedger = async ({
                   { $eq: ["$payoutStatus", "UNSETTLED"] },
                 ],
               },
-              "$kept",
+              "$netContribution",
               0,
             ],
           },
@@ -317,7 +340,7 @@ export const buildPayoutLedger = async ({
                   { $eq: ["$payoutStatus", "PROCESSING"] },
                 ],
               },
-              "$kept",
+              "$netContribution",
               0,
             ],
           },
@@ -331,7 +354,7 @@ export const buildPayoutLedger = async ({
                   { $eq: ["$payoutStatus", "SETTLED"] },
                 ],
               },
-              "$kept",
+              "$netContribution",
               0,
             ],
           },
@@ -389,6 +412,43 @@ export const buildPayoutLedger = async ({
           ],
           default: "CLEARED",
         },
+      },
+      // Netting cap: a company that owes platform commission on cash orders in
+      // excess of its card earnings has a negative unsettled balance. It is
+      // never paid a negative amount - the payable is shown as zero and the
+      // uncovered commission is flagged separately.
+      nettedBalance: {
+        $add: [
+          { $ifNull: ["$unsettled", 0] },
+          { $ifNull: ["$processing", 0] },
+        ],
+      },
+      outstandingCommission: {
+        $max: [
+          0,
+          {
+            $subtract: [
+              0,
+              {
+                $add: [
+                  { $ifNull: ["$unsettled", 0] },
+                  { $ifNull: ["$processing", 0] },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      payoutBalance: {
+        $max: [
+          0,
+          {
+            $add: [
+              { $ifNull: ["$unsettled", 0] },
+              { $ifNull: ["$processing", 0] },
+            ],
+          },
+        ],
       },
     },
   });

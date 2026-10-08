@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import {
@@ -13,6 +13,8 @@ import {
   Settings,
 } from "lucide-react";
 import { formatLYD } from "../../lib/bookingView";
+import { companyVehicleApi } from "../../lib/companyVehicleApi";
+import { ApiError } from "../../lib/apiClient";
 import type { CompanyVehicleData } from "../../types/companyVehicle";
 import { FleetStatusPill } from "./CompanyFleetBits";
 import { categoryLabel } from "./companyFleetUi";
@@ -24,8 +26,9 @@ interface CompanyVehicleHeaderProps {
 
 /**
  * Breadcrumb + live telematics flag, then the hero row: H1 make/model, the
- * real status pill, category chip, metadata ribbon and the action button
- * group (write actions stay behind "coming soon" — no partner edit forms exist).
+ * real status pill, category chip, metadata ribbon and the action button group
+ * (edit routes to the dossier form; the more-menu holds print, maintenance,
+ * publish/unpublish and archive — all tenant-gated vehicles endpoints).
  */
 export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
   data,
@@ -34,16 +37,68 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [actionBusy, setActionBusy] = useState(false);
+  const [toast, setToast] = useState("");
+  const toastTimer = useRef<number | undefined>(undefined);
+
+  const showToast = useCallback((message: string) => {
+    setToast(message);
+    if (toastTimer.current) window.clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(() => setToast(""), 3200);
+  }, []);
+
+  const runAction = useCallback(
+    async (action: () => Promise<unknown>, okKey: string, errorKey: string) => {
+      setActionBusy(true);
+      try {
+        await action();
+        showToast(t(okKey));
+      } catch (error) {
+        const message = error instanceof ApiError ? ` — ${error.message}` : "";
+        showToast(`${t(errorKey)}${message}`);
+      } finally {
+        setActionBusy(false);
+      }
+    },
+    [showToast, t],
+  );
+
+  const handleMaintenance = () => {
+    if (!window.confirm(t("company.vehiclePage.header.maintenanceConfirm"))) return;
+    void runAction(
+      () => companyVehicleApi.updateStatus(vehicle.id, "MAINTENANCE"),
+      "company.vehiclePage.header.maintenanceDone",
+      "company.vehiclePage.header.actionError",
+    );
+  };
+
+  const handleTogglePublish = () => {
+    if (!window.confirm(t("company.vehiclePage.header.publishConfirm"))) return;
+    const nextStatus = vehicle.listingStatus === "PUBLISHED" ? "SUSPENDED" : "PUBLISHED";
+    void runAction(
+      () => companyVehicleApi.updateStatus(vehicle.id, nextStatus),
+      nextStatus === "PUBLISHED"
+        ? "company.vehiclePage.header.published"
+        : "company.vehiclePage.header.unpublished",
+      "company.vehiclePage.header.actionError",
+    );
+  };
+
+  const handleArchive = () => {
+    if (!window.confirm(t("company.vehiclePage.header.archiveConfirm"))) return;
+    setActionBusy(true);
+    companyVehicleApi
+      .archive(vehicle.id)
+      .then(() => navigate("/company/fleet"))
+      .catch((error: unknown) => {
+        const message = error instanceof ApiError ? ` — ${error.message}` : "";
+        showToast(`${t("company.vehiclePage.header.actionError")}${message}`);
+      })
+      .finally(() => setActionBusy(false));
+  };  
 
   const { vehicle, company } = data;
   const hub = vehicle.city ?? vehicle.pickupLocation;
-
-  const moreItems = [
-    { key: "print", icon: FileText },
-    { key: "maintenance", icon: Cpu },
-    { key: "unpublish", icon: CalendarX2 },
-    { key: "archive", icon: Archive },
-  ];
 
   return (
     <div className="flex flex-col gap-4">
@@ -179,18 +234,62 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
                     className="fixed inset-0 z-20 cursor-default"
                   />
                   <div className="absolute right-0 top-full z-30 mt-2 w-64 rounded-xl border border-[#E5E7EB] bg-white p-1.5 shadow-[0_24px_48px_-8px_rgba(15,23,42,0.14)]">
-                    {moreItems.map((item) => (
-                      <button
-                        key={item.key}
-                        type="button"
-                        disabled
-                        title={t("company.vehiclePage.soon")}
-                        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-[#0B1C30] hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        <item.icon className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
-                        {t(`company.vehiclePage.header.${item.key}`)}
-                      </button>
-                    ))}
+                    <button
+                      key="print"
+                      type="button"
+                      disabled={actionBusy}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        window.print();
+                      }}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-[#0B1C30] hover:bg-[#F1F5F9] disabled:cursor-wait disabled:opacity-60"
+                    >
+                      <FileText className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+                      {t("company.vehiclePage.header.print")}
+                    </button>
+                    <button
+                      key="maintenance"
+                      type="button"
+                      disabled={actionBusy}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        handleMaintenance();
+                      }}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-[#0B1C30] hover:bg-[#F1F5F9] disabled:cursor-wait disabled:opacity-60"
+                    >
+                      <Cpu className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+                      {t("company.vehiclePage.header.maintenance")}
+                    </button>
+                    <button
+                      key={vehicle.listingStatus === "PUBLISHED" ? "unpublish" : "publish"}
+                      type="button"
+                      disabled={actionBusy}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        handleTogglePublish();
+                      }}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-[#0B1C30] hover:bg-[#F1F5F9] disabled:cursor-wait disabled:opacity-60"
+                    >
+                      <CalendarX2 className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+                      {t(
+                        `company.vehiclePage.header.${
+                          vehicle.listingStatus === "PUBLISHED" ? "unpublish" : "publish"
+                        }`,
+                      )}
+                    </button>
+                    <button
+                      key="archive"
+                      type="button"
+                      disabled={actionBusy}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        handleArchive();
+                      }}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-[#0B1C30] hover:bg-[#F1F5F9] disabled:cursor-wait disabled:opacity-60"
+                    >
+                      <Archive className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+                      {t("company.vehiclePage.header.archive")}
+                    </button>
                   </div>
                 </>
               )}
@@ -218,6 +317,13 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
           </div>
         )}
       </div>
+
+      {/* Action toast */}
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-[#0B1C30] px-4 py-3 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(8,19,31,0.35)]">
+          {toast}
+        </div>
+      )}
     </div>
   );
 };

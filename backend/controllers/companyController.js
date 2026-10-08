@@ -162,6 +162,23 @@ export const getCompanySettings = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * POST /companies/payouts/request — the operator asks the platform to run their
+ * next settlement cycle into the recorded bank rail. Company sessions only:
+ * the tenant is resolved from the session, so no other partner can be touched.
+ */
+export const requestCompanyPayout = catchAsync(async (req, res, next) => {
+  const companyId = resolveTenant(req, next);
+  if (!companyId) return;
+
+  const result = await companyService.requestCompanyPayout(companyId);
+
+  res.status(201).json({
+    status: "success",
+    data: { payout: result },
+  });
+});
+
 export const updateCompanyCommission = catchAsync(async (req, res, next) => {
   const company = await companyService.updateCompanyCommissionRate(
     req.params.id,
