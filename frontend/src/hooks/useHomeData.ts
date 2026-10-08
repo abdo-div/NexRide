@@ -106,7 +106,7 @@ export const useHomeData = (): HomeDataState => {
       try {
         const [vehicleRes, companyRes] = await Promise.all([
           vehicleApi.listAvailable(controller.signal),
-          companyApi.listActive(controller.signal),
+          companyApi.listActive({ signal: controller.signal }),
         ]);
         if (!active) return;
         setVehicles(vehicleRes.data.vehicles ?? []);

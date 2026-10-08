@@ -22,6 +22,9 @@ import { CompanyLayout } from "./components/company/CompanyLayout";
 // booking, checkout and payment screens are separate chunks so a first-time
 // visitor never downloads the booking/payment code.
 const FleetPage = lazy(() => import("./pages/FleetPage"));
+
+const CompaniesPage = lazy(() => import("./pages/CompaniesPage"));
+const CompanyProfilePage = lazy(() => import("./pages/CompanyProfilePage"));
 const VehicleDetailPage = lazy(() => import("./pages/VehicleDetailPage"));
 const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
 const BookingConfirmationPage = lazy(() =>
@@ -213,6 +216,22 @@ function App() {
         <Routes>
           <Route element={<PublicShell />}>
             <Route path="/" element={<HomePage />} />
+            <Route
+              path="/companies"
+              element={
+                <LazyRoute>
+                  <CompaniesPage />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path="/companies/:companyId"
+              element={
+                <LazyRoute>
+                  <CompanyProfilePage />
+                </LazyRoute>
+              }
+            />
             <Route
               path="/FleetPage"
               element={

@@ -1,6 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router";
+import { ArrowRight } from "lucide-react";
 import { OperatorCard } from "./OperatorsCard";
 import { HomeSectionError } from "./HomeSectionError";
 import type { FleetOperator } from "../../types/operators";
@@ -19,7 +21,10 @@ export const TrustedOperators: React.FC<TrustedOperatorsProps> = ({
   onRetry,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const showError = error !== null && !loading;
+  const showAllVisible = !loading && !showError && operators.length > 4;
+  const preview = operators.slice(0, 4);
 
   return (
     <section id="fleet-operators" className="w-full py-20 px-6 lg:px-12 bg-slate-50/60 border-b border-slate-200/80 overflow-hidden">
@@ -58,10 +63,30 @@ export const TrustedOperators: React.FC<TrustedOperatorsProps> = ({
       ) : showError ? (
         <HomeSectionError onRetry={onRetry} />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {operators.map((operator, index) => (
-            <OperatorCard key={operator.id} operator={operator} index={index} />
-          ))}
+        <div className="gap-5 flex flex-col">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {preview.map((operator, index) => (
+              <OperatorCard key={operator.id} operator={operator} index={index} />
+            ))}
+          </div>
+          {showAllVisible && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="flex justify-center"
+            >
+              <button
+                type="button"
+                onClick={() => navigate("/companies")}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-slate-200 shadow-sm hover:border-[#2563EB] hover:text-[#2563EB] text-slate-800 text-sm font-bold transition-all"
+              >
+                <span>{t("home.operators.showAllCompanies")}</span>
+                <ArrowRight className="w-4 h-4 rtl:rotate-180" />
+              </button>
+            </motion.div>
+          )}
         </div>
       )}
     </section>
