@@ -430,6 +430,7 @@ export const updateBookingStatus = catchAsync(async (req, res, next) => {
   const booking = await bookingService.updateLifecycleStatus(
     req.params.id,
     req.body.status,
+    req.user,
   );
 
   res.status(200).json({

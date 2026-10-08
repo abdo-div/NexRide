@@ -4,6 +4,8 @@ import Payment from "../models/payment_model.js";
 import Booking from "../models/booking_model.js";
 import Vehicle from "../models/vehicle_model.js";
 import AppError from "../utils/appError.js";
+import { logger } from "../utils/logger.js";
+import { isDevelopment } from "../config/env.js";
 import {
   moamalatConfig,
   isMoamalatConfigured,
@@ -73,8 +75,13 @@ export const generateSecureHash = ({
   terminalId,
 }) =>
   hmacDigest(
-    `Amount=${amount}&DateTimeLocalTrxn=${trxDateTime}&MerchantId=${merchantId}` +
-      `&MerchantReference=${merchantReference}&TerminalId=${terminalId}`,
+    canonicalCheckoutString({
+      amount,
+      trxDateTime,
+      merchantId,
+      merchantReference,
+      terminalId,
+    }),
   ).toUpperCase();
 
 /**
@@ -89,6 +96,73 @@ export const generateVerificationHash = ({
   hmacDigest(
     `DateTimeLocalTrxn=${trxDateTime}&MerchantId=${merchantId}&TerminalId=${terminalId}`,
   );
+
+const HEX_RE = /^[0-9a-f]+$/i;
+
+const equalsHex = (expectedHex, providedHex) => {
+  if (typeof expectedHex !== "string" || typeof providedHex !== "string") {
+    return false;
+  }
+  if (!HEX_RE.test(expectedHex) || !HEX_RE.test(providedHex)) {
+    return false;
+  }
+  const expected = Buffer.from(expectedHex, "hex");
+  const provided = Buffer.from(providedHex, "hex");
+  if (expected.length !== provided.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(expected, provided);
+};
+
+const canonicalCheckoutString = ({
+  amount,
+  trxDateTime,
+  merchantId,
+  merchantReference,
+  terminalId,
+}) =>
+  `Amount=${amount}&DateTimeLocalTrxn=${trxDateTime}&MerchantId=${merchantId}` +
+  `&MerchantReference=${merchantReference}&TerminalId=${terminalId}`;
+
+/**
+ * Verifies a Moamalat-side signature (SecureHash / SecuredHash) against the
+ * canonical amount + transaction window message, discriminator-free. The
+ * comparison is constant-time over the hex digests so an attacker cannot learn
+ * the signature byte by byte, and any malformed/absent input is rejected.
+ *
+ * The gateway hashes the checkout fields, so the parties agreeing on this
+ * string are the frontend configure object and any signature echoed back on a
+ * verified transaction - both must match identically.
+ */
+export const verifySecureHashSignature = ({
+  signature,
+  amount,
+  trxDateTime,
+  merchantId,
+  merchantReference,
+  terminalId,
+}) => {
+  if (
+    typeof signature !== "string" ||
+    signature.length === 0 ||
+    amount == null ||
+    typeof trxDateTime !== "string" ||
+    trxDateTime.length === 0
+  ) {
+    return false;
+  }
+  const expected = hmacDigest(
+    canonicalCheckoutString({
+      amount,
+      trxDateTime,
+      merchantId,
+      merchantReference,
+      terminalId,
+    }),
+  ).toUpperCase();
+  // The gateway echoes UPPERCASE digests, but a sandbox may send lowercase.
+  return equalsHex(expected, String(signature).toUpperCase());
+};
 
 // -----------------------------------------------------------------------------
 // Checkout orchestration
@@ -182,11 +256,12 @@ export const verifyTransaction = async ({
   }
 
   if (!response?.ok || !gateway) {
-    console.error(
-      "Moamalat verification request failed:",
-      response?.status,
-      responseText,
-    );
+    logger.error({
+      channel: "moamalat",
+      ok: Boolean(response),
+      status: response?.status ?? null,
+      reason: "Moamalat verification request failed",
+    });
     return {
       verified: false,
       reason: "Moamalat verification request failed.",
@@ -195,51 +270,29 @@ export const verifyTransaction = async ({
     };
   }
 
-  console.log("Moamalat verification response:", JSON.stringify(gateway, null, 2));
-
   let matchedTransaction = null;
 
-  // Manager reference implementation: walk Transactions array -> DateTransactions
-  if (Array.isArray(gateway.Transactions)) {
-    for (const group of gateway.Transactions) {
-      if (!group || !Array.isArray(group.DateTransactions)) {
-        continue;
-      }
-      for (const txn of group.DateTransactions) {
-        if (
-          txn &&
-          String(txn.MerchantReference) === String(merchantReference)
-        ) {
-          matchedTransaction = txn;
-          break;
-        }
-      }
-      if (matchedTransaction) break;
-    }
-  }
-
-  // Fallback tree walk if nested under a different root
-  if (!matchedTransaction) {
-    const collectRows = (node, rows = []) => {
-      if (!node || typeof node !== "object") return rows;
-      if (Array.isArray(node)) {
-        node.forEach((entry) => collectRows(entry, rows));
-        return rows;
-      }
-      if (node.MerchantReference) {
-        rows.push(node);
-        return rows;
-      }
-      ["Transactions", "DateTransactions"].forEach((key) => {
-        if (node[key]) collectRows(node[key], rows);
-      });
+  // Manager reference implementation: walk Transactions array -> DateTransactions.
+  // Tolerant of a naked object envelope (no array wrapper) and missing keys.
+  const collectRows = (node, rows = []) => {
+    if (!node || typeof node !== "object") return rows;
+    if (Array.isArray(node)) {
+      node.forEach((entry) => collectRows(entry, rows));
       return rows;
-    };
-
-    matchedTransaction = collectRows(gateway, []).find(
-      (row) => String(row.MerchantReference) === String(merchantReference),
-    );
-  }
+    }
+    if (node.MerchantReference) {
+      rows.push(node);
+      return rows;
+    }
+    ["Transactions", "DateTransactions"].forEach((key) => {
+      if (node[key]) collectRows(node[key], rows);
+    });
+    return rows;
+  };
+  const rows = collectRows(gateway, []);
+  matchedTransaction = rows.find(
+    (row) => String(row.MerchantReference) === String(merchantReference),
+  );
 
   if (!matchedTransaction) {
     return {
@@ -251,6 +304,61 @@ export const verifyTransaction = async ({
       networkReference: "",
       amount: 0,
     };
+  }
+
+  // When the matched transaction echoes a signature, rely on it: a payment
+  // whose SecureHash/SecuredHash does not match our canonical payload is not
+  // verified. Sandboxes that do not echo a signature (or omit the transaction
+  // date time it is signed over) cannot be reconstructed, so they are refused
+  // as unverifiable rather than trusted by absence.
+  const txnSignature =
+    matchedTransaction.SecureHash ??
+    matchedTransaction.SecuredHash ??
+    matchedTransaction.secureHash ??
+    null;
+  if (txnSignature) {
+    const txnDateTime =
+      typeof matchedTransaction.DateTimeLocalTrxn === "string" &&
+      /^\d{10,14}$/.test(matchedTransaction.DateTimeLocalTrxn)
+        ? matchedTransaction.DateTimeLocalTrxn.slice(0, 12)
+        : null;
+    const signatureValid =
+      txnDateTime != null &&
+      verifySecureHashSignature({
+        signature: txnSignature,
+        amount: matchedTransaction.AmountTrxn,
+        trxDateTime: txnDateTime,
+        merchantId: moamalatConfig.merchantId,
+        merchantReference: String(merchantReference),
+        terminalId: moamalatConfig.terminalId,
+      });
+
+    if (!signatureValid) {
+      return {
+        verified: false,
+        reason: "Transaction signature could not be validated.",
+        status: "SIGNATURE_MISMATCH",
+        merchantReference,
+        systemReference: matchedTransaction.TransactionId
+          ? String(matchedTransaction.TransactionId)
+          : "",
+        networkReference: matchedTransaction.RRN || "",
+        amount: Number(matchedTransaction.AmountTrxn ?? 0),
+      };
+    }
+  }
+
+  if (isDevelopment()) {
+    logger.info(
+      {
+        channel: "moamalat",
+        reference: String(merchantReference),
+        matched: true,
+        signaturePresent: Boolean(txnSignature),
+        signatureValid: true,
+      },
+      "Moamalat verification matched a transaction",
+    );
   }
 
   const gatewayAmount = Number(matchedTransaction.AmountTrxn);

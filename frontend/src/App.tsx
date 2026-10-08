@@ -169,14 +169,21 @@ function LazyRoute({ children }: { children: ReactNode }) {
 
 /**
  * Resets the window scroll position on every route change so a navigation from
- * a long page (e.g. fleet) never opens the next route half-way down.
+ * a long page (e.g. fleet) never opens the next route half-way down. When the
+ * location carries a hash (e.g. `/#how-it-works` from the nav bar), scrolls to
+ * that section instead.
  */
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    if (hash) {
+      const target = document.querySelector(hash);
+      if (target) target.scrollIntoView({ block: "start" });
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, hash]);
 
   return null;
 }

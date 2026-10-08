@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { Bolt, CheckCircle2, ShieldCheck, Lock, Info, Headphones, ArrowRight } from "lucide-react";
 import { DetailIcon } from "./iconMap";
-import { hasStaticDetail } from "../../data/vehicleDetailData";
 import { bookingApi } from "../../lib/bookingApi";
 import type { VehicleDetail } from "../../types/vehicleDetail";
 
@@ -21,11 +20,6 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
   const [protection, setProtection] = React.useState(detail.protectionPlans[0]?.id ?? "standard");
   const [check, setCheck] = React.useState<"idle" | "checking" | "available" | "unavailable">("idle");
   const [checkError, setCheckError] = React.useState<string | null>(null);
-
-  // Placeholder fleet ids have no real vehicle behind them, so they keep the
-  // old direct-navigation (mock) checkout flow. Real bookings go through the
-  // live availability check first.
-  const isStatic = hasStaticDetail(detail.id);
 
   const plan = detail.protectionPlans.find((p) => p.id === protection) ?? detail.protectionPlans[0];
   const days = Math.max(daysBetween(pickupDate, returnDate), detail.minDays);
@@ -63,10 +57,6 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
   };
 
   const onPrimaryClick = () => {
-    if (isStatic) {
-      navigate(`/checkout/${detail.id}`);
-      return;
-    }
     if (check === "available") {
       continueToCheckout();
       return;
@@ -74,9 +64,8 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
     void runCheck();
   };
 
-  const primaryLabel = isStatic
-    ? t(detail.reserveLabel)
-    : check === "checking"
+  const primaryLabel =
+    check === "checking"
       ? t("vehicleDetail.checkingAvailability")
       : check === "available"
         ? t("vehicleDetail.continueToCheckout")
@@ -243,13 +232,13 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
           </div>
         </div>
 
-        {!isStatic && check === "available" && (
+        {check === "available" && (
           <div className="mb-4 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-[12px] font-semibold">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             {t("vehicleDetail.availableForDates")}
           </div>
         )}
-        {!isStatic && check === "unavailable" && (
+        {check === "unavailable" && (
           <div className="mb-4 px-3 py-2.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-[12px] font-semibold">
             <p className="flex items-center gap-2">
               <Info className="w-4 h-4 shrink-0" />

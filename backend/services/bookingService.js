@@ -477,31 +477,121 @@ export const cancelBookingById = async (bookingId, user, { reason = null } = {})
 };
 
 /**
- * Company Fleet Status Lifecycle Transition (CONFIRMED -> ACTIVE -> COMPLETED)
+ * Company Fleet Status Lifecycle transition map.
+ *
+ * The value of each entry is the set of allowed target statuses for a booking
+ * currently in that key state. COMPLETED, CANCELLED and EXPIRED are terminal:
+ * once a booking reaches one of them it can never move again. EXPIRED is never
+ * a valid *target* through the operator pipeline at all - it is produced only
+ * by the background expiry reaper (bookingExpiry.service.js).
  */
-export const updateLifecycleStatus = async (bookingId, status) => {
-  const validStatuses = [
-    "PENDING_PAYMENT",
-    "PAID",
-    "CONFIRMED",
-    "ACTIVE",
-    "COMPLETED",
-    "CANCELLED",
-    "EXPIRED",
-  ];
-  if (!status || !validStatuses.includes(status.toUpperCase())) {
+export const BOOKING_STATUS_TRANSITIONS = Object.freeze({
+  PENDING_PAYMENT: ["PAID", "CONFIRMED", "CANCELLED"],
+  PAID: ["CONFIRMED", "CANCELLED"],
+  CONFIRMED: ["ACTIVE", "CANCELLED"],
+  ACTIVE: ["COMPLETED", "CANCELLED"],
+  COMPLETED: [],
+  CANCELLED: [],
+  EXPIRED: [],
+});
+
+/**
+ * Transitions that require real money before the booking may leave its current
+ * state. Both rails flip `booking.paymentStatus = "PAID"` before this method is
+ * ever relevant: Moamalat online capture (moamalat.service.js) and the
+ * cash-on-delivery collection path (markCashPaymentCompleted). There is no
+ * separate "COLLECTED" booking state - cash collection writes the same field -
+ * so a single `paymentStatus === "PAID"` guard is the unified precondition.
+ */
+const PAYMENT_REQUIRED_TARGETS = new Set(["PAID", "CONFIRMED", "COMPLETED"]);
+
+/**
+ * Company Fleet Status Lifecycle Transition with a strict state machine.
+ *
+ * Enforced rules:
+ *   - PENDING_PAYMENT -> PAID / CONFIRMED only once the payment is confirmed
+ *     (`paymentStatus === "PAID"`).
+ *   - CONFIRMED -> ACTIVE (pickup) then ACTIVE -> COMPLETED (return).
+ *   - CANCELLED is reachable from any open (non-terminal) state.
+ *   - COMPLETED requires `paymentStatus === "PAID"` (online or cash).
+ *   - Direct PENDING_PAYMENT -> COMPLETED / ACTIVE is rejected.
+ *   - Terminal states (COMPLETED/CANCELLED/EXPIRED) never transition again.
+ *
+ * Reaching COMPLETED or CANCELLED releases the vehicle back to "AVAILABLE"
+ * inside the same transaction as the status write, so the two states can never
+ * go out of sync. A maintenance lock is never overridden (mirrors the guard in
+ * cancelBookingById), so completing or cancelling can never un-quarantine a
+ * unit the operator intentionally took off the market.
+ */
+export const updateLifecycleStatus = async (bookingId, status, actorUser = null) => {
+  const target = String(status ?? "").toUpperCase();
+
+  if (!Object.hasOwn(BOOKING_STATUS_TRANSITIONS, target)) {
     throw new AppError(
-      `Invalid booking status. Must be one of: ${validStatuses.join(", ")}`,
+      `Invalid booking status. Must be one of: ${Object.keys(BOOKING_STATUS_TRANSITIONS).join(", ")}`,
       400,
     );
   }
 
-  const booking = await Booking.findByIdAndUpdate(
-    bookingId,
-    { bookingStatus: status.toUpperCase() },
-    { new: true, runValidators: true },
-  );
-
+  const booking = await Booking.findById(bookingId);
   if (!booking) throw new AppError("Booking not found", 404);
-  return booking;
+
+  const from = booking.bookingStatus;
+
+  if (target === from) {
+    throw new AppError(`Booking is already ${target}`, 400);
+  }
+
+  if (!BOOKING_STATUS_TRANSITIONS[from]?.includes(target)) {
+    throw new AppError(
+      `Invalid booking status transition: ${from} -> ${target}`,
+      400,
+    );
+  }
+
+  if (PAYMENT_REQUIRED_TARGETS.has(target) && booking.paymentStatus !== "PAID") {
+    throw new AppError(
+      `Booking cannot transition to ${target} until its payment is confirmed (paymentStatus must be "PAID").`,
+      400,
+    );
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    booking.bookingStatus = target;
+
+    if (target === "CANCELLED") {
+      booking.cancelledBy = actorUser?.id ?? actorUser?._id ?? booking.cancelledBy;
+      booking.cancelledAt = booking.cancelledAt ?? new Date();
+      booking.cancellationReason =
+        booking.cancellationReason ?? "Booking cancelled by operator";
+    }
+
+    await booking.save({ session, validateBeforeSave: false });
+
+    if (target === "COMPLETED" || target === "CANCELLED") {
+      const openMaintenance = await MaintenanceEvent.exists({
+        vehicleId: booking.vehicleId,
+        status: { $ne: "COMPLETED" },
+      }).session(session);
+
+      if (!openMaintenance) {
+        await Vehicle.findByIdAndUpdate(
+          booking.vehicleId,
+          { $set: { operationalStatus: "AVAILABLE" } },
+          { session },
+        );
+      }
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+    return booking;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
 };

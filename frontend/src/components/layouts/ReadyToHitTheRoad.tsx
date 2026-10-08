@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 import { ArrowRight, Phone } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -43,23 +44,23 @@ export const ReadyToHitTheRoad: React.FC = () => {
 
         <div className="flex flex-wrap items-center justify-center gap-4">
           <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
-            <a
-              href="#featured-fleet"
+            <Link
+              to="/fleet"
               className="px-6 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-lg shadow-blue-600/25 flex items-center gap-2 transition-all"
             >
               <span>{t("cta.exploreVehicles")}</span>
               <ArrowRight className="w-4 h-4 rtl:rotate-180" />
-            </a>
+            </Link>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
-            <a
-              href="#contact"
+            <Link
+              to="/#contact"
               className="px-6 py-3.5 rounded-2xl bg-[#0b1220] border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white font-extrabold text-xs flex items-center gap-2 transition-all"
             >
               <span>{t("cta.contactConcierge")}</span>
               <Phone className="w-3.5 h-3.5 text-slate-400" />
-            </a>
+            </Link>
           </motion.div>
         </div>
       </motion.div>

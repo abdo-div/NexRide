@@ -301,7 +301,14 @@ export const useCompanyVehicleEditForm = (
         const current = mapCurrent(draft);
         const payload: Record<string, unknown> = {};
 
-        if (mode === "draft") payload.listingStatus = "DRAFT";
+        if (mode === "draft") {
+          // "Save as draft" always parks the listing in DRAFT regardless of the
+          // status toggle; a tone change cannot slip a published listing out or
+          // publish one while the operator only asked to save their work.
+          payload.listingStatus = "DRAFT";
+        } else if (changed.listingChanged) {
+          payload.listingStatus = listingStatus;
+        }
 
         changed.fields.forEach((key) => {
           const raw = current[key];
@@ -336,17 +343,17 @@ export const useCompanyVehicleEditForm = (
           }
         });
 
-        if (changed.listingChanged) payload.listingStatus = listingStatus;
         if (changed.photosChanged) payload.photos = photos;
 
         if (newImages.length > 0) {
           const formData = new FormData();
           Object.entries(payload).forEach(([key, value]) => {
-            // Multipart fields are strings; null (cleared weekly rate) and the
-            // photos array can't cross that wire, and uploads replace the
-            // photo set anyway, so both are skipped here.
-            if (value === null || Array.isArray(value)) return;
-            formData.append(key, String(value));
+            // Multipart fields are strings. A null (cleared weekly rate) is
+            // conveyed as an empty string — the backend normalises "" back to
+            // null — and uploads replace the photo set, so the new filenames
+            // from `photos` cannot cross this wire and are skipped here.
+            if (Array.isArray(value)) return;
+            formData.append(key, value === null ? "" : String(value));
           });
           newImages.forEach((file) => formData.append("images", file));
           await companyVehicleApi.update(vehicle.id, formData);

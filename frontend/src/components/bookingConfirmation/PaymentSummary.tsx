@@ -40,7 +40,7 @@ export const PaymentSummary: React.FC<Props> = ({
             <span className="font-mono text-[#0F172A] font-semibold">{line.amount}</span>
           </div>
         ))}
-        {paymentStatus !== "UNPAID" && <div className="pt-2">
+        {paymentStatus !== "UNPAID" && payment.depositAmount && <div className="pt-2">
           <div className="p-3 rounded-xl bg-[#F8FAFC] flex items-center justify-between">
             <span className="text-[12px] text-[#0F172A] font-medium">{t(payment.depositLabel)}</span>
             <span className="font-mono font-bold text-[#0F172A]">{payment.depositAmount}</span>
@@ -64,28 +64,26 @@ export const PaymentSummary: React.FC<Props> = ({
         </div>
       </div>
 
-      <div className="flex items-center gap-3 pt-2 text-[#64748B] text-[11px]">
-        {isPaid ? (
-          <>
-            <CreditCard className="w-[18px] h-[18px] text-[#2563EB]" />
-            <span>
-              {t(payment.viaNote)} <strong className="text-[#0F172A">{cardEnding}</strong> (
-              {t("booking.payment.authLabel")} <strong className="text-[#0F172A">{authRef}</strong>)
-            </span>
-          </>
-        ) : (
-          <>
-            <Banknote className="w-[18px] h-[18px] text-amber-700" />
-            <span>
-              {t(
-                isUnpaidCash
-                  ? "booking.payment.cashPendingNote"
-                  : "booking.payment.pendingNote",
-              )}
-            </span>
-          </>
-        )}
-      </div>
+      {isPaid && authRef ? (
+        <div className="flex items-center gap-3 pt-2 text-[#64748B] text-[11px]">
+          <CreditCard className="w-[18px] h-[18px] text-[#2563EB]" />
+          <span>
+            {t(payment.viaNote)} <strong className="text-[#0F172A">{cardEnding}</strong> (
+            {t("booking.payment.authLabel")} <strong className="text-[#0F172A">{authRef}</strong>)
+          </span>
+        </div>
+      ) : !isPaid ? (
+        <div className="flex items-center gap-3 pt-2 text-[#64748B] text-[11px]">
+          <Banknote className="w-[18px] h-[18px] text-amber-700" />
+          <span>
+            {t(
+              isUnpaidCash
+                ? "booking.payment.cashPendingNote"
+                : "booking.payment.pendingNote",
+            )}
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 };

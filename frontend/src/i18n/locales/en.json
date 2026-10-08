@@ -838,10 +838,13 @@
       "certifiedFleets": "Certified Fleets",
       "reservationPerks": "Reservation Perks",
       "locations": {
-        "mitiga": "Tripoli - Mitiga Airport (MJI)",
-        "downtown": "Tripoli Downtown / Hai Al-Andalus",
-        "benina": "Benghazi - Benina Airport (BEN)",
-        "misrata": "Misrata Commercial Free Zone"
+        "tripoli": "Tripoli",
+        "benghazi": "Benghazi",
+        "misrata": "Misrata",
+        "sabha": "Sabha",
+        "zawiya": "Zawiya",
+        "tobruk": "Tobruk",
+        "alKhums": "Al Khums"
       },
       "bodies": {
         "suv": "SUVs",
@@ -1343,11 +1346,11 @@
       "title1": "Payment & Reservation",
       "title2": "Handover & Key Delivery",
       "title3": "Vehicle Return",
-      "detail1": "Paid {{amount}} • 24 Oct 2024",
+      "detail1": "Paid {{amount}}",
       "detailPaymentPending": "Payment of {{amount}} has not yet been collected.",
       "detailCashPending": "Cash collection of {{amount}} is due at vehicle pickup.",
-      "detail2": "24 Oct 2024 · 10:00 AM at Mitiga VIP",
-      "detail3": "27 Oct 2024 · 10:00 AM (Mitiga)"
+      "detail2": "Handover arranged at the pickup location",
+      "detail3": "Vehicle returned at the drop-off depot"
     },
     "vehicle": {
       "badgeTier": "Executive Tier",
@@ -1357,7 +1360,7 @@
     },
     "operator": {
       "location": "Tripoli Central",
-      "ratingNote": "142 verified bookings",
+      "ratingNote": "NexRide verified partner",
       "phoneLabel": "Contact Depot Dispatch"
     },
     "identification": {
@@ -1395,7 +1398,8 @@
       "baseRental": "Vehicle Base Rental ({{price}} LYD × {{days}} days)",
       "addonDays": "{{name}} ({{price}} LYD × {{days}} days)",
       "addonFlat": "{{name}} ({{price}} LYD flat)",
-      "municipalFee": "Municipal Fleet Fee & Platform Tax"
+      "municipalFee": "Municipal Fleet Fee & Platform Tax",
+      "discount": "Discount Applied"
     },
     "protocol": {
       "title": "Arrival & Handover Protocol",
@@ -1410,13 +1414,25 @@
       },
       "cancellation": {
         "title": "Cancellation Policy",
-        "body": "Free 100% refund available up to 24 hours prior to scheduled departure (before 23 Oct 2024, 10:00 AM)."
+        "body": "Free 100% refund available up to 24 hours before the scheduled pickup."
       }
     },
     "dock": {
       "back": "Back to Marketplace",
       "browseMore": "Browse More Vehicles",
       "manage": "Manage Reservation"
+    },
+    "loading": "Loading your booking…",
+    "empty": {
+      "title": "No booking selected",
+      "desc": "Open this page from a completed checkout or from your bookings list.",
+      "action": "Go to My Bookings"
+    },
+    "notFound": {
+      "title": "Booking not found",
+      "desc": "This booking does not exist, or you don't have access to it. Check the link or try again.",
+      "action": "Go to My Bookings",
+      "retry": "Try again"
     }
   },
   "payment": {
@@ -1876,6 +1892,8 @@
       "yourCompany": "Your company",
       "exportFleet": "Export Fleet Report",
       "requestClearance": "Request Payout Clearance",
+      "payoutRequested": "Payout request received — {{amount}} queued for {{bankName}}.",
+      "payoutError": "Payout request failed: {{message}}",
       "addVehicle": "+ Add New Vehicle",
       "clearingTitle": "Weekly Clearing Status",
       "cycleLabel": "Cycle # {{cycle}}",
@@ -2101,9 +2119,21 @@
         "checkpaid": "Payment cleared",
         "checksigned": "Keys & contract signed",
         "verifyHandover": "Verify & Start Handover",
+        "verifyHandoverHint": "Starts the rental once the booking is confirmed.",
         "verifyBlocked": "{{remaining}} checks incomplete",
         "soon": "Coming soon",
         "printContract": "Print Contract",
+        "saving": "Saving…",
+        "terminalAction": "Booking closed",
+        "terminalCaption": "This booking is already closed.",
+        "collectCash": "Collect Cash",
+        "waitingPayment": "Awaiting payment",
+        "waitingPaymentHint": "Waiting for the customer's gateway payment to clear.",
+        "confirmBooking": "Confirm Booking",
+        "completeRental": "Complete Rental",
+        "cancelBooking": "Cancel Booking",
+        "cancelHint": "Cancel with an operator reason.",
+        "cancelPrompt": "Reason for cancellation (or leave empty):",
         "messageDriver": "Message Driver",
         "protocolTitle": "Libyan Unified Rental Protocol",
         "protocolBody": "Before release, confirm the 4 handover checks and hand over the digital keys. Each trip is recorded against the plate for fleet accountability."
@@ -2114,6 +2144,12 @@
         "body": "Bookings for your vehicles will appear here once customers make reservations.",
         "bodyAr": "ستظهر حجوزات مركباتك هنا بمجرد قيام العملاء بالحجز.",
         "hint": "Tip: adjust or clear the filters to widen the register."
+      },
+      "toasts": {
+        "statusUpdated": "Booking updated",
+        "statusError": "Could not update booking",
+        "cashCollected": "Cash collected — booking marked as paid",
+        "bookingCancelled": "Booking cancelled"
       }
     },
     "fleetPage": {
@@ -2321,8 +2357,6 @@
         "categoryAll": "All Types",
         "inspection": "Inspection Result",
         "soonLabel": "Inspection — coming soon",
-        "simulateEmpty": "Preview empty state",
-        "simulateEmptyHint": "Developer preview: render the ledger as if no records existed",
         "reset": "Reset"
       },
       "table": {
@@ -2338,6 +2372,7 @@
         "actions": "Actions",
         "empty": "No maintenance records match this view yet.",
         "completeWork": "Mark work complete",
+        "completed": "Work Completed",
         "details": "Details"
       },
       "drawer": {
@@ -2519,17 +2554,23 @@
         "title": "Payout & Bank Details",
         "titleAr": "الدفعات والبيانات البنكية",
         "description": "How cleared escrow funds reach your account.",
+        "explainer": "Your settlement rail. Payouts are wired into this account once the platform approves each cycle.",
         "commission": "Platform Commission",
         "commissionApplied": "{{rate}}% applied to gross revenue",
         "commissionStandard": "Standard marketplace rate applied",
         "bankName": "Bank Name",
+        "bankNamePlaceholder": "e.g. Libyan Foreign Bank",
         "bankHint": "Clearing bank used for escrow payouts",
-        "accountNumber": "Account Number",
         "holder": "Account Holder",
+        "accountNamePlaceholder": "Name on the account",
         "iban": "IBAN / Swift",
+        "ibanPlaceholder": "LY ...",
         "clearance": "Clearance Cycle",
         "clearanceHint": "Funds clear weekly via LFB RTGS.",
-        "updateBank": "Update bank details"
+        "updateBank": "Update bank details",
+        "saved": "Bank details saved",
+        "saving": "Saving…",
+        "savedToast": "Bank rail updated"
       },
       "security": {
         "title": "Security & Sessions",
@@ -2913,8 +2954,16 @@
         "more": "More actions",
         "print": "Print Spec Sheet",
         "maintenance": "Schedule Maintenance",
+        "maintenanceConfirm": "Mark this vehicle as under maintenance? It leaves the dispatchable pool until you re-enable it.",
+        "maintenanceDone": "Vehicle marked as under maintenance",
         "unpublish": "Unpublish from Marketplace",
-        "archive": "Archive Vehicle Record"
+        "publish": "Publish to Marketplace",
+        "publishConfirm": "Toggle the marketplace listing for this vehicle?",
+        "published": "Vehicle is now published",
+        "unpublished": "Vehicle is now unpublished",
+        "archive": "Archive Vehicle Record",
+        "archiveConfirm": "Archive this vehicle? Its booking history is preserved.",
+        "actionError": "Action failed"
       },
       "ops": {
         "completed": "Completed Bookings",

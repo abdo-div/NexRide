@@ -306,15 +306,17 @@ test("P1-2a: payout summary scales kept revenue by refunded portion and never pa
 
   const summary = await buildPayoutSummary();
 
-  const [matchStage, addFieldsStage, groupStage] = aggregatePipeline;
+  const [matchStage, keptStage, fractionStage, groupStage] = aggregatePipeline;
   assert.deepEqual(matchStage.$match.status.$in, [
     "COMPLETED",
     "REFUNDED",
     "PARTIALLY_REFUNDED",
   ]);
-  assert.ok(addFieldsStage.$addFields.kept);
-  assert.ok(addFieldsStage.$addFields.keptFraction);
-  assert.ok(addFieldsStage.$addFields.refundedPortion);
+  assert.ok(keptStage.$addFields.kept);
+  assert.ok(keptStage.$addFields.refundedPortion);
+  // keptFraction + netContribution live in a second stage because this MongoDB
+  // does not resolve a field added earlier in the same $addFields stage.
+  assert.ok(fractionStage.$addFields.keptFraction);
   assert.equal(groupStage.$group.adjustments.$sum, "$refundedPortion");
   assert.equal(groupStage.$group.gross.$sum.$cond[0], "$keepsRevenue");
   assert.equal(summary.adjustments, 150, "refunded portion feeds the adjustments total");

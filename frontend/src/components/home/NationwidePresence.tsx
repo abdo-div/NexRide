@@ -23,7 +23,7 @@ export const NationwidePresence: React.FC<NationwidePresenceProps> = ({
   const showError = error !== null && !loading;
 
   return (
-    <section className="w-full py-20 px-6 lg:px-12 bg-[#030712] text-white border-b border-slate-900 overflow-hidden">
+    <section id="locations" className="w-full py-20 px-6 lg:px-12 bg-[#030712] text-white border-b border-slate-900 overflow-hidden">
       {/* Section Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

@@ -64,7 +64,6 @@ export const CompanyMaintenancePage: React.FC = () => {
   const [selectedId, setSelectedId] = useState<string>("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [simulateEmpty, setSimulateEmpty] = useState(false);
   const [toast, setToast] = useState("");
   const toastTimer = useRef<number | undefined>(undefined);
 
@@ -116,6 +115,7 @@ export const CompanyMaintenancePage: React.FC = () => {
   };
 
   const handleRelease = async (event: MaintenanceEventDto) => {
+    if (event.dispatchStatus === "COMPLETED") return;
     const vehicle = typeof event.vehicleId === "object" ? event.vehicleId : null;
     const vehicleId = vehicle?._id ?? String(event.vehicleId);
     if (!vehicleId) return;
@@ -124,7 +124,7 @@ export const CompanyMaintenancePage: React.FC = () => {
     showToast(ok ? t("company.maintenance.toasts.released") : t("company.maintenance.toasts.error"));
   };
 
-  const showEmpty = simulateEmpty || (!loading && !error && data.events.length === 0);
+  const showEmpty = !loading && !error && data.events.length === 0;
 
   return (
     <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
@@ -197,8 +197,6 @@ export const CompanyMaintenancePage: React.FC = () => {
                   onCategoryChange={(value) =>
                     setCategory(value as MaintenanceCategory | "ALL")
                   }
-                  simulateEmpty={simulateEmpty}
-                  onSimulateEmptyChange={(value) => setSimulateEmpty(value)}
                   onReset={resetFilters}
                 />
 

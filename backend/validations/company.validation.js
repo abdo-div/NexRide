@@ -30,8 +30,18 @@ const companyBody = z.object({
 
 export const createCompanySchema = z.object({ body: companyBody });
 
+// Direct RTGS settlement rail chosen by the operator. Leaving a field empty is
+// allowed (each entry is optional); the model uppercases the IBAN on save.
+const companyPayoutBody = z.object({
+  accountName: z.string().trim().max(120, "Account name cannot exceed 120 characters").optional(),
+  bankName: z.string().trim().max(80, "Bank name cannot exceed 80 characters").optional(),
+  iban: z.string().trim().max(40, "IBAN cannot exceed 40 characters").optional(),
+});
+
 export const updateCompanySchema = z.object({
-  body: companyBody.partial(),
+  body: companyBody.partial().extend({
+    payout: companyPayoutBody.partial().optional(),
+  }),
 });
 
 export const updateCommissionSchema = z.object({

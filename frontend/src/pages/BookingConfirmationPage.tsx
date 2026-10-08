@@ -1,11 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams, useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { ShieldCheck, CheckCircle2 } from "lucide-react";
-import { getBookingConfirmation } from "../data/bookingConfirmationData";
+import {
+  ShieldCheck,
+  CheckCircle2,
+  CalendarX2,
+  Car,
+  ArrowLeft,
+  RefreshCw,
+} from "lucide-react";
 import { vehicleApi } from "../lib/vehicleApi";
 import { bookingApi } from "../lib/bookingApi";
-import { mapVehicle } from "../lib/vehicleMapper";
+import { mapVehicle, photoUrl, initialsFrom } from "../lib/vehicleMapper";
 import { ConfirmationHeader } from "../components/bookingConfirmation/ConfirmationHeader";
 import { ConfirmationToast } from "../components/bookingConfirmation/ConfirmationToast";
 import { ReferenceBar } from "../components/bookingConfirmation/ReferenceBar";
@@ -17,7 +23,12 @@ import { PaymentSummary } from "../components/bookingConfirmation/PaymentSummary
 import { HandoverProtocol } from "../components/bookingConfirmation/HandoverProtocol";
 import { ActionDock } from "../components/bookingConfirmation/ActionDock";
 import type { BookingDto } from "../types/booking";
-import type { ConfirmationData, ConfirmationMeta, FareLine } from "../types/bookingConfirmation";
+import type {
+  ConfirmationData,
+  ConfirmationMeta,
+  FareLine,
+  Milestone,
+} from "../types/bookingConfirmation";
 import type { Vehicle } from "../types/vehicle";
 
 const TOAST_MS = 2500;
@@ -28,42 +39,343 @@ const lyd2 = (n: number) => `${fmt2(n)} LYD`;
 
 const referenceCodeFrom = (id: string) => `NX-${id.slice(-6).toUpperCase()}`;
 
+/**
+ * Projects the booking's embedded vehicle reference into the shape the cards
+ * render. Used only when the live GET /vehicles/:id round-trip fails, so the
+ * confirmation never depends on static mock data. Every value comes from the
+ * booking document itself.
+ */
+const vehicleFromBooking = (booking: BookingDto): Vehicle | null => {
+  const ref = typeof booking.vehicleId === "object" ? booking.vehicleId : null;
+  if (!ref) return null;
+  const company = typeof booking.companyId === "object" ? booking.companyId : null;
+  const title = `${ref.make ?? ""} ${ref.model ?? ""}`.trim() || "Rental Vehicle";
+  const operatorName = company?.name?.trim() || "NexRide Partner";
+
+  return {
+    id: ref._id,
+    title,
+    category: "Rental Vehicle",
+    segment: "economy",
+    pricePerDay: ref.dailyPrice ?? 0,
+    totalForPeriod: (ref.dailyPrice ?? 0) * 5,
+    periodDays: 5,
+    image: photoUrl(ref.photos?.[0]),
+    location: company?.city ?? "",
+    body: "",
+    drive: ref.transmission === "MANUAL" ? "manual" : "auto",
+    operatorId: company?._id ?? "",
+    operator: {
+      id: company?._id ?? "",
+      name: operatorName,
+      initials: initialsFrom(operatorName),
+      rating: 0,
+      reviewsCount: 0,
+    },
+    specs: {
+      engine: "—",
+      seats: ref.seats ? `${ref.seats} Seats` : "—",
+      gearbox: ref.transmission ?? "—",
+      fuel: ref.fuelType ?? "—",
+    },
+    perks: [booking.pickupLocation].filter(
+      (value): value is string => Boolean(value && value.trim()),
+    ),
+  };
+};
+
+/**
+ * Builds the full confirmation screen exclusively from live booking and vehicle
+ * data. The translation values are structural labels; every displayed value
+ * (reference, totals, dates, driver, company, route) comes from the booking.
+ */
+const buildConfirmation = (
+  booking: BookingDto,
+  vehicle: Vehicle,
+  isCashPending: boolean,
+  lang: string,
+): ConfirmationData => {
+  const customer = typeof booking.customerId === "object" ? booking.customerId : null;
+  const company = typeof booking.companyId === "object" ? booking.companyId : null;
+  const start = new Date(booking.startDate);
+  const end = new Date(booking.endDate);
+  const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / 86400000));
+  const isPaid = booking.paymentStatus === "PAID";
+
+  const fmtDateTime = (date: Date) => {
+    const datePart = new Intl.DateTimeFormat(lang, {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(date);
+    const timePart = new Intl.DateTimeFormat(lang, {
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(date);
+    return `${datePart} · ${timePart}`;
+  };
+
+  const pickupLocation =
+    booking.pickupLocation || vehicle.perks[0] || vehicle.title;
+
+  const milestones: Milestone[] = [
+    {
+      step: "booking.milestones.step1",
+      status: isPaid
+        ? "booking.milestones.statusDone"
+        : "booking.milestones.statusNext",
+      title: "booking.milestones.title1",
+      detail: isPaid
+        ? "booking.milestones.detail1"
+        : isCashPending
+          ? "booking.milestones.detailCashPending"
+          : "booking.milestones.detailPaymentPending",
+      values: { amount: lyd2(booking.totalAmount) },
+      icon: "check",
+      state: isPaid ? "done" : "next",
+    },
+    {
+      step: "booking.milestones.step2",
+      status: isPaid
+        ? "booking.milestones.statusNext"
+        : "booking.milestones.statusScheduled",
+      title: "booking.milestones.title2",
+      detail: "booking.milestones.detail2",
+      icon: "car",
+      state: isPaid ? "next" : "pending",
+    },
+    {
+      step: "booking.milestones.step3",
+      status: "booking.milestones.statusScheduled",
+      title: "booking.milestones.title3",
+      detail: "booking.milestones.detail3",
+      icon: "key",
+      state: "pending",
+    },
+  ];
+
+  const fareLines: FareLine[] = [
+    {
+      label: "booking.fare.baseRental",
+      amount: lyd2(booking.rentalPrice),
+      values: { price: booking.dailyRate, days: booking.totalDays },
+    },
+  ];
+  if (booking.discountAmount > 0) {
+    fareLines.push({
+      label: "booking.fare.discount",
+      amount: `-${lyd2(booking.discountAmount)}`,
+    });
+  }
+
+  const meta: ConfirmationMeta = {
+    crumbs: [
+      { label: "nav.home", to: "/" },
+      { label: "booking.crumbs.checkout" },
+      { label: vehicle.title },
+      { label: "booking.crumbs.current" },
+    ],
+    stepBadge: {
+      caption: "booking.stepBadge.caption",
+      value: "booking.stepBadge.value",
+    },
+    success: {
+      badge: "booking.success.badge",
+      validation: "booking.success.validation",
+      title: "booking.success.title",
+      desc: "booking.success.desc",
+      printLabel: "booking.success.printLabel",
+      downloadLabel: "booking.success.downloadLabel",
+      downloadBusyLabel: "booking.success.downloadBusyLabel",
+      toastPrint: "booking.success.toastPrint",
+      toastDownload: "booking.success.toastDownload",
+    },
+    reference: {
+      label: "booking.reference.label",
+      code: referenceCodeFrom(booking._id),
+      copyToast: "booking.reference.copyToast",
+      chips: [
+        { icon: "encrypted", text: "booking.reference.chips.escrow" },
+        { icon: "clock", text: "booking.reference.chips.instantDispatch" },
+      ],
+    },
+    milestones,
+    vehicleCard: {
+      badgePrimary: "booking.vehicle.badgeTier",
+      badgeSecondary: vehicle.specs.fuel,
+      gpsLabel: "booking.vehicle.gpsLabel",
+      category: vehicle.category,
+      vin: "",
+    },
+    operator: {
+      locationLabel: company?.city || vehicle.operator.name,
+      ratingNote: "booking.operator.ratingNote",
+      phoneLabel: "booking.operator.phoneLabel",
+      phone: company?.phone || "—",
+      phoneHref: company?.phone ? `tel:${company.phone}` : "",
+    },
+    identification: {
+      title: "booking.identification.title",
+      driverName: customer?.name || "—",
+      hotline: company?.phone || "—",
+      email: customer?.email || "—",
+    },
+    route: {
+      title: "booking.route.title",
+      days,
+      daysBadge: "booking.route.daysBadge",
+      pickup: {
+        label: "booking.route.pickupLabel",
+        location: pickupLocation,
+        datetime: fmtDateTime(start),
+        note: "booking.route.pickupNote",
+        icon: "land",
+        primary: true,
+      },
+      dropoff: {
+        label: "booking.route.dropoffLabel",
+        location: pickupLocation,
+        datetime: fmtDateTime(end),
+        icon: "takeoff",
+        primary: false,
+      },
+    },
+    payment: {
+      title: "booking.payment.title",
+      paidBadge: "booking.payment.paidBadge",
+      depositLabel: "booking.payment.depositLabel",
+      depositAmount: "",
+      totalLabel: "booking.payment.totalLabel",
+      totalNote: "booking.payment.totalNote",
+      viaNote: "booking.payment.viaNote",
+    },
+    protocol: {
+      title: "booking.protocol.title",
+      subtitle: "booking.protocol.subtitle",
+      cards: [
+        {
+          icon: "badge",
+          title: "booking.protocol.documents.title",
+          body: "booking.protocol.documents.body",
+        },
+        {
+          icon: "location",
+          title: "booking.protocol.depot.title",
+          body: "booking.protocol.depot.body",
+        },
+        {
+          icon: "restart",
+          title: "booking.protocol.cancellation.title",
+          body: "booking.protocol.cancellation.body",
+        },
+      ],
+    },
+    dock: {
+      back: { icon: "arrowLeft", label: "booking.dock.back", to: "/" },
+      actions: [
+        { label: "booking.dock.browseMore", to: "/fleet" },
+        {
+          icon: "arrowRight",
+          label: "booking.dock.manage",
+          to: "/my-bookings",
+          primary: true,
+        },
+      ],
+    },
+  };
+
+  return {
+    vehicle,
+    meta,
+    fareLines,
+    total: lyd2(booking.totalAmount),
+    // The booking document does not carry card/auth details; the paid summary
+    // hides this line when it is empty rather than inventing one.
+    cardEnding: "",
+    authRef: "",
+  };
+};
+
 export const BookingConfirmationPage: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const { vehicleId } = useParams<{ vehicleId: string }>();
   const [searchParams] = useSearchParams();
   const bookingId = searchParams.get("booking");
   const paymentMethod = searchParams.get("paymentMethod") ?? undefined;
-  const data = useMemo<ConfirmationData>(() => getBookingConfirmation(vehicleId), [vehicleId]);
+
   const [toast, setToast] = useState<string | null>(null);
   const [downloadingInvoice, setDownloadingInvoice] = useState(false);
 
-  // When navigated with ?booking=<id>, overlay the real booking onto the
-  // static confirmation shell (reference, vehicle, dates, totals).
-  const [booking, setBooking] = useState<BookingDto | null>(null);
-  const [realVehicle, setRealVehicle] = useState<Vehicle | null>(null);
+  // Booking fetch state is keyed by (bookingId, nonce) so "loading" is derived
+  // instead of being flipped synchronously inside the effect. A request whose
+  // key does not match the current input is never surfaced.
+  type BookingFetchState =
+    | { status: "idle" }
+    | { status: "ready"; key: string; booking: BookingDto }
+    | { status: "error"; key: string };
+
+  const [nonce, setNonce] = useState(0);
+  const [bookingState, setBookingState] = useState<BookingFetchState>({
+    status: "idle",
+  });
+
+  const requestKey = bookingId ? `${bookingId}::${nonce}` : "";
+
+  const isCurrentRequest =
+    bookingState.status !== "idle" && bookingState.key === requestKey;
+  const loading = !isCurrentRequest;
+  const loadError = isCurrentRequest && bookingState.status === "error";
+  const booking =
+    isCurrentRequest && bookingState.status === "ready"
+      ? bookingState.booking
+      : null;
 
   useEffect(() => {
     if (!bookingId) return;
+    const controller = new AbortController();
     let active = true;
+
     bookingApi
-      .get(bookingId)
+      .get(bookingId, controller.signal)
       .then((res) => {
-        if (active) setBooking(res.data.booking);
+        if (!active) return;
+        setBookingState({
+          status: "ready",
+          key: requestKey,
+          booking: res.data.booking,
+        });
       })
-      .catch(() => {
-        /* fall back to the static shell */
+      .catch((err: unknown) => {
+        if (!active) return;
+        if (err instanceof DOMException && err.name === "AbortError") return;
+        setBookingState({ status: "error", key: requestKey });
       });
+
     return () => {
       active = false;
+      controller.abort();
     };
-  }, [bookingId]);
+  }, [bookingId, nonce, requestKey]);
+
+  const refVehicle = useMemo(
+    () => (booking ? vehicleFromBooking(booking) : null),
+    [booking],
+  );
+
+  // The live vehicle is cached under the booking id it belongs to, so a stale
+  // vehicle never flashes while a fresh booking is being resolved.
+  const liveVehicleKey = booking?._id ?? "";
+  const [liveVehicleState, setLiveVehicleState] = useState<{
+    key: string;
+    vehicle: Vehicle | null;
+  }>({ key: "", vehicle: null });
+  const liveVehicle =
+    liveVehicleState.key === liveVehicleKey ? liveVehicleState.vehicle : null;
 
   const targetVehicleId = useMemo(() => {
-    if (!booking) return vehicleId;
-    const ref = typeof booking.vehicleId === "object" ? booking.vehicleId : null;
-    return ref?._id ?? vehicleId;
-  }, [booking, vehicleId]);
+    const ref = booking && typeof booking.vehicleId === "object" ? booking.vehicleId : null;
+    return ref?._id ?? (booking && typeof booking.vehicleId === "string" ? booking.vehicleId : undefined);
+  }, [booking]);
 
   useEffect(() => {
     if (!booking || !targetVehicleId) return;
@@ -72,128 +384,29 @@ export const BookingConfirmationPage: React.FC = () => {
       .getById(targetVehicleId)
       .then((res) => {
         if (active) {
-          setRealVehicle(mapVehicle(res.data.vehicle, (key, fallback) => t(key, fallback)));
+          setLiveVehicleState({
+            key: liveVehicleKey,
+            vehicle: mapVehicle(res.data.vehicle, (key, fallback) => t(key, fallback)),
+          });
         }
       })
       .catch(() => {
-        /* fall back to the static vehicle card */
+        // The booking's embedded vehicle reference is the fallback, not a mock.
       });
     return () => {
       active = false;
     };
-  }, [booking, targetVehicleId, t]);
+  }, [booking, targetVehicleId, liveVehicleKey, t]);
 
-  const resolved = useMemo<ConfirmationData>(() => {
-    if (!booking) {
-      if (!bookingId) return data;
-      const isCashPending = paymentMethod === "CASH_ON_DELIVERY";
-      return {
-        ...data,
-        meta: {
-          ...data.meta,
-          milestones: data.meta.milestones.map((milestone, index) =>
-            index === 0
-              ? {
-                  ...milestone,
-                  status: "booking.milestones.statusPending",
-                  detail: isCashPending
-                    ? "booking.milestones.detailCashPending"
-                    : "booking.milestones.detailPaymentPending",
-                  state: "next",
-                }
-              : milestone,
-          ),
-        },
-      };
-    }
+  const vehicle = liveVehicle ?? refVehicle;
 
-    const vehicle = realVehicle ?? data.vehicle;
-    const customer = typeof booking.customerId === "object" ? booking.customerId : null;
-    const start = new Date(booking.startDate);
-    const end = new Date(booking.endDate);
-    const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / 86400000));
-    const pickupLocation =
-      booking.pickupLocation || vehicle.perks[0] || data.meta.route.pickup.location;
+  const isCashPending =
+    paymentMethod === "CASH_ON_DELIVERY" && booking?.paymentStatus === "UNPAID";
 
-    const fmtDateTime = (d: Date) => {
-      const datePart = new Intl.DateTimeFormat(i18n.language, {
-        weekday: "short",
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }).format(d);
-      const timePart = new Intl.DateTimeFormat(i18n.language, {
-        hour: "numeric",
-        minute: "2-digit",
-      }).format(d);
-      return `${datePart} · ${timePart}`;
-    };
-
-    const meta: ConfirmationMeta = {
-      ...data.meta,
-      reference: {
-        ...data.meta.reference,
-        code: referenceCodeFrom(booking._id),
-      },
-      milestones: data.meta.milestones.map((milestone, index) => {
-        if (index !== 0) return milestone;
-        const isPaid = booking.paymentStatus === "PAID";
-        const isCashPending =
-          booking.paymentStatus === "UNPAID" &&
-          paymentMethod === "CASH_ON_DELIVERY";
-        return {
-          ...milestone,
-          status: isPaid
-            ? milestone.status
-            : "booking.milestones.statusPending",
-          detail: isPaid
-            ? milestone.detail
-            : isCashPending
-              ? "booking.milestones.detailCashPending"
-              : "booking.milestones.detailPaymentPending",
-          state: isPaid ? "done" : "next",
-          values: { amount: lyd2(booking.totalAmount) },
-        };
-      }),
-      identification: customer?.name
-        ? {
-            ...data.meta.identification,
-            driverName: customer.name,
-            email: customer.email || data.meta.identification.email,
-          }
-        : data.meta.identification,
-      route: {
-        ...data.meta.route,
-        days,
-        pickup: {
-          ...data.meta.route.pickup,
-          location: pickupLocation,
-          datetime: fmtDateTime(start),
-        },
-        dropoff: {
-          ...data.meta.route.dropoff,
-          location: pickupLocation,
-          datetime: fmtDateTime(end),
-        },
-      },
-    };
-
-    const fareLines: FareLine[] = [
-      {
-        label: "booking.fare.baseRental",
-        amount: lyd2(booking.rentalPrice),
-        values: { price: booking.dailyRate, days: booking.totalDays },
-      },
-    ];
-
-    return {
-      ...data,
-      vehicle,
-      meta,
-      fareLines,
-      total: lyd2(booking.totalAmount),
-    };
-  }, [data, booking, bookingId, paymentMethod, realVehicle, i18n.language]);
+  const resolved = useMemo<ConfirmationData | null>(() => {
+    if (!booking || !vehicle) return null;
+    return buildConfirmation(booking, vehicle, isCashPending, i18n.language);
+  }, [booking, vehicle, isCashPending, i18n.language]);
 
   const showToast = (text: string) => {
     setToast(text);
@@ -202,11 +415,11 @@ export const BookingConfirmationPage: React.FC = () => {
 
   const copyRef = async () => {
     try {
-      await navigator.clipboard.writeText(resolved.meta.reference.code);
+      await navigator.clipboard.writeText(resolved?.meta.reference.code ?? "");
     } catch {
       /* clipboard unavailable */
     }
-    showToast(t(resolved.meta.reference.copyToast));
+    if (resolved) showToast(t(resolved.meta.reference.copyToast));
   };
 
   const saveBlobAsFile = (blob: Blob, filename: string) => {
@@ -221,17 +434,12 @@ export const BookingConfirmationPage: React.FC = () => {
   };
 
   const handleDownloadInvoice = async () => {
-    // Static shell (no real booking id): nothing to invoice yet.
-    if (!booking) {
-      showToast(t(resolved.meta.success.toastDownload));
-      return;
-    }
-    if (downloadingInvoice) return;
+    if (!booking || downloadingInvoice) return;
     setDownloadingInvoice(true);
     try {
       const blob = await bookingApi.downloadInvoice(booking._id);
       saveBlobAsFile(blob, `invoice-${booking._id}.pdf`);
-      showToast(t(resolved.meta.success.toastDownload));
+      if (resolved) showToast(t(resolved.meta.success.toastDownload));
     } catch {
       showToast(t("booking.success.toastDownloadError"));
     } finally {
@@ -239,9 +447,80 @@ export const BookingConfirmationPage: React.FC = () => {
     }
   };
 
-  const showPaidConfirmation = bookingId
-    ? booking?.paymentStatus === "PAID"
-    : searchParams.get("paid") === "true";
+  if (!bookingId) {
+    return (
+      <div className="bg-[#F8FAFC] min-h-screen">
+        <div className="max-w-2xl mx-auto px-6 pt-32 pb-20 text-center">
+          <div className="mx-auto w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-5">
+            <CalendarX2 className="w-7 h-7 text-slate-400" />
+          </div>
+          <h1 className="text-2xl font-bold text-[#0F172A]">
+            {t("booking.empty.title")}
+          </h1>
+          <p className="mt-2 text-sm text-slate-500">
+            {t("booking.empty.desc")}
+          </p>
+          <Link
+            to="/my-bookings"
+            className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+            {t("booking.empty.action")}
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="bg-[#F8FAFC] min-h-screen">
+        <div className="pt-20 flex flex-col items-center justify-center gap-4 min-h-[70vh]">
+          <span className="w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-[#64748B]">{t("booking.loading")}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadError || !booking || !resolved) {
+    return (
+      <div className="bg-[#F8FAFC] min-h-screen">
+        <div className="max-w-2xl mx-auto px-6 pt-32 pb-20 text-center">
+          <div className="mx-auto w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-5">
+            <Car className="w-7 h-7 text-slate-400" />
+          </div>
+          <h1 className="text-2xl font-bold text-[#0F172A]">
+            {t("booking.notFound.title")}
+          </h1>
+          <p className="mt-2 text-sm text-slate-500">
+            {t("booking.notFound.desc")}
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            {loadError && (
+              <button
+                type="button"
+                onClick={() => setNonce((value) => value + 1)}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+              >
+                <RefreshCw className="w-4 h-4" />
+                {t("booking.notFound.retry")}
+              </button>
+            )}
+            <Link
+              to="/my-bookings"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] hover:bg-[#F1F5F9] text-slate-700 text-xs font-bold transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+              {t("booking.notFound.action")}
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const showPaidConfirmation = booking.paymentStatus === "PAID";
 
   return (
     <div className="bg-[#F8FAFC] min-h-screen">
@@ -295,9 +574,7 @@ export const BookingConfirmationPage: React.FC = () => {
             <RouteSchedule data={resolved} />
             <PaymentSummary
               data={resolved}
-              paymentStatus={
-                bookingId ? booking?.paymentStatus ?? "UNPAID" : undefined
-              }
+              paymentStatus={booking.paymentStatus}
               paymentMethod={paymentMethod}
             />
           </div>

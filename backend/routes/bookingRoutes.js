@@ -285,7 +285,7 @@ router.patch(
  *             properties:
  *               bookingStatus:
  *                 type: string
- *                 enum: [CONFIRMED, ACTIVE, COMPLETED, CANCELLED]
+ *                 enum: [PAID, CONFIRMED, ACTIVE, COMPLETED, CANCELLED]
  *     responses:
  *       200:
  *         description: Status updated

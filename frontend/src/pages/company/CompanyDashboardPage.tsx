@@ -1,8 +1,9 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Activity, Download, RefreshCw } from "lucide-react";
 import { useAuth } from "../../context/useAuth";
 import { useCompanyDashboard } from "../../hooks/useCompanyDashboard";
+import { companyEarningsApi } from "../../lib/companyEarningsApi";
 import { formatLYD, saveBlobAsFile } from "../../lib/bookingView";
 import { CompanyDashboardHeader } from "../../components/company/CompanyDashboardHeader";
 import { CompanyKpiGrid } from "../../components/company/CompanyKpiGrid";
@@ -44,6 +45,21 @@ export const CompanyDashboardPage: React.FC = () => {
   const { user } = useAuth();
   const { data, period, setPeriod, loading, error, reload } =
     useCompanyDashboard();
+  const [payoutBusy, setPayoutBusy] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    };
+  }, []);
+
+  const showToast = useCallback((message: string) => {
+    setToast(message);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 4200);
+  }, []);
 
   const handleExport = useCallback(() => {
     if (data.upcomingBookings.length === 0) return;
@@ -52,6 +68,28 @@ export const CompanyDashboardPage: React.FC = () => {
       `nexride-dispatch-${new Date().toISOString().slice(0, 10)}.csv`,
     );
   }, [data]);
+
+  const handleRequestPayout = useCallback(async () => {
+    if (payoutBusy) return;
+    setPayoutBusy(true);
+    try {
+      const res = await companyEarningsApi.requestPayout();
+      const bank = res.data?.payout?.payout?.bankName;
+      showToast(
+        t("company.header.payoutRequested", {
+          bankName: bank ?? "",
+          amount: formatLYD(data.kpis.pendingPayout),
+        }),
+      );
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : String(err);
+      showToast(t("company.header.payoutError", { message }));
+    } finally {
+      setPayoutBusy(false);
+      reload();
+    }
+  }, [payoutBusy, data.kpis.pendingPayout, reload, showToast, t]);
 
   return (
     <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
@@ -128,6 +166,7 @@ export const CompanyDashboardPage: React.FC = () => {
               userName={user?.name}
               onExport={handleExport}
               exporting={loading}
+              onRequestPayout={() => void handleRequestPayout()}
             />
 
             <CompanyKpiGrid data={data} />
@@ -193,6 +232,15 @@ export const CompanyDashboardPage: React.FC = () => {
           </>
         )}
       </div>
+
+      {toast && (
+        <div
+          role="status"
+          className="fixed bottom-6 right-6 z-50 max-w-sm rounded-xl border border-[#E5EEFF] bg-white px-4 py-3 text-sm text-[#0B1C30] shadow-[0_8px_24px_rgba(15,23,42,0.12)]"
+        >
+          {toast}
+        </div>
+      )}
     </div>
   );
 };

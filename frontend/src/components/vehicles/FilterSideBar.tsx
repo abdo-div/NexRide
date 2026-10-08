@@ -1,17 +1,18 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Filter, Star, CheckSquare } from "lucide-react";
-import {
-  LOCATION_OPTIONS,
-  BODY_PROFILES,
-  DRIVETRAIN_OPTIONS,
-  CERTIFIED_FLEETS,
-  PERK_OPTIONS,
-} from "../../data/vehicleData";
+import { BODY_PROFILES, DRIVETRAIN_OPTIONS, CERTIFIED_FLEETS, PERK_OPTIONS } from "../../data/vehicleData";
+
+export interface LocationOption {
+  id: string;
+  label: string;
+  count: number;
+}
 
 export interface FilterSelection {
   maxPrice: number;
   onMaxPriceChange: (n: number) => void;
+  locations: LocationOption[];
   selectedLocations: string[];
   onToggleLocation: (id: string) => void;
   selectedBodies: string[];
@@ -51,6 +52,7 @@ const BoxRow: React.FC<{
 export const FilterSideBar: React.FC<FilterSelection> = ({
   maxPrice,
   onMaxPriceChange,
+  locations,
   selectedLocations,
   onToggleLocation,
   selectedBodies,
@@ -89,7 +91,7 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
           {t("fleet.filters.libyanLocation")}
         </span>
         <div className="space-y-2">
-          {LOCATION_OPTIONS.map((l) => (
+          {locations.map((l) => (
             <BoxRow
               key={l.id}
               checked={selectedLocations.includes(l.id)}

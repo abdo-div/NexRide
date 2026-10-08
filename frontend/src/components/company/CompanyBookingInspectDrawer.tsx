@@ -5,7 +5,6 @@ import {
   Car,
   CheckCircle2,
   Circle,
-  FileText,
   MapPin,
   MessageCircle,
   Phone,
@@ -18,7 +17,14 @@ import type { CompanyBookingRow } from "../../types/companyBookings";
 
 interface CompanyBookingInspectDrawerProps {
   row: CompanyBookingRow | null;
+  busy: boolean;
   onClose: () => void;
+  /** Advance the booking lifecycle (e.g. CONFIRMED → ACTIVE → COMPLETED). */
+  onAdvance: (status: string) => void;
+  /** Attest a pending cash-on-delivery payment at pick-up. */
+  onCollectCash: (paymentId: string) => void;
+  /** Cancel the booking with an operator reason. */
+  onCancel: (reason: string) => void;
 }
 
 const CHECK_KEYS = ["gps", "ready", "paid", "signed"] as const;
@@ -32,7 +38,7 @@ const CHECK_KEYS = ["gps", "ready", "paid", "signed"] as const;
  */
 export const CompanyBookingInspectDrawer: React.FC<
   CompanyBookingInspectDrawerProps
-> = ({ row, onClose }) => {
+> = ({ row, busy, onClose, onAdvance, onCollectCash, onCancel }) => {
   const { t } = useTranslation();
 
   if (!row) {
@@ -51,13 +57,88 @@ export const CompanyBookingInspectDrawer: React.FC<
   const whatsapp = digits ? `https://wa.me/${digits}` : null;
   const doneCount = detail.checks.filter((check) => check.done).length;
   const progress = Math.round((doneCount / detail.checks.length) * 100);
-  const allDone = doneCount === detail.checks.length;
   const vehicleTitle =
     detail.title ||
     [row.vehicle.make, row.vehicle.model, row.vehicle.year]
       .filter(Boolean)
       .join(" ") ||
     "NexRide Vehicle";
+
+  const status = row.bookingStatus;
+  const terminal = status === "COMPLETED" || status === "CANCELLED" || status === "EXPIRED";
+  const cashPending =
+    row.ledger?.method === "CASH_ON_DELIVERY" &&
+    row.ledger?.status === "PENDING" &&
+    Boolean(row.paymentId) &&
+    row.payment !== "PAID";
+
+  // The primary CTA follows the real lifecycle state machine (PATCH status is
+  // tenant-scoped) so the dispatcher desk advances a booking with one tap:
+  // PENDING_PAYMENT (cash) → collect; PAID → CONFIRMED; CONFIRMED → ACTIVE;
+  // ACTIVE → COMPLETED. Terminal states owe no further action.
+  const primary = (() => {
+    if (terminal) {
+      return {
+        label: t("company.bookingsPage.inspect.terminalAction"),
+        hint: undefined,
+        action: undefined,
+        secondary: false,
+      };
+    }
+    if (status === "PENDING_PAYMENT") {
+      if (cashPending) {
+        return {
+          label: t("company.bookingsPage.inspect.collectCash"),
+          hint: undefined,
+          action: () => onCollectCash(row.paymentId as string),
+          secondary: false,
+        };
+      }
+      return {
+        label: t("company.bookingsPage.inspect.waitingPayment"),
+        hint: t("company.bookingsPage.inspect.waitingPaymentHint"),
+        action: undefined,
+        secondary: false,
+      };
+    }
+    if (status === "PAID") {
+      return {
+        label: t("company.bookingsPage.inspect.confirmBooking"),
+        hint: undefined,
+        action: () => onAdvance("CONFIRMED"),
+        secondary: false,
+      };
+    }
+    if (status === "CONFIRMED") {
+      return {
+        label: t("company.bookingsPage.inspect.verifyHandover"),
+        hint: t("company.bookingsPage.inspect.verifyHandoverHint"),
+        action: () => onAdvance("ACTIVE"),
+        secondary: false,
+      };
+    }
+    if (status === "ACTIVE") {
+      return {
+        label: t("company.bookingsPage.inspect.completeRental"),
+        hint: undefined,
+        action: () => onAdvance("COMPLETED"),
+        secondary: false,
+      };
+    }
+    return {
+      label: t("company.bookingsPage.inspect.terminalAction"),
+      hint: undefined,
+      action: undefined,
+      secondary: false,
+    };
+  })();
+
+  const handleCancelClick = () => {
+    if (busy) return;
+    const reason = window.prompt(t("company.bookingsPage.inspect.cancelPrompt"));
+    if (reason === null) return;
+    onCancel(reason.trim());
+  };
 
   return (
     <aside className="flex flex-col gap-4 lg:sticky lg:top-20">
@@ -266,27 +347,28 @@ export const CompanyBookingInspectDrawer: React.FC<
           <div className="flex flex-col gap-2">
             <button
               type="button"
-              disabled={!allDone}
-              title={
-                allDone
-                  ? undefined
-                  : t("company.bookingsPage.inspect.verifyBlocked", {
-                      remaining: detail.checks.length - doneCount,
-                    })
-              }
+              disabled={busy || !primary.action}
+              title={primary.hint}
+              onClick={primary.action}
               className="w-full rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_12px_rgba(37,99,235,0.25)] transition-all hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:bg-[#9AA4B5] disabled:opacity-60"
             >
-              {t("company.bookingsPage.inspect.verifyHandover")}
+              {busy
+                ? t("company.bookingsPage.inspect.saving")
+                : primary.label}
             </button>
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                disabled
-                title={t("company.bookingsPage.inspect.soon")}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#EFF4FF] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] transition-all hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={terminal || busy}
+                onClick={handleCancelClick}
+                title={
+                  terminal
+                    ? t("company.bookingsPage.inspect.terminalCaption")
+                    : t("company.bookingsPage.inspect.cancelHint")
+                }
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#FFEDED] px-4 py-2.5 text-sm font-semibold text-[#BA1A1A] transition-all hover:bg-[#FFDBE0] disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <FileText className="h-4 w-4 text-[#565E74]" aria-hidden="true" />
-                {t("company.bookingsPage.inspect.printContract")}
+                {t("company.bookingsPage.inspect.cancelBooking")}
               </button>
               {whatsapp && (
                 <a

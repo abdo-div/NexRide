@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { SEGMENTS } from "../data/vehicleData";
+import { SEGMENTS, LOCATION_OPTIONS } from "../data/vehicleData";
 import type { Vehicle } from "../types/vehicle";
 
 const toggleIn = (list: string[], id: string) =>
@@ -66,6 +66,21 @@ export const useVehicleFilters = (vehicles: Vehicle[]) => {
     return counts;
   }, [vehicles]);
 
+  // Live location options: option ids are the real database city strings, so
+  // counts reflect the currently fetched fleet. A city with no available
+  // vehicles is hidden instead of shown with a dead checkbox.
+  const locationOptions = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const v of vehicles) {
+      counts[v.location] = (counts[v.location] ?? 0) + 1;
+    }
+    return LOCATION_OPTIONS.map((o) => ({
+      id: o.id,
+      label: o.label,
+      count: counts[o.id] ?? 0,
+    })).filter((o) => o.count > 0);
+  }, [vehicles]);
+
   const activeCount =
     selectedLocations.length +
     selectedBodies.length +
@@ -90,6 +105,7 @@ export const useVehicleFilters = (vehicles: Vehicle[]) => {
     selectedLocations,
     toggleLocation,
     removeLocation,
+    locationOptions,
     selectedBodies,
     toggleBody,
     removeBody,

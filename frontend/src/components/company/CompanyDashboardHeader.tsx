@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import { Download, Landmark, Plus, ShieldCheck, Wallet } from "lucide-react";
 import { formatLYD } from "../../lib/bookingView";
 import type { CompanyDashboardData } from "../../types/companyDashboard";
@@ -9,6 +10,8 @@ interface CompanyDashboardHeaderProps {
   userName?: string;
   onExport: () => void;
   exporting: boolean;
+  /** Requests the tenant's next payout cycle (POST /companies/payouts/request). */
+  onRequestPayout: () => void;
 }
 
 /**
@@ -21,8 +24,10 @@ export const CompanyDashboardHeader: React.FC<CompanyDashboardHeaderProps> = ({
   userName,
   onExport,
   exporting,
+  onRequestPayout,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const company = data.company;
 
   return (
@@ -61,18 +66,16 @@ export const CompanyDashboardHeader: React.FC<CompanyDashboardHeaderProps> = ({
           </button>
           <button
             type="button"
-            disabled
-            title={t("company.layout.soon")}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#DCE9FF] px-4 py-2.5 text-sm font-semibold text-[#2563EB] shadow-sm transition-all hover:bg-[#D3E4FE] cursor-not-allowed"
+            onClick={onRequestPayout}
+            className="inline-flex items-center gap-2 rounded-xl bg-[#DCE9FF] px-4 py-2.5 text-sm font-semibold text-[#2563EB] shadow-sm transition-all hover:bg-[#D3E4FE] cursor-pointer"
           >
             <Landmark className="h-5 w-5" />
             {t("company.header.requestClearance")}
           </button>
           <button
             type="button"
-            disabled
-            title={t("company.layout.soon")}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_16px_rgba(37,99,235,0.28)] transition-all hover:opacity-95 cursor-not-allowed"
+            onClick={() => navigate("/company/fleet/new")}
+            className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_16px_rgba(37,99,235,0.28)] transition-all hover:bg-[#1D4ED8] cursor-pointer"
           >
             <Plus className="h-5 w-5" />
             {t("company.header.addVehicle")}
@@ -118,9 +121,8 @@ export const CompanyDashboardHeader: React.FC<CompanyDashboardHeaderProps> = ({
           </span>
           <button
             type="button"
-            disabled
-            title={t("company.layout.soon")}
-            className="inline-flex items-center gap-0.5 rounded-full bg-[#EFF4FF] px-3 py-1 text-sm font-semibold text-[#2563EB] transition-colors hover:bg-[#DCE9FF] cursor-not-allowed"
+            onClick={() => navigate("/company/payouts")}
+            className="inline-flex items-center gap-0.5 rounded-full bg-[#EFF4FF] px-3 py-1 text-sm font-semibold text-[#2563EB] transition-colors hover:bg-[#DCE9FF] cursor-pointer"
           >
             {t("company.header.auditTrail")}
             <span aria-hidden="true">›</span>

@@ -12,27 +12,34 @@ import { CompanySettingsBookingCard } from "../../components/company/CompanySett
 import { CompanySettingsNotificationsCard } from "../../components/company/CompanySettingsNotificationsCard";
 import { CompanySettingsPayoutCard } from "../../components/company/CompanySettingsPayoutCard";
 import { CompanySettingsSecurityCard } from "../../components/company/CompanySettingsSecurityCard";
-import type { CompanySettingsPasswordInput } from "../../types/companySettings";
+import type {
+  CompanySettingsPasswordInput,
+  CompanySettingsPayout,
+} from "../../types/companySettings";
 
 /**
  * Company Settings — a sticky left rail over eight section cards. Profile and
- * security (password) are real tenant-scoped surfaces; every other design-mock
- * control is rendered as an honest, disabled "coming soon" row. Save lives in
- * the header and persists the editable profile fields via PATCH /settings.
+ * security (password) are real tenant-scoped surfaces. Payout & Bank now
+ * persists the RTGS rail via PATCH /settings; every other design-mock control
+ * is rendered as an honest, disabled "coming soon" row.
  */
 export const CompanySettingsPage: React.FC = () => {
   const { t } = useTranslation();
   const {
     data,
     draft,
+    payoutDraft,
     loading,
     error,
     busy,
     dirty,
     canSave,
+    payoutDirty,
     reload,
     updateDraft,
+    updatePayoutDraft,
     saveProfile,
+    savePayout,
     changePassword,
   } = useCompanySettings();
 
@@ -51,6 +58,15 @@ export const CompanySettingsPage: React.FC = () => {
     showToast(
       result.ok
         ? t("company.settings.toasts.saved")
+        : result.message || t("company.settings.toasts.savedError"),
+    );
+  };
+
+  const handleSavePayout = async () => {
+    const result = await savePayout();
+    showToast(
+      result.ok
+        ? t("company.settings.payout.savedToast")
         : result.message || t("company.settings.toasts.savedError"),
     );
   };
@@ -160,7 +176,13 @@ export const CompanySettingsPage: React.FC = () => {
                   <CompanySettingsNotificationsCard onComingSoon={notifyComingSoon} />
                   <CompanySettingsPayoutCard
                     commissionRate={data.profile.customCommissionRate}
-                    onComingSoon={notifyComingSoon}
+                    payout={payoutDraft}
+                    dirty={payoutDirty}
+                    busy={busy}
+                    onChange={(field, value) =>
+                      updatePayoutDraft(field as keyof CompanySettingsPayout, value)
+                    }
+                    onSave={() => void handleSavePayout()}
                   />
                   <CompanySettingsSecurityCard
                     busy={busy}

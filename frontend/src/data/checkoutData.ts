@@ -1,51 +1,15 @@
 import type { Vehicle } from "../types/vehicle";
 import type {
-  CheckoutData,
   CheckoutMeta,
   CheckoutTotals,
   FareLine,
 } from "../types/checkout";
-import { MOCK_VEHICLES } from "./vehicleData";
 
-export const DEFAULT_CHECKOUT_VEHICLE: Vehicle = {
-  id: "s-class-500",
-  title: "Mercedes-Benz S-Class S 500 4MATIC",
-  category: "Executive Flagship · Business Class",
-  segment: "luxury",
-  pricePerDay: 250,
-  totalForPeriod: 750,
-  periodDays: 3,
-  image:
-    "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=1000",
-  location: "mji",
-  body: "sedan",
-  drive: "auto",
-  operatorId: "safwa",
-  operator: {
-    id: "safwa",
-    name: "Al-Safwa Elite Car Rental",
-    initials: "AS",
-    rating: 4.98,
-    reviewsCount: 142,
-    isVerified: true,
-  },
-  isInstantConfirmation: true,
-  isTopPick: true,
-  airportVip: true,
-  badgeTag: "Executive Tier",
-  badgeTagSecondary: "2024 Model",
-  specs: {
-    engine: "3.0L I6 MHEV",
-    seats: "5 Seats",
-    gearbox: "9G-TRONIC",
-    fuel: "Hybrid Petrol",
-  },
-  perks: [
-    "Complimentary Mitiga VIP Terminal delivery",
-    "Chauffeur escort option available on request",
-  ],
-};
-
+/**
+ * Checkout form configuration (labels, add-on catalogue, payment fields).
+ * This is structural UI config only — vehicles and pricing on the checkout
+ * page always come from the live API via `useVehicleDetail`, never from here.
+ */
 const CHECKOUT_META: CheckoutMeta = {
   stepLabel: "checkout.header.stepLabel",
   crumbs: [
@@ -240,25 +204,7 @@ const CHECKOUT_META: CheckoutMeta = {
   ],
 };
 
-export const getCheckout = (vehicleId?: string): CheckoutData => {
-  const vehicle =
-    MOCK_VEHICLES.find((v) => v.id === vehicleId) ?? DEFAULT_CHECKOUT_VEHICLE;
-  const meta: CheckoutMeta = {
-    ...CHECKOUT_META,
-    crumbs: [
-      { label: "checkout.header.crumbs.fleet", to: "/FleetPage" },
-      {
-        label:
-          vehicle.segment === "luxury"
-            ? "checkout.header.crumbs.tripoliLuxury"
-            : "checkout.header.crumbs.tripoliFleet",
-      },
-      { label: vehicle.title },
-      { label: "checkout.header.crumbs.checkout" },
-    ],
-  };
-  return { vehicle, meta };
-};
+export const getCheckoutMeta = (): CheckoutMeta => CHECKOUT_META;
 
 const buildFareLine = (
   id: string,

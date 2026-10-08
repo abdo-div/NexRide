@@ -7,6 +7,7 @@ import {
 } from "../controllers/moamalatController.js";
 import { protect, restrictTo } from "../middlewares/authMiddleware.js";
 import { idempotency } from "../middlewares/idempotence.middleware.js";
+import { paymentVerificationLimiter } from "../middlewares/rateLimitMiddleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import {
   initiatePaymentSchema,
@@ -102,6 +103,11 @@ router.post(
  *       400:
  *         description: Verification failed
  */
-router.post("/verify", validate(verifyPaymentSchema), verifyPayment);
+router.post(
+  "/verify",
+  paymentVerificationLimiter,
+  validate(verifyPaymentSchema),
+  verifyPayment,
+);
 
 export default router;

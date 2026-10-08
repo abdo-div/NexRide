@@ -43,33 +43,33 @@ export const NavBar: React.FC = () => {
             {t("nav.browseCars")}
           </Link>
 
-          <a
-            href="#fleet-operators"
+          <Link
+            to="/#fleet-operators"
             className="px-3.5 py-1.5 rounded-full text-slate-600 hover:text-blue-600 hover:bg-white/60 transition-all"
           >
             {i18n.language === "ar" ? "عن الشركة" : t("nav.fleetPartners")}
-          </a>
+          </Link>
 
-          <a
-            href="#how-it-works"
+          <Link
+            to="/#how-it-works"
             className="px-3.5 py-1.5 rounded-full text-slate-600 hover:text-blue-600 hover:bg-white/60 transition-all"
           >
             {i18n.language === "ar" ? "الشروط والأحكام" : t("nav.howItWorks")}
-          </a>
+          </Link>
 
-          <a
-            href="#locations"
+          <Link
+            to="/#locations"
             className="px-3.5 py-1.5 rounded-full text-slate-600 hover:text-blue-600 hover:bg-white/60 transition-all"
           >
             {i18n.language === "ar" ? "المواقع والمطارات" : t("nav.locations")}
-          </a>
+          </Link>
 
-          <a
-            href="#contact"
+          <Link
+            to="/#contact"
             className="px-3.5 py-1.5 rounded-full text-slate-600 hover:text-blue-600 hover:bg-white/60 transition-all"
           >
             {t("nav.contact")}
-          </a>
+          </Link>
 
           {isAuthenticated && (
             <Link
@@ -131,34 +131,34 @@ export const NavBar: React.FC = () => {
               >
                 {t("nav.browseCars")}
               </Link>
-              <a
-                href="#fleet-operators"
+              <Link
+                to="/#fleet-operators"
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
               >
                 {i18n.language === "ar" ? "عن الشركة" : t("nav.fleetPartners")}
-              </a>
-              <a
-                href="#how-it-works"
+              </Link>
+              <Link
+                to="/#how-it-works"
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
               >
                 {i18n.language === "ar" ? "الشروط والأحكام" : t("nav.howItWorks")}
-              </a>
-              <a
-                href="#locations"
+              </Link>
+              <Link
+                to="/#locations"
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
               >
                 {i18n.language === "ar" ? "المواقع والمطارات" : t("nav.locations")}
-              </a>
-              <a
-                href="#contact"
+              </Link>
+              <Link
+                to="/#contact"
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
               >
                 {t("nav.contact")}
-              </a>
+              </Link>
               {isAuthenticated && (
                 <Link
                   to="/my-bookings"

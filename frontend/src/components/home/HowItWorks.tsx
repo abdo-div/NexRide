@@ -7,7 +7,7 @@ import { HOW_IT_WORKS_STEPS } from "../../data/stepsData";
 export const HowItWorks: React.FC = () => {
   const { t } = useTranslation();
   return (
-    <section className="w-full py-20 px-6 lg:px-12 bg-white border-b border-slate-100 overflow-hidden">
+    <section id="how-it-works" className="w-full py-20 px-6 lg:px-12 bg-white border-b border-slate-100 overflow-hidden">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

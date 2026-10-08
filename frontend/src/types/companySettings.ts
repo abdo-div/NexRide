@@ -1,5 +1,12 @@
 export type CompanyStatus = "PENDING" | "APPROVED" | "SUSPENDED" | "REJECTED";
 
+/** Direct RTGS settlement rail: bank + IBAN the platform wires payouts to. */
+export interface CompanySettingsPayout {
+  bankName: string;
+  iban: string;
+  accountName: string;
+}
+
 /** The operator's own profile document as surfaced by GET /companies/settings. */
 export interface CompanySettingsProfile {
   _id: string;
@@ -17,6 +24,7 @@ export interface CompanySettingsProfile {
   approvedAt: string | null;
   createdAt: string | null;
   customCommissionRate: number | null;
+  payout: CompanySettingsPayout | null;
 }
 
 /** A pickup hub derived from the fleet's distinct pickup locations in use. */
@@ -50,6 +58,7 @@ export interface CompanySettingsPatch {
   phone?: string;
   city?: string;
   address?: string;
+  payout?: CompanySettingsPayout;
 }
 
 /** Body accepted by PATCH /users/update-my-password. */
