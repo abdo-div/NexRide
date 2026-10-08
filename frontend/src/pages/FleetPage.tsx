@@ -41,6 +41,7 @@ export const FleetPage: React.FC = () => {
   const searchLocation = searchParams.get("location") ?? "";
   const searchStart = searchParams.get("startDate") ?? "";
   const searchEnd = searchParams.get("endDate") ?? "";
+  const companyParam = searchParams.get("company") ?? "";
   const hasSearch = Boolean(searchLocation || searchStart || searchEnd);
 
   const { vehicles: dtoVehicles, loading, error, reload } = useVehicles({
@@ -86,7 +87,10 @@ export const FleetPage: React.FC = () => {
   }, [filters.selectedLocations, searchParams, setSearchParams]);
 
   const vehicles = useMemo(() => {
-    const list = [...filteredVehicles];
+    const scoped = companyParam
+      ? filteredVehicles.filter((v) => v.operatorId === companyParam)
+      : filteredVehicles;
+    const list = [...scoped];
     if (sort === "price-desc") list.sort((a, b) => b.pricePerDay - a.pricePerDay);
     if (sort === "price-asc") list.sort((a, b) => a.pricePerDay - b.pricePerDay);
     if (sort === "rating") {
@@ -98,7 +102,7 @@ export const FleetPage: React.FC = () => {
       );
     }
     return list;
-  }, [filteredVehicles, sort]);
+  }, [filteredVehicles, sort, companyParam]);
 
   const singleLocation =
     filters.selectedLocations.length === 1 ? filters.selectedLocations[0] : "";
@@ -136,6 +140,20 @@ export const FleetPage: React.FC = () => {
     : t("fleet.params.allCategories");
 
   const tokenRows: { label: string; onRemove: () => void }[] = [];
+
+  if (companyParam) {
+    const scopedCompany =
+      allVehicles.find((v) => v.operatorId === companyParam)?.operator.name ??
+      companyParam;
+    tokenRows.push({
+      label: t("fleet.tokens.company", { name: scopedCompany }),
+      onRemove: () => {
+        const next = new URLSearchParams(searchParams);
+        next.delete("company");
+        setSearchParams(next, { replace: true });
+      },
+    });
+  }
 
   if (selectedSegment) {
     tokenRows.push({
@@ -202,7 +220,9 @@ export const FleetPage: React.FC = () => {
             </div>
             <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 text-white text-xs font-semibold">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              {t("fleet.verifiedMatch", { count: filteredVehicles.length })}
+              {t("fleet.verifiedMatch", {
+                count: companyParam ? vehicles.length : filteredVehicles.length,
+              })}
             </div>
           </div>
         </div>
@@ -252,7 +272,9 @@ export const FleetPage: React.FC = () => {
                     {t("fleet.results.title")}
                   </h2>
                   <span className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[10px] font-bold text-[#2563EB]">
-                    {t("fleet.results.availableCount", { count: filteredVehicles.length })}
+                    {t("fleet.results.availableCount", {
+                      count: companyParam ? vehicles.length : filteredVehicles.length,
+                    })}
                   </span>
                 </div>
                 <p className="text-[13px] text-slate-500">
@@ -368,8 +390,43 @@ export const FleetPage: React.FC = () => {
               )
             )}
 
+            {/* Company filter set, but that operator has no available vehicles */}
+            {!loading && !error && allVehicles.length > 0 && vehicles.length === 0 && companyParam && (
+              <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl shadow-sm px-6 py-16 text-center">
+                <div className="mx-auto w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                  <Car className="w-6 h-6 text-slate-400" />
+                </div>
+                <h3 className="text-base font-bold text-[#0F172A]">
+                  {t("fleet.emptyCompany.title")}
+                </h3>
+                <p className="mt-1 text-sm text-slate-500">
+                  {t("fleet.emptyCompany.desc")}
+                </p>
+                <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/companies")}
+                    className="px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+                  >
+                    {t("fleet.emptyCompany.back")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = new URLSearchParams(searchParams);
+                      next.delete("company");
+                      setSearchParams(next, { replace: true });
+                    }}
+                    className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors"
+                  >
+                    {t("fleet.emptyCompany.clearCompany")}
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Loaded with data, but filters exclude everything */}
-            {!loading && !error && allVehicles.length > 0 && vehicles.length === 0 && (
+            {!loading && !error && allVehicles.length > 0 && vehicles.length === 0 && !companyParam && (
               <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl shadow-sm px-6 py-16 text-center">
                 <div className="mx-auto w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mb-4">
                   <Car className="w-6 h-6 text-slate-400" />
