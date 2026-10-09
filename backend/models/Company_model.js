@@ -69,7 +69,7 @@ const companySchema = new mongoose.Schema(
     },
     logo: {
       type: String,
-      default: "default-company-logo.png",
+      default: "",
     },
 
     // -------------------------------------------------------------------------

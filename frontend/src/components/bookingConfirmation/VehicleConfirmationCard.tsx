@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Phone, Star, BadgeCheck } from "lucide-react";
 import { ConfirmationIcon } from "./ConfirmationIcon";
 import type { ConfirmationData } from "../../types/bookingConfirmation";
+import { companyLogoUrl } from "../../lib/vehicleMapper";
 
 export const VehicleConfirmationCard: React.FC<{ data: ConfirmationData }> = ({ data }) => {
   const { t } = useTranslation();
@@ -60,9 +61,7 @@ export const VehicleConfirmationCard: React.FC<{ data: ConfirmationData }> = ({ 
 
         <div className="bg-[#F8FAFC] rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-1">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-white text-[18px] font-bold text-[#2563EB] flex items-center justify-center shadow-sm">
-              {vehicle.operator.initials}
-            </div>
+            {companyLogoUrl(vehicle.operator.logo) ? <img src={companyLogoUrl(vehicle.operator.logo) ?? ""} alt={vehicle.operator.name} className="h-12 w-12 rounded-xl border border-slate-200 object-cover shadow-sm" /> : <div className="w-12 h-12 rounded-xl bg-white text-[18px] font-bold text-[#2563EB] flex items-center justify-center shadow-sm">{vehicle.operator.initials}</div>}
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
                 <span className="text-[16px] text-[#0F172A] font-bold">{vehicle.operator.name}</span>

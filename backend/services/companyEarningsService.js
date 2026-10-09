@@ -5,6 +5,7 @@ import Vehicle from "../models/vehicle_model.js";
 import Company from "../models/Company_model.js";
 import User from "../models/User_model.js";
 import PlatformSettings from "../models/PlatformSettings_model.js";
+import { getPlatformPolicy } from "./platformPolicyService.js";
 import AppError from "../utils/appError.js";
 import { resolvePagination, buildPaginationMeta } from "../utils/pagination.js";
 import {
@@ -475,6 +476,7 @@ export const buildCompanyEarnings = async ({
   if (!company) {
     throw new AppError("No company found with that ID.", 404);
   }
+  const platformPolicy = await getPlatformPolicy();
 
   const rangeCode = VALID_RANGES.has(range) ? range : "all";
   const window = windowOf(rangeCode);
@@ -730,7 +732,8 @@ export const buildCompanyEarnings = async ({
     company: {
       name: company.name,
       slug: company.slug,
-      commissionRate: company.customCommissionRate ?? 8,
+      commissionRate:
+        company.customCommissionRate ?? platformPolicy.commissionRatePct,
     },
     range: { code: rangeCode, from: window?.from ?? null, to: window?.to ?? null },
     settings: { payoutSchedule, clearingBank },

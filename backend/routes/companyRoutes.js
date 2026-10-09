@@ -10,6 +10,8 @@ import {
   deleteCompany,
   getCompanySettings,
   requestCompanyPayout,
+  uploadCompanyLogo,
+  processCompanyLogo,
 } from "../controllers/companyController.js";
 import { registerCompanyOwner } from "../controllers/companyRegistrationController.js";
 import {
@@ -721,6 +723,8 @@ router.post(
 router.patch(
   ["/settings", "/update-my-company", "/updateMyCompany"],
   restrictTo("company"),
+  uploadCompanyLogo,
+  processCompanyLogo,
   validateSubdomain,
   validate(updateCompanySchema),
   updateMyCompany,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Award,
@@ -10,6 +10,7 @@ import type {
   CompanySettingsProfile,
   EditableCompanyField,
 } from "../../types/companySettings";
+import { companyLogoUrl, initialsFrom } from "../../lib/vehicleMapper";
 
 interface InputFieldProps {
   label: string;
@@ -76,6 +77,8 @@ interface CompanySettingsProfileCardProps {
   draft: CompanySettingsProfile;
   subdomain: string;
   onChange: (field: EditableCompanyField, value: string) => void;
+  busy: boolean;
+  onLogoChange: (file: File) => void;
 }
 
 /**
@@ -87,8 +90,25 @@ export const CompanySettingsProfileCard: React.FC<CompanySettingsProfileCardProp
   draft,
   subdomain,
   onChange,
+  busy,
+  onLogoChange,
 }) => {
   const { t } = useTranslation();
+  const logoInput = useRef<HTMLInputElement>(null);
+  const [logoError, setLogoError] = useState("");
+  const logo = companyLogoUrl(draft.logo);
+
+  const chooseLogo = (files: FileList | null) => {
+    const file = files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
+      setLogoError(t("company.settings.profile.logoInvalid"));
+      return;
+    }
+    setLogoError("");
+    onLogoChange(file);
+    if (logoInput.current) logoInput.current.value = "";
+  };
 
   return (
     <CompanySettingsSection
@@ -153,9 +173,7 @@ export const CompanySettingsProfileCard: React.FC<CompanySettingsProfileCardProp
         <div className="flex items-end">
           <div className="flex w-full items-center justify-between gap-4 rounded-xl border border-dashed border-[#D3E4FE] bg-[#F8FAFF] px-4 py-3">
             <div className="flex min-w-0 items-center gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-sm font-extrabold text-white">
-                {draft.name.charAt(0).toUpperCase() || "N"}
-              </span>
+              {logo ? <img src={logo} alt={draft.name} className="h-12 w-12 shrink-0 rounded-xl border border-slate-200 object-cover" /> : <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#2563EB] text-sm font-extrabold text-white">{initialsFrom(draft.name)}</span>}
               <div className="min-w-0">
                 <p className="text-xs font-bold text-[#0B1C30]">
                   {t("company.settings.profile.logo")}
@@ -165,11 +183,13 @@ export const CompanySettingsProfileCard: React.FC<CompanySettingsProfileCardProp
                 </p>
               </div>
             </div>
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#EFF4FF] px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-[#2563EB]">
+            <input ref={logoInput} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => chooseLogo(e.target.files)} />
+            <button type="button" disabled={busy} onClick={() => logoInput.current?.click()} className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg bg-[#2563EB] px-3 py-2 text-[11px] font-extrabold text-white hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-60">
               <CloudUpload className="h-3 w-3" aria-hidden="true" />
-              {t("company.settings.soon")}
-            </span>
+              {busy ? t("company.settings.profile.logoUploading") : t("company.settings.profile.logoAction")}
+            </button>
           </div>
+          {logoError && <p className="mt-1 text-[11px] font-semibold text-[#BA1A1A]">{logoError}</p>}
         </div>
       </div>
 

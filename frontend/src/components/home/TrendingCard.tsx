@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { Heart, Star, ArrowRight } from "lucide-react";
+import { Heart, Star, ArrowRight } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import type { TrendingCar } from "../../types/trendingCar";
 

@@ -244,7 +244,7 @@ export const createVehicleListing = async (bodyData, files, tenantCompanyId) => 
   const { lng, lat, ...vehicleData } = bodyData;
 
   // Build GeoJSON Point if coordinates are supplied
-  if (lng && lat) {
+  if (lng !== undefined && lat !== undefined && lng !== "" && lat !== "") {
     vehicleData.location = {
       type: "Point",
       coordinates: [Number(lng), Number(lat)],
@@ -302,7 +302,15 @@ export const createVehicleListing = async (bodyData, files, tenantCompanyId) => 
  * unscoped, which preserves the cross-tenant platform view.
  */
 export const updateVehicleRecord = async (vehicleId, updateData, tenantId = null) => {
-  const { companyId: _ignoredCompanyId, ...safeUpdateData } = updateData ?? {};
+  const { companyId: _ignoredCompanyId, lng, lat, ...safeUpdateData } = updateData ?? {};
+  if (lng !== undefined || lat !== undefined) {
+    const current = await Vehicle.findOne({ _id: vehicleId, ...(tenantId ? { companyId: tenantId } : {}) });
+    const longitude = lng === undefined ? current?.location?.coordinates?.[0] : Number(lng);
+    const latitude = lat === undefined ? current?.location?.coordinates?.[1] : Number(lat);
+    if (Number.isFinite(longitude) && Number.isFinite(latitude)) {
+      safeUpdateData.location = { type: "Point", coordinates: [longitude, latitude] };
+    }
+  }
 
   const vehicle = await Vehicle.findOneAndUpdate(
     { _id: vehicleId, ...(tenantId ? { companyId: tenantId } : {}) },
@@ -329,7 +337,7 @@ export const updateVehicleStatusById = async (
   status,
   tenantId = null,
 ) => {
-  const operationalStatuses = ["AVAILABLE", "MAINTENANCE", "UNAVAILABLE"];
+  const operationalStatuses = ["AVAILABLE", "MAINTENANCE", "SUSPENDED"];
   const listingStatuses = ["DRAFT", "PUBLISHED", "SUSPENDED"];
 
   const upperStatus = status ? status.toUpperCase() : "";

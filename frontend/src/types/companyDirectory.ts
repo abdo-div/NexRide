@@ -16,6 +16,7 @@ export interface CompanyDirectoryEntry {
   id: string;
   initials: string;
   avatarBg: string;
+  logo?: string;
   name: string;
   city: string;
   address: string;

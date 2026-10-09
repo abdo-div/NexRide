@@ -3,10 +3,11 @@ import { useTranslation } from "react-i18next";
 import { BadgeCheck } from "lucide-react";
 import type { CompanyVehicleEditForm } from "../../hooks/useCompanyVehicleEditForm";
 import { SectionCard } from "./CompanyVehicleBits";
-import { EditField, ReadonlyField } from "./CompanyVehicleEditBits";
+import { EditField } from "./CompanyVehicleEditBits";
 
 interface CompanyVehicleEditInfoProps {
   form: CompanyVehicleEditForm;
+  essentialOnly?: boolean;
 }
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -20,6 +21,7 @@ const VEHICLE_TYPES = ["SEDAN", "SUV", "HATCHBACK", "LUXURY", "VAN", "PICKUP"] a
  */
 export const CompanyVehicleEditInfo: React.FC<CompanyVehicleEditInfoProps> = ({
   form,
+  essentialOnly = false,
 }) => {
   const { t } = useTranslation();
   const { draft, fieldErrors, setField } = form;
@@ -43,24 +45,29 @@ export const CompanyVehicleEditInfo: React.FC<CompanyVehicleEditInfoProps> = ({
       }
     >
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <EditField
+        {!essentialOnly && <EditField
           label={t("company.editVehiclePage.info.make")}
           labelAr={t("company.editVehiclePage.info.makeAr")}
           value={draft.make}
+          required
+          placeholder={t("company.editVehiclePage.info.makePlaceholder")}
           onChange={(value) => setField("make", value)}
           error={fieldErrors.make}
-        />
-        <EditField
+        />}
+        {!essentialOnly && <EditField
           label={t("company.editVehiclePage.info.model")}
           labelAr={t("company.editVehiclePage.info.modelAr")}
           value={draft.model}
+          required
+          placeholder={t("company.editVehiclePage.info.modelPlaceholder")}
           onChange={(value) => setField("model", value)}
           error={fieldErrors.model}
-        />
+        />}
         <EditField
           label={t("company.editVehiclePage.info.year")}
           labelAr={t("company.editVehiclePage.info.yearAr")}
           type="number"
+          required
           min={1900}
           max={CURRENT_YEAR + 1}
           value={draft.year}
@@ -71,22 +78,28 @@ export const CompanyVehicleEditInfo: React.FC<CompanyVehicleEditInfoProps> = ({
           label={t("company.editVehiclePage.info.category")}
           labelAr={t("company.editVehiclePage.info.categoryAr")}
           type="select"
+          required
           options={typeOptions}
           value={draft.type}
           onChange={(value) => setField("type", value)}
           error={fieldErrors.type}
         />
-        <ReadonlyField
+        <EditField
           label={t("company.editVehiclePage.info.plate")}
           labelAr={t("company.editVehiclePage.info.plateAr")}
-          comingSoon
-          hint={t("company.editVehiclePage.info.registrationTag")}
+          value={draft.plateNumber}
+          placeholder={t("company.editVehiclePage.info.platePlaceholder")}
+          onChange={(value) => setField("plateNumber", value)}
+          error={fieldErrors.plateNumber}
         />
-        <ReadonlyField
+        <EditField
           label={t("company.editVehiclePage.info.vin")}
           labelAr={t("company.editVehiclePage.info.vinAr")}
-          comingSoon
-          hint={t("company.editVehiclePage.info.registry")}
+          value={draft.vin}
+          placeholder={t("company.editVehiclePage.info.vinPlaceholder")}
+          maxLength={17}
+          onChange={(value) => setField("vin", value.toUpperCase())}
+          error={fieldErrors.vin}
         />
       </div>
 
@@ -101,6 +114,7 @@ export const CompanyVehicleEditInfo: React.FC<CompanyVehicleEditInfoProps> = ({
           rows={3}
           maxLength={500}
           value={draft.description}
+          placeholder={t("company.editVehiclePage.info.descriptionPlaceholder")}
           onChange={(value) => setField("description", value)}
           error={fieldErrors.description}
         />

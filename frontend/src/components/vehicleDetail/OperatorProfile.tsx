@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Car, BadgeCheck, Star, MessageCircle, Phone } from "lucide-react";
 import type { VehicleDetail } from "../../types/vehicleDetail";
+import { companyLogoUrl } from "../../lib/vehicleMapper";
 
 export const OperatorProfile: React.FC<{ detail: VehicleDetail }> = ({ detail }) => {
   const { t } = useTranslation();
@@ -10,9 +11,7 @@ export const OperatorProfile: React.FC<{ detail: VehicleDetail }> = ({ detail })
   return (
     <section className="bg-white p-6 rounded-2xl border border-[#E2E8F0] shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
       <div className="flex items-start gap-4">
-        <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 shadow-sm text-[#2563EB]">
-          <Car className="w-8 h-8" />
-        </div>
+        {companyLogoUrl(op.logo) ? <img src={companyLogoUrl(op.logo) ?? ""} alt={op.name} className="h-16 w-16 shrink-0 rounded-2xl border border-blue-100 object-cover shadow-sm" /> : <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 shadow-sm text-[#2563EB]"><Car className="w-8 h-8" /></div>}
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h3 className="text-[18px] font-bold text-[#0F172A]">{op.name}</h3>

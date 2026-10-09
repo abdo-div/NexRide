@@ -8,6 +8,7 @@ import { buildPayoutLedger } from "../services/payoutService.js";
 import {
   netContributionOf,
   computeNettedBalance,
+  meetsMinimumPayout,
 } from "../utils/payoutNetting.js";
 
 const PROBE_URI =
@@ -145,4 +146,21 @@ test("Test 3: cash-only earnings owe commission and show a zero payout, not a ne
     assert.equal(ledger[0].payoutBalance, 0);
     assert.equal(ledger[0].outstandingCommission, 40);
   });
+});
+
+test("Test 4: the net balance must meet the configured minimum payout", () => {
+  const below = computeNettedBalance([
+    { ...cardRow, companyShare: 920 },
+    { ...cashRow, commissionAmount: 40 },
+  ]);
+  assert.equal(below.dueToCompany, 880);
+  assert.equal(meetsMinimumPayout(below, 1000), false);
+  assert.equal(meetsMinimumPayout({ dueToCompany: 1000 }, 1000), false);
+
+  const above = computeNettedBalance([
+    { ...cardRow, amount: 2000, commissionAmount: 160, companyShare: 1840 },
+    cashRow,
+  ]);
+  assert.equal(above.dueToCompany, 1800);
+  assert.equal(meetsMinimumPayout(above, 1000), true);
 });

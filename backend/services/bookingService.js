@@ -12,6 +12,7 @@ import {
   DATE_BLOCKING_BOOKING_STATUSES,
   buildDateOverlapFilter,
 } from "../utils/bookingStatus.js";
+import { getPlatformPolicy } from "./platformPolicyService.js";
 
 // The search allowlist is deliberately limited to fields stored on the booking
 // document. Populated references (vehicle make/model, customer and partner
@@ -127,11 +128,8 @@ export const checkAvailability = async (vehicleId, startDate, endDate) => {
 };
 
 /**
- * This is the authoritative on-write mutex for a vehicle row. A conditional
- * findOneAndUpdate is an atomic "test-and-set": concurrent checkouts for the
- * same vehicle serialize on this document, so the read-then-insert collision
- * check that follows can never race past itself. The claim is always rolled
- * back to AVAILABLE inside the caller's transaction.
+ * Touching the row inside the transaction provides a write-conflict mutex
+ * without overloading operationalStatus with a temporary reservation state.
  */
 const claimVehicleForCheckout = (vehicleId, session) =>
   Vehicle.findOneAndUpdate(
@@ -140,7 +138,7 @@ const claimVehicleForCheckout = (vehicleId, session) =>
       listingStatus: "PUBLISHED",
       operationalStatus: "AVAILABLE",
     },
-    { $set: { operationalStatus: "UNAVAILABLE" } },
+    { $set: { updatedAt: new Date() } },
     { session, new: true },
   );
 
@@ -149,17 +147,10 @@ const isWriteConflict = (error) =>
   /WriteConflict|TransientTransactionError/i.test(error?.message ?? "");
 
 /**
- * Rolls the vehicle availability claim back. Conditionally matches only a unit
- * still in the transient UNAVAILABLE state, so it can never override an
- * operationalStatus that changed underneath the checkout (e.g. an admin moving
- * the unit to MAINTENANCE).
+ * No release write is required: the transaction mutex never changes physical
+ * vehicle state.
  */
-const releaseVehicleFromCheckout = (vehicleId, session) =>
-  Vehicle.findOneAndUpdate(
-    { _id: vehicleId, operationalStatus: "UNAVAILABLE" },
-    { $set: { operationalStatus: "AVAILABLE" } },
-    { session },
-  );
+const releaseVehicleFromCheckout = async () => undefined;
 
 /**
  * Creates a customer booking with server-side price calculation & overlap
@@ -316,11 +307,15 @@ export const REFUND_POLICY = Object.freeze({
  * @param {Date|string} [cancelledAt] - cancellation moment (defaults to now)
  * @returns {number} 0, 0.5 or 1
  */
-export const computeRefundFraction = (startDate, cancelledAt = new Date()) => {
+export const computeRefundFraction = (
+  startDate,
+  cancelledAt = new Date(),
+  policy = REFUND_POLICY,
+) => {
   const hoursBefore = (new Date(startDate) - new Date(cancelledAt)) / 3600000;
-  if (hoursBefore >= REFUND_POLICY.fullRefundHours) return 1;
-  if (hoursBefore >= REFUND_POLICY.partialRefundHours) {
-    return REFUND_POLICY.partialRefundFraction;
+  if (hoursBefore >= policy.fullRefundHours) return 1;
+  if (hoursBefore >= policy.partialRefundHours) {
+    return policy.partialRefundFraction;
   }
   return 0;
 };
@@ -387,9 +382,15 @@ export const cancelBookingById = async (bookingId, user, { reason = null } = {})
     booking.cancelledAt = new Date();
     booking.cancellationReason = reason ?? booking.cancellationReason;
 
+    const { freeCancellationHours } = await getPlatformPolicy();
     const refundFraction = computeRefundFraction(
       booking.startDate,
       booking.cancelledAt,
+      {
+        fullRefundHours: freeCancellationHours,
+        partialRefundHours: freeCancellationHours / 2,
+        partialRefundFraction: REFUND_POLICY.partialRefundFraction,
+      },
     );
 
     // The latest completed ledger row is the one that was actually collected
@@ -489,7 +490,7 @@ export const BOOKING_STATUS_TRANSITIONS = Object.freeze({
   PENDING_PAYMENT: ["PAID", "CONFIRMED", "CANCELLED"],
   PAID: ["CONFIRMED", "CANCELLED"],
   CONFIRMED: ["ACTIVE", "CANCELLED"],
-  ACTIVE: ["COMPLETED", "CANCELLED"],
+  ACTIVE: ["COMPLETED"],
   COMPLETED: [],
   CANCELLED: [],
   EXPIRED: [],

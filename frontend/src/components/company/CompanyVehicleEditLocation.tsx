@@ -3,10 +3,11 @@ import { useTranslation } from "react-i18next";
 import { MapPin, Navigation } from "lucide-react";
 import type { CompanyVehicleEditForm } from "../../hooks/useCompanyVehicleEditForm";
 import { SectionCard } from "./CompanyVehicleBits";
-import { ComingSoonPill, EditField } from "./CompanyVehicleEditBits";
+import { EditField } from "./CompanyVehicleEditBits";
 
 interface CompanyVehicleEditLocationProps {
   form: CompanyVehicleEditForm;
+  essentialOnly?: boolean;
 }
 
 /**
@@ -17,6 +18,7 @@ interface CompanyVehicleEditLocationProps {
  */
 export const CompanyVehicleEditLocation: React.FC<CompanyVehicleEditLocationProps> = ({
   form,
+  essentialOnly = false,
 }) => {
   const { t } = useTranslation();
   const { draft, fieldErrors, setField } = form;
@@ -35,6 +37,8 @@ export const CompanyVehicleEditLocation: React.FC<CompanyVehicleEditLocationProp
           label={t("company.editVehiclePage.location.city")}
           labelAr={t("company.editVehiclePage.location.cityAr")}
           value={draft.city}
+          required
+          placeholder={t("company.editVehiclePage.location.cityPlaceholder")}
           onChange={(value) => setField("city", value)}
           error={fieldErrors.city}
         />
@@ -42,12 +46,18 @@ export const CompanyVehicleEditLocation: React.FC<CompanyVehicleEditLocationProp
           label={t("company.editVehiclePage.location.pickup")}
           labelAr={t("company.editVehiclePage.location.pickupAr")}
           value={draft.pickupLocation}
+          required
+          placeholder={t("company.editVehiclePage.location.pickupPlaceholder")}
           onChange={(value) => setField("pickupLocation", value)}
           error={fieldErrors.pickupLocation}
         />
       </div>
 
-      <div className="mt-4 flex items-center justify-between rounded-xl bg-[#F1F5F9] px-4 py-3">
+      {!essentialOnly && <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <EditField label={t("company.editVehiclePage.location.longitude")} type="number" min={-180} max={180} value={draft.lng} onChange={(v) => setField("lng", v)} error={fieldErrors.lng} />
+        <EditField label={t("company.editVehiclePage.location.latitude")} type="number" min={-90} max={90} value={draft.lat} onChange={(v) => setField("lat", v)} error={fieldErrors.lat} />
+      </div>}
+      {!essentialOnly && <div className="mt-4 flex items-center justify-between rounded-xl bg-[#F1F5F9] px-4 py-3">
         <span className="flex items-center gap-2 text-xs font-semibold text-[#0B1C30] dark:text-white">
           <Navigation className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
           {t("company.editVehiclePage.location.coords")}
@@ -75,27 +85,8 @@ export const CompanyVehicleEditLocation: React.FC<CompanyVehicleEditLocationProp
             {t("company.editVehiclePage.location.noCoords")}
           </span>
         )}
-      </div>
+      </div>}
 
-      <div className="mt-4 rounded-xl border border-[#E5E7EB] bg-[#F7F9FC] p-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-[#9AA4B5]" aria-hidden="true" />
-              <span className="text-xs font-bold text-[#0B1C30] dark:text-white">
-                {t("company.editVehiclePage.location.depot")} ·{" "}
-                {t("company.editVehiclePage.location.deliveryPoints")}
-              </span>
-            </div>
-            <p className="text-[11px] text-[#9AA4B5]">
-              {t("company.editVehiclePage.location.handover")}
-            </p>
-            <p className="text-[11px] text-[#9AA4B5]">{t("company.editVehiclePage.location.geofence")}</p>
-          </div>
-          <ComingSoonPill>{t("company.vehiclePage.soon")}</ComingSoonPill>
-        </div>
-        <p className="mt-2 text-[11px] text-[#9AA4B5]">{t("company.editVehiclePage.location.geoNote")}</p>
-      </div>
     </SectionCard>
   );
 };

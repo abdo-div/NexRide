@@ -35,6 +35,8 @@ export const ApplicantInfoStep: React.FC<Props> = ({ draft, setDraft, errors }) 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <LabeledField label={t("partner.step1.name")} error={errors.name}>
           <TextInput
+            name="name"
+            autoComplete="name"
             value={applicant.name}
             onChange={(name) => patch({ name })}
             placeholder={t("partner.step1.namePlaceholder")}
@@ -45,6 +47,8 @@ export const ApplicantInfoStep: React.FC<Props> = ({ draft, setDraft, errors }) 
           <TextInput
             type="email"
             dir="ltr"
+            name="email"
+            autoComplete="email"
             value={applicant.email}
             onChange={(email) => patch({ email })}
             placeholder={t("partner.step1.emailPlaceholder")}
@@ -55,8 +59,13 @@ export const ApplicantInfoStep: React.FC<Props> = ({ draft, setDraft, errors }) 
           <TextInput
             type="tel"
             dir="ltr"
+            name="phoneNumber"
+            autoComplete="tel"
+            inputMode="tel"
             value={applicant.phoneNumber}
-            onChange={(phoneNumber) => patch({ phoneNumber })}
+            onChange={(phoneNumber) =>
+              patch({ phoneNumber: phoneNumber.replace(/[^\d+()\s-]/g, "") })
+            }
             placeholder={t("partner.step1.phonePlaceholder")}
           />
         </LabeledField>
@@ -70,6 +79,8 @@ export const ApplicantInfoStep: React.FC<Props> = ({ draft, setDraft, errors }) 
         >
           <TextInput
             type="password"
+            name="new-password"
+            autoComplete="new-password"
             value={applicant.password}
             onChange={(password) => patch({ password })}
           />
@@ -78,6 +89,8 @@ export const ApplicantInfoStep: React.FC<Props> = ({ draft, setDraft, errors }) 
         <LabeledField label={t("partner.step1.passwordConfirm")} error={errors.passwordConfirm}>
           <TextInput
             type="password"
+            name="confirm-password"
+            autoComplete="new-password"
             value={applicant.passwordConfirm}
             onChange={(passwordConfirm) => patch({ passwordConfirm })}
           />

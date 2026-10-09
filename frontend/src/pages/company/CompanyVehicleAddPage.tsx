@@ -13,10 +13,7 @@ import { useCompanyVehicleAddForm } from "../../hooks/useCompanyVehicleAddForm";
 import type { CompanyVehicleProfile } from "../../types/companyVehicle";
 import { CompanyVehicleEditInfo } from "../../components/company/CompanyVehicleEditInfo";
 import { CompanyVehicleEditSpecs } from "../../components/company/CompanyVehicleEditSpecs";
-import {
-  CompanyVehicleEditFeatures,
-  CompanyVehicleEditMedia,
-} from "../../components/company/CompanyVehicleEditExtras";
+import { CompanyVehicleEditMedia } from "../../components/company/CompanyVehicleEditExtras";
 import { CompanyVehicleEditPricing } from "../../components/company/CompanyVehicleEditPricing";
 import { CompanyVehicleEditLocation } from "../../components/company/CompanyVehicleEditLocation";
 import { CompanyVehicleEditPublish } from "../../components/company/CompanyVehicleEditPublish";
@@ -55,7 +52,7 @@ export const CompanyVehicleAddPage: React.FC = () => {
         <div className="flex flex-col gap-4">
           {/* Breadcrumb */}
           <div className="flex flex-wrap items-center gap-1 text-xs font-semibold text-[#565E74]">
-            <span>Portal</span>
+            <span>{t("company.addVehiclePage.portal")}</span>
             <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
             <button
               type="button"
@@ -86,6 +83,9 @@ export const CompanyVehicleAddPage: React.FC = () => {
                     "company.addVehiclePage.subtitle",
                     "Fill in all required fields, upload photos, set pricing and publish your listing.",
                   )}
+                </p>
+                <p className="text-xs font-semibold text-[#9AA4B5]">
+                  {t("company.addVehiclePage.requiredHint")}
                 </p>
               </div>
 
@@ -143,32 +143,29 @@ export const CompanyVehicleAddPage: React.FC = () => {
         </div>
 
         {/* ── Form body ───────────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-12">
-          <div className="flex flex-col gap-6 xl:col-span-8">
+        <div className="grid grid-cols-1 items-start gap-6 2xl:grid-cols-12">
+          <div className="flex min-w-0 flex-col gap-6 2xl:col-span-8">
             <SectionAnchor id="info">
-              <CompanyVehicleEditInfo form={form} />
+              <CompanyVehicleEditInfo form={form} essentialOnly />
             </SectionAnchor>
             <SectionAnchor id="specs">
-              <CompanyVehicleEditSpecs form={form} />
-            </SectionAnchor>
-            <SectionAnchor id="features">
-              <CompanyVehicleEditFeatures />
+              <CompanyVehicleEditSpecs form={form} essentialOnly />
             </SectionAnchor>
             <SectionAnchor id="media">
               <CompanyVehicleEditMedia form={form} />
             </SectionAnchor>
             <SectionAnchor id="pricing">
-              <CompanyVehicleEditPricing form={form} />
+              <CompanyVehicleEditPricing form={form} essentialOnly />
             </SectionAnchor>
             <SectionAnchor id="location">
-              <CompanyVehicleEditLocation form={form} />
+              <CompanyVehicleEditLocation form={form} essentialOnly />
             </SectionAnchor>
             <SectionAnchor id="publish">
               <CompanyVehicleEditPublish form={form} />
             </SectionAnchor>
           </div>
 
-          <div className="xl:col-span-4">
+          <div className="min-w-0 2xl:col-span-4">
             <CompanyVehicleEditPreview form={form} />
           </div>
         </div>

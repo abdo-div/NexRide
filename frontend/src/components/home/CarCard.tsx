@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Heart, Fuel, Gauge, Users, MapPin, CheckCircle2 } from "lucide-react";
+import { Heart, GasPump as Fuel, Gauge, UsersThree as Users, MapPin, CheckCircle as CheckCircle2 } from "@phosphor-icons/react";
 import type { Car } from "../../types/car";
 
 interface CarCardProps {

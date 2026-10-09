@@ -85,7 +85,7 @@ export const CompanyVehicleEditPage: React.FC = () => {
                 <CompanyVehicleEditSpecs form={form} />
               </SectionAnchor>
               <SectionAnchor id="features">
-                <CompanyVehicleEditFeatures />
+                <CompanyVehicleEditFeatures form={form} />
               </SectionAnchor>
               <SectionAnchor id="media">
                 <CompanyVehicleEditMedia form={form} />

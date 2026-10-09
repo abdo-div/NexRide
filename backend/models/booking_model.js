@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import PlatformSettings from "./PlatformSettings_model.js";
 
 const bookingSchema = new mongoose.Schema(
   {
@@ -214,7 +215,17 @@ bookingSchema.pre("validate", async function () {
 
   // 1. Snapshot vehicle daily price & company commission rate
   this.dailyRate = vehicle.dailyPrice;
-  this.commissionRate = company.customCommissionRate ?? 8;
+  let defaultCommissionRate = 8;
+  try {
+    const settings = await PlatformSettings
+      .findOne({ key: "platform" })
+      .select("commission.standardRatePct")
+      .lean();
+    defaultCommissionRate = settings?.commission?.standardRatePct ?? 8;
+  } catch {
+    // A missing/unavailable registry must not prevent a booking snapshot.
+  }
+  this.commissionRate = company.customCommissionRate ?? defaultCommissionRate;
 
   // 2. Calculate rental duration (minimum 1 day)
   const timeDiff = Math.abs(this.endDate - this.startDate);

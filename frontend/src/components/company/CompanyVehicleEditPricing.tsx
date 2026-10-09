@@ -4,10 +4,11 @@ import { Banknote } from "lucide-react";
 import { formatLYD } from "../../lib/bookingView";
 import type { CompanyVehicleEditForm } from "../../hooks/useCompanyVehicleEditForm";
 import { SectionCard } from "./CompanyVehicleBits";
-import { ComingSoonPill, EditField, ReadonlyField } from "./CompanyVehicleEditBits";
+import { EditField } from "./CompanyVehicleEditBits";
 
 interface CompanyVehicleEditPricingProps {
   form: CompanyVehicleEditForm;
+  essentialOnly?: boolean;
 }
 
 const effectivePerDay = (weekly: number): number => Math.round((weekly / 7) * 100) / 100;
@@ -26,6 +27,7 @@ const weeklySavingsPct = (daily: number, weekly: number): number | null => {
  */
 export const CompanyVehicleEditPricing: React.FC<CompanyVehicleEditPricingProps> = ({
   form,
+  essentialOnly = false,
 }) => {
   const { t } = useTranslation();
   const { draft, fieldErrors, setField } = form;
@@ -54,6 +56,8 @@ export const CompanyVehicleEditPricing: React.FC<CompanyVehicleEditPricingProps>
           labelAr={t("company.editVehiclePage.pricing.dailyAr")}
           type="number"
           min={0}
+          required
+          placeholder="0"
           unit="LYD"
           value={draft.dailyPrice}
           onChange={(value) => setField("dailyPrice", value)}
@@ -65,6 +69,7 @@ export const CompanyVehicleEditPricing: React.FC<CompanyVehicleEditPricingProps>
           labelAr={t("company.editVehiclePage.pricing.weeklyAr")}
           type="number"
           min={0}
+          placeholder="0"
           unit="LYD"
           value={draft.weeklyPrice}
           onChange={(value) => setField("weeklyPrice", value)}
@@ -77,20 +82,7 @@ export const CompanyVehicleEditPricing: React.FC<CompanyVehicleEditPricingProps>
               : undefined
           }
         />
-        <div className="flex flex-col justify-between gap-2 rounded-xl border border-dashed border-[#E5E7EB] bg-[#F7F9FC] p-4 opacity-70">
-          <div>
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
-                {t("company.editVehiclePage.pricing.monthly")}
-              </span>
-              <ComingSoonPill>{t("company.vehiclePage.soon")}</ComingSoonPill>
-            </div>
-            <p className="mt-1 text-2xl font-extrabold text-[#9AA4B5]">—</p>
-          </div>
-          <span className="text-[11px] text-[#9AA4B5]">
-            / {t("company.editVehiclePage.pricing.month")}
-          </span>
-        </div>
+        {!essentialOnly && <EditField label={t("company.editVehiclePage.pricing.monthly")} type="number" min={0} unit="LYD" placeholder="0" value={draft.monthlyPrice} onChange={(v) => setField("monthlyPrice", v)} error={fieldErrors.monthlyPrice} />}
       </div>
 
       {savings != null && (
@@ -105,30 +97,32 @@ export const CompanyVehicleEditPricing: React.FC<CompanyVehicleEditPricingProps>
         </div>
       )}
 
-      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-        <ReadonlyField
+      {!essentialOnly && <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <EditField
           label={t("company.editVehiclePage.pricing.escrow")}
           labelAr={t("company.editVehiclePage.pricing.escrowAr")}
+          type="number" min={0}
+          placeholder="0"
           unit="LYD"
-          comingSoon
-          hint={t("company.editVehiclePage.pricing.escrowHint")}
+          value={draft.depositAmount} onChange={(v) => setField("depositAmount", v)} error={fieldErrors.depositAmount}
         />
-        <ReadonlyField
+        <EditField
           label={t("company.editVehiclePage.pricing.mileage")}
           labelAr={t("company.editVehiclePage.pricing.mileageAr")}
+          type="number" min={0}
+          placeholder="0"
           unit={t("company.editVehiclePage.pricing.mileageUnit")}
-          comingSoon
+          value={draft.mileageLimit} onChange={(v) => setField("mileageLimit", v)} error={fieldErrors.mileageLimit}
         />
-        <ReadonlyField
+        <EditField
           label={t("company.editVehiclePage.pricing.extra")}
           labelAr={t("company.editVehiclePage.pricing.extraAr")}
+          type="number" min={0}
+          placeholder="0"
           unit={t("company.editVehiclePage.pricing.extraUnit")}
-          comingSoon
+          value={draft.extraMileageFee} onChange={(v) => setField("extraMileageFee", v)} error={fieldErrors.extraMileageFee}
         />
-      </div>
-      <p className="mt-3 text-[11px] text-[#9AA4B5]">
-        {t("company.editVehiclePage.pricing.depositsComing")}
-      </p>
+      </div>}
     </SectionCard>
   );
 };

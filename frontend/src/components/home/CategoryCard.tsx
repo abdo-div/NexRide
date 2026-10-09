@@ -1,6 +1,13 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, Car, Star, Mountain, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  CarSimple,
+  Jeep,
+  Lightning,
+  Mountains,
+  Sparkle,
+} from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import type { VehicleCategory } from "../../types/category";
 
@@ -11,18 +18,32 @@ interface CategoryCardProps {
 
 export const CategoryCard: React.FC<CategoryCardProps> = ({ category, index = 0 }) => {
   const { t } = useTranslation();
+  const iconClass = "h-6 w-6 transition-colors duration-300 group-hover:text-white";
   const renderIcon = () => {
+    if (category.id === "executive-suv") {
+      return <Jeep weight="duotone" className={iconClass} />;
+    }
+
     switch (category.iconName) {
       case "star":
-        return <Star className="w-5 h-5 text-amber-500 fill-amber-500/20" />;
+        return <Sparkle weight="duotone" className={iconClass} />;
       case "mountain":
-        return <Mountain className="w-5 h-5 text-amber-600" />;
+        return <Mountains weight="duotone" className={iconClass} />;
       case "zap":
-        return <Zap className="w-5 h-5 text-cyan-500 fill-cyan-500/20" />;
+        return <Lightning weight="duotone" className={iconClass} />;
       default:
-        return <Car className="w-5 h-5 text-blue-600" />;
+        return <CarSimple weight="duotone" className={iconClass} />;
     }
   };
+
+  const iconTheme =
+    category.iconName === "star"
+      ? "bg-violet-50 border-violet-100 text-violet-600"
+      : category.iconName === "mountain"
+        ? "bg-orange-50 border-orange-100 text-orange-600"
+        : category.iconName === "zap"
+          ? "bg-cyan-50 border-cyan-100 text-cyan-600"
+          : "bg-blue-50 border-blue-100 text-blue-600";
 
   return (
     <motion.div
@@ -48,7 +69,9 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, index = 0 
         </div>
 
         {/* Category Icon Wrapper */}
-        <div className="w-10 h-10 rounded-xl bg-blue-50/80 border border-blue-100 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+        <div
+          className={`w-12 h-12 rounded-2xl border flex items-center justify-center mb-4 shadow-sm group-hover:scale-105 group-hover:bg-blue-600 group-hover:border-blue-600 group-hover:text-white transition-all duration-300 ${iconTheme}`}
+        >
           {renderIcon()}
         </div>
 
@@ -86,7 +109,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, index = 0 
           aria-label={`${t("home.categories.explore")} ${t(category.title)}`}
           className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-blue-600 group-hover:border-blue-600 transition-all duration-200"
         >
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5 transition-transform" />
+          <ArrowRight weight="bold" className="w-4 h-4 group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5 transition-transform" />
         </a>
       </div>
     </motion.div>

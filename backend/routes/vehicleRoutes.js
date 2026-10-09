@@ -73,7 +73,7 @@ router.get("/", getAllVehicles);
  *         name: operationalStatus
  *         schema:
  *           type: string
- *           enum: [AVAILABLE, MAINTENANCE, UNAVAILABLE]
+ *           enum: [AVAILABLE, MAINTENANCE, SUSPENDED]
  *     responses:
  *       200:
  *         description: Matching vehicles
@@ -239,7 +239,7 @@ router.patch(
  *             properties:
  *               status:
  *                 type: string
- *                 enum: [AVAILABLE, MAINTENANCE, UNAVAILABLE]
+ *                 enum: [AVAILABLE, MAINTENANCE, SUSPENDED]
  *               listingStatus:
  *                 type: string
  *                 enum: [DRAFT, PUBLISHED, SUSPENDED]

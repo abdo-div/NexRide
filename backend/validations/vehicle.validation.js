@@ -4,7 +4,7 @@ import { objectId, ciEnum, idParamSchema } from "./common.validation.js";
 const VEHICLE_TYPES = ["SEDAN", "SUV", "HATCHBACK", "LUXURY", "VAN", "PICKUP"];
 const TRANSMISSIONS = ["MANUAL", "AUTOMATIC"];
 const FUEL_TYPES = ["GASOLINE", "DIESEL", "ELECTRIC", "HYBRID"];
-const OPERATIONAL_STATUSES = ["AVAILABLE", "MAINTENANCE", "UNAVAILABLE"];
+const OPERATIONAL_STATUSES = ["AVAILABLE", "MAINTENANCE", "SUSPENDED"];
 const LISTING_STATUSES = ["DRAFT", "PUBLISHED", "SUSPENDED"];
 
 // Multer/resize middleware may hand us either a single filename or an array
@@ -13,6 +13,8 @@ const imageField = z.union([z.array(z.string()), z.string()]).optional();
 const createVehicleBody = z.object({
   make: z.string().trim().min(1, "vehicle make is required").max(100),
   model: z.string().trim().min(1, "vehicle model is required").max(100),
+  plateNumber: z.string().trim().max(30).optional(),
+  vin: z.string().trim().max(17).optional(),
   year: z.coerce
     .number()
     .int()
@@ -24,6 +26,16 @@ const createVehicleBody = z.object({
   seats: z.coerce.number().int().min(1).max(20),
   doors: z.coerce.number().int().min(1).max(10).optional(),
   description: z.string().trim().max(500).optional(),
+  odometer: z.preprocess((v) => (v === "" ? null : v), z.coerce.number().min(0).nullable().optional()),
+  engine: z.string().trim().max(100).optional(),
+  drivetrain: z.string().trim().max(50).optional(),
+  exteriorColor: z.string().trim().max(50).optional(),
+  interiorColor: z.string().trim().max(50).optional(),
+  tankCapacity: z.preprocess((v) => (v === "" ? null : v), z.coerce.number().min(0).nullable().optional()),
+  features: z.preprocess(
+    (v) => typeof v === "string" ? v.split(",").map((item) => item.trim()).filter(Boolean) : v,
+    z.array(z.string().trim().min(1).max(80)).max(30).optional(),
+  ),
   dailyPrice: z.coerce
     .number()
     .min(0, "daily rental price cannot be negative"),
@@ -33,6 +45,10 @@ const createVehicleBody = z.object({
     (v) => (v === "" ? null : v),
     z.coerce.number().min(0).nullable().optional(),
   ),
+  monthlyPrice: z.preprocess((v) => (v === "" ? null : v), z.coerce.number().min(0).nullable().optional()),
+  depositAmount: z.preprocess((v) => (v === "" ? 0 : v), z.coerce.number().min(0).optional()),
+  mileageLimit: z.preprocess((v) => (v === "" ? null : v), z.coerce.number().min(0).nullable().optional()),
+  extraMileageFee: z.preprocess((v) => (v === "" ? null : v), z.coerce.number().min(0).nullable().optional()),
   city: z.string().trim().min(1, "city location is required").max(100),
   pickupLocation: z
     .string()
@@ -45,8 +61,8 @@ const createVehicleBody = z.object({
   imageCover: z.string().optional(),
   images: imageField,
   // GeoJSON coordinates supplied as separate multipart fields
-  lng: z.coerce.number().optional(),
-  lat: z.coerce.number().optional(),
+  lng: z.coerce.number().min(-180).max(180).optional(),
+  lat: z.coerce.number().min(-90).max(90).optional(),
   // Only honoured by the controller for admins; tenant company is resolved server-side
   companyId: objectId.optional(),
 });

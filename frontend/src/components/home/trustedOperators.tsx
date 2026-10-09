@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@phosphor-icons/react";
 import { OperatorCard } from "./OperatorsCard";
 import { HomeSectionError } from "./HomeSectionError";
 import type { FleetOperator } from "../../types/operators";

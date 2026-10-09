@@ -4,14 +4,14 @@ import { ImagePlus, Sparkles, Star, X } from "lucide-react";
 import type { CompanyVehicleEditForm } from "../../hooks/useCompanyVehicleEditForm";
 import { photoUrl } from "../../lib/vehicleMapper";
 import { SectionCard } from "./CompanyVehicleBits";
-import { ComingSoonPill } from "./CompanyVehicleEditBits";
 
 /**
  * Card 3 — Features & amenities. The record has no feature-set field yet, so
  * the whole section is a clearly-labelled coming-soon placeholder.
  */
-export const CompanyVehicleEditFeatures: React.FC = () => {
+export const CompanyVehicleEditFeatures: React.FC<CompanyVehicleEditMediaProps> = ({ form }) => {
   const { t } = useTranslation();
+  const { draft, setField, fieldErrors } = form;
 
   return (
     <SectionCard
@@ -22,19 +22,17 @@ export const CompanyVehicleEditFeatures: React.FC = () => {
       subtitle={t("company.editVehiclePage.features.subtitle")}
       action={
         <span className="text-[11px] font-bold text-[#9AA4B5]">
-          {t("company.editVehiclePage.features.count", { count: 0 })}
+          {t("company.editVehiclePage.features.count", { count: draft.features.split(",").filter((v) => v.trim()).length })}
         </span>
       }
     >
-      <div className="flex items-center gap-3 rounded-xl border border-dashed border-[#E5E7EB] bg-[#F7F9FC] p-5">
-        <Sparkles className="h-6 w-6 shrink-0 text-[#C3C6D7]" aria-hidden="true" />
-        <div>
-          <p className="text-sm text-[#0B1C30]">{t("company.editVehiclePage.features.empty")}</p>
-          <div className="mt-1.5">
-            <ComingSoonPill>{t("company.vehiclePage.soon")}</ComingSoonPill>
-          </div>
-        </div>
-      </div>
+      <label htmlFor="vehicle-features" className="mb-1.5 block text-xs font-bold text-[#0B1C30] dark:text-white">
+        {t("company.editVehiclePage.features.fieldLabel")}
+      </label>
+      <textarea id="vehicle-features" value={draft.features} onChange={(e) => setField("features", e.target.value)} rows={3}
+        placeholder={t("company.editVehiclePage.features.placeholder")}
+        className="w-full resize-none rounded-xl border border-[#E5E7EB] bg-white px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15" />
+      <p className={`mt-1 text-[11px] ${fieldErrors.features ? "text-[#DC2626]" : "text-[#9AA4B5]"}`}>{fieldErrors.features || t("company.editVehiclePage.features.hint")}</p>
     </SectionCard>
   );
 };
@@ -48,11 +46,20 @@ interface CompanyVehicleEditMediaProps {
  * initialiser, never inside an effect) and revoked when the tile unmounts.
  */
 const LocalFilePreview: React.FC<{ file: File; alt: string }> = ({ file, alt }) => {
-  const [src] = useState(() => URL.createObjectURL(file));
+  const [src, setSrc] = useState("");
   useEffect(() => {
-    return () => URL.revokeObjectURL(src);
-  }, [src]);
-  return <img src={src} alt={alt} className="aspect-[4/3] w-full object-cover" />;
+    let active = true;
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      if (active && typeof reader.result === "string") setSrc(reader.result);
+    });
+    reader.readAsDataURL(file);
+    return () => {
+      active = false;
+      if (reader.readyState === FileReader.LOADING) reader.abort();
+    };
+  }, [file]);
+  return src ? <img src={src} alt={alt} className="aspect-[4/3] w-full object-cover" /> : <div className="aspect-[4/3] w-full animate-pulse bg-[#E2E8F0]" />;
 };
 
 /**
@@ -68,10 +75,20 @@ export const CompanyVehicleEditMedia: React.FC<CompanyVehicleEditMediaProps> = (
   const { photos, newImages, setCover, removePhoto, addNewImages, removeNewImage } = form;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const pickFiles = (fileList: FileList | null) => {
     if (!fileList) return;
-    addNewImages(Array.from(fileList));
+    const candidates = Array.from(fileList);
+    const invalid = candidates.find((file) => !file.type.startsWith("image/") || file.size > 5 * 1024 * 1024);
+    if (invalid) {
+      setUploadError(t("company.editVehiclePage.media.invalidFile"));
+    } else if (total + candidates.length > 8) {
+      setUploadError(t("company.editVehiclePage.media.maxPhotos"));
+    } else {
+      setUploadError(null);
+      addNewImages(candidates);
+    }
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -179,6 +196,7 @@ export const CompanyVehicleEditMedia: React.FC<CompanyVehicleEditMediaProps> = (
           {t("company.editVehiclePage.media.replaceHint")}
         </span>
       </div>
+      {uploadError && <p className="mt-2 text-[11px] font-semibold text-[#DC2626]">{uploadError}</p>}
     </SectionCard>
   );
 };

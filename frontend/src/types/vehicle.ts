@@ -9,6 +9,7 @@ export interface VehicleOperator {
   id: string;
   name: string;
   initials: string;
+  logo?: string;
   rating: number;
   reviewsCount: number;
   isVerified?: boolean;

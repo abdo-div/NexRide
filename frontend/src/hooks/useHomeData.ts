@@ -178,7 +178,7 @@ export const useHomeData = (): HomeDataState => {
         startingPrice:
           matches.length > 0
             ? Math.min(...matches.map((vehicle) => vehicle.dailyPrice))
-            : null,
+            : base.startingPrice,
       };
     });
 
@@ -214,6 +214,7 @@ export const useHomeData = (): HomeDataState => {
         return {
           id,
           initials: initialsFrom(company.name),
+          logo: company.logo,
           avatarBg: AVATAR_BG[index % AVATAR_BG.length],
           name: company.name,
           locations: company.city ?? "",

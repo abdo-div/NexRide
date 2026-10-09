@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { CalendarDays, MapPin, Pencil } from "lucide-react";
 import type { CompanyFleetVehicle } from "../../types/companyFleet";
+import { photoUrl } from "../../lib/vehicleMapper";
 import {
   FleetStatusPill,
   PriceBlock,
@@ -85,7 +86,7 @@ export const CompanyFleetTable: React.FC<CompanyFleetTableProps> = ({
                     <div className="h-11 w-16 shrink-0 overflow-hidden rounded-lg bg-[#F1F5F9]">
                       {row.photo ? (
                         <img
-                          src={row.photo}
+                          src={photoUrl(row.photo)}
                           alt={`${row.make} ${row.model}`}
                           className="h-full w-full object-cover"
                           loading="lazy"

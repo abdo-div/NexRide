@@ -40,6 +40,7 @@ const companyPayoutBody = z.object({
 
 export const updateCompanySchema = z.object({
   body: companyBody.partial().extend({
+    logo: z.string().trim().max(255).optional(),
     payout: companyPayoutBody.partial().optional(),
   }),
 });

@@ -506,7 +506,11 @@ test("Company A's payout summary is computed against its own tenant, never a que
     assert.equal(outcome.statusCode, 200);
     assert.equal(captured.length, 1);
     const match = captured[0][0].$match;
-    assert.equal(match.status, "COMPLETED");
+    assert.deepEqual(match.status.$in, [
+      "COMPLETED",
+      "REFUNDED",
+      "PARTIALLY_REFUNDED",
+    ]);
     assert.equal(
       match.companyId.toString(),
       companyA,

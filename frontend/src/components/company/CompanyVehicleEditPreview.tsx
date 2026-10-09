@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { CheckCircle2, ExternalLink, Eye, Loader2, UserRound } from "lucide-react";
@@ -13,6 +13,23 @@ interface CompanyVehicleEditPreviewProps {
 }
 
 const readyGreen = "bg-[#DDF4E4] text-[#0E6B34]";
+
+const LocalPreviewImage: React.FC<{ file: File; alt: string }> = ({ file, alt }) => {
+  const [src, setSrc] = useState("");
+  useEffect(() => {
+    let active = true;
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      if (active && typeof reader.result === "string") setSrc(reader.result);
+    });
+    reader.readAsDataURL(file);
+    return () => {
+      active = false;
+      if (reader.readyState === FileReader.LOADING) reader.abort();
+    };
+  }, [file]);
+  return src ? <img src={src} alt={alt} className="h-full w-full object-cover" /> : <div className="h-full w-full animate-pulse bg-[#E2E8F0]" />;
+};
 
 /**
  * Right sticky column: live marketplace preview (reflects every pending edit),
@@ -39,6 +56,7 @@ export const CompanyVehicleEditPreview: React.FC<CompanyVehicleEditPreviewProps>
     newImages,
   } = form;
 
+  const stagedPhoto = newImages[0] ?? null;
   const photo = previewVehicle.photos[0] ?? previewVehicle.photo ?? null;
   const photosReady = newImages.length > 0 || previewVehicle.photos.length > 0;
 
@@ -94,7 +112,9 @@ export const CompanyVehicleEditPreview: React.FC<CompanyVehicleEditPreviewProps>
 
         <div className="mt-3 overflow-hidden rounded-xl border border-[#E5E7EB] bg-white shadow-sm">
           <div className="relative aspect-[16/9] w-full bg-[#F1F5F9]">
-            {photo ? (
+            {stagedPhoto ? (
+              <LocalPreviewImage file={stagedPhoto} alt={`${previewVehicle.make} ${previewVehicle.model}`} />
+            ) : photo ? (
               <img
                 src={photoUrl(photo)}
                 alt={`${previewVehicle.make} ${previewVehicle.model}`}

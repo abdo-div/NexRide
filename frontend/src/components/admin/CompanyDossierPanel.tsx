@@ -32,7 +32,7 @@ import {
   vehiclesOf,
 } from "../../lib/companyView";
 import { customerName, vehicleFullTitle } from "../../lib/fleetView";
-import { photoUrl, initialsFrom } from "../../lib/vehicleMapper";
+import { companyLogoUrl, photoUrl, initialsFrom } from "../../lib/vehicleMapper";
 import { StatusPill } from "./StatusPill";
 
 export type CompanyTab = "overview" | "vehicles" | "bookings" | "escrow";
@@ -92,9 +92,7 @@ export const CompanyDossierPanel: React.FC<CompanyDossierPanelProps> = ({
       {/* -------------------------------------------------------------------- */}
       <div className="flex flex-col justify-between gap-4 border-b border-slate-100 bg-[#EAF0FF] px-6 py-5 xl:flex-row xl:items-center">
         <div className="flex items-start gap-4">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#2563EB] text-[22px] font-extrabold text-white shadow-md">
-            {initialsFrom(company.name)}
-          </div>
+          {companyLogoUrl(company.logo) ? <img src={companyLogoUrl(company.logo) ?? ""} alt={company.name} className="h-16 w-16 shrink-0 rounded-2xl border border-white object-cover shadow-md" /> : <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#2563EB] text-[22px] font-extrabold text-white shadow-md">{initialsFrom(company.name)}</div>}
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="truncate text-[22px] font-extrabold tracking-tight text-[#0B1C30]">

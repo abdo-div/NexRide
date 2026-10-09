@@ -1,6 +1,11 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ShieldCheck, Building2, CreditCard, Car } from "lucide-react";
+import {
+  ShieldCheck,
+  Buildings as Building2,
+  CreditCard,
+  CarSimple,
+} from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import type { StandardFeature } from "../../types/standard";
 
@@ -11,18 +16,20 @@ interface StandardCardProps {
 
 export const StandardCard: React.FC<StandardCardProps> = ({ feature, index = 0 }) => {
   const { t } = useTranslation();
+  const iconClass =
+    "h-6 w-6 text-blue-600 transition-colors duration-300 group-hover:text-white";
   const renderIcon = () => {
     switch (feature.iconType) {
       case "shield":
-        return <ShieldCheck className="w-5 h-5 text-blue-600" />;
+        return <ShieldCheck weight="duotone" className={iconClass} />;
       case "building":
-        return <Building2 className="w-5 h-5 text-blue-600" />;
+        return <Building2 weight="duotone" className={iconClass} />;
       case "credit-card":
-        return <CreditCard className="w-5 h-5 text-blue-600" />;
+        return <CreditCard weight="duotone" className={iconClass} />;
       case "car":
-        return <Car className="w-5 h-5 text-rose-500" />;
+        return <CarSimple weight="duotone" className={iconClass} />;
       default:
-        return <ShieldCheck className="w-5 h-5 text-blue-600" />;
+        return <ShieldCheck weight="duotone" className={iconClass} />;
     }
   };
 
@@ -37,7 +44,7 @@ export const StandardCard: React.FC<StandardCardProps> = ({ feature, index = 0 }
     >
       <div>
         {/* Icon Box */}
-        <div className="w-11 h-11 rounded-2xl bg-blue-100/60 border border-blue-200/50 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+        <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 shadow-sm flex items-center justify-center mb-6 group-hover:scale-105 group-hover:bg-blue-600 group-hover:border-blue-600 group-hover:text-white transition-all duration-300">
           {renderIcon()}
         </div>
 

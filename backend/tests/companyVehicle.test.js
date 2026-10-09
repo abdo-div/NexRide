@@ -271,11 +271,13 @@ test("the vehicle dossier maps specs, ledger metrics, calendar and trips", async
   });
 
   assert.equal(response.vehicle.code, `NR-VH-${vehicleA.slice(-5).toUpperCase()}`);
-  assert.equal(response.vehicle.displayStatus, "available");
+  // The confirmed Oct 8-12 trip overlaps the test run date, so the derived
+  // display state is rented even though the physical vehicle state is healthy.
+  assert.equal(response.vehicle.displayStatus, "rented");
   assert.equal(response.vehicle.doors, 4);
   assert.equal(response.company.code, "#fleet-a");
 
-  assert.deepEqual(response.metrics.bookings, { total: 3, completed: 1, upcoming: 2 });
+  assert.deepEqual(response.metrics.bookings, { total: 3, completed: 1, upcoming: 1 });
   assert.equal(response.metrics.financial.revenue, 5550);
   assert.equal(response.metrics.rentalDays, 11);
   assert.ok(response.metrics.utilization.daysRented >= 5);
@@ -285,8 +287,8 @@ test("the vehicle dossier maps specs, ledger metrics, calendar and trips", async
   assert.ok(booked.some((d) => d.date === "2026-10-08"), "Oct 8 must be marked booked");
   assert.ok(pending.some((d) => d.date === "2026-10-17"), "Oct 17 must be pending payment");
 
-  assert.equal(response.nextDispatch.reference, "NX-B2B2B2");
-  assert.equal(response.nextDispatch.customerName, "Ahmed Ali");
+  assert.equal(response.nextDispatch.reference, "NX-B3B3B3");
+  assert.equal(response.nextDispatch.customerName, "Omar Khaled");
 
   assert.equal(response.trips.list.length, 1);
   const trip = response.trips.list[0];

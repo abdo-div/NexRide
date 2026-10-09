@@ -271,37 +271,31 @@ export const fetchAllPayments = async (queryParams, user, tenantId = null) => {
  * Calculate company payout summary & platform splits
  */
 export const calculateCompanyPayoutSummary = async (companyId) => {
-  const matchQuery = companyId
-    ? { companyId: new mongoose.Types.ObjectId(companyId) }
-    : {};
-
-  const stats = await Payment.aggregate([
-    { $match: { ...matchQuery, status: "COMPLETED" } },
+  const { computeNettedBalance } = await import("../utils/payoutNetting.js");
+  const match = {
+    status: { $in: ["COMPLETED", "REFUNDED", "PARTIALLY_REFUNDED"] },
+    payoutStatus: "UNSETTLED",
+  };
+  if (companyId) match.companyId = new mongoose.Types.ObjectId(companyId);
+  const rows = await Payment.aggregate([
+    { $match: match },
     {
-      $group: {
-        _id: "$payoutStatus",
-        totalAmount: { $sum: "$amount" },
-        count: { $sum: 1 },
+      $project: {
+        paymentMethod: 1,
+        status: 1,
+        amount: 1,
+        refundAmount: 1,
+        commissionAmount: 1,
+        companyShare: 1,
       },
     },
   ]);
-
-  let totalRevenue = 0;
-  let pendingPayouts = 0;
-  let settledPayouts = 0;
-
-  stats.forEach((stat) => {
-    totalRevenue += stat.totalAmount;
-    if (stat._id === "UNSETTLED") pendingPayouts = stat.totalAmount;
-    if (stat._id === "SETTLED") settledPayouts = stat.totalAmount;
-  });
-
+  const balance = computeNettedBalance(rows);
   return {
-    totalRevenue,
-    pendingPayouts,
-    settledPayouts,
-    platformCommissionSplit: totalRevenue * 0.08, // Default 8% platform fee
-    netCompanyEarnings: totalRevenue * 0.92,
+    pendingPayouts: balance.dueToCompany,
+    nettedBalance: balance.nettedBalance,
+    cashCommission: balance.cashCommission,
+    outstandingCommission: balance.outstandingCommission,
   };
 };
 
@@ -310,7 +304,12 @@ export const calculateCompanyPayoutSummary = async (companyId) => {
  */
 export const settlePaymentPayout = async (paymentId) => {
   const payment = await Payment.findByIdAndUpdate(
-    paymentId,
+    {
+      _id: paymentId,
+      status: { $in: ["COMPLETED", "PARTIALLY_REFUNDED"] },
+      payoutStatus: { $in: ["UNSETTLED", "PROCESSING"] },
+      paymentMethod: { $ne: "CASH_ON_DELIVERY" },
+    },
     {
       payoutStatus: "SETTLED",
       payoutSettledAt: new Date(),

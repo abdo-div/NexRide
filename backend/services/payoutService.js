@@ -5,10 +5,26 @@ import {
   resolvePagination,
 } from "../utils/pagination.js";
 import {
+  computeNettedBalance,
   isCashExpr,
   netContributionExpr,
   keptFractionExpr,
 } from "../utils/payoutNetting.js";
+import { getPlatformPolicy } from "./platformPolicyService.js";
+
+const PAYOUT_ELIGIBLE_STATUSES = ["COMPLETED", "PARTIALLY_REFUNDED"];
+const CARD_PAYMENT_FILTER = { $ne: "CASH_ON_DELIVERY" };
+
+export const getCompanyPayoutBalance = async (companyId) => {
+  const rows = await Payment.find({
+    companyId,
+    status: { $in: ["COMPLETED", "REFUNDED", "PARTIALLY_REFUNDED"] },
+    payoutStatus: "UNSETTLED",
+  })
+    .select("paymentMethod status amount refundAmount commissionAmount companyShare")
+    .lean();
+  return computeNettedBalance(rows);
+};
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -506,12 +522,32 @@ export const buildPayoutLedger = async ({
  * deterministic batch reference plus how many payments were marked PROCESSING.
  */
 export const dispatchPayoutBatch = async (companyIds) => {
-  const filter = { status: "COMPLETED", payoutStatus: "UNSETTLED" };
-  if (Array.isArray(companyIds) && companyIds.length > 0) {
-    filter.companyId = {
-      $in: companyIds.map((id) => new mongoose.Types.ObjectId(id)),
-    };
+  const { minimumPayout } = await getPlatformPolicy();
+  const requestedIds = Array.isArray(companyIds) && companyIds.length > 0
+    ? companyIds
+    : await Payment.distinct("companyId", {
+        status: { $in: PAYOUT_ELIGIBLE_STATUSES },
+        payoutStatus: "UNSETTLED",
+      });
+
+  const eligibleIds = [];
+  for (const id of requestedIds.filter(Boolean)) {
+    const balance = await getCompanyPayoutBalance(id);
+    if (balance.dueToCompany > minimumPayout) eligibleIds.push(id);
   }
+
+  if (eligibleIds.length === 0) {
+    return { batchRef: null, dispatched: 0, companies: 0 };
+  }
+
+  const filter = {
+    status: { $in: PAYOUT_ELIGIBLE_STATUSES },
+    payoutStatus: "UNSETTLED",
+    paymentMethod: CARD_PAYMENT_FILTER,
+    companyId: {
+      $in: eligibleIds.map((id) => new mongoose.Types.ObjectId(id)),
+    },
+  };
 
   const affected = await Payment.distinct("companyId", filter);
 
@@ -538,8 +574,9 @@ export const dispatchPayoutBatch = async (companyIds) => {
  */
 export const settlePayoutBatch = async (companyId) => {
   const filter = {
-    status: "COMPLETED",
+    status: { $in: PAYOUT_ELIGIBLE_STATUSES },
     payoutStatus: { $in: ["UNSETTLED", "PROCESSING"] },
+    paymentMethod: CARD_PAYMENT_FILTER,
   };
   if (companyId) {
     filter.companyId = new mongoose.Types.ObjectId(companyId);

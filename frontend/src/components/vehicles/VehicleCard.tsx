@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Heart, Star, Gauge, Armchair, Settings, Fuel, CheckCircle2 } from "lucide-react";
 import type { Vehicle } from "../../types/vehicle";
 import { VehicleImage } from "../VehicleImage";
+import { companyLogoUrl } from "../../lib/vehicleMapper";
 
 const SPEC_META: {
   key: keyof Vehicle["specs"];
@@ -99,9 +100,7 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
 
           {/* Partner accreditation */}
           <div className="flex items-center gap-3 pt-1 flex-wrap">
-            <div className="w-6 h-6 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center font-bold text-[10px] text-[#2563EB]">
-              {vehicle.operator.initials}
-            </div>
+            {companyLogoUrl(vehicle.operator.logo) ? <img src={companyLogoUrl(vehicle.operator.logo) ?? ""} alt={vehicle.operator.name} className="h-6 w-6 rounded-full border border-blue-200 object-cover" /> : <div className="w-6 h-6 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center font-bold text-[10px] text-[#2563EB]">{vehicle.operator.initials}</div>}
             <span className="text-sm font-semibold text-slate-800">{vehicle.operator.name}</span>
             <span className="text-slate-300 text-xs">•</span>
             <div className="flex items-center text-[#F97316] text-xs font-bold">

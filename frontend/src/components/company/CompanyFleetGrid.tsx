@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { ChevronRight, MapPin, ScanLine } from "lucide-react";
 import type { CompanyFleetVehicle } from "../../types/companyFleet";
+import { photoUrl } from "../../lib/vehicleMapper";
 import { FleetStatusPill, PriceBlock } from "./CompanyFleetBits";
 import { categoryLabel } from "./companyFleetUi";
 
@@ -26,7 +27,7 @@ export const CompanyFleetGrid: React.FC<CompanyFleetGridProps> = ({ rows, onSele
           <div className="relative h-44 shrink-0 bg-[#F1F5F9]">
             {row.photo ? (
               <img
-                src={row.photo}
+                src={photoUrl(row.photo)}
                 alt={`${row.make} ${row.model}`}
                 className="h-full w-full object-cover"
                 loading="lazy"

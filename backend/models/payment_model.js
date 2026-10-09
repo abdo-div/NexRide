@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import PlatformSettings from "./PlatformSettings_model.js";
 
 const paymentSchema = new mongoose.Schema(
   {
@@ -190,7 +191,18 @@ paymentSchema.pre("save", async function () {
       .model("Company")
       .findById(this.companyId)
       .select("customCommissionRate");
-    this.commissionRate = company?.customCommissionRate ?? 8;
+    let defaultCommissionRate = 8;
+    try {
+      const settings = await PlatformSettings
+        .findOne({ key: "platform" })
+        .select("commission.standardRatePct")
+        .lean();
+      defaultCommissionRate = settings?.commission?.standardRatePct ?? 8;
+    } catch {
+      // Preserve checkout availability if the policy registry is unavailable.
+    }
+    this.commissionRate =
+      company?.customCommissionRate ?? defaultCommissionRate;
     this.commissionAmount = Number(
       ((this.amount * this.commissionRate) / 100).toFixed(2),
     );

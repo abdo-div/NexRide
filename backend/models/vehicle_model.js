@@ -19,6 +19,8 @@ const vehicleSchema = new mongoose.Schema(
       required: [true, "vehicle model is required corolla, fiesta, etc"],
       trim: true,
     },
+    plateNumber: { type: String, trim: true, maxlength: 30, default: "" },
+    vin: { type: String, trim: true, uppercase: true, maxlength: 17, default: "" },
     year: {
       type: Number,
       required: [true, "vehicle year is required"],
@@ -68,6 +70,13 @@ const vehicleSchema = new mongoose.Schema(
       trim: true,
       maxlength: [500, "description cannot exceed 500 characters"],
     },
+    odometer: { type: Number, min: 0, default: null },
+    engine: { type: String, trim: true, maxlength: 100, default: "" },
+    drivetrain: { type: String, trim: true, maxlength: 50, default: "" },
+    exteriorColor: { type: String, trim: true, maxlength: 50, default: "" },
+    interiorColor: { type: String, trim: true, maxlength: 50, default: "" },
+    tankCapacity: { type: Number, min: 0, default: null },
+    features: { type: [String], default: [] },
     photos: {
       type: [String],
       default: [],
@@ -87,12 +96,16 @@ const vehicleSchema = new mongoose.Schema(
       default: null,
       min: [0, "weekly rental price cannot be negative"],
     },
+    monthlyPrice: { type: Number, default: null, min: 0 },
+    depositAmount: { type: Number, default: 0, min: 0 },
+    mileageLimit: { type: Number, default: null, min: 0 },
+    extraMileageFee: { type: Number, default: null, min: 0 },
     operationalStatus: {
       type: String,
       enum: {
-        values: ["AVAILABLE", "MAINTENANCE", "UNAVAILABLE"],
+        values: ["AVAILABLE", "MAINTENANCE", "SUSPENDED"],
         message:
-          "operational status must be AVAILABLE , MAINTENANCE or UNAVAILABLE",
+          "operational status must be AVAILABLE, MAINTENANCE or SUSPENDED",
       },
       default: "AVAILABLE",
       index: true,

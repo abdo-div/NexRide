@@ -25,6 +25,10 @@ const EMPTY_DRAFT: CompanyVehicleEditDraft = {
   weeklyPrice: "",
   city: "",
   pickupLocation: "",
+  plateNumber: "", vin: "", odometer: "", engine: "", drivetrain: "",
+  exteriorColor: "", interiorColor: "", tankCapacity: "", features: "",
+  monthlyPrice: "", depositAmount: "0", mileageLimit: "", extraMileageFee: "",
+  lng: "", lat: "",
 };
 
 /** Placeholder vehicle so preview cards never receive null. */
@@ -44,6 +48,9 @@ const BLANK_VEHICLE: CompanyVehicleProfile = {
   weeklyPrice: null,
   city: "",
   pickupLocation: null,
+  plateNumber: null, vin: null, odometer: null, engine: null, drivetrain: null,
+  exteriorColor: null, interiorColor: null, tankCapacity: null, features: [],
+  monthlyPrice: null, depositAmount: 0, mileageLimit: null, extraMileageFee: null,
   operationalStatus: "AVAILABLE",
   listingStatus: "DRAFT",
   photo: null,
@@ -69,7 +76,7 @@ export const useCompanyVehicleAddForm = (
   onCreated?: (vehicle: CompanyVehicleProfile) => void,
 ) => {
   const [draft, setDraftState] = useState<CompanyVehicleEditDraft>(EMPTY_DRAFT);
-  const [listingStatus, setListingStatus] = useState<CompanyVehicleListingStatus>("DRAFT");
+  const [listingStatus, setListingStatus] = useState<CompanyVehicleListingStatus>("PUBLISHED");
   const [photos] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
 
@@ -128,7 +135,7 @@ export const useCompanyVehicleAddForm = (
 
   const reset = useCallback(() => {
     setDraftState(EMPTY_DRAFT);
-    setListingStatus("DRAFT");
+    setListingStatus("PUBLISHED");
     setNewImages([]);
     setSaved(false);
     setSaveError(null);
@@ -191,11 +198,16 @@ export const useCompanyVehicleAddForm = (
         if (draft.weeklyPrice.trim()) appendIfValue("weeklyPrice", draft.weeklyPrice);
         appendIfValue("city", draft.city);
         appendIfValue("pickupLocation", draft.pickupLocation);
+        ["plateNumber", "vin", "odometer", "engine", "drivetrain", "exteriorColor",
+          "interiorColor", "tankCapacity", "features", "monthlyPrice", "depositAmount",
+          "mileageLimit", "extraMileageFee"].forEach((key) => {
+          const value = draft[key as keyof CompanyVehicleEditDraft];
+          if (value.trim()) formData.append(key, value.trim());
+        });
+        if (draft.lng.trim()) formData.append("lng", draft.lng.trim());
+        if (draft.lat.trim()) formData.append("lat", draft.lat.trim());
 
-        formData.append(
-          "listingStatus",
-          mode === "draft" ? "DRAFT" : listingStatus,
-        );
+        formData.append("listingStatus", mode === "draft" ? "DRAFT" : "PUBLISHED");
 
         newImages.forEach((file) => formData.append("images", file));
 
@@ -220,7 +232,7 @@ export const useCompanyVehicleAddForm = (
         setSaving(false);
       }
     },
-    [draft, listingStatus, newImages, onCreated],
+    [draft, newImages, onCreated],
   );
 
   const saveChanges = useCallback(() => save("save"), [save]);

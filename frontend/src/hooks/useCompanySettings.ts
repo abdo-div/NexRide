@@ -177,6 +177,20 @@ export const useCompanySettings = () => {
     [],
   );
 
+  const saveLogo = useCallback(async (file: File): Promise<SettingsMutationResult> => {
+    setBusy(true);
+    try {
+      await companySettingsApi.updateLogo(file);
+      setAttempt((n) => n + 1);
+      window.dispatchEvent(new CustomEvent("nexride:company-profile-updated"));
+      return { ok: true, message: "" };
+    } catch (error) {
+      return { ok: false, message: errorMessage(error) };
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
   return {
     data,
     draft,
@@ -192,6 +206,7 @@ export const useCompanySettings = () => {
     updatePayoutDraft,
     saveProfile,
     savePayout,
+    saveLogo,
     changePassword,
   };
 };
