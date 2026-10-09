@@ -17,6 +17,7 @@ import type {
   CompanyFleetCompany,
   CompanyFleetVehicle,
 } from "../../types/companyFleet";
+import { photoUrl } from "../../lib/vehicleMapper";
 import { categoryLabel, fleetStatusTone } from "./companyFleetUi";
 
 interface CompanyFleetInspectDrawerProps {
@@ -117,7 +118,7 @@ export const CompanyFleetInspectDrawer: React.FC<CompanyFleetInspectDrawerProps>
             <div className="relative mt-3 h-40 overflow-hidden rounded-xl bg-[#F1F5F9]">
               {row.photo ? (
                 <img
-                  src={row.photo}
+                  src={photoUrl(row.photo)}
                   alt={`${row.make} ${row.model}`}
                   className="h-full w-full object-cover"
                 />

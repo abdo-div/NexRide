@@ -1,6 +1,11 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, ShieldCheck, Car, Tag } from "lucide-react";
+import {
+  ArrowRight,
+  CarSimple,
+  CurrencyCircleDollar,
+  SealCheck,
+} from "@phosphor-icons/react";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
 
@@ -43,18 +48,10 @@ export const HeroHeader: React.FC = () => {
             className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2"
           >
             <span>{t("home.hero.browseCars")}</span>
-            <ArrowRight className="w-4 h-4 rtl:rotate-180" />
+            <ArrowRight weight="bold" className="w-4 h-4 rtl:rotate-180" />
           </Link>
         </motion.div>
 
-        <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-          <Link
-            to="/partner/apply"
-            className="px-6 py-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold text-sm shadow-xs transition-all flex items-center gap-2"
-          >
-            <span>{t("home.hero.sellYourCar")}</span>
-          </Link>
-        </motion.div>
       </motion.div>
 
       {/* Trust Badges Bar */}
@@ -65,8 +62,8 @@ export const HeroHeader: React.FC = () => {
         className="mt-8 flex items-center gap-6 text-xs text-slate-600 font-medium"
       >
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-xs">
-            <Car className="w-4 h-4" />
+          <div className="w-10 h-10 rounded-xl bg-blue-50 ring-1 ring-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
+            <CarSimple weight="duotone" className="w-5 h-5" />
           </div>
           <div>
             <div className="font-bold text-slate-900 text-xs">10,000+</div>
@@ -77,8 +74,8 @@ export const HeroHeader: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-xs">
-            <ShieldCheck className="w-4 h-4" />
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 ring-1 ring-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm">
+            <SealCheck weight="fill" className="w-5 h-5" />
           </div>
           <div>
             <div className="font-bold text-slate-900 text-xs">
@@ -91,8 +88,8 @@ export const HeroHeader: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-xs">
-            <Tag className="w-4 h-4" />
+          <div className="w-10 h-10 rounded-xl bg-amber-50 ring-1 ring-amber-100 flex items-center justify-center text-amber-600 shadow-sm">
+            <CurrencyCircleDollar weight="duotone" className="w-5 h-5" />
           </div>
           <div>
             <div className="font-bold text-slate-900 text-xs">

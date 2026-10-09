@@ -19,7 +19,7 @@ import {
   unsettledShare,
   vehiclesOf,
 } from "../../lib/companyView";
-import { initialsFrom } from "../../lib/vehicleMapper";
+import { companyLogoUrl, initialsFrom } from "../../lib/vehicleMapper";
 import { AdminPagination } from "./AdminPagination";
 import { StatusPill } from "./StatusPill";
 
@@ -117,9 +117,7 @@ export const AdminCompaniesTable: React.FC<AdminCompaniesTableProps> = ({
                 >
                   <td className="py-3.5 pl-4 pr-4">
                     <div className="flex min-w-[190px] items-center gap-3">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#E5EEFF] text-sm font-bold text-[#2563EB] shadow-sm">
-                        {initialsFrom(c.name)}
-                      </div>
+                      {companyLogoUrl(c.logo) ? <img src={companyLogoUrl(c.logo) ?? ""} alt={c.name} className="h-11 w-11 shrink-0 rounded-xl border border-slate-200 object-cover shadow-sm" /> : <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#E5EEFF] text-sm font-bold text-[#2563EB] shadow-sm">{initialsFrom(c.name)}</div>}
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5">
                           <span className="truncate text-sm font-bold text-[#0B1C30]">

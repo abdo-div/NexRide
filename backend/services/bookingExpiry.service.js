@@ -27,35 +27,21 @@ const clampExpiryMinutes = (minutes) =>
 // reader creates a default document on first call - not a side effect a
 // background timer should have.
 const readConfiguredExpiryMinutes = async (platformSettings) => {
-  const raw = process.env.RESERVATION_EXPIRY_MINUTES;
-
-  if (raw === undefined || raw === "") {
-    try {
-      const settings = await platformSettings
-        .findOne({ key: "platform" })
-        .select("booking.reservationExpiryMinutes")
-        .lean();
-      const value = settings?.booking?.reservationExpiryMinutes;
-      if (typeof value === "number" && Number.isFinite(value)) {
-        return clampExpiryMinutes(value);
-      }
-    } catch (err) {
-      logger.warn(
-        { err: err.message },
-        "Could not read reservationExpiryMinutes; using default",
-      );
+  try {
+    const settings = await platformSettings
+      .findOne({ key: "platform" })
+      .select("booking.reservationExpiryMinutes")
+      .lean();
+    const value = settings?.booking?.reservationExpiryMinutes;
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return clampExpiryMinutes(value);
     }
-
-    return DEFAULT_EXPIRY_MINUTES;
+  } catch (err) {
+    logger.warn(
+      { err: err.message },
+      "Could not read reservationExpiryMinutes; using default",
+    );
   }
-
-  const parsed = Number(raw);
-  if (Number.isFinite(parsed)) return clampExpiryMinutes(parsed);
-
-  logger.warn(
-    { value: raw },
-    "RESERVATION_EXPIRY_MINUTES is not a number; using default",
-  );
   return DEFAULT_EXPIRY_MINUTES;
 };
 

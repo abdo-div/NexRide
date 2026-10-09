@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Search, Scale, Lock, Key } from "lucide-react";
+import { MagnifyingGlass as Search, Scales as Scale, LockKey as Lock, Key } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import type { HowItWorksStep } from "../../types/step";
 

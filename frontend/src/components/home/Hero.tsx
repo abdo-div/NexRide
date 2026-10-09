@@ -5,13 +5,13 @@ import { motion } from "framer-motion";
 
 export const Hero: React.FC = () => {
   return (
-    <section className="relative z-40 w-full bg-slate-900 pt-32 pb-14 border-b border-slate-200 min-h-[700px] flex flex-col justify-between overflow-hidden">
+    <section className="relative z-40 w-full bg-slate-900 pt-32 pb-14 border-b border-slate-200 min-h-[700px] flex flex-col justify-between overflow-visible">
       {/* Background Image Layer (Spans 100% Width & Height) */}
       <motion.div
         initial={{ scale: 1.05, opacity: 0.8 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 1.2, ease: "easeOut" }}
-        className="absolute inset-0 z-0 pointer-events-none"
+        className="absolute inset-0 z-0 pointer-events-none overflow-hidden"
       >
         <img
           src="/public/screen.png"

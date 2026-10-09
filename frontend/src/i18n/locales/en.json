@@ -2592,7 +2592,11 @@
         "addressPh": "Souk Al-Jumaa, Tripoli",
         "subdomain": "Storefront Subdomain",
         "logo": "Brand Logo",
-        "logoHint": "PNG/JPG, square, up to 2MB",
+        "logoHint": "PNG, JPG or WebP, square, up to 5 MB",
+        "logoAction": "Upload logo",
+        "logoUploading": "Uploading…",
+        "logoSaved": "Company logo updated successfully.",
+        "logoInvalid": "Choose a PNG, JPG, or WebP image no larger than 5 MB.",
         "about": "About / Description",
         "aboutPh": "Short company bio shown on your storefront…",
         "website": "Website",
@@ -3214,6 +3218,18 @@
         "view": "View"
       }
     },
+    "addVehiclePage": {
+      "title": "Add New Vehicle",
+      "portal": "Company Portal",
+      "draft": "New Draft",
+      "subtitle": "Fill in all required fields, upload photos, set pricing and publish your listing.",
+      "back": "Back to Fleet",
+      "saveDraft": "Save as Draft",
+      "saving": "Saving…",
+      "publish": "Publish Vehicle",
+      "successMsg": "Vehicle created successfully! Redirecting…"
+      ,"requiredHint": "Fields marked with * are required. Optional details can be completed later."
+    },
     "editVehiclePage": {
       "title": "Edit Vehicle",
       "titleAr": "تعديل المركبة",
@@ -3265,6 +3281,11 @@
         "description": "Vehicle Description",
         "descriptionAr": "وصف المركبة وميزاتها التنافسية",
         "charCount": "{{count}} / 500 characters"
+        ,"makePlaceholder": "For example: Toyota"
+        ,"modelPlaceholder": "For example: Corolla"
+        ,"platePlaceholder": "For example: 12-345678"
+        ,"vinPlaceholder": "17-character chassis number"
+        ,"descriptionPlaceholder": "Describe the vehicle, its condition, and its key advantages"
       },
       "specs": {
         "title": "Vehicle Specifications",
@@ -3287,20 +3308,30 @@
         "drivetrain": "Drivetrain",
         "exterior": "Exterior Color",
         "interior": "Interior Color",
-        "tank": "Fuel Tank Capacity"
+        "tank": "Fuel Tank Capacity",
+        "coreGroup": "Core specifications",
+        "detailsGroup": "Engine and body details",
+        "kmUnit": "KM",
+        "literUnit": "L",
+        "enginePlaceholder": "For example: 2.0 L",
+        "drivetrainPlaceholder": "For example: Front-wheel drive",
+        "colorPlaceholder": "Enter color"
       },
       "features": {
         "title": "Features & Amenities",
         "titleAr": "الميزات والتجهيزات الفاخرة",
         "subtitle": "In-cabin luxury, tech, and safety amenities",
         "empty": "Feature & amenity data isn't part of the vehicle record yet. It will appear here once modelled.",
-        "count": "{{count}} selected"
+        "count": "{{count}} selected",
+        "placeholder": "For example: Air conditioning, Bluetooth, GPS, child seat",
+        "hint": "Separate amenities with commas."
+        ,"fieldLabel": "Vehicle features and amenities"
       },
       "media": {
         "title": "Vehicle Photos & Media",
         "titleAr": "معرض الصور والوسائط",
         "subtitle": "The first image is set as the listing primary cover",
-        "count": "{{count}} / 12 photos",
+        "count": "{{count}} / 8 photos",
         "primary": "Primary Cover",
         "cover": "Set as Cover",
         "upload": "Upload & Manage Media",
@@ -3309,7 +3340,9 @@
         "remove": "Remove",
         "setCover": "Set as cover",
         "pending": "{{count}} new photo(s) ready",
-        "replaceHint": "Saving with new photos replaces the current photo set."
+        "replaceHint": "Saving with new photos replaces the current photo set.",
+        "invalidFile": "Please choose image files no larger than 5 MB each.",
+        "maxPhotos": "A vehicle can have up to 8 photos."
       },
       "pricing": {
         "title": "Rental Pricing & Escrow Deposit",
@@ -3354,7 +3387,11 @@
         "handover": "Handover Protocol & Instructions",
         "geofence": "Operational Geofence Map",
         "geoNote": "Depots, delivery points and geofencing aren't modelled yet.",
-        "noCoords": "No live coordinates"
+        "noCoords": "No live coordinates",
+        "longitude": "Longitude",
+        "latitude": "Latitude",
+        "cityPlaceholder": "For example: Tripoli",
+        "pickupPlaceholder": "Branch name or pickup address"
       },
       "policies": {
         "title": "Rental Policies & Driver Requirements",

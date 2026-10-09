@@ -158,7 +158,7 @@ export const buildAnalyticsSummary = async ({ period, hub } = {}) => {
           $sum: { $cond: [{ $eq: ["$operationalStatus", "MAINTENANCE"] }, 1, 0] },
         },
         unavailable: {
-          $sum: { $cond: [{ $eq: ["$operationalStatus", "UNAVAILABLE"] }, 1, 0] },
+          $sum: { $cond: [{ $eq: ["$operationalStatus", "SUSPENDED"] }, 1, 0] },
         },
         published: {
           $sum: { $cond: [{ $eq: ["$listingStatus", "PUBLISHED"] }, 1, 0] },

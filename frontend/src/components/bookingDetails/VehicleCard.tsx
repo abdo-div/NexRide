@@ -12,7 +12,7 @@ import {
   Truck,
 } from "lucide-react";
 import type { BookingDto } from "../../types/booking";
-import { initialsFrom, photoUrl } from "../../lib/vehicleMapper";
+import { companyLogoUrl, initialsFrom, photoUrl } from "../../lib/vehicleMapper";
 import {
   providerOf,
   rentalDays,
@@ -165,9 +165,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ booking }) => {
         {provider && (
           <div className="p-4 bg-[#EFF4FF] rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-[#0F172A] text-white flex items-center justify-center font-bold text-[18px] shrink-0">
-                {initialsFrom(provider.name ?? "N")}
-              </div>
+              {companyLogoUrl(provider.logo) ? <img src={companyLogoUrl(provider.logo) ?? ""} alt={provider.name ?? ""} className="h-12 w-12 shrink-0 rounded-xl border border-slate-200 object-cover" /> : <div className="w-12 h-12 rounded-xl bg-[#0F172A] text-white flex items-center justify-center font-bold text-[18px] shrink-0">{initialsFrom(provider.name ?? "N")}</div>}
               <div className="flex flex-col">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-[15px] font-bold text-[#0F172A]">

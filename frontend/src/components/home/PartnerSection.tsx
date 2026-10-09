@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { Rocket, ArrowRight, BookOpen } from "lucide-react";
+import { RocketLaunch as Rocket, ArrowRight, BookOpen } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import { PartnerDashboardMock } from "./PartnerDashboardMock";
 import { PartnerMetrics } from "./PartnerMetrics";

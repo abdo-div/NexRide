@@ -17,6 +17,8 @@ import {
   Wrench,
 } from "lucide-react";
 import { useAuth } from "../../context/useAuth";
+import { companySettingsApi } from "../../lib/companySettingsApi";
+import { companyLogoUrl, initialsFrom } from "../../lib/vehicleMapper";
 
 interface NavEntry {
   path: string;
@@ -49,6 +51,21 @@ export const CompanyLayout: React.FC = () => {
   const location = useLocation();
 
   const [clock, setClock] = useState(() => new Date());
+  const [companyIdentity, setCompanyIdentity] = useState({ name: "", logo: "" });
+
+  useEffect(() => {
+    let active = true;
+    const loadIdentity = async () => {
+      try {
+        const response = await companySettingsApi.get();
+        if (active) setCompanyIdentity({ name: response.data.settings.profile.name, logo: response.data.settings.profile.logo });
+      } catch { /* The account name remains the safe fallback. */ }
+    };
+    void loadIdentity();
+    const refresh = () => void loadIdentity();
+    window.addEventListener("nexride:company-profile-updated", refresh);
+    return () => { active = false; window.removeEventListener("nexride:company-profile-updated", refresh); };
+  }, []);
 
   useEffect(() => {
     const timer = window.setInterval(() => setClock(new Date()), 30000);
@@ -129,14 +146,10 @@ export const CompanyLayout: React.FC = () => {
           <div className="border-t border-slate-200 bg-[#EFF4FF] p-4">
             <div className="flex items-center justify-between rounded-xl bg-white p-3 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
               <div className="flex min-w-0 items-center gap-2">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-white">
-                  <span className="text-sm font-bold">
-                    {(user?.name ?? "A").slice(0, 1).toUpperCase()}
-                  </span>
-                </div>
+                {companyLogoUrl(companyIdentity.logo) ? <img src={companyLogoUrl(companyIdentity.logo) ?? ""} alt={companyIdentity.name} className="h-9 w-9 shrink-0 rounded-full border border-slate-200 object-cover" /> : <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-white"><span className="text-xs font-bold">{initialsFrom(companyIdentity.name || user?.name || "N")}</span></div>}
                 <div className="flex min-w-0 flex-col">
                   <span className="truncate text-sm font-bold leading-tight text-[#0B1C30]">
-                    {user?.name ?? "Operator"}
+                    {companyIdentity.name || user?.name || "Operator"}
                   </span>
                   <span className="truncate text-[11px] text-[#565E74]">
                     {t("company.layout.partnerRole")}

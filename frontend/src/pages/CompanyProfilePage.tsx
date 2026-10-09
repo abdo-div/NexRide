@@ -20,7 +20,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { useCompanyProfile } from "../hooks/useCompanyProfile";
-import { initialsFrom, photoUrl } from "../lib/vehicleMapper";
+import { companyLogoUrl, initialsFrom, photoUrl } from "../lib/vehicleMapper";
 import type { VehicleType } from "../types/vehicle";
 import type { CompanyProfileVehicle } from "../types/companyProfile";
 import {
@@ -287,6 +287,7 @@ export const CompanyProfilePage: React.FC = () => {
 
   const name = company?.name ?? "";
   const initials = initialsFrom(name);
+  const companyLogo = companyLogoUrl(company?.logo);
   const fleetSize = fleet.length;
   const totalCollected = starCounts.reduce((s, c) => s + c.count, 0);
   const mapQuery = encodeURIComponent(
@@ -394,7 +395,7 @@ export const CompanyProfilePage: React.FC = () => {
           <div className="p-6 md:p-8 -mt-10 relative z-20 flex flex-col lg:flex-row lg:items-start justify-between gap-8">
             <div className="flex flex-col sm:flex-row gap-5 items-start">
               <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white shadow-xl p-2 flex flex-col items-center justify-center relative flex-shrink-0">
-                <div
+                {companyLogo ? <img src={companyLogo} alt={name} className="h-full w-full rounded-xl object-cover" /> : <div
                   className={`w-full h-full rounded-xl ${avatarGradient} flex flex-col items-center justify-center shadow-inner`}
                 >
                   <span className="text-[28px] font-extrabold text-amber-300 tracking-tight">
@@ -403,7 +404,7 @@ export const CompanyProfilePage: React.FC = () => {
                   <span className="text-[10px] text-white/80 font-bold tracking-widest uppercase max-w-[90px] truncate">
                     {name}
                   </span>
-                </div>
+                </div>}
                 <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow">
                   <BadgeCheck className="w-4 h-4" />
                 </div>

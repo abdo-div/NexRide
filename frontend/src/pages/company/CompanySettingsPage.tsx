@@ -40,6 +40,7 @@ export const CompanySettingsPage: React.FC = () => {
     updatePayoutDraft,
     saveProfile,
     savePayout,
+    saveLogo,
     changePassword,
   } = useCompanySettings();
 
@@ -84,6 +85,11 @@ export const CompanySettingsPage: React.FC = () => {
   };
 
   const notifyComingSoon = () => showToast(t("company.settings.soonMessage"));
+
+  const handleLogo = async (file: File) => {
+    const result = await saveLogo(file);
+    showToast(result.ok ? t("company.settings.profile.logoSaved") : result.message || t("company.settings.toasts.savedError"));
+  };
 
   const scrollToSection = (id: string) => {
     setActive(id);
@@ -133,11 +139,12 @@ export const CompanySettingsPage: React.FC = () => {
                   <div className="h-32 animate-pulse rounded-2xl border border-slate-200 bg-white" />
                 </div>
               ) : (
-                <CompanySettingsNav
+                  <CompanySettingsNav
                   companyName={companyName}
                   subdomain={subdomain}
                   city={city}
                   verified={verified}
+                  logo={data?.profile.logo ?? ""}
                   active={active}
                   onSelect={scrollToSection}
                   onComingSoon={notifyComingSoon}
@@ -162,6 +169,8 @@ export const CompanySettingsPage: React.FC = () => {
                     draft={draft}
                     subdomain={subdomain}
                     onChange={updateDraft}
+                    busy={busy}
+                    onLogoChange={(file) => void handleLogo(file)}
                   />
                   <CompanySettingsBusinessCard
                     profile={data.profile}

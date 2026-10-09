@@ -19,7 +19,7 @@ export const UncompromisingStandards: React.FC = () => {
         <span className="text-[11px] font-bold text-blue-600 uppercase tracking-widest block mb-2">
           {t("home.standards.eyebrow")}
         </span>
-        <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight uppercase mb-4">
+        <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight uppercase leading-[1.35] mb-4">
           {t("home.standards.title")}
         </h2>
         <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">

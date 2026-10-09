@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Radio, ShieldCheck } from "lucide-react";
+import { Broadcast as Radio, ShieldCheck } from "@phosphor-icons/react";
 import { REGION_FEATURES } from "../../data/regionData";
 
 export const RegionFeaturesBanner: React.FC = () => {

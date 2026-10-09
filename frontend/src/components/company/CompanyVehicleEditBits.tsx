@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 import { Lock } from "lucide-react";
 
 export interface ComingSoonPillProps {
@@ -83,6 +83,7 @@ export interface EditFieldProps {
   maxLength?: number;
   rows?: number;
   disabled?: boolean;
+  required?: boolean;
 }
 
 /**
@@ -106,7 +107,9 @@ export const EditField: React.FC<EditFieldProps> = ({
   maxLength,
   rows = 3,
   disabled = false,
+  required = false,
 }) => {
+  const fieldId = useId();
   const inputClass = `w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none transition-colors placeholder:text-[#9AA4B5] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 ${
     error ? "border-[#E24A55]" : "border-[#E5E7EB]"
   } ${disabled ? "cursor-not-allowed bg-[#F7F9FC] text-[#9AA4B5] opacity-70" : "hover:border-[#C3C6D7]"} ${
@@ -116,12 +119,15 @@ export const EditField: React.FC<EditFieldProps> = ({
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between gap-2">
-        <label className="text-xs font-bold text-[#0B1C30] dark:text-white">{label}</label>
-        {labelAr && <span className="text-[11px] text-[#9AA4B5]">({labelAr})</span>}
+        <label htmlFor={fieldId} className="text-xs font-bold text-[#0B1C30] dark:text-white">
+          {label}{required && <span className="ms-1 text-[#DC2626]">*</span>}
+        </label>
+        {labelAr && labelAr !== label && <span className="text-[11px] text-[#9AA4B5]">({labelAr})</span>}
       </div>
 
       {type === "select" ? (
         <select
+          id={fieldId}
           value={value}
           onChange={(event) => onChange(event.target.value)}
           disabled={disabled}
@@ -138,6 +144,7 @@ export const EditField: React.FC<EditFieldProps> = ({
         </select>
       ) : type === "textarea" ? (
         <textarea
+          id={fieldId}
           value={value}
           onChange={(event) => onChange(event.target.value)}
           disabled={disabled}
@@ -149,6 +156,7 @@ export const EditField: React.FC<EditFieldProps> = ({
       ) : (
         <div className="relative">
           <input
+            id={fieldId}
             type={type}
             inputMode={type === "number" ? "decimal" : undefined}
             value={value}

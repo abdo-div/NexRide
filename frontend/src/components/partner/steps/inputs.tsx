@@ -6,12 +6,29 @@ export const TextInput: React.FC<{
   placeholder?: string;
   type?: string;
   dir?: string;
+  name?: string;
+  autoComplete?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   error?: string;
   className?: string;
-}> = ({ value, onChange, placeholder, type = "text", dir, error, className = "" }) => (
+}> = ({
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  dir,
+  name,
+  autoComplete,
+  inputMode,
+  error,
+  className = "",
+}) => (
   <input
     type={type}
     dir={dir}
+    name={name}
+    autoComplete={autoComplete}
+    inputMode={inputMode}
     value={value}
     onChange={(event) => onChange(event.target.value)}
     placeholder={placeholder}

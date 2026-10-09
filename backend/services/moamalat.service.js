@@ -2,7 +2,6 @@ import crypto from "node:crypto";
 import mongoose from "mongoose";
 import Payment from "../models/payment_model.js";
 import Booking from "../models/booking_model.js";
-import Vehicle from "../models/vehicle_model.js";
 import AppError from "../utils/appError.js";
 import { logger } from "../utils/logger.js";
 import { isDevelopment } from "../config/env.js";
@@ -482,15 +481,6 @@ export const finalizeVerifiedPayment = async ({
     payment.transactionId = systemReference || payment.transactionId;
     payment.paidAt = new Date();
     await payment.save({ session });
-
-    // Booking overlap checks + fleet search already include PAID/CONFIRMED/
-    // ACTIVE records; flipping operationalStatus mirrors the existing
-    // cash completion path and satisfies "car no longer available".
-    await Vehicle.findByIdAndUpdate(
-      booking.vehicleId,
-      { operationalStatus: "UNAVAILABLE" },
-      { session },
-    );
 
     await session.commitTransaction();
     session.endSession();

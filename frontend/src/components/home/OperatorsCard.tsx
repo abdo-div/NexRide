@@ -1,8 +1,9 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Star, ArrowRight, ShieldCheck } from "lucide-react";
+import { Star, ArrowRight, ShieldCheck } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import type { FleetOperator } from "../../types/operators";
+import { companyLogoUrl } from "../../lib/vehicleMapper";
 
 interface OperatorCardProps {
   operator: FleetOperator;
@@ -23,11 +24,11 @@ export const OperatorCard: React.FC<OperatorCardProps> = ({ operator, index = 0 
       <div>
         {/* Header: Logo Initials & Verified Badge */}
         <div className="flex items-center justify-between mb-5">
-          <div
+          {companyLogoUrl(operator.logo) ? <img src={companyLogoUrl(operator.logo) ?? ""} alt={operator.name} className="h-12 w-12 rounded-2xl border border-slate-200 object-cover shadow-xs" /> : <div
             className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-sm tracking-wider shadow-xs ${operator.avatarBg}`}
           >
             {operator.initials}
-          </div>
+          </div>}
 
           {operator.isVerified && (
             <span className="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-600 font-bold text-[11px] flex items-center gap-1">

@@ -45,10 +45,22 @@ test("dispatch processes only completed unsettled payments", async (t) => {
   let distinctFilter;
   let updateFilter;
   let update;
+  const companyId = "aaaaaaaaaaaaaaaaaaaaaaaa";
   t.mock.method(Payment, "distinct", async (_field, filter) => {
     distinctFilter = filter;
-    return ["company-1"];
+    return [companyId];
   });
+  t.mock.method(Payment, "find", () => ({
+    select: () => ({
+      lean: async () => [{
+        paymentMethod: "MOAMALAT",
+        status: "COMPLETED",
+        amount: 2000,
+        commissionAmount: 160,
+        companyShare: 1840,
+      }],
+    }),
+  }));
   t.mock.method(Payment, "updateMany", async (filter, updateDoc) => {
     updateFilter = filter;
     update = updateDoc;
@@ -57,8 +69,10 @@ test("dispatch processes only completed unsettled payments", async (t) => {
 
   const result = await dispatchPayoutBatch();
 
-  assert.deepEqual(distinctFilter, updateFilter);
-  assert.deepEqual(updateFilter, { status: "COMPLETED", payoutStatus: "UNSETTLED" });
+  assert.deepEqual(distinctFilter.status.$in, ["COMPLETED", "PARTIALLY_REFUNDED"]);
+  assert.deepEqual(updateFilter.status.$in, ["COMPLETED", "PARTIALLY_REFUNDED"]);
+  assert.deepEqual(updateFilter.paymentMethod, { $ne: "CASH_ON_DELIVERY" });
+  assert.equal(String(updateFilter.companyId.$in[0]), companyId);
   assert.deepEqual(update, { $set: { payoutStatus: "PROCESSING" } });
   assert.equal(result.dispatched, 3);
   assert.equal(result.companies, 1);
@@ -70,6 +84,17 @@ test("dispatch can be scoped to the requested company IDs", async (t) => {
     filter = query;
     return [];
   });
+  t.mock.method(Payment, "find", () => ({
+    select: () => ({
+      lean: async () => [{
+        paymentMethod: "MOAMALAT",
+        status: "COMPLETED",
+        amount: 2000,
+        commissionAmount: 160,
+        companyShare: 1840,
+      }],
+    }),
+  }));
   t.mock.method(Payment, "updateMany", async (query) => {
     assert.deepEqual(query, filter);
     return { modifiedCount: 0 };
@@ -92,8 +117,9 @@ test("settlement marks only eligible completed payments as settled", async (t) =
 
   const result = await settlePayoutBatch("aaaaaaaaaaaaaaaaaaaaaaaa");
 
-  assert.equal(filter.status, "COMPLETED");
+  assert.deepEqual(filter.status.$in, ["COMPLETED", "PARTIALLY_REFUNDED"]);
   assert.deepEqual(filter.payoutStatus.$in, ["UNSETTLED", "PROCESSING"]);
+  assert.deepEqual(filter.paymentMethod, { $ne: "CASH_ON_DELIVERY" });
   assert.equal(String(filter.companyId), "aaaaaaaaaaaaaaaaaaaaaaaa");
   assert.equal(update.$set.payoutStatus, "SETTLED");
   assert.ok(update.$set.payoutSettledAt instanceof Date);

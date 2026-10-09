@@ -18,11 +18,12 @@ const multerFilter = (req, file, cb) => {
 const upload = multer({
   storage: multerStorage,
   fileFilter: multerFilter,
+  limits: { fileSize: 5 * 1024 * 1024, files: 8 },
 });
 
 export const uploadVehicleImages = upload.fields([
   { name: "imageCover", maxCount: 1 },
-  { name: "images", maxCount: 3 },
+  { name: "images", maxCount: 8 },
 ]);
 
 export const resizeVehicleImages = catchAsync(async (req, res, next) => {

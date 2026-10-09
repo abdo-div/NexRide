@@ -3,20 +3,12 @@ import { useTranslation } from "react-i18next";
 import { SlidersHorizontal } from "lucide-react";
 import type { CompanyVehicleEditForm } from "../../hooks/useCompanyVehicleEditForm";
 import { SectionCard } from "./CompanyVehicleBits";
-import { ComingSoonPill, EditField } from "./CompanyVehicleEditBits";
+import { EditField } from "./CompanyVehicleEditBits";
 
 interface CompanyVehicleEditSpecsProps {
   form: CompanyVehicleEditForm;
+  essentialOnly?: boolean;
 }
-
-const telemetryKeys = [
-  "odometer",
-  "engine",
-  "drivetrain",
-  "exterior",
-  "interior",
-  "tank",
-] as const;
 
 /**
  * Card 2 — Technical specifications. Transmission, fuel, seats and doors are
@@ -25,6 +17,7 @@ const telemetryKeys = [
  */
 export const CompanyVehicleEditSpecs: React.FC<CompanyVehicleEditSpecsProps> = ({
   form,
+  essentialOnly = false,
 }) => {
   const { t } = useTranslation();
   const { draft, fieldErrors, setField } = form;
@@ -45,11 +38,13 @@ export const CompanyVehicleEditSpecs: React.FC<CompanyVehicleEditSpecsProps> = (
       titleAr={t("company.editVehiclePage.specs.titleAr")}
       subtitle={t("company.editVehiclePage.specs.subtitle")}
     >
+      <p className="mb-3 text-xs font-bold text-[#565E74]">{t("company.editVehiclePage.specs.coreGroup")}</p>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <EditField
           label={t("company.editVehiclePage.specs.transmission")}
           labelAr={t("company.editVehiclePage.specs.transmissionAr")}
           type="select"
+          required
           options={transmissionOptions}
           value={draft.transmission}
           onChange={(value) => setField("transmission", value)}
@@ -59,6 +54,7 @@ export const CompanyVehicleEditSpecs: React.FC<CompanyVehicleEditSpecsProps> = (
           label={t("company.editVehiclePage.specs.fuel")}
           labelAr={t("company.editVehiclePage.specs.fuelAr")}
           type="select"
+          required
           options={fuelOptions}
           value={draft.fuelType}
           onChange={(value) => setField("fuelType", value)}
@@ -68,6 +64,7 @@ export const CompanyVehicleEditSpecs: React.FC<CompanyVehicleEditSpecsProps> = (
           label={t("company.editVehiclePage.specs.seats")}
           labelAr={t("company.editVehiclePage.specs.seatsAr")}
           type="number"
+          required
           min={1}
           max={20}
           value={draft.seats}
@@ -78,6 +75,7 @@ export const CompanyVehicleEditSpecs: React.FC<CompanyVehicleEditSpecsProps> = (
           label={t("company.editVehiclePage.specs.doors")}
           labelAr={t("company.editVehiclePage.specs.doorsAr")}
           type="number"
+          required
           min={1}
           max={10}
           value={draft.doors}
@@ -86,27 +84,15 @@ export const CompanyVehicleEditSpecs: React.FC<CompanyVehicleEditSpecsProps> = (
         />
       </div>
 
-      <div className="mt-4 rounded-xl border border-[#E5E7EB] bg-[#F7F9FC] p-4">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-xs font-bold text-[#0B1C30] dark:text-white">
-            {t("company.editVehiclePage.specs.telemetryTitle")}
-          </span>
-          <ComingSoonPill>{t("company.vehiclePage.soon")}</ComingSoonPill>
-        </div>
-        <p className="mt-1 text-[11px] text-[#9AA4B5]">
-          {t("company.editVehiclePage.specs.telemetryNote")}
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {telemetryKeys.map((key) => (
-            <span
-              key={key}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-1 text-[11px] font-semibold text-[#9AA4B5]"
-            >
-              {t(`company.editVehiclePage.specs.${key}`)}
-            </span>
-          ))}
-        </div>
-      </div>
+      {!essentialOnly && <><p className="mb-3 mt-6 border-t border-[#EEF1F5] pt-5 text-xs font-bold text-[#565E74]">{t("company.editVehiclePage.specs.detailsGroup")}</p>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <EditField label={t("company.editVehiclePage.specs.odometer")} type="number" min={0} unit={t("company.editVehiclePage.specs.kmUnit")} placeholder="0" value={draft.odometer} onChange={(v) => setField("odometer", v)} error={fieldErrors.odometer} />
+        <EditField label={t("company.editVehiclePage.specs.engine")} placeholder={t("company.editVehiclePage.specs.enginePlaceholder")} value={draft.engine} onChange={(v) => setField("engine", v)} error={fieldErrors.engine} />
+        <EditField label={t("company.editVehiclePage.specs.drivetrain")} placeholder={t("company.editVehiclePage.specs.drivetrainPlaceholder")} value={draft.drivetrain} onChange={(v) => setField("drivetrain", v)} error={fieldErrors.drivetrain} />
+        <EditField label={t("company.editVehiclePage.specs.exterior")} placeholder={t("company.editVehiclePage.specs.colorPlaceholder")} value={draft.exteriorColor} onChange={(v) => setField("exteriorColor", v)} error={fieldErrors.exteriorColor} />
+        <EditField label={t("company.editVehiclePage.specs.interior")} placeholder={t("company.editVehiclePage.specs.colorPlaceholder")} value={draft.interiorColor} onChange={(v) => setField("interiorColor", v)} error={fieldErrors.interiorColor} />
+        <EditField label={t("company.editVehiclePage.specs.tank")} type="number" min={0} unit={t("company.editVehiclePage.specs.literUnit")} placeholder="0" value={draft.tankCapacity} onChange={(v) => setField("tankCapacity", v)} error={fieldErrors.tankCapacity} />
+      </div></>}
     </SectionCard>
   );
 };

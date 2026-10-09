@@ -295,6 +295,6 @@ test("verified amount must match the stored booking, and repeated verification i
   assert.equal(repeated.body.alreadyProcessed, true);
   assert.equal(fetchCount, 1);
   assert.equal(bookingSaveCount, 1);
-  assert.equal(vehicleUpdateCount, 1);
+  assert.equal(vehicleUpdateCount, 0);
   assert.equal(redisDeleteCount, 1);
 });

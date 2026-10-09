@@ -67,6 +67,12 @@ export const initialsFrom = (name: string): string =>
     .map((word) => word[0]?.toUpperCase() ?? "")
     .join("") || "?";
 
+export const companyLogoUrl = (logo: string | null | undefined): string | null => {
+  if (!logo || logo === "default-company-logo.png") return null;
+  if (/^(https?:\/\/|data:|blob:)/i.test(logo)) return logo;
+  return `${API_ORIGIN}/companies/${encodeURIComponent(logo.replace(/^\/+/, ""))}`;
+};
+
 /** Resolves a stored photo filename to a URL, falling back to the placeholder. */
 export const photoUrl = (photo: string | undefined): string => {
   if (!photo) return PLACEHOLDER_IMAGE;
@@ -92,6 +98,7 @@ const buildOperator = (dto: VehicleDto, t: Translate): VehicleOperator => {
     id: company?._id ?? "",
     name,
     initials: initialsFrom(name),
+    logo: company?.logo,
     rating: dto.ratingsAverage,
     reviewsCount: dto.ratingsQuantity,
     // Only an approved company may display the verified-partner mark.

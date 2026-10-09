@@ -88,7 +88,7 @@ const runBookingRequest = async (t, opts = {}) => {
     session: async () => vehicle,
   }));
   t.mock.method(Vehicle, "findOneAndUpdate", async (filter, update, options) => {
-    if (update.$set?.operationalStatus === "UNAVAILABLE") {
+    if (update.$set?.updatedAt instanceof Date) {
       captures.claimFilter = filter;
       captures.claimOptions.push(options);
       // The losing concurrent checkout observes the vehicle mid-claim and the
@@ -146,7 +146,7 @@ test("P1-1: two concurrent checkouts for the same vehicle - one succeeds, the lo
   assert.equal(winner.session.committed, true);
   assert.equal(winner.session.aborted, false);
   assert.equal(winner.lock.released, true);
-  assert.equal(winner.captures.restoreCalls.length, 1);
+  assert.equal(winner.captures.restoreCalls.length, 0);
   assert.equal(winner.captures.bookingCreates, 1);
 
   // The loser never sees the booking; its write is refused before any insert.

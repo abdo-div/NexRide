@@ -17,6 +17,7 @@ import {
   DATE_BLOCKING_BOOKING_STATUSES,
   buildDateOverlapFilter,
 } from "../utils/bookingStatus.js";
+import { getPlatformPolicy } from "../services/platformPolicyService.js";
 // Administrative register.
 //
 // The search allowlist lives in the service (`BOOKING_SEARCH_FIELDS`) because the
@@ -214,23 +215,20 @@ export const createBooking = catchAsync(async (req, res, next) => {
       );
     }
 
-    // 2. Atomic row-level claim on the vehicle document (P1-1 race fix).
+    // 2. Atomic row-level transaction mutex (P1-1 race fix).
     //
     // The overlap check below is read-then-insert: two concurrent transactions
     // can both observe "no overlap" and both insert. Latching onto the vehicle
     // row with a conditional findOneAndUpdate makes the vehicle document the
-    // mutex - the second concurrent checkout either finds it non-AVAILABLE
-    // (clean 409) or contends for the in-flight transaction's write lock, which
-    // MongoDB reports as a WriteConflict (translated to 409 below). The claim
-    // is rolled back to AVAILABLE inside the same transaction, so it can never
-    // leak after a crash.
+    // mutex. Touching updatedAt creates write contention without using the
+    // physical operationalStatus as a temporary reservation flag.
     const claimed = await Vehicle.findOneAndUpdate(
       {
         _id: vehicleId,
         listingStatus: "PUBLISHED",
         operationalStatus: "AVAILABLE",
       },
-      { $set: { operationalStatus: "UNAVAILABLE" } },
+      { $set: { updatedAt: new Date() } },
       { session, new: true },
     );
 
@@ -254,7 +252,11 @@ export const createBooking = catchAsync(async (req, res, next) => {
 
     const rentalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
     const totalAmount = rentalDays * claimed.dailyPrice;
-    const commissionAmount = totalAmount * 0.08;
+    // The Booking pre-validation hook applies the company's override. These
+    // values satisfy required fields until that authoritative snapshot runs.
+    const platformPolicy = await getPlatformPolicy();
+    const commissionRate = platformPolicy.commissionRatePct;
+    const commissionAmount = totalAmount * (commissionRate / 100);
     const companyShare = totalAmount - commissionAmount;
 
     const [booking] = await Booking.create(
@@ -270,7 +272,7 @@ export const createBooking = catchAsync(async (req, res, next) => {
           totalDays: rentalDays,
           rentalPrice: totalAmount,
           totalAmount,
-          commissionRate: 0.08,
+          commissionRate,
           commissionAmount,
           companyShare,
           bookingStatus: "PENDING_PAYMENT",
@@ -297,16 +299,6 @@ export const createBooking = catchAsync(async (req, res, next) => {
         { session },
       );
     }
-
-    // 4. Release the checkout claim inside the same transaction. Conditionally
-    // matches only a unit still in the transient UNAVAILABLE state, so it can
-    // never override an admin that moved the vehicle to MAINTENANCE mid-checkout.
-    // The committed booking row is what blocks overlapping dates from here on.
-    await Vehicle.findOneAndUpdate(
-      { _id: vehicleId, operationalStatus: "UNAVAILABLE" },
-      { $set: { operationalStatus: "AVAILABLE" } },
-      { session },
-    );
 
     await session.commitTransaction();
     session.endSession();

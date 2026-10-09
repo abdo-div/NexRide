@@ -5,6 +5,7 @@ import { BadgeCheck, Star, Shield, ArrowRight } from "lucide-react";
 import { CheckoutIcon } from "./CheckoutIcon";
 import type { CheckoutMeta, CheckoutTotals } from "../../types/checkout";
 import type { Vehicle } from "../../types/vehicle";
+import { companyLogoUrl } from "../../lib/vehicleMapper";
 
 interface Props {
   vehicle: Vehicle;
@@ -61,9 +62,7 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
 
           <div className="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC]">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-[#2563EB] text-white flex items-center justify-center font-bold text-[12px]">
-                {vehicle.operator.initials}
-              </div>
+              {companyLogoUrl(vehicle.operator.logo) ? <img src={companyLogoUrl(vehicle.operator.logo) ?? ""} alt={vehicle.operator.name} className="h-8 w-8 rounded-full border border-slate-200 object-cover" /> : <div className="w-8 h-8 rounded-full bg-[#2563EB] text-white flex items-center justify-center font-bold text-[12px]">{vehicle.operator.initials}</div>}
               <div className="flex flex-col">
                 <div className="flex items-center gap-1">
                   <span className="text-[12px] font-bold text-[#0F172A]">

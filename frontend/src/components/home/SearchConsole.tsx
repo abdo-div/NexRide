@@ -2,17 +2,17 @@ import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import {
-  Search,
-  MapPin,
-  Plane,
-  Calendar,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
+  MagnifyingGlass as Search,
+  MapPinArea as MapPin,
+  Airplane as Plane,
+  CalendarDots as Calendar,
+  CaretDown as ChevronDown,
+  CaretLeft as ChevronLeft,
+  CaretRight as ChevronRight,
   ArrowRight,
   Check,
-  Map,
-} from "lucide-react";
+  MapTrifold as Map,
+} from "@phosphor-icons/react";
 
 // ----------------------------------------------------------------------------
 // Data
@@ -134,7 +134,7 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
   return (
     <div
       ref={popupRef}
-      className={`absolute top-full left-0 mt-2 z-40 origin-top-right transition-all duration-150 ${
+      className={`absolute top-full start-0 mt-2 z-[100] origin-top transition-all duration-150 ${
         open
           ? "opacity-100 scale-100"
           : "pointer-events-none opacity-0 scale-95"
@@ -331,7 +331,7 @@ const LocationField: React.FC<LocationFieldProps> = ({
         onClick={onToggle}
         className="w-full flex items-center gap-3 text-left px-4 py-3.5"
       >
-        <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
+        <MapPin weight="duotone" className="w-5 h-5 text-blue-600 shrink-0" />
         <div className="flex-1 min-w-0">
           <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
             {label}
@@ -346,6 +346,7 @@ const LocationField: React.FC<LocationFieldProps> = ({
           </div>
         </div>
         <ChevronDown
+          weight="bold"
           className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         />
       </button>
@@ -353,7 +354,7 @@ const LocationField: React.FC<LocationFieldProps> = ({
       {/* Popup */}
       <div
         ref={popupRef}
-        className={`absolute top-full left-0 mt-2 z-40 origin-top-left transition-all duration-150 ${
+        className={`absolute top-full start-0 mt-2 z-[100] origin-top transition-all duration-150 ${
           open ? "opacity-100 scale-100" : "pointer-events-none opacity-0 scale-95"
         }`}
       >
@@ -385,7 +386,7 @@ const LocationField: React.FC<LocationFieldProps> = ({
           {/* Search */}
           <div className="px-2 pb-2">
             <div className="flex items-center gap-2 bg-slate-100 rounded-lg px-3">
-              <Search className="w-3.5 h-3.5 text-slate-400" />
+              <Search weight="bold" className="w-3.5 h-3.5 text-slate-500" />
               <input
                 autoFocus={open}
                 value={query}
@@ -407,7 +408,7 @@ const LocationField: React.FC<LocationFieldProps> = ({
                   value?.name === c ? "bg-slate-50" : "hover:bg-slate-50"
                 }`}
               >
-                <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <MapPin weight="duotone" className="w-4 h-4 text-blue-500 shrink-0" />
                 <span className="flex-1 text-xs font-bold text-slate-800">{c}</span>
                 {value?.name === c && <Check className="w-3.5 h-3.5 text-blue-600" />}
               </button>
@@ -421,7 +422,7 @@ const LocationField: React.FC<LocationFieldProps> = ({
                   value?.name === a.name ? "bg-slate-50" : "hover:bg-slate-50"
                 }`}
               >
-                <Plane className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <Plane weight="duotone" className="w-4 h-4 text-blue-500 shrink-0" />
                 <span className="flex-1">
                   <span className="block text-xs font-bold text-slate-800">{a.name}</span>
                   <span className="block text-[10px] text-slate-400">
@@ -558,7 +559,7 @@ export const SearchConsole: React.FC = () => {
 
   const fromValue = (
     <div className="flex items-center gap-1.5">
-      <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
+      <Calendar weight="duotone" className="w-5 h-5 text-blue-600 shrink-0" />
       <div className="flex-1 min-w-0 text-left">
         <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
           {t("home.search.pickupDateTime")}
@@ -569,13 +570,13 @@ export const SearchConsole: React.FC = () => {
             : `${t("home.search.today")} · ${pickupTime}`}
         </div>
       </div>
-      <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+      <ChevronDown weight="bold" className="w-4 h-4 text-slate-400 shrink-0" />
     </div>
   );
 
   const toValue = (
     <div className="flex items-center gap-1.5">
-      <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
+      <Calendar weight="duotone" className="w-5 h-5 text-blue-600 shrink-0" />
       <div className="flex-1 min-w-0 text-left">
         <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
           {t("home.search.returnDateTime")}
@@ -586,12 +587,12 @@ export const SearchConsole: React.FC = () => {
             : `${t("home.search.today")} · ${returnTime}`}
         </div>
       </div>
-      <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+      <ChevronDown weight="bold" className="w-4 h-4 text-slate-400 shrink-0" />
     </div>
   );
 
   return (
-    <div id="search-engine" className="relative z-40 mt-8 w-full">
+    <div id="search-engine" className="relative z-[60] mt-8 w-full overflow-visible">
       {/* Card */}
       <div className="rounded-2xl bg-slate-200 shadow-2xl shadow-slate-900/15 border border-slate-200">
         {/* Main row */}
@@ -668,9 +669,9 @@ export const SearchConsole: React.FC = () => {
               type="submit"
               className="w-full h-full min-h-[56px] rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-bold text-sm flex items-center justify-center gap-2 px-6 transition-colors shadow-lg shadow-blue-600/25"
             >
-              <Search className="w-4 h-4" />
+              <Search weight="bold" className="w-4 h-4" />
               <span>{t("home.search.search")}</span>
-              <ArrowRight className="w-4 h-4 rtl:rotate-180" />
+              <ArrowRight weight="bold" className="w-4 h-4 rtl:rotate-180" />
             </button>
           </div>
         </form>
@@ -685,7 +686,7 @@ export const SearchConsole: React.FC = () => {
               className="peer sr-only"
             />
             <span className="w-4 h-4 rounded border border-slate-300 flex items-center justify-center transition-colors peer-checked:bg-blue-600 peer-checked:border-blue-600">
-              <Check className="w-3 h-3 text-white" />
+              <Check weight="bold" className="w-3 h-3 text-white" />
             </span>
             <span className="text-xs font-bold text-slate-700">
               {t("home.search.differentReturn")}

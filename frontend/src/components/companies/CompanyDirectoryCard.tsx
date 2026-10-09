@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Star, ArrowRight, ShieldCheck, Building2 } from "lucide-react";
 import type { CompanyDirectoryEntry } from "../../types/companyDirectory";
+import { companyLogoUrl } from "../../lib/vehicleMapper";
 
 interface CompanyDirectoryCardProps {
   company: CompanyDirectoryEntry;
@@ -25,11 +26,11 @@ export const CompanyDirectoryCard: React.FC<CompanyDirectoryCardProps> = ({
         {/* Header: monogram, name & badge */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div
+            {companyLogoUrl(company.logo) ? <img src={companyLogoUrl(company.logo) ?? ""} alt={company.name} className="h-12 w-12 shrink-0 rounded-xl border border-slate-200 object-cover shadow-sm" /> : <div
               className={`w-12 h-12 rounded-xl flex items-center justify-center font-extrabold text-sm tracking-wider shadow-sm shrink-0 ${company.avatarBg}`}
             >
               {company.initials}
-            </div>
+            </div>}
             <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-1">
                 <h3 className="font-bold text-[15px] text-slate-900 truncate">
@@ -164,11 +165,11 @@ export const CompanyDirectoryRow: React.FC<CompanyDirectoryCardProps> = ({
   return (
     <article className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm hover:shadow-xl transition-all duration-300 p-5 flex flex-col md:flex-row md:items-center gap-4">
       <div className="flex items-center gap-3 min-w-0 md:w-1/3">
-        <div
+        {companyLogoUrl(company.logo) ? <img src={companyLogoUrl(company.logo) ?? ""} alt={company.name} className="h-12 w-12 shrink-0 rounded-xl border border-slate-200 object-cover shadow-sm" /> : <div
           className={`w-12 h-12 rounded-xl flex items-center justify-center font-extrabold text-sm tracking-wider shadow-sm shrink-0 ${company.avatarBg}`}
         >
           {company.initials}
-        </div>
+        </div>}
         <div className="flex flex-col min-w-0">
           <div className="flex items-center gap-1.5">
             <h3 className="font-bold text-slate-900 truncate">{company.name}</h3>

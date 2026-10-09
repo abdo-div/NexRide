@@ -11,6 +11,7 @@ import {
   Scale,
   ShieldCheck,
 } from "lucide-react";
+import { companyLogoUrl, initialsFrom } from "../../lib/vehicleMapper";
 
 interface CompanySettingsNavItem {
   id: string;
@@ -34,6 +35,7 @@ interface CompanySettingsNavProps {
   subdomain: string;
   city: string;
   verified: boolean;
+  logo: string;
   active: string;
   onSelect: (id: string) => void;
   onComingSoon: () => void;
@@ -49,6 +51,7 @@ export const CompanySettingsNav: React.FC<CompanySettingsNavProps> = ({
   subdomain,
   city,
   verified,
+  logo,
   active,
   onSelect,
   onComingSoon,
@@ -99,9 +102,7 @@ export const CompanySettingsNav: React.FC<CompanySettingsNavProps> = ({
           </span>
         </div>
         <div className="flex items-center gap-3 px-5 py-4">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-base font-extrabold text-white">
-            {companyName.charAt(0).toUpperCase() || "N"}
-          </span>
+          {companyLogoUrl(logo) ? <img src={companyLogoUrl(logo) ?? ""} alt={companyName} className="h-11 w-11 shrink-0 rounded-xl border border-slate-200 object-cover" /> : <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2563EB] text-base font-extrabold text-white">{initialsFrom(companyName)}</span>}
           <div className="min-w-0">
             <p className="truncate text-sm font-bold text-[#0B1C30]">{companyName}</p>
             <p className="truncate text-xs font-semibold text-[#565E74]">

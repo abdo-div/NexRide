@@ -31,6 +31,16 @@ export const companySettingsApi = {
       signal,
     }),
 
+  updateLogo: (logo: File, signal?: AbortSignal) => {
+    const body = new FormData();
+    body.append("logo", logo);
+    return request<CompanyUpdateResponse>("/companies/settings", {
+      method: "PATCH",
+      body,
+      signal,
+    });
+  },
+
   updatePassword: (input: CompanySettingsPasswordInput, signal?: AbortSignal) =>
     request<{ status: string }>("/users/update-my-password", {
       method: "PATCH",

@@ -26,6 +26,7 @@ export interface BookingCompanyRef {
   name?: string;
   phone?: string;
   city?: string;
+  logo?: string;
 }
 
 export type BookingStatus =

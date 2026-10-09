@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { RefreshCcw } from "lucide-react";
+import { ArrowClockwise as RefreshCcw } from "@phosphor-icons/react";
 
 interface HomeSectionErrorProps {
   onRetry: () => void;

@@ -116,6 +116,7 @@ export const useCompaniesDirectory = (): CompaniesDirectoryState => {
       id,
       initials: initialsFrom(company.name),
       avatarBg: AVATAR_BG[index % AVATAR_BG.length],
+      logo: company.logo,
       name: company.name,
       city: company.city?.trim() ?? "",
       address: company.address?.trim() ?? "",

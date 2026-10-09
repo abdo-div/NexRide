@@ -4,7 +4,8 @@ import Vehicle from "../models/vehicle_model.js";
 import AppError from "../utils/appError.js";
 import APIFeatures from "../utils/APIFeatures.js";
 import { runPaginatedQuery } from "../utils/paginatedQuery.js";
-import { calculateCompanyPayoutSummary } from "./paymentService.js";
+import { getCompanyPayoutBalance } from "./payoutService.js";
+import { getPlatformPolicy } from "./platformPolicyService.js";
 
 const COMPANY_SEARCH_FIELDS = [
   "name",
@@ -147,10 +148,14 @@ export const requestCompanyPayout = async (companyId) => {
     );
   }
 
-  const { pendingPayouts } = await calculateCompanyPayoutSummary(companyId);
-  if (pendingPayouts <= 0) {
+  const [{ dueToCompany: pendingPayouts, outstandingCommission }, policy] =
+    await Promise.all([
+      getCompanyPayoutBalance(companyId),
+      getPlatformPolicy(),
+    ]);
+  if (pendingPayouts <= policy.minimumPayout) {
     throw new AppError(
-      "Nothing is payable yet — earnings are still unsettled or escrowed.",
+      `Net payout balance must reach ${policy.minimumPayout} before a request can be submitted.`,
       400,
     );
   }
@@ -161,6 +166,8 @@ export const requestCompanyPayout = async (companyId) => {
   return {
     requestedAt: company.lastPayoutRequestAt,
     pendingPayouts,
+    minimumPayout: policy.minimumPayout,
+    outstandingCommission,
     payout: company.payout,
   };
 };

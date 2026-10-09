@@ -22,7 +22,11 @@ export type CompanyVehicleEditField =
   | "dailyPrice"
   | "weeklyPrice"
   | "city"
-  | "pickupLocation";
+  | "pickupLocation"
+  | "plateNumber" | "vin" | "odometer" | "engine" | "drivetrain"
+  | "exteriorColor" | "interiorColor" | "tankCapacity" | "features"
+  | "monthlyPrice" | "depositAmount" | "mileageLimit" | "extraMileageFee"
+  | "lng" | "lat";
 
 export interface CompanyVehicleEditDraft {
   make: string;
@@ -38,6 +42,10 @@ export interface CompanyVehicleEditDraft {
   weeklyPrice: string;
   city: string;
   pickupLocation: string;
+  plateNumber: string; vin: string; odometer: string; engine: string; drivetrain: string;
+  exteriorColor: string; interiorColor: string; tankCapacity: string; features: string;
+  monthlyPrice: string; depositAmount: string; mileageLimit: string; extraMileageFee: string;
+  lng: string; lat: string;
 }
 
 /** Fields that arrive as numbers in the API contract. */
@@ -47,6 +55,8 @@ const numericKeys: CompanyVehicleEditField[] = [
   "doors",
   "dailyPrice",
   "weeklyPrice",
+  "odometer", "tankCapacity", "monthlyPrice", "depositAmount", "mileageLimit", "extraMileageFee",
+  "lng", "lat",
 ];
 
 const fromVehicle = (vehicle: CompanyVehicleProfile): CompanyVehicleEditDraft => ({
@@ -63,6 +73,14 @@ const fromVehicle = (vehicle: CompanyVehicleProfile): CompanyVehicleEditDraft =>
   weeklyPrice: vehicle.weeklyPrice != null ? String(vehicle.weeklyPrice) : "",
   city: vehicle.city ?? "",
   pickupLocation: vehicle.pickupLocation ?? "",
+  plateNumber: vehicle.plateNumber ?? "", vin: vehicle.vin ?? "",
+  odometer: vehicle.odometer != null ? String(vehicle.odometer) : "", engine: vehicle.engine ?? "",
+  drivetrain: vehicle.drivetrain ?? "", exteriorColor: vehicle.exteriorColor ?? "",
+  interiorColor: vehicle.interiorColor ?? "", tankCapacity: vehicle.tankCapacity != null ? String(vehicle.tankCapacity) : "",
+  features: (vehicle.features ?? []).join(", "), monthlyPrice: vehicle.monthlyPrice != null ? String(vehicle.monthlyPrice) : "",
+  depositAmount: String(vehicle.depositAmount ?? 0), mileageLimit: vehicle.mileageLimit != null ? String(vehicle.mileageLimit) : "",
+  extraMileageFee: vehicle.extraMileageFee != null ? String(vehicle.extraMileageFee) : "",
+  lng: vehicle.coordinates ? String(vehicle.coordinates[0]) : "", lat: vehicle.coordinates ? String(vehicle.coordinates[1]) : "",
 });
 
 const effectivePhotos = (vehicle: CompanyVehicleProfile): string[] =>
@@ -90,6 +108,13 @@ const mapBase = (vehicle: CompanyVehicleProfile): Record<CompanyVehicleEditField
   weeklyPrice: vehicle.weeklyPrice != null ? String(vehicle.weeklyPrice) : "",
   city: vehicle.city ?? "",
   pickupLocation: vehicle.pickupLocation ?? "",
+  plateNumber: vehicle.plateNumber ?? "", vin: vehicle.vin ?? "", odometer: vehicle.odometer != null ? String(vehicle.odometer) : "",
+  engine: vehicle.engine ?? "", drivetrain: vehicle.drivetrain ?? "", exteriorColor: vehicle.exteriorColor ?? "",
+  interiorColor: vehicle.interiorColor ?? "", tankCapacity: vehicle.tankCapacity != null ? String(vehicle.tankCapacity) : "",
+  features: (vehicle.features ?? []).join(", "), monthlyPrice: vehicle.monthlyPrice != null ? String(vehicle.monthlyPrice) : "",
+  depositAmount: String(vehicle.depositAmount ?? 0), mileageLimit: vehicle.mileageLimit != null ? String(vehicle.mileageLimit) : "",
+  extraMileageFee: vehicle.extraMileageFee != null ? String(vehicle.extraMileageFee) : "",
+  lng: vehicle.coordinates ? String(vehicle.coordinates[0]) : "", lat: vehicle.coordinates ? String(vehicle.coordinates[1]) : "",
 });
 
 const mapCurrent = (draft: CompanyVehicleEditDraft): Record<CompanyVehicleEditField, string> => ({
@@ -106,6 +131,11 @@ const mapCurrent = (draft: CompanyVehicleEditDraft): Record<CompanyVehicleEditFi
   weeklyPrice: draft.weeklyPrice,
   city: draft.city,
   pickupLocation: draft.pickupLocation,
+  plateNumber: draft.plateNumber, vin: draft.vin, odometer: draft.odometer, engine: draft.engine,
+  drivetrain: draft.drivetrain, exteriorColor: draft.exteriorColor, interiorColor: draft.interiorColor,
+  tankCapacity: draft.tankCapacity, features: draft.features, monthlyPrice: draft.monthlyPrice,
+  depositAmount: draft.depositAmount, mileageLimit: draft.mileageLimit, extraMileageFee: draft.extraMileageFee,
+  lng: draft.lng, lat: draft.lat,
 });
 
 const toNumber = (value: string): number | null => {
@@ -210,10 +240,10 @@ export const useCompanyVehicleEditForm = (
   const addNewImages = useCallback(
     (files: File[]) => {
       if (files.length === 0) return;
-      setNewImages((prev) => [...prev, ...files].slice(0, 3));
+      setNewImages((prev) => [...prev, ...files].slice(0, Math.max(0, 8 - photos.length)));
       markEditing();
     },
-    [markEditing],
+    [markEditing, photos.length],
   );
 
   const removeNewImage = useCallback(

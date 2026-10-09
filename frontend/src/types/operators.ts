@@ -1,6 +1,7 @@
 export interface FleetOperator {
   id: string;
   initials: string;
+  logo?: string;
   avatarBg: string;
   name: string;
   locations: string;

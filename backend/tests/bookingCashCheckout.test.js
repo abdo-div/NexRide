@@ -115,7 +115,7 @@ const runCreateBooking = async (
     session: async () => vehicle,
   }));
   t.mock.method(Vehicle, "findOneAndUpdate", async (filter, update, options) => {
-    if (update.$set?.operationalStatus === "UNAVAILABLE") {
+    if (update.$set?.updatedAt instanceof Date) {
       vehicleQuery = filter;
       claimOptions.push(options);
       return vehicle;
@@ -197,15 +197,7 @@ test("cash checkout creates a pending cash ledger entry atomically with an unpai
   assert.equal(result.claimOptions.length, 1);
   assert.equal(result.claimOptions[0].session, session);
   assert.equal(result.claimOptions[0].new, true);
-  assert.equal(result.restoreCalls.length, 1);
-  assert.deepEqual(result.restoreCalls[0].filter, {
-    _id: vehicleId,
-    operationalStatus: "UNAVAILABLE",
-  });
-  assert.deepEqual(result.restoreCalls[0].update, {
-    $set: { operationalStatus: "AVAILABLE" },
-  });
-  assert.equal(result.restoreCalls[0].options.session, session);
+  assert.equal(result.restoreCalls.length, 0);
 });
 
 test("card checkout creation remains pending without a cash payment record", async (t) => {

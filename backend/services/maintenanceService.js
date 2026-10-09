@@ -77,7 +77,7 @@ export const buildMaintenanceSummary = async (companyId) => {
     statusCounts.map((row) => [row._id, row.count]),
   );
   const inServiceVehicles = byStatus.MAINTENANCE ?? 0;
-  const unavailableFleet = byStatus.UNAVAILABLE ?? 0;
+  const unavailableFleet = byStatus.SUSPENDED ?? 0;
 
   const now = Date.now();
   const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);

@@ -155,3 +155,6 @@ export const computeNettedBalance = (rows = []) => {
     outstandingCommission: Math.max(0, -nettedBalance),
   };
 };
+
+export const meetsMinimumPayout = (balance, minimumPayout) =>
+  Number(balance?.dueToCompany ?? 0) > Number(minimumPayout ?? 0);

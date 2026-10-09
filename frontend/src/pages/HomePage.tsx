@@ -10,16 +10,18 @@ import { PartnerSection } from "../components/home/PartnerSection";
 import { TrustedOperators } from "../components/home/trustedOperators";
 import { UncompromisingStandards } from "../components/home/UncompromisingStandards";
 import { ReadyToHitTheRoad } from "../components/layouts/ReadyToHitTheRoad";
+import { IconContext } from "@phosphor-icons/react";
 
 export const HomePage: React.FC = () => {
   const home = useHomeData();
 
   return (
+    <IconContext.Provider value={{ weight: "duotone", mirrored: false }}>
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="w-full overflow-hidden"
+      className="w-full overflow-x-clip overflow-y-visible"
     >
       <Hero />
       <VehicleCategories
@@ -53,6 +55,7 @@ export const HomePage: React.FC = () => {
       <UncompromisingStandards />
       <ReadyToHitTheRoad />
     </motion.div>
+    </IconContext.Provider>
   );
 };
 
