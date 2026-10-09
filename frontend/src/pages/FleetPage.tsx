@@ -42,6 +42,7 @@ export const FleetPage: React.FC = () => {
   const searchStart = searchParams.get("startDate") ?? "";
   const searchEnd = searchParams.get("endDate") ?? "";
   const companyParam = searchParams.get("company") ?? "";
+  const categoryParam = searchParams.get("category") ?? "";
   const hasSearch = Boolean(searchLocation || searchStart || searchEnd);
 
   const { vehicles: dtoVehicles, loading, error, reload } = useVehicles({
@@ -87,9 +88,25 @@ export const FleetPage: React.FC = () => {
   }, [filters.selectedLocations, searchParams, setSearchParams]);
 
   const vehicles = useMemo(() => {
-    const scoped = companyParam
+    const companyScoped = companyParam
       ? filteredVehicles.filter((v) => v.operatorId === companyParam)
       : filteredVehicles;
+    const scoped = companyScoped.filter((vehicle) => {
+      switch (categoryParam) {
+        case "economy":
+          return ["SEDAN", "HATCHBACK"].includes(vehicle.vehicleType);
+        case "executive-suv":
+          return vehicle.vehicleType === "SUV";
+        case "ultra-luxury":
+          return vehicle.vehicleType === "LUXURY";
+        case "desert-4x4":
+          return vehicle.vehicleType === "PICKUP";
+        case "electric-hybrid":
+          return ["ELECTRIC", "HYBRID"].includes(vehicle.fuelType);
+        default:
+          return true;
+      }
+    });
     const list = [...scoped];
     if (sort === "price-desc") list.sort((a, b) => b.pricePerDay - a.pricePerDay);
     if (sort === "price-asc") list.sort((a, b) => a.pricePerDay - b.pricePerDay);
@@ -102,7 +119,7 @@ export const FleetPage: React.FC = () => {
       );
     }
     return list;
-  }, [filteredVehicles, sort, companyParam]);
+  }, [filteredVehicles, sort, companyParam, categoryParam]);
 
   const singleLocation =
     filters.selectedLocations.length === 1 ? filters.selectedLocations[0] : "";
@@ -140,6 +157,24 @@ export const FleetPage: React.FC = () => {
     : t("fleet.params.allCategories");
 
   const tokenRows: { label: string; onRemove: () => void }[] = [];
+
+  if (categoryParam) {
+    const categoryKey: Record<string, string> = {
+      economy: "data.categories.economy.title",
+      "executive-suv": "data.categories.executiveSuv.title",
+      "ultra-luxury": "data.categories.ultraLuxury.title",
+      "desert-4x4": "data.categories.desert4x4.title",
+      "electric-hybrid": "data.categories.electricHybrid.title",
+    };
+    tokenRows.push({
+      label: t(categoryKey[categoryParam] ?? "fleet.params.allCategories"),
+      onRemove: () => {
+        const next = new URLSearchParams(searchParams);
+        next.delete("category");
+        setSearchParams(next, { replace: true });
+      },
+    });
+  }
 
   if (companyParam) {
     const scopedCompany =

@@ -40,7 +40,7 @@ const COMPANY_STYLES: Record<string, string> = {
 const VEHICLE_STYLES: Record<string, string> = {
   AVAILABLE: "bg-blue-50 text-blue-700",
   MAINTENANCE: "bg-amber-50 text-amber-800",
-  UNAVAILABLE: "bg-rose-50 text-rose-700",
+  SUSPENDED: "bg-rose-50 text-rose-700",
 };
 
 const USER_STYLES: Record<string, string> = {
@@ -90,7 +90,7 @@ export const StatusPill: React.FC<StatusPillProps> = ({
           ? "bg-blue-500"
           : kind === "vehicle" && status === "MAINTENANCE"
             ? "bg-amber-500"
-            : kind === "vehicle" && status === "UNAVAILABLE"
+            : kind === "vehicle" && status === "SUSPENDED"
               ? "bg-rose-500"
               : "bg-current";
 

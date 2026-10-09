@@ -12,7 +12,7 @@ const SEGMENT_LABEL_KEY: Record<string, string> = {
 const OPERATIONAL_BADGE: Record<string, string> = {
   AVAILABLE: "vehicleDetail.statusAvailableNow",
   MAINTENANCE: "vehicleDetail.statusMaintenance",
-  UNAVAILABLE: "vehicleDetail.statusUnavailable",
+  SUSPENDED: "vehicleDetail.statusUnavailable",
 };
 
 /**

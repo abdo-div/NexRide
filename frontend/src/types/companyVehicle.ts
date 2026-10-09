@@ -51,7 +51,7 @@ export interface CompanyVehicleProfile {
   depositAmount?: number;
   mileageLimit?: number | null;
   extraMileageFee?: number | null;
-  operationalStatus: "AVAILABLE" | "MAINTENANCE" | "UNAVAILABLE";
+  operationalStatus: "AVAILABLE" | "MAINTENANCE" | "SUSPENDED";
   listingStatus: "DRAFT" | "PUBLISHED" | "SUSPENDED";
   rating: { average: number | null; count: number };
   gpsActive: boolean;
