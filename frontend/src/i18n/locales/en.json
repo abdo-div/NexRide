@@ -563,7 +563,7 @@
       "line2": "Perfect Car.",
       "line3": "Drive Your",
       "line4": "Dreams.",
-      "subtitle": "Explore thousands of verified cars from trusted Libyan sellers. Best prices. Easy financing. Drive with confidence across Tripoli, Benghazi, Misrata, and Sabha.",
+      "subtitle": "Explore thousands of verified cars from trusted Libyan sellers. Best prices. Easy financing. Drive with confidence across Libya.",
       "browseCars": "Browse Cars",
       "sellYourCar": "Sell Your Car",
       "carsListed": "Cars Listed",
@@ -3500,6 +3500,7 @@
       "AVAILABLE": "Available",
       "MAINTENANCE": "In maintenance",
       "UNAVAILABLE": "Unavailable",
+      "SUSPENDED": "Suspended",
       "FAILED": "Failed"
     },
     "kpis": {

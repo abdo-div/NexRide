@@ -119,6 +119,8 @@ export const mapVehicle = (dto: VehicleDto, translate: Translate = noTranslate):
     id: dto._id ?? dto.id ?? "",
     title: `${dto.make} ${dto.model}`,
     category: translate(`fleet.types.${dto.type}`, dto.type),
+    vehicleType: dto.type,
+    fuelType: dto.fuelType,
     segment: SEGMENT_BY_TYPE[dto.type] ?? "economy",
     pricePerDay: dto.dailyPrice,
     totalForPeriod,

@@ -55,7 +55,7 @@ import type { VehicleDto } from "../../types/vehicle";
 
 const PAGE_SIZE = 20;
 
-type Segment = "ALL" | "AVAILABLE" | "MAINTENANCE" | "UNAVAILABLE";
+type Segment = "ALL" | "AVAILABLE" | "MAINTENANCE" | "SUSPENDED";
 type SortKey = "created" | "priceLow" | "priceHigh" | "name";
 
 /** Client sort chips translated into the endpoint's `sort` contract. */
@@ -123,7 +123,7 @@ export const AdminFleetPage: React.FC = () => {
       (v) => v.operationalStatus === "MAINTENANCE",
     ).length;
     const unavailable = fleetVehicles.filter(
-      (v) => v.operationalStatus === "UNAVAILABLE",
+      (v) => v.operationalStatus === "SUSPENDED",
     ).length;
     const reserved = fleetVehicles.filter((v) =>
       fleetBookings.some(
@@ -171,8 +171,8 @@ export const AdminFleetPage: React.FC = () => {
       MAINTENANCE: fleetVehicles.filter(
         (v) => v.operationalStatus === "MAINTENANCE",
       ).length,
-      UNAVAILABLE: fleetVehicles.filter(
-        (v) => v.operationalStatus === "UNAVAILABLE",
+      SUSPENDED: fleetVehicles.filter(
+        (v) => v.operationalStatus === "SUSPENDED",
       ).length,
     }),
     [fleetVehicles],
@@ -506,11 +506,11 @@ export const AdminFleetPage: React.FC = () => {
                 }}
               />
               <SegmentChip
-                active={segment === "UNAVAILABLE"}
+                active={segment === "SUSPENDED"}
                 label={t("admin.fleet.primeUnavailable")}
-                count={segmentCounts.UNAVAILABLE}
+                count={segmentCounts.SUSPENDED}
                 onClick={() => {
-                  setSegment("UNAVAILABLE");
+                  setSegment("SUSPENDED");
                   resetPage();
                 }}
               />
@@ -540,7 +540,7 @@ export const AdminFleetPage: React.FC = () => {
                 setStatus(v);
                 resetPage();
               }}
-              options={["AVAILABLE", "MAINTENANCE", "UNAVAILABLE"].map((s) => ({
+              options={["AVAILABLE", "MAINTENANCE", "SUSPENDED"].map((s) => ({
                 value: s,
                 label: t(`admin.status.${s}`),
               }))}

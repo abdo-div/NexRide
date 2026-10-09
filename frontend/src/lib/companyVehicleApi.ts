@@ -71,7 +71,7 @@ export const companyVehicleApi = {
   /**
    * Flip a vehicle's operational or listing status (PATCH /cars/:id/status).
    * The backend routes the value to operationalStatus (AVAILABLE / MAINTENANCE /
-   * UNAVAILABLE) or listingStatus (DRAFT / PUBLISHED / SUSPENDED) and scopes the
+   * SUSPENDED) or listingStatus (DRAFT / PUBLISHED / SUSPENDED) and scopes the
    * write to the caller's own fleet.
    */
   updateStatus: (vehicleId: string, status: string) =>

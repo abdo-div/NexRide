@@ -55,7 +55,9 @@ const vehicleFromBooking = (booking: BookingDto): Vehicle | null => {
   return {
     id: ref._id,
     title,
-    category: "Rental Vehicle",
+  category: "Rental Vehicle",
+  vehicleType: "SEDAN",
+  fuelType: "GASOLINE",
     segment: "economy",
     pricePerDay: ref.dailyPrice ?? 0,
     totalForPeriod: (ref.dailyPrice ?? 0) * 5,

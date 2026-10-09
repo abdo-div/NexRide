@@ -19,6 +19,8 @@ export interface Vehicle {
   id: string;
   title: string;
   category: string;
+  vehicleType: VehicleType;
+  fuelType: VehicleFuelType;
   segment: string;
   pricePerDay: number;
   totalForPeriod: number;
@@ -54,7 +56,7 @@ export type VehicleType =
 
 export type VehicleTransmission = "MANUAL" | "AUTOMATIC";
 export type VehicleFuelType = "GASOLINE" | "DIESEL" | "ELECTRIC" | "HYBRID";
-export type VehicleOperationalStatus = "AVAILABLE" | "MAINTENANCE" | "UNAVAILABLE";
+export type VehicleOperationalStatus = "AVAILABLE" | "MAINTENANCE" | "SUSPENDED";
 export type VehicleListingStatus = "DRAFT" | "PUBLISHED" | "SUSPENDED";
 
 /** Populated subset of the Company document (see services/vehicleService.js). */

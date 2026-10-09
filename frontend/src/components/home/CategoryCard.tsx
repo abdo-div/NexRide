@@ -9,6 +9,7 @@ import {
   Sparkle,
 } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
+import { Link } from "react-router";
 import type { VehicleCategory } from "../../types/category";
 
 interface CategoryCardProps {
@@ -52,8 +53,13 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, index = 0 
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
       whileHover={{ y: -6, transition: { duration: 0.2 } }}
-      className="bg-white/80 rounded-2xl border border-slate-200/80 p-5 flex flex-col justify-between hover:shadow-xl hover:shadow-blue-500/5 transition-shadow duration-300 group hover:border-blue-200"
+      className="bg-white/80 rounded-2xl border border-slate-200/80 hover:shadow-xl hover:shadow-blue-500/5 transition-shadow duration-300 group hover:border-blue-200"
     >
+      <Link
+        to={`/fleet?category=${encodeURIComponent(category.id)}`}
+        aria-label={`${t("home.categories.explore")} ${t(category.title)}`}
+        className="p-5 flex min-h-full flex-col justify-between rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+      >
       <div>
         {/* Badges Bar */}
         <div className="flex items-center justify-between gap-2 mb-6">
@@ -104,14 +110,14 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, index = 0 
           </div>
         </div>
 
-        <a
-          href={`#category-${category.id}`}
-          aria-label={`${t("home.categories.explore")} ${t(category.title)}`}
+        <span
+          aria-hidden="true"
           className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-blue-600 group-hover:border-blue-600 transition-all duration-200"
         >
           <ArrowRight weight="bold" className="w-4 h-4 group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5 transition-transform" />
-        </a>
+        </span>
       </div>
+      </Link>
     </motion.div>
   );
 };
