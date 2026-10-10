@@ -202,6 +202,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
           endDate,
           pickupLocation: locationParam || undefined,
           paymentMethod: "CASH_ON_DELIVERY",
+          addonIds: Array.from(selected) as Array<"insurance" | "driver" | "childseat" | "delivery">,
         });
         setPhase("done");
         const confirmationQuery = new URLSearchParams({
@@ -233,6 +234,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
         startDate,
         endDate,
         pickupLocation: locationParam || undefined,
+        addonIds: Array.from(selected) as Array<"insurance" | "driver" | "childseat" | "delivery">,
       });
 
       const booking = result.data.booking;

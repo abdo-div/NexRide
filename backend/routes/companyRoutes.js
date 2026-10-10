@@ -22,6 +22,14 @@ import {
 import { getCompanyDashboard } from "../controllers/companyDashboardController.js";
 import { getCompanyBookings } from "../controllers/companyBookingsController.js";
 import { getCompanyReviews, replyToCompanyReview } from "../controllers/companyReviewsController.js";
+import {
+  getCompanyConversations,
+  getCompanyConversationThread,
+  postCompanyConversationMessage,
+  patchCompanyConversationRead,
+  patchCompanyConversationsReadAll,
+  postCompanyBroadcast,
+} from "../controllers/companyMessagesController.js";
 import { getCompanyFleet } from "../controllers/companyFleetController.js";
 import { getCompanyVehicleDetail } from "../controllers/companyVehicleController.js";
 import { protect, restrictTo, protectAllowPendingCompany } from "../middlewares/authMiddleware.js";
@@ -41,6 +49,10 @@ import {
   toggleVerificationSchema,
 } from "../validations/company.validation.js";
 import { companyResponseSchema } from "../validations/review.validation.js";
+import {
+  sendMessageSchema,
+  broadcastNoticeSchema,
+} from "../validations/message.validation.js";
 
 const router = express.Router();
 
@@ -641,6 +653,191 @@ router.post(
   restrictTo("company", "admin"),
   validate(companyResponseSchema),
   replyToCompanyReview,
+);
+
+/**
+ * @openapi
+ * /companies/conversations:
+ *   get:
+ *     tags: [Companies]
+ *     summary: Tenant-scoped Messages inbox for the authenticated company
+ *     description: >-
+ *       Returns the operator's own conversation feed plus a KPI ribbon (active
+ *       conversations, unread priority, average first-reply speed, customer
+ *       satisfaction) and quick-filter counts, all recomputed from the
+ *       tenant's real conversation, message and review documents. The tenant is
+ *       resolved from the session, never the query string.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: view
+ *         schema:
+ *           type: string
+ *           enum: [All, needsReply, activeRentals, postRental]
+ *       - in: query
+ *         name: channel
+ *         schema:
+ *           type: string
+ *           enum: [INQUIRY, ACTIVE_BOOKING, POST_RENTAL_SUPPORT]
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Conversations deck + page
+ *       403:
+ *         description: Company or admin role required
+ */
+router.get(
+  "/conversations",
+  protect,
+  restrictTo("company", "admin"),
+  getCompanyConversations,
+);
+
+/**
+ * @openapi
+ * /companies/conversations/broadcast:
+ *   post:
+ *     tags: [Companies]
+ *     summary: Broadcast a notice into every OPEN conversation of the tenant
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Broadcast written to the tenant's open threads
+ *       403:
+ *         description: Company or admin role required
+ */
+router.post(
+  "/conversations/broadcast",
+  protect,
+  restrictTo("company", "admin"),
+  validate(broadcastNoticeSchema),
+  postCompanyBroadcast,
+);
+
+/**
+ * @openapi
+ * /companies/conversations/read-all:
+ *   patch:
+ *     tags: [Companies]
+ *     summary: Mark every conversation in the tenant inbox as read
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Inbox unread counters cleared
+ *       403:
+ *         description: Company or admin role required
+ */
+router.patch(
+  "/conversations/read-all",
+  protect,
+  restrictTo("company", "admin"),
+  patchCompanyConversationsReadAll,
+);
+
+/**
+ * @openapi
+ * /companies/conversations/{id}:
+ *   get:
+ *     tags: [Companies]
+ *     summary: Full thread for one of the tenant's conversations
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Conversation thread
+ *       404:
+ *         description: Conversation not found in this tenant
+ */
+router.get(
+  "/conversations/:id",
+  protect,
+  restrictTo("company", "admin"),
+  getCompanyConversationThread,
+);
+
+/**
+ * @openapi
+ * /companies/conversations/{id}/messages:
+ *   post:
+ *     tags: [Companies]
+ *     summary: Send an agent reply on one of the tenant's conversations
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [body]
+ *             properties:
+ *               body:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Message stored
+ *       404:
+ *         description: Conversation not found in this tenant
+ */
+router.post(
+  "/conversations/:id/messages",
+  protect,
+  restrictTo("company", "admin"),
+  validate(sendMessageSchema),
+  postCompanyConversationMessage,
+);
+
+/**
+ * @openapi
+ * /companies/conversations/{id}/read:
+ *   patch:
+ *     tags: [Companies]
+ *     summary: Mark one of the tenant's conversations as read
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Conversation unread counter cleared
+ *       404:
+ *         description: Conversation not found in this tenant
+ */
+router.patch(
+  "/conversations/:id/read",
+  protect,
+  restrictTo("company", "admin"),
+  patchCompanyConversationRead,
 );
 
 /**

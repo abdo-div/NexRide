@@ -13,3 +13,15 @@
 body {
   font-family: var(--app-font);
 }
+/* Keep the legally required map credit compact and visually unobtrusive. */
+.vehicle-location-map .leaflet-control-attribution {
+  background: rgb(255 255 255 / 78%);
+  color: #64748b;
+  font-size: 9px;
+  line-height: 1.2;
+  padding: 2px 4px;
+}
+
+.vehicle-location-map .leaflet-control-attribution a {
+  color: #475569;
+}

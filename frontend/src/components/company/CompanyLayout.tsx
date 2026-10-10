@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
   Banknote,
@@ -7,6 +7,7 @@ import {
   CalendarDays,
   Car,
   Clock,
+  Globe2,
   LayoutDashboard,
   LogOut,
   MapPin,
@@ -32,7 +33,7 @@ const NAV_ENTRIES: NavEntry[] = [
   { path: "/company/fleet", labelKey: "company.layout.navFleet", icon: Car, enabled: true },
   { path: "/company/maintenance", labelKey: "company.layout.navMaintenance", icon: Wrench, enabled: true },
   { path: "/company/bookings", labelKey: "company.layout.navBookings", icon: CalendarDays, enabled: true },
-  { path: "/company/messages", labelKey: "company.layout.navMessages", icon: MessageSquareText, enabled: false },
+  { path: "/company/messages", labelKey: "company.layout.navMessages", icon: MessageSquareText, enabled: true },
   { path: "/company/payouts", labelKey: "company.layout.navPayouts", icon: Banknote, enabled: true },
   { path: "/company/reviews", labelKey: "company.layout.navReviews", icon: Star, enabled: true },
   { path: "/company/settings", labelKey: "company.layout.navSettings", icon: Settings, enabled: true },
@@ -81,10 +82,14 @@ export const CompanyLayout: React.FC = () => {
     return `${time} (${zone})`;
   }, [clock, i18n.language]);
 
-  const handleLogout = () => {
-    void signOut();
-    navigate("/");
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/", { replace: true });
   };
+
+  const viewWebsiteLabel = i18n.language.startsWith("ar")
+    ? "عرض الموقع"
+    : "View website";
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -144,6 +149,13 @@ export const CompanyLayout: React.FC = () => {
           </nav>
 
           <div className="border-t border-slate-200 bg-[#EFF4FF] p-4">
+            <Link
+              to="/"
+              className="mb-3 flex items-center gap-3 rounded-xl border border-[#C9D8F8] bg-white px-4 py-2.5 text-sm font-semibold text-[#2563EB] shadow-[0_1px_8px_rgba(0,0,0,0.04)] transition-colors hover:border-[#2563EB] hover:bg-[#E5EEFF]"
+            >
+              <Globe2 className="h-5 w-5" />
+              <span>{viewWebsiteLabel}</span>
+            </Link>
             <div className="flex items-center justify-between rounded-xl bg-white p-3 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
               <div className="flex min-w-0 items-center gap-2">
                 {companyLogoUrl(companyIdentity.logo) ? <img src={companyLogoUrl(companyIdentity.logo) ?? ""} alt={companyIdentity.name} className="h-9 w-9 shrink-0 rounded-full border border-slate-200 object-cover" /> : <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-white"><span className="text-xs font-bold">{initialsFrom(companyIdentity.name || user?.name || "N")}</span></div>}
@@ -158,7 +170,7 @@ export const CompanyLayout: React.FC = () => {
               </div>
               <button
                 type="button"
-                onClick={handleLogout}
+                onClick={() => void handleLogout()}
                 title={t("company.layout.logoutTitle")}
                 className="shrink-0 rounded-lg p-2 text-[#565E74] transition-colors hover:bg-[#E5EEFF] hover:text-[#BA1A1A] cursor-pointer"
               >

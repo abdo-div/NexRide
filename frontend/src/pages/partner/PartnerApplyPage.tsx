@@ -168,7 +168,7 @@ export const PartnerApplyPage: React.FC = () => {
 
   return (
     <div className="bg-[#F8FAFC] min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-24 pb-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20">
         <PartnerHero />
 
         {submitError ? (
@@ -181,7 +181,7 @@ export const PartnerApplyPage: React.FC = () => {
           </div>
         ) : null}
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
+        <div className="mt-10 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-8 xl:gap-12 items-start">
           <div className="flex flex-col gap-5">
             <PartnerWizard
               activeStep={activeStep}

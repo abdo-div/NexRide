@@ -41,6 +41,16 @@ export const companySettingsApi = {
     });
   },
 
+  updateCover: (coverImage: File, signal?: AbortSignal) => {
+    const body = new FormData();
+    body.append("coverImage", coverImage);
+    return request<CompanyUpdateResponse>("/companies/settings", {
+      method: "PATCH",
+      body,
+      signal,
+    });
+  },
+
   updatePassword: (input: CompanySettingsPasswordInput, signal?: AbortSignal) =>
     request<{ status: string }>("/users/update-my-password", {
       method: "PATCH",

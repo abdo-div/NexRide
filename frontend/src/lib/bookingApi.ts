@@ -37,6 +37,7 @@ export interface CreateBookingPayload {
   pickupLocation?: string;
   pickupMethod?: "BRANCH_PICKUP" | "DELIVERY";
   paymentMethod?: "CASH_ON_DELIVERY";
+  addonIds?: Array<"insurance" | "driver" | "childseat" | "delivery">;
 }
 
 /**

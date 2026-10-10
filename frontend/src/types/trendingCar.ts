@@ -8,7 +8,9 @@ export interface SpecItem {
 
 export interface TrendingCar {
   id: string;
+  companyId?: string;
   companyName: string;
+  companyLogo?: string;
   location: string;
   rating: number;
   reviewCount: number;

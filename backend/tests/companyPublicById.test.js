@@ -5,12 +5,13 @@ import { getCompanyById } from "../controllers/companyController.js";
 import * as companyService from "../services/companyService.js";
 
 const companyId = "aaaaaaaaaaaaaaaaaaaaaaaa";
-const safeFields = ["_id", "name", "slug", "logo", "description", "city"];
+const safeFields = ["_id", "name", "slug", "logo", "coverImage", "description", "city", "phone"];
 const privateCompany = {
   _id: companyId,
   name: "Approved Rentals",
   slug: "approved-rentals",
   logo: "approved-rentals.png",
+  coverImage: "approved-rentals-cover.webp",
   description: "Public company description",
   city: "Tripoli",
   ownerId: "bbbbbbbbbbbbbbbbbbbbbbbb",
@@ -75,8 +76,10 @@ test("approved, non-deleted company returns only the public DTO", async (t) => {
     name: "Approved Rentals",
     slug: "approved-rentals",
     logo: "approved-rentals.png",
+    coverImage: "approved-rentals-cover.webp",
     description: "Public company description",
     city: "Tripoli",
+    phone: "+218900000000",
   });
 });
 
@@ -141,7 +144,7 @@ test("public company-by-ID controller responds with only the safe DTO", async (t
   assert.equal("customCommissionRate" in responseBody.data.company, false);
   assert.equal("commissionAmount" in responseBody.data.company, false);
   assert.equal("email" in responseBody.data.company, false);
-  assert.equal("phone" in responseBody.data.company, false);
+  assert.equal(responseBody.data.company.phone, "+218900000000");
   assert.equal("address" in responseBody.data.company, false);
   assert.equal("approvedAt" in responseBody.data.company, false);
   assert.equal("createdAt" in responseBody.data.company, false);

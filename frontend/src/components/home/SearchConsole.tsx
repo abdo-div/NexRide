@@ -508,6 +508,13 @@ export const SearchConsole: React.FC = () => {
   useEffect(() => {
     if (!openPicker) return;
     const onDocClick = (e: MouseEvent) => {
+      const target = e.target;
+      if (
+        target instanceof Element &&
+        target.closest(`[data-search-picker="${openPicker}"]`)
+      ) {
+        return;
+      }
       const ref = pickRefs[openPicker];
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpenPicker(null);
@@ -601,7 +608,10 @@ export const SearchConsole: React.FC = () => {
           onSubmit={handleSubmit}
         >
           {/* Pick-up location */}
-          <div className="bg-white rounded-t-2xl lg:rounded-tr-none relative">
+          <div
+            data-search-picker="pickup"
+            className="bg-white rounded-t-2xl lg:rounded-tr-none relative"
+          >
             <LocationField
               label={t("home.search.pickup")}
               value={pickupLocation}
@@ -617,10 +627,11 @@ export const SearchConsole: React.FC = () => {
           </div>
 
           {/* Pick-up date & time */}
-          <div className="bg-white relative">
+          <div data-search-picker="from" className="bg-white relative">
             <button
               type="button"
               onClick={() => setOpenPicker(openPicker === "from" ? null : "from")}
+              aria-expanded={openPicker === "from"}
               className="w-full h-full flex items-center px-4 py-3.5 text-left"
             >
               {fromValue}
@@ -639,10 +650,11 @@ export const SearchConsole: React.FC = () => {
           </div>
 
           {/* Return date & time */}
-          <div className="bg-white lg:rounded-tr-2xl relative">
+          <div data-search-picker="to" className="bg-white lg:rounded-tr-2xl relative">
             <button
               type="button"
               onClick={() => setOpenPicker(openPicker === "to" ? null : "to")}
+              aria-expanded={openPicker === "to"}
               className="w-full h-full flex items-center px-4 py-3.5 text-left"
             >
               {toValue}
@@ -700,7 +712,7 @@ export const SearchConsole: React.FC = () => {
         {/* Different-return location */}
         {differentReturn && (
           <div className="mx-2 mb-2 rounded-xl bg-slate-50 border border-slate-200 relative overflow-visible">
-            <div className="bg-white rounded-xl relative">
+            <div data-search-picker="return" className="bg-white rounded-xl relative">
               <LocationField
                 label={t("home.search.returnLocation")}
                 value={returnLocation}

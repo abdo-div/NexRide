@@ -10,6 +10,7 @@ import {
   Car,
   Clock,
   CreditCard,
+  Globe2,
   LayoutDashboard,
   LoaderCircle,
   LogOut,
@@ -102,10 +103,14 @@ export const AdminLayout: React.FC = () => {
   const currentHubLabel =
     hub || (hubOptions.length > 0 ? t("admin.layout.allHubs") : t("admin.layout.dispatch"));
 
-  const handleLogout = () => {
-    void signOut();
-    navigate("/");
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/", { replace: true });
   };
+
+  const viewWebsiteLabel = i18n.language.startsWith("ar")
+    ? "عرض الموقع"
+    : "View website";
 
   return (
     <AdminHubContext.Provider value={{ hub, setHub }}>
@@ -180,6 +185,13 @@ export const AdminLayout: React.FC = () => {
             </nav>
 
             <div className="border-t border-slate-200 bg-[#EFF4FF] p-4">
+              <Link
+                to="/"
+                className="mb-3 flex items-center gap-3 rounded-xl border border-[#C9D8F8] bg-white px-4 py-2.5 text-sm font-semibold text-[#2563EB] shadow-[0_1px_8px_rgba(0,0,0,0.04)] transition-colors hover:border-[#2563EB] hover:bg-[#E5EEFF]"
+              >
+                <Globe2 className="h-5 w-5" />
+                <span>{viewWebsiteLabel}</span>
+              </Link>
               <div className="flex items-center justify-between rounded-xl bg-white p-3 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
                 <div className="flex min-w-0 items-center gap-2">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-white">
@@ -198,7 +210,7 @@ export const AdminLayout: React.FC = () => {
                 </div>
                 <button
                   type="button"
-                  onClick={handleLogout}
+                  onClick={() => void handleLogout()}
                   title={t("admin.layout.logoutTitle")}
                   className="shrink-0 rounded-lg p-2 text-[#565E74] transition-colors hover:bg-[#E5EEFF] hover:text-[#BA1A1A] cursor-pointer"
                 >

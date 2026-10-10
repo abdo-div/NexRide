@@ -8,10 +8,13 @@ import {
   changeLanguage,
   type LanguageKey,
 } from "../../i18n";
+import { useAuth } from "../../context/useAuth";
 
 export const Footer: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [email, setEmail] = useState("");
+  const { user } = useAuth();
+  const isCompany = user?.role?.trim() === "company";
   const lang = (i18n.language in LANGUAGES ? i18n.language : "ar") as LanguageKey;
 
   const EXPLORE_LINKS: FooterSection = {
@@ -25,7 +28,9 @@ export const Footer: React.FC = () => {
   const PARTNER_LINKS: FooterSection = {
     title: t("footer.forPartners"),
     links: [
-      { label: t("footer.partnerLinks.becomePartner"), href: "/partner/apply" },
+      ...(!isCompany
+        ? [{ label: t("footer.partnerLinks.becomePartner"), href: "/partner/apply" }]
+        : []),
       { label: t("footer.partnerLinks.partnerPortal"), href: "/login" },
     ],
   };

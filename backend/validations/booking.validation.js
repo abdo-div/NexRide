@@ -19,6 +19,10 @@ export const createBookingSchema = z.object({
       pickupMethod: ciEnum(["BRANCH_PICKUP", "DELIVERY"]).optional(),
       discountAmount: z.coerce.number().min(0).optional(),
       paymentMethod: z.enum(["CASH_ON_DELIVERY"]).optional(),
+      addonIds: z
+        .array(z.enum(["insurance", "driver", "childseat", "delivery"]))
+        .max(4)
+        .default([]),
     })
     .refine(dateRangeIsValid, dateRangeError),
 });

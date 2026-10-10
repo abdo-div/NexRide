@@ -15,6 +15,7 @@ import { CompanySettingsSecurityCard } from "../../components/company/CompanySet
 import type {
   CompanySettingsPasswordInput,
   CompanySettingsPayout,
+  CompanySettingsPreferences,
 } from "../../types/companySettings";
 
 /**
@@ -41,6 +42,8 @@ export const CompanySettingsPage: React.FC = () => {
     saveProfile,
     savePayout,
     saveLogo,
+    saveCover,
+    savePreferences,
     changePassword,
   } = useCompanySettings();
 
@@ -89,6 +92,21 @@ export const CompanySettingsPage: React.FC = () => {
   const handleLogo = async (file: File) => {
     const result = await saveLogo(file);
     showToast(result.ok ? t("company.settings.profile.logoSaved") : result.message || t("company.settings.toasts.savedError"));
+  };
+
+  const handleCover = async (file: File) => {
+    const result = await saveCover(file);
+    showToast(result.ok ? (t("company.settings.profile.coverSaved", { defaultValue: "Company cover updated." })) : result.message || t("company.settings.toasts.savedError"));
+  };
+
+  const handlePreference = async <S extends keyof CompanySettingsPreferences>(section: S, key: keyof CompanySettingsPreferences[S], value: boolean) => {
+    if (!data) return;
+    const preferences = {
+      ...data.profile.settingsPreferences,
+      [section]: { ...data.profile.settingsPreferences[section], [key]: value },
+    } as CompanySettingsPreferences;
+    const result = await savePreferences(preferences);
+    showToast(result.ok ? t("company.settings.toasts.saved") : result.message || t("company.settings.toasts.savedError"));
   };
 
   const scrollToSection = (id: string) => {
@@ -171,6 +189,7 @@ export const CompanySettingsPage: React.FC = () => {
                     onChange={updateDraft}
                     busy={busy}
                     onLogoChange={(file) => void handleLogo(file)}
+                    onCoverChange={(file) => void handleCover(file)}
                   />
                   <CompanySettingsBusinessCard
                     profile={data.profile}
@@ -180,9 +199,9 @@ export const CompanySettingsPage: React.FC = () => {
                     hubs={data.hubs}
                     onComingSoon={notifyComingSoon}
                   />
-                  <CompanySettingsPoliciesCard onComingSoon={notifyComingSoon} />
-                  <CompanySettingsBookingCard onComingSoon={notifyComingSoon} />
-                  <CompanySettingsNotificationsCard onComingSoon={notifyComingSoon} />
+                  <CompanySettingsPoliciesCard values={data.profile.settingsPreferences.policies} busy={busy} onToggle={(key, value) => void handlePreference("policies", key, value)} />
+                  <CompanySettingsBookingCard values={data.profile.settingsPreferences.booking} busy={busy} onToggle={(key, value) => void handlePreference("booking", key, value)} />
+                  <CompanySettingsNotificationsCard values={data.profile.settingsPreferences.notifications} busy={busy} onToggle={(key, value) => void handlePreference("notifications", key, value)} />
                   <CompanySettingsPayoutCard
                     commissionRate={data.profile.customCommissionRate}
                     payout={payoutDraft}

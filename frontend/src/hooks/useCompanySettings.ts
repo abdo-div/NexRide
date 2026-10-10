@@ -7,6 +7,7 @@ import type {
   CompanySettingsPatch,
   CompanySettingsPayout,
   CompanySettingsProfile,
+  CompanySettingsPreferences,
 } from "../types/companySettings";
 
 const EMPTY_PROFILE: CompanySettingsProfile = {
@@ -16,6 +17,7 @@ const EMPTY_PROFILE: CompanySettingsProfile = {
   slug: "",
   description: "",
   logo: "",
+  coverImage: "",
   email: "",
   phone: "",
   city: "",
@@ -26,6 +28,11 @@ const EMPTY_PROFILE: CompanySettingsProfile = {
   createdAt: null,
   customCommissionRate: null,
   payout: null,
+  settingsPreferences: {
+    policies: { minimumAge:false, allowedLicenses:false, idRequired:true, fuel:false, km:false, smoking:false },
+    booking: { instant:false, securityDeposit:false, lead:false, channel:false, extensions:false, cc:false },
+    notifications: { newBooking:true, dispatches:true, maintenance:false, payout:true, sms:false, weeklyEmail:true },
+  },
 };
 
 const EMPTY_PAYOUT: CompanySettingsPayout = {
@@ -162,6 +169,20 @@ export const useCompanySettings = () => {
     }
   }, [payoutDraft]);
 
+  const savePreferences = useCallback(async (preferences: CompanySettingsPreferences): Promise<SettingsMutationResult> => {
+    setBusy(true);
+    try {
+      await companySettingsApi.updateProfile({ settingsPreferences: preferences });
+      setData((current) => current ? { ...current, profile: { ...current.profile, settingsPreferences: preferences } } : current);
+      setDraft((current) => ({ ...current, settingsPreferences: preferences }));
+      return { ok: true, message: "" };
+    } catch (error) {
+      return { ok: false, message: errorMessage(error) };
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
   const changePassword = useCallback(
     async (input: CompanySettingsPasswordInput): Promise<SettingsMutationResult> => {
       setBusy(true);
@@ -191,6 +212,20 @@ export const useCompanySettings = () => {
     }
   }, []);
 
+  const saveCover = useCallback(async (file: File): Promise<SettingsMutationResult> => {
+    setBusy(true);
+    try {
+      await companySettingsApi.updateCover(file);
+      setAttempt((n) => n + 1);
+      window.dispatchEvent(new CustomEvent("nexride:company-profile-updated"));
+      return { ok: true, message: "" };
+    } catch (error) {
+      return { ok: false, message: errorMessage(error) };
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
   return {
     data,
     draft,
@@ -206,7 +241,9 @@ export const useCompanySettings = () => {
     updatePayoutDraft,
     saveProfile,
     savePayout,
+    savePreferences,
     saveLogo,
+    saveCover,
     changePassword,
   };
 };

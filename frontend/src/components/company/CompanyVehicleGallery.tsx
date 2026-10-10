@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Camera, ImagePlus } from "lucide-react";
 import type { CompanyVehicleProfile } from "../../types/companyVehicle";
+import { photoUrl, vehiclePlaceholderImage } from "../../lib/vehicleMapper";
 
 interface CompanyVehicleGalleryProps {
   vehicle: CompanyVehicleProfile;
@@ -35,9 +36,13 @@ export const CompanyVehicleGallery: React.FC<CompanyVehicleGalleryProps> = ({
       <div className="group relative h-[360px] w-full overflow-hidden rounded-xl bg-[#213145]">
         {current ? (
           <img
-            src={current}
+            src={photoUrl(current)}
             alt={`${vehicle.make} ${vehicle.model}`}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = vehiclePlaceholderImage;
+            }}
           />
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-white/60">
@@ -75,10 +80,14 @@ export const CompanyVehicleGallery: React.FC<CompanyVehicleGalleryProps> = ({
               aria-label={`${vehicle.make} ${vehicle.model} photo ${index + 2}`}
             >
               <img
-                src={photo}
+                src={photoUrl(photo)}
                 alt={`${vehicle.make} ${vehicle.model} ${index + 2}`}
                 className="h-full w-full object-cover"
                 loading="lazy"
+                onError={(event) => {
+                  event.currentTarget.onerror = null;
+                  event.currentTarget.src = vehiclePlaceholderImage;
+                }}
               />
             </button>
           ))}

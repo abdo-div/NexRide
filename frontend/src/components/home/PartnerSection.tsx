@@ -5,9 +5,12 @@ import { RocketLaunch as Rocket, ArrowRight, BookOpen } from "@phosphor-icons/re
 import { motion } from "framer-motion";
 import { PartnerDashboardMock } from "./PartnerDashboardMock";
 import { PartnerMetrics } from "./PartnerMetrics";
+import { useAuth } from "../../context/useAuth";
 
 export const PartnerSection: React.FC = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const isCompany = user?.role?.trim() === "company";
   return (
     <section className="w-full py-20 px-6 lg:px-12 bg-[#020617] border-b border-slate-900 text-white overflow-hidden">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -50,7 +53,7 @@ export const PartnerSection: React.FC = () => {
           <PartnerMetrics />
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap items-center gap-4">
+          {!isCompany && <div className="flex flex-wrap items-center gap-4">
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link
                 to="/partner/apply"
@@ -70,7 +73,7 @@ export const PartnerSection: React.FC = () => {
                 <BookOpen className="w-4 h-4 text-slate-400" />
               </Link>
             </motion.div>
-          </div>
+          </div>}
         </motion.div>
       </div>
     </section>

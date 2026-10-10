@@ -136,12 +136,17 @@ test("company fleet cannot be pivoted with a forged ?companyId", async (t) => {
     "deck + list pipelines must run",
   );
   const listPipeline = sinks.vehiclePipelines.find((p) => p.some((s) => s.$facet));
+  assert.ok(
+    listPipeline[0].$match.companyId instanceof mongoose.Types.ObjectId,
+    "aggregation tenant filters must use an ObjectId, not the JWT string",
+  );
   assert.equal(
     listPipeline[0].$match.companyId.toString(),
     companyA,
     "the register must stay pinned to tenant A despite ?companyId=B",
   );
   const deckPipeline = sinks.vehiclePipelines.find((p) => !p.some((s) => s.$facet));
+  assert.ok(deckPipeline[0].$match.companyId instanceof mongoose.Types.ObjectId);
   assert.equal(deckPipeline[0].$match.companyId.toString(), companyA);
   assert.equal(outcome.body.data.summary.total, 4);
   assert.equal(outcome.body.data.summary.available, 1);

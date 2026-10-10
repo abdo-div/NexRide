@@ -288,6 +288,7 @@ export const CompanyProfilePage: React.FC = () => {
   const name = company?.name ?? "";
   const initials = initialsFrom(name);
   const companyLogo = companyLogoUrl(company?.logo);
+  const companyCover = companyLogoUrl(company?.coverImage);
   const fleetSize = fleet.length;
   const totalCollected = starCounts.reduce((s, c) => s + c.count, 0);
   const mapQuery = encodeURIComponent(
@@ -380,8 +381,10 @@ export const CompanyProfilePage: React.FC = () => {
 
       {/* Hero card */}
       <section className="max-w-7xl mx-auto px-6 lg:px-12 pt-4 pb-8">
-        <div className="w-full bg-white rounded-2xl shadow-md overflow-hidden relative">
-          <div className="h-28 w-full bg-gradient-to-r from-[#1d4ed8] to-[#2563EB] relative overflow-hidden flex items-end justify-between px-8 pb-3">
+        <div className="w-full bg-white rounded-2xl border border-slate-200 shadow-[0_12px_36px_-16px_rgba(15,23,42,.28)] overflow-hidden relative">
+          <div className="h-52 sm:h-64 w-full bg-gradient-to-r from-[#0B1C30] via-[#153A6B] to-[#2563EB] relative overflow-hidden flex items-start justify-between px-6 md:px-8 pt-5">
+            {companyCover && <img src={companyCover} alt="" className="absolute inset-0 h-full w-full object-cover" />}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C30]/80 via-[#0B1C30]/20 to-[#0B1C30]/25" />
             <span className="text-[11px] tracking-widest text-blue-100 uppercase font-bold flex items-center gap-1.5 z-10">
               <ShieldCheck className="w-4 h-4" />
               {t("companyProfile.supplierTier")}
@@ -392,9 +395,9 @@ export const CompanyProfilePage: React.FC = () => {
             </span>
           </div>
 
-          <div className="p-6 md:p-8 -mt-10 relative z-20 flex flex-col lg:flex-row lg:items-start justify-between gap-8">
+          <div className="p-6 md:px-8 md:pb-8 -mt-14 relative z-20 flex flex-col lg:flex-row lg:items-start justify-between gap-8">
             <div className="flex flex-col sm:flex-row gap-5 items-start">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white shadow-xl p-2 flex flex-col items-center justify-center relative flex-shrink-0">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white shadow-xl ring-1 ring-slate-200 p-2 flex flex-col items-center justify-center relative flex-shrink-0">
                 {companyLogo ? <img src={companyLogo} alt={name} className="h-full w-full rounded-xl object-cover" /> : <div
                   className={`w-full h-full rounded-xl ${avatarGradient} flex flex-col items-center justify-center shadow-inner`}
                 >
@@ -473,7 +476,7 @@ export const CompanyProfilePage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setContactOpen((open) => !open)}
-                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-[14px] font-bold shadow-md transition-colors"
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#0B1C30] hover:bg-slate-800 text-white text-[14px] font-bold shadow-md transition-colors"
                 >
                   <Phone className="w-5 h-5" />
                   {t("companyProfile.contactCompany")}
@@ -492,6 +495,12 @@ export const CompanyProfilePage: React.FC = () => {
                   <p className="text-[12px] text-slate-500 leading-relaxed">
                     {t("companyProfile.contactNote", { name })}
                   </p>
+                  {company?.phone && (
+                    <a href={`tel:${company.phone}`} dir="ltr" className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[13px] font-bold text-[#0B1C30] ring-1 ring-slate-200 hover:text-[#2563EB]">
+                      <Phone className="h-4 w-4" />
+                      {company.phone}
+                    </a>
+                  )}
                   <a
                     href="#contact"
                     className="inline-flex items-center gap-2 text-[13px] font-bold text-[#2563EB] hover:underline"

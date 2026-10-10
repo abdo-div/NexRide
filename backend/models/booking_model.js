@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import PlatformSettings from "./PlatformSettings_model.js";
+import { calculateBookingExtras } from "../utils/bookingPricing.js";
 
 const bookingSchema = new mongoose.Schema(
   {
@@ -86,6 +87,26 @@ const bookingSchema = new mongoose.Schema(
       default: 0,
       min: [0, "Discount cannot be negative"],
     },
+    addonIds: {
+      type: [String],
+      enum: ["insurance", "driver", "childseat", "delivery"],
+      default: [],
+    },
+    addons: {
+      type: [
+        {
+          _id: false,
+          id: { type: String, required: true },
+          unit: { type: String, enum: ["DAY", "FLAT"], required: true },
+          unitPrice: { type: Number, min: 0, required: true },
+          quantity: { type: Number, min: 1, required: true },
+          amount: { type: Number, min: 0, required: true },
+        },
+      ],
+      default: [],
+    },
+    addonsTotal: { type: Number, default: 0, min: 0 },
+    municipalFee: { type: Number, default: 0, min: 0 },
     totalAmount: {
       type: Number,
       required: true,
@@ -192,7 +213,9 @@ bookingSchema.pre("validate", async function () {
     !this.isModified("endDate") &&
     !this.isModified("vehicleId") &&
     !this.isModified("companyId") &&
-    !this.isModified("discountAmount")
+    !this.isModified("discountAmount") &&
+    !this.isModified("addonIds") &&
+    !this.isModified("municipalFee")
   ) {
     return;
   }
@@ -233,7 +256,13 @@ bookingSchema.pre("validate", async function () {
 
   // 3. Compute base amounts
   this.rentalPrice = this.totalDays * this.dailyRate;
-  this.totalAmount = Math.max(0, this.rentalPrice - this.discountAmount);
+  const extras = calculateBookingExtras(this.addonIds, this.totalDays);
+  this.addons = extras.addons;
+  this.addonsTotal = extras.addonsTotal;
+  this.totalAmount = Math.max(
+    0,
+    this.rentalPrice + this.addonsTotal + this.municipalFee - this.discountAmount,
+  );
 
   // 4. Compute immutable NexRide commission & Company Payout split
   this.commissionAmount = Number(

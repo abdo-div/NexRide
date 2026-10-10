@@ -21,7 +21,6 @@ const VEHICLE_TYPES = ["SEDAN", "SUV", "HATCHBACK", "LUXURY", "VAN", "PICKUP"] a
  */
 export const CompanyVehicleEditInfo: React.FC<CompanyVehicleEditInfoProps> = ({
   form,
-  essentialOnly = false,
 }) => {
   const { t } = useTranslation();
   const { draft, fieldErrors, setField } = form;
@@ -45,7 +44,7 @@ export const CompanyVehicleEditInfo: React.FC<CompanyVehicleEditInfoProps> = ({
       }
     >
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {!essentialOnly && <EditField
+        <EditField
           label={t("company.editVehiclePage.info.make")}
           labelAr={t("company.editVehiclePage.info.makeAr")}
           value={draft.make}
@@ -53,8 +52,8 @@ export const CompanyVehicleEditInfo: React.FC<CompanyVehicleEditInfoProps> = ({
           placeholder={t("company.editVehiclePage.info.makePlaceholder")}
           onChange={(value) => setField("make", value)}
           error={fieldErrors.make}
-        />}
-        {!essentialOnly && <EditField
+        />
+        <EditField
           label={t("company.editVehiclePage.info.model")}
           labelAr={t("company.editVehiclePage.info.modelAr")}
           value={draft.model}
@@ -62,7 +61,7 @@ export const CompanyVehicleEditInfo: React.FC<CompanyVehicleEditInfoProps> = ({
           placeholder={t("company.editVehiclePage.info.modelPlaceholder")}
           onChange={(value) => setField("model", value)}
           error={fieldErrors.model}
-        />}
+        />
         <EditField
           label={t("company.editVehiclePage.info.year")}
           labelAr={t("company.editVehiclePage.info.yearAr")}

@@ -15,6 +15,7 @@ export interface CompanySettingsProfile {
   slug: string;
   description: string;
   logo: string;
+  coverImage: string;
   email: string;
   phone: string;
   city: string;
@@ -25,6 +26,13 @@ export interface CompanySettingsProfile {
   createdAt: string | null;
   customCommissionRate: number | null;
   payout: CompanySettingsPayout | null;
+  settingsPreferences: CompanySettingsPreferences;
+}
+
+export interface CompanySettingsPreferences {
+  policies: Record<"minimumAge" | "allowedLicenses" | "idRequired" | "fuel" | "km" | "smoking", boolean>;
+  booking: Record<"instant" | "securityDeposit" | "lead" | "channel" | "extensions" | "cc", boolean>;
+  notifications: Record<"newBooking" | "dispatches" | "maintenance" | "payout" | "sms" | "weeklyEmail", boolean>;
 }
 
 /** A pickup hub derived from the fleet's distinct pickup locations in use. */
@@ -59,6 +67,7 @@ export interface CompanySettingsPatch {
   city?: string;
   address?: string;
   payout?: CompanySettingsPayout;
+  settingsPreferences?: CompanySettingsPreferences;
 }
 
 /** Body accepted by PATCH /users/update-my-password. */

@@ -160,7 +160,14 @@ export const buildCompanyFleet = async ({ companyId, search, status, category, t
     throw new AppError("A valid company id is required for the fleet register.", 400);
   }
 
-  const company = await Company.findById(companyId).select("name slug city");
+  // Aggregation pipelines do not apply Mongoose schema casting. `protect()`
+  // deliberately exposes the tenant id as a string, while Vehicle.companyId
+  // is stored as an ObjectId, so matching with the raw session value silently
+  // produced an empty fleet. Canonicalize it once and use the ObjectId for
+  // every aggregate match below.
+  const tenantObjectId = new mongoose.Types.ObjectId(companyId);
+
+  const company = await Company.findById(tenantObjectId).select("name slug city");
   if (!company) {
     throw new AppError("No company exists for this fleet register.", 404);
   }
@@ -174,14 +181,18 @@ export const buildCompanyFleet = async ({ companyId, search, status, category, t
   const startToday = startOfDay(now);
   const endToday = new Date(startToday);
   endToday.setHours(23, 59, 59, 999);
-  const onRoadSet = await buildOnRoadSet({ companyId, start: startToday, end: endToday });
+  const onRoadSet = await buildOnRoadSet({
+    companyId: tenantObjectId,
+    start: startToday,
+    end: endToday,
+  });
   const onRoadIds = Array.from(onRoadSet);
 
   // ---------------------------------------------------------------------------
   // Summary — whole fleet posture (no list filters), one bucket per vehicle.
   // ---------------------------------------------------------------------------
   const [deckGroup] = await Vehicle.aggregate([
-    { $match: { companyId, deletedAt: null } },
+    { $match: { companyId: tenantObjectId, deletedAt: null } },
     { $addFields: vehicleClassField(onRoadIds) },
     {
       $group: {
@@ -226,7 +237,14 @@ export const buildCompanyFleet = async ({ companyId, search, status, category, t
   // ---------------------------------------------------------------------------
   // Paginated list (filters apply), classified with the same priority ladder.
   // ---------------------------------------------------------------------------
-  const pipeline = buildBasePipeline({ companyId, search, category, transmission, fuel, city });
+  const pipeline = buildBasePipeline({
+    companyId: tenantObjectId,
+    search,
+    category,
+    transmission,
+    fuel,
+    city,
+  });
   pipeline.push({ $addFields: vehicleClassField(onRoadIds) });
 
   if (status) {

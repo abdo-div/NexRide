@@ -2005,6 +2005,102 @@
       "logoutTitle": "Sign out",
       "soon": "Coming soon"
     },
+    "messagesPage": {
+      "breadcrumb": "Operations",
+      "primary": "Messages",
+      "title": "Messages",
+      "titleAr": "الرسائل",
+      "liveBadge": "Live inbox",
+      "subtitle": "Reply to the real booking threads raised by your customers",
+      "subtitleAr": "Manage every renter conversation in one place",
+      "scopedTenant": "Tenant · {{code}}",
+      "actions": {
+        "allChannels": "All Channels",
+        "channelInquiry": "Direct Enquiry",
+        "channelActiveBooking": "Active Booking",
+        "channelPostRental": "Post-Rental Support",
+        "markAllRead": "Mark All Read",
+        "broadcast": "Broadcast Notice",
+        "closeMenu": "Close menu"
+      },
+      "metrics": {
+        "activeTitle": "Active Conversations",
+        "activeSub": "{{count}} total threads",
+        "unreadTitle": "Unread Priority",
+        "unreadSub": "{{count}} conversations awaiting you",
+        "minutes": "{{value}} min",
+        "responseTitle": "Avg Response Speed",
+        "responseSub": "First reply after opening",
+        "satisfactionTitle": "Customer Satisfaction",
+        "satisfactionSub": "Share of 4★+ reviews"
+      },
+      "searchPlaceholder": "Search conversations, customers or references",
+      "filters": {
+        "all": "All",
+        "needsReply": "Needs Reply",
+        "activeRentals": "Active Rentals",
+        "postRental": "Post-Rental"
+      },
+      "channel": {
+        "inquiry": "Enquiry",
+        "activeBooking": "Active Booking",
+        "postRental": "Post-Rental"
+      },
+      "list": {
+        "empty": "No conversations yet",
+        "emptyHint": "Threads open automatically when a booking is created.",
+        "noMessages": "No messages yet",
+        "range": "{{from}}–{{to}} of {{total}}",
+        "previous": "Previous page",
+        "next": "Next page"
+      },
+      "thread": {
+        "selectTitle": "Select a conversation",
+        "selectHint": "Choose a thread from the directory to read and reply.",
+        "templatesLabel": "Quick replies",
+        "composerPlaceholder": "Write a reply to your customer…",
+        "send": "Send",
+        "composerHint": "Replies are stored on the booking thread.",
+        "replyAs": "Replying as Fleet Operator"
+      },
+      "templates": {
+        "showroom": "Your vehicle will be ready at our main branch — bring your licence and national ID.",
+        "airportMeet": "We can meet you at the airport arrivals hall; share your flight number and we will track it.",
+        "fuelPolicy": "The tank is handed over full and should be returned full to avoid a refuelling charge.",
+        "escrow": "Your deposit is held in escrow and released after the vehicle is returned and inspected."
+      },
+      "context": {
+        "empty": "Conversation details will appear here.",
+        "renterTitle": "Renter",
+        "phone": "Phone",
+        "phoneUnavailable": "Not provided",
+        "bookingTitle": "Active Reservation",
+        "reference": "Reference",
+        "vehicle": "Vehicle",
+        "dates": "Rental dates",
+        "pickup": "Pickup",
+        "pickupUnavailable": "Branch pickup",
+        "total": "Total",
+        "noBooking": "This conversation is not linked to a booking."
+      },
+      "broadcast": {
+        "title": "Broadcast Notice",
+        "subtitle": "Sent to every open conversation in your inbox",
+        "placeholder": "Write the notice your customers will receive…",
+        "cancel": "Cancel",
+        "send": "Send Notice",
+        "sending": "Sending…"
+      },
+      "states": {
+        "loadError": "We couldn't load your inbox. Please try again.",
+        "retry": "Retry"
+      },
+      "toasts": {
+        "markedRead": "All conversations marked as read",
+        "broadcastSuccess": "Notice sent to your open conversations",
+        "genericError": "Something went wrong. Please try again."
+      }
+    },
     "overview": {
       "command": "Fleet Operator",
       "grid": "Operations Dashboard",
@@ -3391,7 +3487,8 @@
         "longitude": "Longitude",
         "latitude": "Latitude",
         "cityPlaceholder": "For example: Tripoli",
-        "pickupPlaceholder": "Branch name or pickup address"
+        "pickupPlaceholder": "Branch name or pickup address",
+        "mapHint": "Click the map to set the pickup point"
       },
       "policies": {
         "title": "Rental Policies & Driver Requirements",

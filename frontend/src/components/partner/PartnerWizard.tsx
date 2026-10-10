@@ -115,9 +115,9 @@ export const PartnerWizard: React.FC<WizardProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="min-w-0 flex flex-col gap-6">
       {/* Tab bar */}
-      <div className="flex items-center overflow-x-auto gap-1 p-1.5 rounded-xl bg-[#EFF4FF] shadow-sm">
+      <div className="flex items-center overflow-x-auto gap-2 p-2 rounded-2xl bg-[#EFF4FF] shadow-sm">
         {Array.from({ length: STEP_COUNT }, (_, index) => index + 1).map((step) => {
           const isActive = step === activeStep;
           const isCompleted = step < activeStep;
@@ -126,7 +126,7 @@ export const PartnerWizard: React.FC<WizardProps> = ({
               key={step}
               type="button"
               onClick={() => onGoTo(step)}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 whitespace-nowrap transition-colors cursor-pointer ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer ${
                 isActive
                   ? "bg-white text-[#2563EB] shadow-sm"
                   : "text-[#434655] hover:text-[#0B1C30]"

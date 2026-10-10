@@ -9,6 +9,7 @@ export interface CompanyDto {
   address?: string;
   description?: string;
   logo?: string;
+  coverImage?: string;
   status?: string;
 }
 
@@ -28,8 +29,10 @@ export interface CompanyPublicDto {
   name: string;
   slug?: string;
   logo?: string;
+  coverImage?: string;
   description?: string;
   city?: string;
+  phone?: string;
 }
 
 interface CompanyResponse {

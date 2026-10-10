@@ -72,7 +72,7 @@ export const fetchPublicCompanyById = async (companyId) => {
     status: "APPROVED",
     deletedAt: null,
   })
-    .select("_id name slug logo description city")
+    .select("_id name slug logo coverImage description city phone")
     .lean();
 
   if (!company) {
@@ -84,8 +84,10 @@ export const fetchPublicCompanyById = async (companyId) => {
     name: company.name,
     slug: company.slug,
     logo: company.logo,
+    coverImage: company.coverImage,
     description: company.description,
     city: company.city,
+    phone: company.phone,
   };
 };
 
@@ -255,6 +257,7 @@ export const fetchCompanySettings = async (companyId) => {
       slug: company.slug,
       description: company.description ?? "",
       logo: company.logo ?? "",
+      coverImage: company.coverImage ?? "",
       email: company.email,
       phone: company.phone,
       city: company.city,
@@ -265,6 +268,7 @@ export const fetchCompanySettings = async (companyId) => {
       createdAt: company.createdAt ?? null,
       customCommissionRate: company.customCommissionRate ?? null,
       payout: company.payout ?? null,
+      settingsPreferences: company.settingsPreferences ?? {},
     },
     readiness: {
       verified: company.status === "APPROVED",

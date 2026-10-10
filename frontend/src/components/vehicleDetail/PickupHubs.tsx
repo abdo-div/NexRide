@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Building2, MapPin } from "lucide-react";
 import type { VehicleDetail } from "../../types/vehicleDetail";
+import { VehicleLocationMap } from "../maps/VehicleLocationMap";
 
 const HubIcon: React.FC<{ kind: "plane" | "building"; className?: string }> = ({
   kind,
@@ -36,16 +37,13 @@ export const PickupHubs: React.FC<{ detail: VehicleDetail }> = ({ detail }) => {
           </div>
         ))}
       </div>
-      <div className="w-full h-56 rounded-2xl border border-[#E2E8F0] relative overflow-hidden flex items-end p-4 shadow-inner bg-gradient-to-br from-blue-600/10 via-slate-100 to-slate-200">
-        {detail.mapImage && (
-          <img
-            src={detail.mapImage}
-            alt={t("vehicleDetail.mapAlt")}
-            className="absolute inset-0 w-full h-full object-cover opacity-40"
-          />
-        )}
-        <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px]" />
-        <div className="relative z-10 bg-white/95 border border-[#E2E8F0] p-3.5 rounded-2xl flex items-center justify-between w-full shadow-md">
+      <div className="relative">
+        <VehicleLocationMap
+          coordinates={detail.coordinates}
+          label={detail.hubs[0]?.name}
+          className="h-72"
+        />
+        <div className="absolute inset-x-4 bottom-4 z-[500] bg-white/95 border border-[#E2E8F0] p-3.5 rounded-2xl flex items-center justify-between shadow-md backdrop-blur-md">
           <div className="flex items-center gap-3">
             <MapPin className="w-[26px] h-[26px] text-[#2563EB] shrink-0" />
             <div>

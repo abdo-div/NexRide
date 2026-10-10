@@ -29,7 +29,7 @@ export const PartnerHero: React.FC = () => {
 
   return (
     <>
-      <section className="w-full bg-[#EFF4FF] px-6 lg:px-12 pt-8 pb-6">
+      <section className="w-full rounded-3xl bg-[#EFF4FF] px-5 sm:px-8 lg:px-12 pt-8 pb-8 overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-col gap-4">
           <nav className="flex items-center gap-1 text-xs font-semibold text-[#434655]" aria-label="Breadcrumb">
             <Link to="/" className="hover:text-[#004AC6] transition-colors">
@@ -70,12 +70,12 @@ export const PartnerHero: React.FC = () => {
         </div>
       </section>
 
-      <section className="w-full px-6 lg:px-12 mt-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section className="w-full px-0 sm:px-2 mt-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-7">
           {benefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="bg-white p-6 rounded-xl shadow-md flex items-start gap-4"
+              className="min-h-40 bg-white p-6 rounded-2xl border border-slate-100 shadow-md flex items-start gap-5"
             >
               <div
                 className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${benefit.tile}`}
