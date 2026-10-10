@@ -1,4 +1,5 @@
 import express from "express";
+import fs from "node:fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import morgan from "morgan";
@@ -86,6 +87,12 @@ import { isDevelopment } from "./config/env.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const backendPublicPath = path.join(__dirname, "public");
+const frontendDistPath = process.env.FRONTEND_DIST_DIR
+  ? path.resolve(process.env.FRONTEND_DIST_DIR)
+  : path.resolve(__dirname, "../frontend/dist");
+const frontendIndexPath = path.join(frontendDistPath, "index.html");
+const hasFrontendBuild = fs.existsSync(frontendIndexPath);
 
 const app = express();
 
@@ -149,7 +156,26 @@ if (isDevelopment()) {
 // 6. STATIC FILES
 // ============================================
 
-app.use(express.static(path.join(__dirname, "public")));
+// Static middleware must run before view, API and SPA fallback routes. Disabling
+// serve-static's directory redirects is important here: a request such as
+// /public/index.html must never bounce between a directory URL and the SPA.
+const staticOptions = { index: false, redirect: false };
+
+app.use("/public", express.static(backendPublicPath, staticOptions));
+app.use(express.static(backendPublicPath, staticOptions));
+
+if (hasFrontendBuild) {
+  // Keep compatibility with the old /public/index.html entry URL, but return
+  // the SPA document directly instead of redirecting to another public URL.
+  app.get("/public/index.html", (req, res) => {
+    res.sendFile(frontendIndexPath);
+  });
+
+  // Vite emits assets at the build root (/assets, /favicon.svg, etc.). The
+  // /public mount also supports legacy references such as /public/screen.png.
+  app.use("/public", express.static(frontendDistPath, staticOptions));
+  app.use(express.static(frontendDistPath, staticOptions));
+}
 
 // ============================================
 // 7. BODY PARSING
@@ -202,7 +228,12 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // 13. APPLICATION ROUTES
 // ============================================
 
-app.use("/", viewRouter);
+// The Pug pages are retained as a development/legacy fallback only. When a
+// React production build is present, letting these routes run first would
+// intercept SPA paths such as /fleet before the HTML fallback can serve them.
+if (!hasFrontendBuild) {
+  app.use("/", viewRouter);
+}
 
 app.use("/api/v1/cars", vehicleRouter);
 app.use("/api/v1/users", userRouter);
@@ -231,9 +262,39 @@ app.post(
 
 app.use("/api/v1/admin", adminRouter);
 
+// ============================================
+// 14. REACT SPA FALLBACK
+// ============================================
+
+if (hasFrontendBuild) {
+  app.get("/{*path}", (req, res, next) => {
+    const requestPath = req.path.toLowerCase();
+    const isApiRequest =
+      requestPath === "/api" || requestPath.startsWith("/api/");
+    const isPublicFileRequest =
+      requestPath === "/public" || requestPath.startsWith("/public/");
+    const isPhysicalFileRequest = path.posix.extname(requestPath) !== "";
+    const acceptsHtml = req.accepts("html");
+
+    // Missing assets and API endpoints must remain real 404s. Serving the SPA
+    // for either masks deployment errors and can create redirect loops in an
+    // upstream static host.
+    if (
+      isApiRequest ||
+      isPublicFileRequest ||
+      isPhysicalFileRequest ||
+      !acceptsHtml
+    ) {
+      return next();
+    }
+
+    return res.sendFile(frontendIndexPath);
+  });
+}
+
 
 // ============================================
-// 14. 404 - ROUTE NOT FOUND
+// 15. 404 - ROUTE NOT FOUND
 // ============================================
 
 app.all("/{*path}", (req, res, next) => {
@@ -241,7 +302,7 @@ app.all("/{*path}", (req, res, next) => {
 });
 
 // ============================================
-// 15. GLOBAL ERROR HANDLER
+// 16. GLOBAL ERROR HANDLER
 // ============================================
 
 app.use(globalErrorHandler);
