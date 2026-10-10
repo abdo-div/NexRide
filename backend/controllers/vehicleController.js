@@ -55,9 +55,11 @@ export const resizeVehicleImages = catchAsync(async (req, res, next) => {
 
 export const getAllVehicles = catchAsync(async (req, res, next) => {
   const publicOnly = req.user?.role !== "admin";
+  const publicTenantId =
+    req.tenantResolution === "domain" ? req.tenantId : null;
   const { vehicles, pagination } = await vehicleService.fetchAllVehicles(
     req.query,
-    req.tenantId,
+    publicOnly ? publicTenantId : req.tenantId,
     publicOnly,
   );
 
@@ -71,9 +73,11 @@ export const getAllVehicles = catchAsync(async (req, res, next) => {
 
 export const searchVehicles = catchAsync(async (req, res, next) => {
   // Public search combining customer filters with booking-calendar availability.
+  const publicTenantId =
+    req.tenantResolution === "domain" ? req.tenantId : null;
   const vehicles = await vehicleService.fetchAvailableVehicles(
     req.query,
-    req.tenantId,
+    publicTenantId,
   );
 
   res.status(200).json({
@@ -84,10 +88,13 @@ export const searchVehicles = catchAsync(async (req, res, next) => {
 });
 
 export const getVehicleById = catchAsync(async (req, res, next) => {
+  const publicOnly = req.user?.role !== "admin";
+  const publicTenantId =
+    req.tenantResolution === "domain" ? req.tenantId : null;
   const vehicle = await vehicleService.fetchVehicleById(
     req.params.id,
-    req.tenantId,
-    req.user?.role !== "admin",
+    publicOnly ? publicTenantId : req.tenantId,
+    publicOnly,
   );
 
   res.status(200).json({
