@@ -100,8 +100,13 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
 
           {/* Partner accreditation */}
           <div className="flex items-center gap-3 pt-1 flex-wrap">
-            {companyLogoUrl(vehicle.operator.logo) ? <img src={companyLogoUrl(vehicle.operator.logo) ?? ""} alt={vehicle.operator.name} className="h-6 w-6 rounded-full border border-blue-200 object-cover" /> : <div className="w-6 h-6 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center font-bold text-[10px] text-[#2563EB]">{vehicle.operator.initials}</div>}
-            <span className="text-sm font-semibold text-slate-800">{vehicle.operator.name}</span>
+            <Link
+              to={vehicle.operator.id ? `/companies/${vehicle.operator.id}` : "#"}
+              className="flex items-center gap-2 text-sm font-semibold text-slate-800 hover:text-[#2563EB]"
+            >
+              {companyLogoUrl(vehicle.operator.logo) ? <img src={companyLogoUrl(vehicle.operator.logo) ?? ""} alt={vehicle.operator.name} className="h-6 w-6 rounded-full border border-blue-200 object-cover" /> : <span className="flex h-6 w-6 items-center justify-center rounded-full border border-blue-200 bg-blue-100 text-[10px] font-bold text-[#2563EB]">{vehicle.operator.initials}</span>}
+              <span>{vehicle.operator.name}</span>
+            </Link>
             <span className="text-slate-300 text-xs">•</span>
             <div className="flex items-center text-[#F97316] text-xs font-bold">
               <Star className="w-3.5 h-3.5 fill-[#F97316] text-[#F97316] me-0.5" />

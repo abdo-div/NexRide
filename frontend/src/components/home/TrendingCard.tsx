@@ -4,6 +4,7 @@ import { Link } from "react-router";
 import { Heart, Star, ArrowRight } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import type { TrendingCar } from "../../types/trendingCar";
+import { companyLogoUrl, initialsFrom } from "../../lib/vehicleMapper";
 
 interface TrendingCardProps {
   car: TrendingCar;
@@ -79,10 +80,24 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car, index = 0 }) =>
       <div className="p-5 flex-1 flex flex-col justify-between">
         <div>
           {/* Partner Company & Rating */}
-          <div className="flex items-center justify-between text-xs mb-1">
-            <span className="font-semibold text-blue-600">
-              {car.companyName} • {car.location}
-            </span>
+          <div className="flex items-center justify-between gap-3 text-xs mb-2">
+            <Link
+              to={car.companyId ? `/companies/${car.companyId}` : "#"}
+              className="flex min-w-0 items-center gap-2 font-semibold text-blue-600 hover:text-blue-700"
+            >
+              {companyLogoUrl(car.companyLogo) ? (
+                <img
+                  src={companyLogoUrl(car.companyLogo) ?? ""}
+                  alt={car.companyName}
+                  className="h-7 w-7 shrink-0 rounded-full border border-blue-100 object-cover"
+                />
+              ) : (
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-blue-100 bg-blue-50 text-[9px] font-black text-blue-600">
+                  {initialsFrom(car.companyName)}
+                </span>
+              )}
+              <span className="truncate">{car.companyName} • {car.location}</span>
+            </Link>
             <div className="flex items-center gap-1 font-bold text-slate-700">
               <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
               <span>{car.rating.toFixed(1)}</span>

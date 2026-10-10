@@ -51,4 +51,20 @@ export const authApi = {
     }),
 
   me: () => request<MeResponse>("/users/me"),
+
+  updateProfile: (profile: FormData) =>
+    request<MeResponse>("/users/update-me", {
+      method: "PATCH",
+      body: profile,
+    }),
+
+  updatePassword: (input: {
+    passwordCurrent: string;
+    password: string;
+    passwordConfirm: string;
+  }) =>
+    request<SessionResponse>("/users/update-my-password", {
+      method: "PATCH",
+      body: input,
+    }),
 };

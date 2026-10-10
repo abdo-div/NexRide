@@ -4,6 +4,7 @@ import {
   Award,
   Building2,
   CloudUpload,
+  ImageIcon,
 } from "lucide-react";
 import { CompanySettingsSection } from "./CompanySettingsSection";
 import type {
@@ -79,6 +80,7 @@ interface CompanySettingsProfileCardProps {
   onChange: (field: EditableCompanyField, value: string) => void;
   busy: boolean;
   onLogoChange: (file: File) => void;
+  onCoverChange: (file: File) => void;
 }
 
 /**
@@ -92,11 +94,16 @@ export const CompanySettingsProfileCard: React.FC<CompanySettingsProfileCardProp
   onChange,
   busy,
   onLogoChange,
+  onCoverChange,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const logoInput = useRef<HTMLInputElement>(null);
+  const coverInput = useRef<HTMLInputElement>(null);
   const [logoError, setLogoError] = useState("");
+  const [coverError, setCoverError] = useState("");
   const logo = companyLogoUrl(draft.logo);
+  const cover = companyLogoUrl(draft.coverImage);
+  const isArabic = i18n.language.startsWith("ar");
 
   const chooseLogo = (files: FileList | null) => {
     const file = files?.[0];
@@ -110,6 +117,18 @@ export const CompanySettingsProfileCard: React.FC<CompanySettingsProfileCardProp
     if (logoInput.current) logoInput.current.value = "";
   };
 
+  const chooseCover = (files: FileList | null) => {
+    const file = files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/") || file.size > 8 * 1024 * 1024) {
+      setCoverError(isArabic ? "اختر صورة أصغر من 8 ميجابايت." : "Choose an image smaller than 8 MB.");
+      return;
+    }
+    setCoverError("");
+    onCoverChange(file);
+    if (coverInput.current) coverInput.current.value = "";
+  };
+
   return (
     <CompanySettingsSection
       id="settings-profile"
@@ -118,6 +137,19 @@ export const CompanySettingsProfileCard: React.FC<CompanySettingsProfileCardProp
       description={t("company.settings.profile.description")}
       icon={<Building2 className="h-5 w-5" aria-hidden="true" />}
     >
+      <div className="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-[#EFF4FF]">
+        <div className="relative h-40 w-full overflow-hidden bg-gradient-to-r from-[#0B1C30] via-[#153A6B] to-[#2563EB]">
+          {cover ? <img src={cover} alt="" className="absolute inset-0 h-full w-full object-cover" /> : <div className="absolute inset-0 grid place-items-center text-blue-100"><ImageIcon className="h-10 w-10" /></div>}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C30]/55 to-transparent" />
+          <div className="absolute bottom-4 start-4 text-white">
+            <p className="text-sm font-extrabold">{isArabic ? "صورة غلاف الشركة" : "Company cover image"}</p>
+            <p className="mt-0.5 text-[11px] text-white/75">{isArabic ? "تظهر أعلى صفحة شركتك العامة" : "Shown at the top of your public company page"}</p>
+          </div>
+          <input ref={coverInput} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => chooseCover(e.target.files)} />
+          <button type="button" disabled={busy} onClick={() => coverInput.current?.click()} className="absolute bottom-4 end-4 inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[11px] font-extrabold text-[#0B1C30] shadow-lg hover:bg-[#EFF4FF] disabled:opacity-60"><CloudUpload className="h-3.5 w-3.5" />{busy ? (isArabic ? "جارٍ الرفع..." : "Uploading...") : (isArabic ? "تغيير الغلاف" : "Change cover")}</button>
+        </div>
+        {coverError && <p className="px-4 py-2 text-[11px] font-semibold text-[#BA1A1A]">{coverError}</p>}
+      </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <InputField
           label={t("company.settings.profile.brandName")}

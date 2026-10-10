@@ -44,14 +44,14 @@ export const ReadonlyField: React.FC<ReadonlyFieldProps> = ({
 }) => (
   <div className="flex flex-col gap-1.5">
     <div className="flex items-center justify-between gap-2">
-      <label className="text-xs font-bold text-[#0B1C30] dark:text-white">{label}</label>
+      <label className="text-xs font-bold text-[#0B1C30]">{label}</label>
       {labelAr && <span className="text-[11px] text-[#9AA4B5]">({labelAr})</span>}
     </div>
     <div
       className={`flex min-h-[42px] w-full items-center justify-between gap-2 rounded-xl border border-[#E5E7EB] bg-[#F7F9FC] px-3.5 py-2.5 text-sm ${
         comingSoon
           ? "cursor-not-allowed text-[#9AA4B5] opacity-70"
-          : "font-semibold text-[#0B1C30] dark:text-white"
+          : "font-semibold text-[#0B1C30]"
       }`}
     >
       <span className="truncate">{comingSoon ? "—" : (value ?? "—")}</span>
@@ -119,7 +119,7 @@ export const EditField: React.FC<EditFieldProps> = ({
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between gap-2">
-        <label htmlFor={fieldId} className="text-xs font-bold text-[#0B1C30] dark:text-white">
+        <label htmlFor={fieldId} className="text-xs font-bold text-[#0B1C30]">
           {label}{required && <span className="ms-1 text-[#DC2626]">*</span>}
         </label>
         {labelAr && labelAr !== label && <span className="text-[11px] text-[#9AA4B5]">({labelAr})</span>}

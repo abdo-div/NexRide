@@ -135,7 +135,10 @@ export const buildVehicleDetail = (
         description: city ? `${city}, Libya` : vehicle.title,
       },
     ],
-    mapUrl: city
+    coordinates: dto.location?.coordinates ?? null,
+    mapUrl: dto.location?.coordinates
+      ? `https://www.google.com/maps/search/?api=1&query=${dto.location.coordinates[1]},${dto.location.coordinates[0]}`
+      : city
       ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${city}, Libya`)}`
       : undefined,
     conciergeTitle: "vehicleDetail.conciergePickupTitle",

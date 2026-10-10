@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 import { Star, ArrowRight, ShieldCheck } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import type { FleetOperator } from "../../types/operators";
@@ -81,13 +82,14 @@ export const OperatorCard: React.FC<OperatorCardProps> = ({ operator, index = 0 
       </div>
 
       {/* View Agency Fleet Button */}
-      <a
-        href={`#operator-${operator.id}`}
+      <Link
+        to={`/companies/${operator.id}`}
+        aria-label={`${t("home.operators.viewFleet")} — ${operator.name}`}
         className="w-full mt-4 py-2.5 rounded-xl bg-slate-100/80 hover:bg-blue-600 hover:text-white text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors group/btn"
       >
         <span>{t("home.operators.viewFleet")}</span>
         <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 rtl:rotate-180 rtl:group-hover/btn:-translate-x-1 transition-transform" />
-      </a>
+      </Link>
     </motion.div>
   );
 };

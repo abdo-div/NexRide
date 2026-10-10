@@ -44,6 +44,8 @@ const MODEL_MODULES = [
   "../models/review_model.js",
   "../models/Maintenance_model.js",
   "../models/PlatformSettings_model.js",
+  "../models/conversation_model.js",
+  "../models/message_model.js",
 ];
 
 const dryRun = process.argv.includes("--dry-run");

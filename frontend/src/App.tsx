@@ -38,6 +38,7 @@ const CompanyApplicationStatusPage = lazy(
 );
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 const MyBookingsPage = lazy(() => import("./pages/MyBookingsPage"));
+const MyProfilePage = lazy(() => import("./pages/MyProfilePage"));
 const BookingDetailsPage = lazy(() => import("./pages/BookingDetailsPage"));
 
 const AdminOverviewPage = lazy(() =>
@@ -140,6 +141,12 @@ const CompanySettingsPage = lazy(() =>
 const CompanyReviewsPage = lazy(() =>
   import("./pages/company/CompanyReviewsPage").then((module) => ({
     default: module.CompanyReviewsPage,
+  })),
+);
+
+const CompanyMessagesPage = lazy(() =>
+  import("./pages/company/CompanyMessagesPage").then((module) => ({
+    default: module.CompanyMessagesPage,
   })),
 );
 
@@ -345,6 +352,16 @@ function App() {
               }
             />
             <Route
+              path="/my-profile"
+              element={
+                <ProtectedRoute>
+                  <LazyRoute>
+                    <MyProfilePage />
+                  </LazyRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/my-bookings/:bookingId"
               element={
                 <ProtectedRoute>
@@ -398,6 +415,7 @@ function App() {
             <Route path="fleet/:vehicleId/edit" element={<CompanyVehicleEditPage />} />
             <Route path="maintenance" element={<CompanyMaintenancePage />} />
             <Route path="reviews" element={<CompanyReviewsPage />} />
+            <Route path="messages" element={<CompanyMessagesPage />} />
             <Route path="payouts" element={<CompanyEarningsPage />} />
             <Route path="settings" element={<CompanySettingsPage />} />
           </Route>

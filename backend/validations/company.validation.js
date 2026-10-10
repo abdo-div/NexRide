@@ -38,10 +38,21 @@ const companyPayoutBody = z.object({
   iban: z.string().trim().max(40, "IBAN cannot exceed 40 characters").optional(),
 });
 
+const booleanSettings = (keys) =>
+  z.object(Object.fromEntries(keys.map((key) => [key, z.boolean().optional()]))).partial();
+
+const settingsPreferencesBody = z.object({
+  policies: booleanSettings(["minimumAge", "allowedLicenses", "idRequired", "fuel", "km", "smoking"]).optional(),
+  booking: booleanSettings(["instant", "securityDeposit", "lead", "channel", "extensions", "cc"]).optional(),
+  notifications: booleanSettings(["newBooking", "dispatches", "maintenance", "payout", "sms", "weeklyEmail"]).optional(),
+});
+
 export const updateCompanySchema = z.object({
   body: companyBody.partial().extend({
     logo: z.string().trim().max(255).optional(),
+    coverImage: z.string().trim().max(255).optional(),
     payout: companyPayoutBody.partial().optional(),
+    settingsPreferences: settingsPreferencesBody.partial().optional(),
   }),
 });
 

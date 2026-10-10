@@ -10,7 +10,11 @@ import { useAuth } from "../../context/useAuth";
 export const NavBar: React.FC = () => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const isCustomer = isAuthenticated && user?.role?.trim() === "customer";
+  const isCompany = user?.role?.trim() === "company";
+  const isAdmin = user?.role?.trim() === "admin";
+  const canApplyAsPartner = !isCompany && !isAdmin;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isHomePage = location.pathname === "/";
 
@@ -71,7 +75,7 @@ export const NavBar: React.FC = () => {
             {t("nav.contact")}
           </Link>
 
-          {isAuthenticated && (
+          {isCustomer && (
             <Link
               to="/my-bookings"
               className="px-3.5 py-1.5 rounded-full text-slate-600 hover:text-blue-600 hover:bg-white/60 transition-all"
@@ -159,27 +163,30 @@ export const NavBar: React.FC = () => {
               >
                 {t("nav.contact")}
               </Link>
-              {isAuthenticated && (
-                <Link
-                  to="/my-bookings"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
-                >
-                  {t("nav.myBookings")}
-                </Link>
+              {isCustomer && (
+                <>
+                  <Link to="/my-profile" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all">
+                    {i18n.language === "ar" ? "ملفي الشخصي" : "My profile"}
+                  </Link>
+                  <Link to="/my-bookings" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all">
+                    {t("nav.myBookings")}
+                  </Link>
+                </>
               )}
             </div>
 
-            <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
-              <Link
-                to="/partner/apply"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md flex items-center justify-center gap-2"
-              >
-                <Zap className="w-4 h-4 fill-amber-300 text-amber-300" />
-                <span>{t("nav.listFleet")}</span>
-              </Link>
-            </div>
+            {canApplyAsPartner && (
+              <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
+                <Link
+                  to="/partner/apply"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md flex items-center justify-center gap-2"
+                >
+                  <Zap className="w-4 h-4 fill-amber-300 text-amber-300" />
+                  <span>{t("nav.listFleet")}</span>
+                </Link>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

@@ -149,11 +149,13 @@ export const useHomeData = (): HomeDataState => {
           b.ratingsQuantity - a.ratingsQuantity,
       )
       .slice(0, 3)
-      .map((vehicle) => ({
+      .map((vehicle) => {
+        const company = isCompanyRef(vehicle.companyId) ? vehicle.companyId : null;
+        return {
         id: vehicle._id,
-        companyName: isCompanyRef(vehicle.companyId)
-          ? vehicle.companyId.name?.trim() ?? ""
-          : "",
+        companyId: company?._id ?? "",
+        companyName: company?.name?.trim() || "NexRide partner",
+        companyLogo: company?.logo,
         location: vehicle.city,
         rating: vehicle.ratingsAverage,
         reviewCount: vehicle.ratingsQuantity,
@@ -166,7 +168,8 @@ export const useHomeData = (): HomeDataState => {
         dailyPrice: vehicle.dailyPrice,
         currency: "LYD",
         href: `/vehicles/${vehicle._id}`,
-      }));
+      };
+      });
   };
 
   const buildCategories = (): VehicleCategory[] =>

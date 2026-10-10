@@ -146,6 +146,8 @@ export interface VehicleDetail {
   mapImage?: string;
   /** Optional real link target for the delivery-zone map; falls back to "JavaScript:void" when absent. */
   mapUrl?: string;
+  /** Pickup point in GeoJSON order: [longitude, latitude]. */
+  coordinates?: [number, number] | null;
   /**
    * False when checkout has not been connected to this vehicle yet. The
    * Reserve button is then disabled instead of handing a real vehicle over to

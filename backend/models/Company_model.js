@@ -71,6 +71,10 @@ const companySchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    coverImage: {
+      type: String,
+      default: "",
+    },
 
     // -------------------------------------------------------------------------
     // Contact & Business Verification
@@ -251,6 +255,32 @@ const companySchema = new mongoose.Schema(
         accountName: { type: String, trim: true, default: "" },
       },
       default: {},
+    },
+    settingsPreferences: {
+      policies: {
+        minimumAge: { type: Boolean, default: false },
+        allowedLicenses: { type: Boolean, default: false },
+        idRequired: { type: Boolean, default: true },
+        fuel: { type: Boolean, default: false },
+        km: { type: Boolean, default: false },
+        smoking: { type: Boolean, default: false },
+      },
+      booking: {
+        instant: { type: Boolean, default: false },
+        securityDeposit: { type: Boolean, default: false },
+        lead: { type: Boolean, default: false },
+        channel: { type: Boolean, default: false },
+        extensions: { type: Boolean, default: false },
+        cc: { type: Boolean, default: false },
+      },
+      notifications: {
+        newBooking: { type: Boolean, default: true },
+        dispatches: { type: Boolean, default: true },
+        maintenance: { type: Boolean, default: false },
+        payout: { type: Boolean, default: true },
+        sms: { type: Boolean, default: false },
+        weeklyEmail: { type: Boolean, default: true },
+      },
     },
     // Documents uploaded as part of the partner application.
     applicationDocuments: {

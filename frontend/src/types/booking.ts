@@ -53,6 +53,16 @@ export interface BookingDto {
   totalDays: number;
   rentalPrice: number;
   discountAmount: number;
+  addonIds?: string[];
+  addons?: Array<{
+    id: string;
+    unit: "DAY" | "FLAT";
+    unitPrice: number;
+    quantity: number;
+    amount: number;
+  }>;
+  addonsTotal?: number;
+  municipalFee?: number;
   totalAmount: number;
   commissionRate: number;
   commissionAmount: number;

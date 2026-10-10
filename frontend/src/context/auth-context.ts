@@ -11,6 +11,8 @@ export interface AuthContextValue {
   signOut: () => Promise<void>;
   /** Adopts a token + user pair issued outside sign-in/sign-up (password reset). */
   adoptSession: (token: string, user: AuthUser) => void;
+  /** Replaces the cached account after an authenticated profile mutation. */
+  updateUser: (user: AuthUser) => void;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);

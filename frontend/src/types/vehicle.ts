@@ -103,6 +103,8 @@ export interface VehicleDto {
   listingStatus: VehicleListingStatus;
   city: string;
   pickupLocation: string;
+  /** GeoJSON Point; coordinates are [longitude, latitude]. */
+  location?: { type: "Point"; coordinates: [number, number] } | null;
   ratingsAverage: number;
   ratingsQuantity: number;
   createdAt?: string;

@@ -94,7 +94,7 @@ export const SettingRow: React.FC<SettingRowProps> = ({
 }) => {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-50 py-3.5 last:border-0">
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-5 border-b border-slate-100 py-4 last:border-0">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm font-semibold text-[#0B1C30]">{label}</span>
@@ -120,24 +120,32 @@ export const SettingRow: React.FC<SettingRowProps> = ({
 };
 
 interface SettingToggleProps {
-  /** Presentation-only: every toggle on the settings pages is unmodelled today. */
   enabled?: boolean;
+  disabled?: boolean;
+  label?: string;
+  onChange?: (enabled: boolean) => void;
 }
 
-/** Read-only switch visual for rows whose behavior is not wired to a model yet. */
-export const SettingToggle: React.FC<SettingToggleProps> = ({ enabled = false }) => {
+/** Accessible persisted switch with stable thumb direction in RTL layouts. */
+export const SettingToggle: React.FC<SettingToggleProps> = ({ enabled = false, disabled = false, label, onChange }) => {
   return (
-    <span
-      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
-        enabled ? "bg-[#2563EB]" : "bg-[#E5E7EB]"
+    <button
+      type="button"
+      role="switch"
+      dir="ltr"
+      aria-checked={enabled}
+      aria-label={label}
+      disabled={disabled}
+      onClick={() => onChange?.(!enabled)}
+      className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full p-1 shadow-inner transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
+        enabled ? "bg-[#2563EB]" : "bg-[#CBD5E1]"
       }`}
-      aria-hidden="true"
     >
       <span
-        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
-          enabled ? "translate-x-5" : "translate-x-0.5"
+        className={`block h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200 ${
+          enabled ? "translate-x-5" : "translate-x-0"
         }`}
       />
-    </span>
+    </button>
   );
 };

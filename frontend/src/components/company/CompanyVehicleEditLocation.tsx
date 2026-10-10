@@ -4,6 +4,7 @@ import { MapPin, Navigation } from "lucide-react";
 import type { CompanyVehicleEditForm } from "../../hooks/useCompanyVehicleEditForm";
 import { SectionCard } from "./CompanyVehicleBits";
 import { EditField } from "./CompanyVehicleEditBits";
+import { VehicleLocationMap } from "../maps/VehicleLocationMap";
 
 interface CompanyVehicleEditLocationProps {
   form: CompanyVehicleEditForm;
@@ -18,11 +19,16 @@ interface CompanyVehicleEditLocationProps {
  */
 export const CompanyVehicleEditLocation: React.FC<CompanyVehicleEditLocationProps> = ({
   form,
-  essentialOnly = false,
 }) => {
   const { t } = useTranslation();
   const { draft, fieldErrors, setField } = form;
   const { coordinates, gpsActive } = form.previewVehicle;
+  const lng = Number(draft.lng);
+  const lat = Number(draft.lat);
+  const draftCoordinates: [number, number] | null =
+    draft.lng.trim() && draft.lat.trim() && Number.isFinite(lng) && Number.isFinite(lat)
+      ? [lng, lat]
+      : coordinates;
 
   return (
     <SectionCard
@@ -53,12 +59,26 @@ export const CompanyVehicleEditLocation: React.FC<CompanyVehicleEditLocationProp
         />
       </div>
 
-      {!essentialOnly && <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="mt-4">
+        <VehicleLocationMap
+          coordinates={draftCoordinates}
+          editable
+          label={draft.pickupLocation || draft.city}
+          onChange={(longitude, latitude) => {
+            setField("lng", longitude.toFixed(6));
+            setField("lat", latitude.toFixed(6));
+          }}
+          pickerHint={t("company.editVehiclePage.location.mapHint")}
+          className="h-72"
+        />
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
         <EditField label={t("company.editVehiclePage.location.longitude")} type="number" min={-180} max={180} value={draft.lng} onChange={(v) => setField("lng", v)} error={fieldErrors.lng} />
         <EditField label={t("company.editVehiclePage.location.latitude")} type="number" min={-90} max={90} value={draft.lat} onChange={(v) => setField("lat", v)} error={fieldErrors.lat} />
-      </div>}
-      {!essentialOnly && <div className="mt-4 flex items-center justify-between rounded-xl bg-[#F1F5F9] px-4 py-3">
-        <span className="flex items-center gap-2 text-xs font-semibold text-[#0B1C30] dark:text-white">
+      </div>
+      <div className="mt-4 flex items-center justify-between rounded-xl bg-[#F1F5F9] px-4 py-3">
+        <span className="flex items-center gap-2 text-xs font-semibold text-[#0B1C30]">
           <Navigation className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
           {t("company.editVehiclePage.location.coords")}
         </span>
@@ -85,7 +105,7 @@ export const CompanyVehicleEditLocation: React.FC<CompanyVehicleEditLocationProp
             {t("company.editVehiclePage.location.noCoords")}
           </span>
         )}
-      </div>}
+      </div>
 
     </SectionCard>
   );

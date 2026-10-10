@@ -18,6 +18,11 @@ import {
   buildDateOverlapFilter,
 } from "../utils/bookingStatus.js";
 import { getPlatformPolicy } from "../services/platformPolicyService.js";
+import { ensureBookingConversation } from "../services/companyMessagesService.js";
+import {
+  calculateBookingExtras,
+  MUNICIPAL_FEE_LYD,
+} from "../utils/bookingPricing.js";
 // Administrative register.
 //
 // The search allowlist lives in the service (`BOOKING_SEARCH_FIELDS`) because the
@@ -114,6 +119,7 @@ export const createBooking = catchAsync(async (req, res, next) => {
     endDate,
     pickupLocation,
     paymentMethod,
+    addonIds = [],
   } = req.body;
   const start = new Date(startDate);
   const end = new Date(endDate);
@@ -251,7 +257,9 @@ export const createBooking = catchAsync(async (req, res, next) => {
     }
 
     const rentalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-    const totalAmount = rentalDays * claimed.dailyPrice;
+    const rentalPrice = rentalDays * claimed.dailyPrice;
+    const extras = calculateBookingExtras(addonIds, rentalDays);
+    const totalAmount = rentalPrice + extras.addonsTotal + MUNICIPAL_FEE_LYD;
     // The Booking pre-validation hook applies the company's override. These
     // values satisfy required fields until that authoritative snapshot runs.
     const platformPolicy = await getPlatformPolicy();
@@ -270,7 +278,11 @@ export const createBooking = catchAsync(async (req, res, next) => {
           pickupLocation: pickupLocation || vehicle.pickupLocation,
           dailyRate: vehicle.dailyPrice,
           totalDays: rentalDays,
-          rentalPrice: totalAmount,
+          rentalPrice,
+          addonIds,
+          addons: extras.addons,
+          addonsTotal: extras.addonsTotal,
+          municipalFee: MUNICIPAL_FEE_LYD,
           totalAmount,
           commissionRate,
           commissionAmount,
@@ -310,6 +322,12 @@ export const createBooking = catchAsync(async (req, res, next) => {
     if (lock) await safelyRelease(() => lock.release());
     await safelyRelease(() =>
       bookingConcurrency.releaseVehicleHold(vehicleId),
+    );
+
+    // Open the operator inbox thread for this booking. Best-effort: a messaging
+    // failure must never fail a committed booking, so it is caught and ignored.
+    await ensureBookingConversation(booking, { vehicle: claimed }).catch(
+      () => {},
     );
 
     const data = { booking };

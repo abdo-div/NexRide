@@ -3,28 +3,39 @@ import AppError from "../utils/appError.js";
 import * as companyService from "../services/companyService.js";
 import Company from "../models/Company_model.js";
 import multer from "multer";
-import { saveCompanyLogo } from "../utils/companyImages.js";
+import { saveCompanyCover, saveCompanyLogo } from "../utils/companyImages.js";
 
 const logoUpload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+  limits: { fileSize: 8 * 1024 * 1024, files: 2 },
   fileFilter: (_req, file, cb) => {
     if (file.mimetype.startsWith("image/")) return cb(null, true);
     cb(new AppError("Please upload an image file.", 400), false);
   },
 });
 
-export const uploadCompanyLogo = logoUpload.single("logo");
+export const uploadCompanyLogo = logoUpload.fields([
+  { name: "logo", maxCount: 1 },
+  { name: "coverImage", maxCount: 1 },
+]);
 
 export const processCompanyLogo = catchAsync(async (req, _res, next) => {
-  if (!req.file) {
-    delete req.body.logo;
-    return next();
-  }
   const companyId = req.tenantId || req.user.company;
   if (!companyId) return next(new AppError("No company profile linked to this user account.", 400));
-  const filename = `company-${companyId}-${Date.now()}.webp`;
-  req.body.logo = await saveCompanyLogo(req.file.buffer, filename);
+  const logo = req.files?.logo?.[0];
+  const cover = req.files?.coverImage?.[0];
+  if (logo) {
+    const filename = `company-${companyId}-${Date.now()}.webp`;
+    req.body.logo = await saveCompanyLogo(logo.buffer, filename);
+  } else {
+    delete req.body.logo;
+  }
+  if (cover) {
+    const filename = `company-cover-${companyId}-${Date.now()}.webp`;
+    req.body.coverImage = await saveCompanyCover(cover.buffer, filename);
+  } else {
+    delete req.body.coverImage;
+  }
   next();
 });
 

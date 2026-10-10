@@ -1,64 +1,11 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Bell, BellRing } from "lucide-react";
-import {
-  CompanySettingsSection,
-  SettingRow,
-  SettingToggle,
-} from "./CompanySettingsSection";
+import { Bell } from "lucide-react";
+import { CompanySettingsSection, SettingRow, SettingToggle } from "./CompanySettingsSection";
+import type { CompanySettingsPreferences } from "../../types/companySettings";
 
-interface CompanySettingsNotificationsCardProps {
-  onComingSoon: () => void;
-}
-
-/**
- * Notification Preferences — unmodelled today (no per-company notification
- * channels on the model), so every channel is shown as a disabled toggle.
- */
-export const CompanySettingsNotificationsCard: React.FC<CompanySettingsNotificationsCardProps> = ({
-  onComingSoon,
-}) => {
-  const { t } = useTranslation();
-  const rows = [
-    { labelKey: "newBooking", hintKey: "newBookingHint", enabled: true },
-    { labelKey: "dispatches", hintKey: "dispatchesHint", enabled: true },
-    { labelKey: "maintenance", hintKey: "maintenanceHint", enabled: false },
-    { labelKey: "payout", hintKey: "payoutHint", enabled: true },
-    { labelKey: "sms", hintKey: "smsHint", enabled: false },
-    { labelKey: "weeklyEmail", hintKey: "weeklyEmailHint", enabled: true },
-  ];
-
-  return (
-    <CompanySettingsSection
-      id="settings-notifications"
-      title={t("company.settings.notifications.title")}
-      titleAr={t("company.settings.notifications.titleAr")}
-      description={t("company.settings.notifications.description")}
-      icon={<Bell className="h-5 w-5" aria-hidden="true" />}
-      soon
-    >
-      <div className="divide-y divide-slate-50">
-        {rows.map((row) => (
-          <SettingRow
-            key={row.labelKey}
-            label={t(`company.settings.notifications.${row.labelKey}`)}
-            hint={t(`company.settings.notifications.${row.hintKey}`)}
-            soon
-          >
-            <SettingToggle enabled={row.enabled} />
-          </SettingRow>
-        ))}
-      </div>
-      <button
-        type="button"
-        onClick={onComingSoon}
-        className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-4 py-2 text-sm font-semibold text-[#2563EB] transition-colors hover:bg-[#E5EEFF] cursor-pointer"
-      >
-        <BellRing className="h-4 w-4" aria-hidden="true" />
-        {t("company.settings.notifications.custom")}
-      </button>
-    </CompanySettingsSection>
-  );
-};
-
+type Key = keyof CompanySettingsPreferences["notifications"];
+interface Props { values: CompanySettingsPreferences["notifications"]; busy: boolean; onToggle: (key: Key, value: boolean) => void; }
+const rows:{labelKey:Key;hintKey:string}[]=[{labelKey:"newBooking",hintKey:"newBookingHint"},{labelKey:"dispatches",hintKey:"dispatchesHint"},{labelKey:"maintenance",hintKey:"maintenanceHint"},{labelKey:"payout",hintKey:"payoutHint"},{labelKey:"sms",hintKey:"smsHint"},{labelKey:"weeklyEmail",hintKey:"weeklyEmailHint"}];
+export const CompanySettingsNotificationsCard:React.FC<Props>=({values,busy,onToggle})=>{const {t}=useTranslation();return <CompanySettingsSection id="settings-notifications" title={t("company.settings.notifications.title")} titleAr={t("company.settings.notifications.titleAr")} description={t("company.settings.notifications.description")} icon={<Bell className="h-5 w-5"/>}><div className="divide-y divide-slate-100">{rows.map((row)=><SettingRow key={row.labelKey} label={t(`company.settings.notifications.${row.labelKey}`)} hint={t(`company.settings.notifications.${row.hintKey}`)}><SettingToggle label={t(`company.settings.notifications.${row.labelKey}`)} enabled={values[row.labelKey]} disabled={busy} onChange={(value)=>onToggle(row.labelKey,value)}/></SettingRow>)}</div></CompanySettingsSection>};
 export default CompanySettingsNotificationsCard;

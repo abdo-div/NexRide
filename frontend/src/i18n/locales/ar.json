@@ -2005,6 +2005,102 @@
       "logoutTitle": "تسجيل الخروج",
       "soon": "قريباً"
     },
+    "messagesPage": {
+      "breadcrumb": "العمليات",
+      "primary": "الرسائل",
+      "title": "الرسائل",
+      "titleAr": "Messages",
+      "liveBadge": "صندوق مباشر",
+      "subtitle": "راسل عملاءك ضمن حجوزاتك الحقيقية",
+      "subtitleAr": "أدر جميع محادثات المستأجرين في مكان واحد",
+      "scopedTenant": "المستأجر · {{code}}",
+      "actions": {
+        "allChannels": "كل القنوات",
+        "channelInquiry": "استفسار مباشر",
+        "channelActiveBooking": "حجز نشط",
+        "channelPostRental": "دعم ما بعد الإيجار",
+        "markAllRead": "تعليم الكل كمقروء",
+        "broadcast": "إرسال تعميم",
+        "closeMenu": "إغلاق القائمة"
+      },
+      "metrics": {
+        "activeTitle": "المحادثات النشطة",
+        "activeSub": "{{count}} محادثة إجمالاً",
+        "unreadTitle": "غير مقروء بأولوية",
+        "unreadSub": "{{count}} محادثة بانتظارك",
+        "minutes": "{{value}} دقيقة",
+        "responseTitle": "متوسط سرعة الرد",
+        "responseSub": "أول رد بعد فتح المحادثة",
+        "satisfactionTitle": "رضا العملاء",
+        "satisfactionSub": "نسبة التقييمات ٤★ وأعلى"
+      },
+      "searchPlaceholder": "ابحث في المحادثات أو العملاء أو المراجع",
+      "filters": {
+        "all": "الكل",
+        "needsReply": "بحاجة لرد",
+        "activeRentals": "إيجارات نشطة",
+        "postRental": "ما بعد الإيجار"
+      },
+      "channel": {
+        "inquiry": "استفسار",
+        "activeBooking": "حجز نشط",
+        "postRental": "ما بعد الإيجار"
+      },
+      "list": {
+        "empty": "لا توجد محادثات بعد",
+        "emptyHint": "تُفتح المحادثات تلقائياً عند إنشاء حجز.",
+        "noMessages": "لا توجد رسائل بعد",
+        "range": "{{from}}–{{to}} من {{total}}",
+        "previous": "الصفحة السابقة",
+        "next": "الصفحة التالية"
+      },
+      "thread": {
+        "selectTitle": "اختر محادثة",
+        "selectHint": "اختر محادثة من القائمة للقراءة والرد.",
+        "templatesLabel": "ردود سريعة",
+        "composerPlaceholder": "اكتب رداً لعميلك…",
+        "send": "إرسال",
+        "composerHint": "تُحفظ الردود في سلسلة الحجز.",
+        "replyAs": "الرد بصفتك مشغل الأسطول"
+      },
+      "templates": {
+        "showroom": "ستكون سيارتك جاهزة في فرعنا الرئيسي — أحضر رخصة القيادة والبطاقة الوطنية.",
+        "airportMeet": "يمكننا لقاؤك في صالة الوصول بالمطار؛ شارك رقم رحلتك وسنتابعها.",
+        "fuelPolicy": "يُسلّم الخزان ممتلئاً ويجب إعادته ممتلئاً لتجنب رسوم التزويد بالوقود.",
+        "escrow": "يُحتجز مبلغ التأمين في حساب ضمان ويُفرج عنه بعد إعادة السيارة وفحصها."
+      },
+      "context": {
+        "empty": "ستظهر تفاصيل المحادثة هنا.",
+        "renterTitle": "المستأجر",
+        "phone": "الهاتف",
+        "phoneUnavailable": "غير متوفر",
+        "bookingTitle": "الحجز النشط",
+        "reference": "المرجع",
+        "vehicle": "السيارة",
+        "dates": "تواريخ الإيجار",
+        "pickup": "الاستلام",
+        "pickupUnavailable": "استلام من الفرع",
+        "total": "الإجمالي",
+        "noBooking": "هذه المحادثة غير مرتبطة بحجز."
+      },
+      "broadcast": {
+        "title": "إرسال تعميم",
+        "subtitle": "يُرسل إلى كل محادثة مفتوحة في صندوقك",
+        "placeholder": "اكتب التعميم الذي سيستلمه عملاؤك…",
+        "cancel": "إلغاء",
+        "send": "إرسال التعميم",
+        "sending": "جارٍ الإرسال…"
+      },
+      "states": {
+        "loadError": "تعذر تحميل صندوق الرسائل. حاول مرة أخرى.",
+        "retry": "إعادة المحاولة"
+      },
+      "toasts": {
+        "markedRead": "تم تعليم جميع المحادثات كمقروءة",
+        "broadcastSuccess": "تم إرسال التعميم إلى محادثاتك المفتوحة",
+        "genericError": "حدث خطأ ما. حاول مرة أخرى."
+      }
+    },
     "overview": {
       "command": "مشغل أسطول",
       "grid": "لوحة العمليات",
@@ -3391,7 +3487,8 @@
         "longitude": "خط الطول",
         "latitude": "خط العرض",
         "cityPlaceholder": "مثال: طرابلس",
-        "pickupPlaceholder": "اسم الفرع أو عنوان نقطة الاستلام"
+        "pickupPlaceholder": "اسم الفرع أو عنوان نقطة الاستلام",
+        "mapHint": "اضغط على الخريطة لتحديد نقطة الاستلام"
       },
       "policies": {
         "title": "شروط وسياسات التأجير",

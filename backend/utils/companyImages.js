@@ -15,3 +15,13 @@ export const saveCompanyLogo = async (buffer, filename) => {
     .toFile(path.join(companyLogosDirectory, filename));
   return filename;
 };
+
+export const saveCompanyCover = async (buffer, filename) => {
+  await mkdir(companyLogosDirectory, { recursive: true });
+  await sharp(buffer)
+    .resize(1800, 600, { fit: "cover", position: "centre" })
+    .toFormat("webp")
+    .webp({ quality: 86 })
+    .toFile(path.join(companyLogosDirectory, filename));
+  return filename;
+};
