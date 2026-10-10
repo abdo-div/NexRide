@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { CalendarDays, Camera, CheckCircle2, ChevronRight, Eye, EyeOff, Home, KeyRound, LockKeyhole, Mail, Phone, Save, ShieldCheck, UserRound } from "lucide-react";
@@ -28,6 +28,7 @@ export const MyProfilePage: React.FC = () => {
   const c = i18n.language.startsWith("ar") ? text.ar : text.en;
   const fileInput = useRef<HTMLInputElement>(null);
   const securityRef = useRef<HTMLElement>(null);
+  const previewUrlRef = useRef("");
   const [form, setForm] = useState({ name:user?.name ?? "", email:user?.email ?? "", phoneNumber:user?.phoneNumber ?? "" });
   const [photo, setPhoto] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
@@ -38,18 +39,19 @@ export const MyProfilePage: React.FC = () => {
   const [passwordBusy, setPasswordBusy] = useState(false);
   const [showPasswords, setShowPasswords] = useState(false);
 
-  const setFormFromUser = (next = user) => { if (next) setForm({ name:next.name, email:next.email, phoneNumber:next.phoneNumber }); };
-  useEffect(() => { let active = true; authApi.me().then(({data}) => { if (active) { updateUser(data.user); setFormFromUser(data.user); } }).catch(() => active && setProfileNotice({kind:"error",text:c.loadError})); return () => { active = false; }; }, [c.loadError, updateUser]);
-  useEffect(() => { if (!photo) { setPreview(""); return; } const url = URL.createObjectURL(photo); setPreview(url); return () => URL.revokeObjectURL(url); }, [photo]);
+  const setFormFromUser = useCallback((next = user) => { if (next) setForm({ name:next.name, email:next.email, phoneNumber:next.phoneNumber }); }, [user]);
+  useEffect(() => { let active = true; authApi.me().then(({data}) => { if (active) { updateUser(data.user); setFormFromUser(data.user); } }).catch(() => active && setProfileNotice({kind:"error",text:c.loadError})); return () => { active = false; }; }, [c.loadError, setFormFromUser, updateUser]);
+  useEffect(() => () => { if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current); }, []);
   const initials = useMemo(() => (user?.name ?? "N R").split(/\s+/).filter(Boolean).slice(0,2).map((part) => part[0]).join("").toUpperCase(), [user?.name]);
   if (!user) return null;
   const avatar = preview || userPhotoUrl(user.photo);
   const joined = user.createdAt ? new Intl.DateTimeFormat(i18n.language,{month:"long",year:"numeric"}).format(new Date(user.createdAt)) : "—";
   const dirty = Boolean(photo) || form.name !== user.name || form.email !== user.email || form.phoneNumber !== user.phoneNumber;
 
-  const selectPhoto = (file?: File) => { if (!file) return; if (!["image/jpeg","image/png"].includes(file.type) || file.size > 5*1024*1024) { setProfileNotice({kind:"error",text:c.fileError}); return; } setPhoto(file); setProfileNotice(null); };
-  const reset = () => { setFormFromUser(); setPhoto(null); setProfileNotice(null); };
-  const saveProfile = async (event:React.FormEvent) => { event.preventDefault(); setSaving(true); setProfileNotice(null); try { const payload = new FormData(); payload.append("name",form.name.trim()); payload.append("email",form.email.trim()); payload.append("phoneNumber",form.phoneNumber.trim()); if(photo) payload.append("photo",photo); const {data}=await authApi.updateProfile(payload); updateUser(data.user); setFormFromUser(data.user); setPhoto(null); setProfileNotice({kind:"success",text:c.saved}); } catch(error) { setProfileNotice({kind:"error",text:error instanceof ApiError?error.message:c.error}); } finally { setSaving(false); } };
+  const clearSelectedPhoto = () => { if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current); previewUrlRef.current = ""; setPreview(""); setPhoto(null); };
+  const selectPhoto = (file?: File) => { if (!file) return; if (!["image/jpeg","image/png"].includes(file.type) || file.size > 5*1024*1024) { setProfileNotice({kind:"error",text:c.fileError}); return; } if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current); const url = URL.createObjectURL(file); previewUrlRef.current = url; setPreview(url); setPhoto(file); setProfileNotice(null); };
+  const reset = () => { setFormFromUser(); clearSelectedPhoto(); setProfileNotice(null); };
+  const saveProfile = async (event:React.FormEvent) => { event.preventDefault(); setSaving(true); setProfileNotice(null); try { const payload = new FormData(); payload.append("name",form.name.trim()); payload.append("email",form.email.trim()); payload.append("phoneNumber",form.phoneNumber.trim()); if(photo) payload.append("photo",photo); const {data}=await authApi.updateProfile(payload); updateUser(data.user); setFormFromUser(data.user); clearSelectedPhoto(); setProfileNotice({kind:"success",text:c.saved}); } catch(error) { setProfileNotice({kind:"error",text:error instanceof ApiError?error.message:c.error}); } finally { setSaving(false); } };
   const savePassword = async (event:React.FormEvent) => { event.preventDefault(); setPasswordNotice(null); if(!passwords.passwordCurrent||!passwords.password||!passwords.passwordConfirm) return setPasswordNotice({kind:"error",text:c.required}); if(passwords.password.length<8) return setPasswordNotice({kind:"error",text:c.short}); if(passwords.password!==passwords.passwordConfirm) return setPasswordNotice({kind:"error",text:c.mismatch}); setPasswordBusy(true); try { const result=await authApi.updatePassword(passwords); adoptSession(result.token,result.data.user); setPasswords({passwordCurrent:"",password:"",passwordConfirm:""}); setPasswordNotice({kind:"success",text:c.passwordSaved}); } catch(error) { setPasswordNotice({kind:"error",text:error instanceof ApiError?error.message:c.error}); } finally { setPasswordBusy(false); } };
 
   return <main className="min-h-screen bg-[#F8F9FF] pb-16 pt-24 md:pt-28"><div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 sm:px-6 lg:px-8">

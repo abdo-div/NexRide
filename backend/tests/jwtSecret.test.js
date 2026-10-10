@@ -29,7 +29,7 @@ test("startup validation fails clearly when JWT_SECRET is missing", () => {
     ["--input-type=module", "-e", "await import('./server.js')"],
     {
       cwd: process.cwd(),
-      env: { ...process.env, JWT_SECRET: "" },
+      env: { ...process.env, NODE_ENV: "test", JWT_SECRET: "" },
       encoding: "utf8",
     },
   );
