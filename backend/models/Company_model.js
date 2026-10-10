@@ -1,0 +1,400 @@
+import mongoose from "mongoose";
+import validator from "validator";
+
+const RESERVED_SUBDOMAINS = [
+  "admin",
+  "api",
+  "www",
+  "app",
+  "billing",
+  "support",
+];
+
+const companySchema = new mongoose.Schema(
+  {
+    // -------------------------------------------------------------------------
+    // Ownership & Credentials
+    // -------------------------------------------------------------------------
+    ownerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: [
+        true,
+        "A rental company must be linked to an owner user account",
+      ],
+      unique: true, // Guarantees 1 user owns at most 1 company
+      index: true,
+    },
+    name: {
+      type: String,
+      required: [true, "Please provide the official company name"],
+      trim: true,
+      maxlength: [120, "Company name cannot exceed 120 characters"],
+      index: true,
+    },
+    subdomain: {
+      type: String,
+      required: [true, "Company subdomain is required"],
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [
+        /^[a-z0-9-]+$/,
+        "Subdomain can only contain lowercase letters, numbers, and hyphens",
+      ],
+      index: true,
+      validate: {
+        validator: function (val) {
+          // Allows only lowercase letters, numbers, and hyphens (3-30 chars)
+          const isValidFormat = /^[a-z0-9-]{3,30}$/.test(val);
+          const isNotReserved = !RESERVED_SUBDOMAINS.includes(val);
+          return isValidFormat && isNotReserved;
+        },
+        message: "Invalid or reserved subdomain format.",
+      },
+    },
+    // URL-friendly slug for path-based storefronts
+    slug: {
+      type: String,
+      required: [true, "Company slug is required"],
+      unique: true,
+      lowercase: true,
+      trim: true,
+      index: true,
+    },
+    description: {
+      type: String,
+      trim: true,
+      maxlength: [2000, "Company description cannot exceed 2000 characters"],
+    },
+    logo: {
+      type: String,
+      default: "",
+    },
+    coverImage: {
+      type: String,
+      default: "",
+    },
+
+    // -------------------------------------------------------------------------
+    // Contact & Business Verification
+    // -------------------------------------------------------------------------
+    email: {
+      type: String,
+      required: [true, "Company business email is required"],
+      lowercase: true,
+      trim: true,
+      validate: [validator.isEmail, "Please provide a valid company email"],
+    },
+    phone: {
+      type: String,
+      required: [true, "Company contact phone number is required"],
+      trim: true,
+    },
+    commercialRegisterNumber: {
+      type: String,
+      trim: true,
+      select: false, // Hidden by default from public queries for privacy
+    },
+
+    // -------------------------------------------------------------------------
+    // Location & GeoJSON (Libyan Marketplace Focus)
+    // -------------------------------------------------------------------------
+    city: {
+      type: String,
+      required: [
+        true,
+        "Main company city is required (e.g., Tripoli, Benghazi)",
+      ],
+      trim: true,
+      index: true,
+    },
+    address: {
+      type: String,
+      required: [true, "Physical business address is required"],
+      trim: true,
+    },
+    // GeoJSON point for map-based proximity search & branch pickups
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        validate: {
+          validator: (value) =>
+            !value ||
+            (value.length === 2 &&
+              value[0] >= -180 &&
+              value[0] <= 180 &&
+              value[1] >= -90 &&
+              value[1] <= 90),
+          message: "Location coordinates must be [longitude, latitude]",
+        },
+      },
+    },
+
+    // -------------------------------------------------------------------------
+    // Platform Lifecycle & Approval Workflow
+    // -------------------------------------------------------------------------
+    status: {
+      type: String,
+      enum: {
+        values: ["PENDING", "APPROVED", "SUSPENDED", "REJECTED"], // Guide Section 5 workflow
+        message: "Status must be PENDING, APPROVED, SUSPENDED, or REJECTED",
+      },
+      default: "PENDING",
+      index: true,
+    },
+    rejectionReason: {
+      type: String,
+      default: null,
+    },
+    approvedAt: Date,
+    suspendedAt: Date,
+
+    // -------------------------------------------------------------------------
+    // Financial Metrics & Commission Overrides
+    // -------------------------------------------------------------------------
+    // Custom commission override rate (if null, falls back to global default e.g. 8%)
+    customCommissionRate: {
+      type: Number,
+      min: [0, "Commission cannot be negative"],
+      max: [100, "Commission cannot exceed 100%"],
+      default: null,
+    },
+
+    // -------------------------------------------------------------------------
+    // Partner Application & Onboarding Profile (public application wizard)
+    // -------------------------------------------------------------------------
+    // Human-readable application reference shown on the applicant's status page.
+    applicationRef: {
+      type: String,
+      uppercase: true,
+      trim: true,
+      unique: true,
+      sparse: true,
+      index: true,
+    },
+    // Fleet size band declared during onboarding.
+    fleetSizeTier: {
+      type: String,
+      enum: {
+        values: ["BOUTIQUE", "MIDTIER", "SELECTED", "MAJOR", "ENTERPRISE"],
+        message: "Fleet tier must be BOUTIQUE, MIDTIER, SELECTED, MAJOR, or ENTERPRISE",
+      },
+      default: null,
+    },
+    // Vehicle categories the operator plans to offer through NexRide.
+    vehicleCategories: {
+      type: [
+        {
+          type: String,
+          enum: {
+            values: [
+              "ECONOMY",
+              "COMPACT",
+              "SEDAN",
+              "SUV",
+              "LUXURY_EXECUTIVE",
+              "PASSENGER_VAN",
+              "PICKUP_UTILITY",
+              "CHAFFEURED_ARMORED",
+            ],
+            message: "Invalid vehicle category",
+          },
+        },
+      ],
+      default: [],
+    },
+    // Libyan cities where the operator is active.
+    operatingHubs: {
+      type: [String],
+      default: [],
+    },
+    // Depot & handover locations where customers collect or inspect vehicles.
+    depots: {
+      type: [
+        {
+          name: { type: String, trim: true, required: false },
+          address: { type: String, trim: true, required: false },
+          hubType: {
+            type: String,
+            enum: ["PRIMARY", "AIRPORT_TERMINAL", "BRANCH"],
+            default: "BRANCH",
+          },
+          phone: { type: String, trim: true, default: "" },
+          hours: { type: String, trim: true, default: "" },
+        },
+      ],
+      default: [],
+    },
+    // Commercial rental policies agreed during onboarding.
+    rentalPolicy: {
+      type: {
+        minDurationDays: Number,
+        maxDurationDays: Number,
+        minDriverAge: Number,
+        cancellationPolicy: {
+          type: String,
+          enum: ["FLEXIBLE", "MODERATE", "STRICT"],
+          default: "MODERATE",
+        },
+        depositAmountLYD: Number,
+        additionalDriverAllowed: Boolean,
+        inVehicleSmokingAllowed: Boolean,
+      },
+      default: {},
+    },
+    // Bank settlement rail selected during onboarding (direct RTGS payout).
+    payout: {
+      type: {
+        bankName: { type: String, trim: true, default: "" },
+        iban: { type: String, trim: true, uppercase: true, default: "" },
+        accountName: { type: String, trim: true, default: "" },
+      },
+      default: {},
+    },
+    settingsPreferences: {
+      policies: {
+        minimumAge: { type: Boolean, default: false },
+        allowedLicenses: { type: Boolean, default: false },
+        idRequired: { type: Boolean, default: true },
+        fuel: { type: Boolean, default: false },
+        km: { type: Boolean, default: false },
+        smoking: { type: Boolean, default: false },
+      },
+      booking: {
+        instant: { type: Boolean, default: false },
+        securityDeposit: { type: Boolean, default: false },
+        lead: { type: Boolean, default: false },
+        channel: { type: Boolean, default: false },
+        extensions: { type: Boolean, default: false },
+        cc: { type: Boolean, default: false },
+      },
+      notifications: {
+        newBooking: { type: Boolean, default: true },
+        dispatches: { type: Boolean, default: true },
+        maintenance: { type: Boolean, default: false },
+        payout: { type: Boolean, default: true },
+        sms: { type: Boolean, default: false },
+        weeklyEmail: { type: Boolean, default: true },
+      },
+    },
+    // Documents uploaded as part of the partner application.
+    applicationDocuments: {
+      type: [
+        {
+          name: { type: String, trim: true, default: "" },
+          kind: {
+            type: String,
+            enum: {
+              values: ["COMMERCIAL_REGISTRY", "OWNER_ID", "TRANSPORT_LICENSE", "INSURANCE", "OTHER"],
+              message: "Invalid document kind",
+            },
+            default: "OTHER",
+          },
+          mimeType: { type: String, default: "" },
+          size: { type: Number, default: 0 },
+          url: { type: String, default: "" },
+        },
+      ],
+      default: [],
+    },
+
+    // Payout request intent raised from the partner dashboard. The actual
+    // disbursement is approved & dispatched by the platform, so this only
+    // records that the operator asked for their next settlement cycle.
+    lastPayoutRequestAt: {
+      type: Date,
+      default: null,
+    },
+
+    // -------------------------------------------------------------------------
+    // Soft Delete & Operational State
+    // -------------------------------------------------------------------------
+    deletedAt: {
+      type: Date,
+      default: null,
+      select: false,
+    },
+  },
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    // Prevent automated indexing performance bottlenecks on high-volume production deployments
+    autoIndex: process.env.NODE_ENV !== "production",
+  },
+);
+
+// -----------------------------------------------------------------------------
+// Indexes (ESR Rule: Equality -> Sort -> Range)
+// -----------------------------------------------------------------------------
+companySchema.index({ status: 1, city: 1 });
+companySchema.index({ location: "2dsphere" }); // Enables geospatial radius queries ($near)
+
+// -----------------------------------------------------------------------------
+// Virtual Population (Lookup Company Vehicles without manual queries)
+// -----------------------------------------------------------------------------
+companySchema.virtual("vehicles", {
+  ref: "Vehicle",
+  localField: "_id",
+  foreignField: "companyId",
+  justOne: false,
+});
+
+companySchema.virtual("activeBookingsCount", {
+  ref: "Booking",
+  localField: "_id",
+  foreignField: "companyId",
+  count: true,
+});
+
+// -----------------------------------------------------------------------------
+// Hooks & Middleware
+// -----------------------------------------------------------------------------
+
+// 1. Pre-save Slug Generator (Transforms "Tripoli Cars" -> "tripoli-cars")
+companySchema.pre("validate", function () {
+  if (this.isModified("name")) {
+    this.slug = this.name
+      .toLowerCase()
+      .replace(/[^\w ]+/g, "")
+      .replace(/ +/g, "-");
+  }
+});
+
+// 2. Query Hook: Exclude soft-deleted companies automatically
+companySchema.pre(/^find/, function () {
+  if (!this.getOptions().withDeleted) {
+    this.where({ deletedAt: null });
+  }
+});
+
+// 3. Status Transition Timestamp Auditor
+companySchema.pre("save", function () {
+  if (this.isModified("status")) {
+    if (this.status === "APPROVED" && !this.approvedAt) {
+      this.approvedAt = new Date();
+    } else if (this.status === "SUSPENDED") {
+      this.suspendedAt = new Date();
+    }
+  }
+});
+
+// -----------------------------------------------------------------------------
+// Instance & Static Methods
+// -----------------------------------------------------------------------------
+
+// Soft Delete instance method
+companySchema.methods.softDelete = async function () {
+  this.deletedAt = new Date();
+  this.status = "SUSPENDED";
+  return await this.save();
+};
+
+const Company = mongoose.model("Company", companySchema);
+
+export default Company;
