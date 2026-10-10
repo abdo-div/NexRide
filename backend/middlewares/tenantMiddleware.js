@@ -28,6 +28,7 @@ export const resolveTenant = catchAsync(async (req, res, next) => {
   ];
 
   let company = null;
+  let matchedDomain = false;
 
   if (subdomains.length > 0) {
     company = await Company.findOne({
@@ -35,6 +36,7 @@ export const resolveTenant = catchAsync(async (req, res, next) => {
       deletedAt: null,
       status: "APPROVED",
     });
+    matchedDomain = Boolean(company);
   }
 
   // Company uses status: APPROVED as its active state (there is no
@@ -61,6 +63,11 @@ export const resolveTenant = catchAsync(async (req, res, next) => {
   // Inject company details directly into the Request object
   req.tenant = company;
   req.tenantId = company._id;
+  // Consumers that expose a global public catalogue must distinguish a real
+  // tenant-domain match from the compatibility fallback. Otherwise a shared
+  // frontend host (for example a Render static-site domain) is accidentally
+  // restricted to whichever company happened to be returned first.
+  req.tenantResolution = matchedDomain ? "domain" : "fallback";
 
   next();
 });
