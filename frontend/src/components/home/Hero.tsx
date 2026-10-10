@@ -14,7 +14,7 @@ export const Hero: React.FC = () => {
         className="absolute inset-0 z-0 pointer-events-none overflow-hidden"
       >
         <img
-          src="/public/screen.png"
+          src="/screen.png"
           alt="Fleet Background"
           className="w-full h-full object-cover object-center"
         />
