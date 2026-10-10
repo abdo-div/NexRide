@@ -3,30 +3,54 @@ import AppError from "../utils/appError.js";
 import catchAsync from "../utils/catchAsync.js";
 
 export const resolveTenant = catchAsync(async (req, res, next) => {
-  const host = req.headers.host; // e.g., "albaraka.nexride.com" or "localhost:5000"
+  const hostnames = [];
 
-  if (!host) return next();
-
-  // Extract the first part of the domain
-  const hostParts = host.split(".");
-
-  // Skip tenant extraction for main domain, api, or direct IP accesses
-  // Example: nexride.com, www.nexride.com, api.nexride.com, localhost:5000
-  if (
-    hostParts.length < 3 ||
-    ["www", "api", "admin", "localhost"].includes(hostParts[0].toLowerCase())
-  ) {
-    return next();
+  // Prefer the browser origin because the API host is commonly shared by all
+  // tenants. Fall back to the request host for direct tenant-domain requests.
+  if (req.headers.origin) {
+    try {
+      hostnames.push(new URL(req.headers.origin).hostname);
+    } catch {
+      // An invalid Origin cannot identify a tenant, so continue with Host.
+    }
   }
 
-  const subdomain = hostParts[0].toLowerCase();
+  const requestHost = req.hostname || req.headers.host?.split(":")[0];
+  if (requestHost) hostnames.push(requestHost);
 
-  // Search DB for company matching subdomain
-  const company = await Company.findOne({
-    subdomain,
-    deletedAt: null,
-    status: "APPROVED",
-  });
+  const reservedSubdomains = new Set(["www", "api", "admin", "localhost"]);
+  const subdomains = [
+    ...new Set(
+      hostnames
+        .map((hostname) => hostname.split(".")[0]?.toLowerCase())
+        .filter((subdomain) => subdomain && !reservedSubdomains.has(subdomain)),
+    ),
+  ];
+
+  let company = null;
+
+  if (subdomains.length > 0) {
+    company = await Company.findOne({
+      subdomain: { $in: subdomains },
+      deletedAt: null,
+      status: "APPROVED",
+    });
+  }
+
+  // Company uses status: APPROVED as its active state (there is no
+  // operationalStatus field on this model). Prefer an active company, then any
+  // available non-deleted company so local/shared-domain requests still get a
+  // tenant context.
+  if (!company) {
+    company = await Company.findOne({
+      deletedAt: null,
+      status: "APPROVED",
+    });
+  }
+
+  if (!company) {
+    company = await Company.findOne({ deletedAt: null });
+  }
 
   if (!company) {
     return next(
