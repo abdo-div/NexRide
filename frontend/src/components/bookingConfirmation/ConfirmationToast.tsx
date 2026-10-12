@@ -7,7 +7,7 @@ export const ConfirmationToast: React.FC<{ text: string | null }> = ({ text }) =
       text ? "translate-y-0 opacity-100" : "translate-y-24 opacity-0 pointer-events-none"
     }`}
   >
-    <CheckCircle2 className="w-[20px] h-[20px] text-[#B4C5FF]" />
+    <CheckCircle2 className="w-[20px] h-[20px] text-[#CBD5E1]" />
     <span className="text-[12px]">{text}</span>
   </div>
 );

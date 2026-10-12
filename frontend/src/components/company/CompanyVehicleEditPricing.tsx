@@ -40,12 +40,12 @@ export const CompanyVehicleEditPricing: React.FC<CompanyVehicleEditPricingProps>
   return (
     <SectionCard
       icon={Banknote}
-      iconStyle="bg-[#E5EEFF] text-[#2563EB]"
+      iconStyle="bg-[#F1F5F9] text-[#142B4A]"
       title={t("company.editVehiclePage.pricing.title")}
       titleAr={t("company.editVehiclePage.pricing.titleAr")}
       subtitle={t("company.editVehiclePage.pricing.subtitle")}
       action={
-        <span className="rounded-full bg-[#F1F5F9] px-2.5 py-1 text-[11px] font-bold text-[#2563EB]">
+        <span className="rounded-full bg-[#F1F5F9] px-2.5 py-1 text-[11px] font-bold text-[#142B4A]">
           {t("company.editVehiclePage.pricing.currency")}
         </span>
       }

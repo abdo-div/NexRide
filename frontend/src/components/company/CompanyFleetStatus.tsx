@@ -26,15 +26,15 @@ export const CompanyFleetStatus: React.FC<CompanyFleetStatusProps> = ({
       labelKey: "company.fleet.available",
       hintKey: "company.fleet.readyHint",
       value: fleet.available,
-      bar: "bg-[#2563EB]",
-      dot: "bg-[#2563EB]",
+      bar: "bg-[#142B4A]",
+      dot: "bg-[#142B4A]",
     },
     {
       labelKey: "company.fleet.onRoad",
       hintKey: "company.fleet.onRoadHint",
       value: fleet.onRoad,
-      bar: "bg-[#004AC6]",
-      dot: "bg-[#004AC6]",
+      bar: "bg-[#142B4A]",
+      dot: "bg-[#142B4A]",
       accent: true,
     },
     {
@@ -62,13 +62,13 @@ export const CompanyFleetStatus: React.FC<CompanyFleetStatusProps> = ({
             <span className="text-sm text-[#565E74]">({t("company.fleet.titleAr")})</span>
           </div>
         </div>
-        <span className="rounded-full bg-[#E5EEFF] px-3 py-1 text-sm font-bold text-[#2563EB]">
+        <span className="rounded-full bg-[#F1F5F9] px-3 py-1 text-sm font-bold text-[#142B4A]">
           {t("company.fleet.total", { count: total })}
         </span>
       </div>
 
       <div className="flex flex-col gap-1">
-        <div className="flex h-3.5 w-full overflow-hidden rounded-full bg-[#E5EEFF]">
+        <div className="flex h-3.5 w-full overflow-hidden rounded-full bg-[#F1F5F9]">
           {segments
             .filter((s) => s.value > 0)
             .map((s) => (
@@ -82,7 +82,7 @@ export const CompanyFleetStatus: React.FC<CompanyFleetStatusProps> = ({
         </div>
         <div className="flex items-center justify-between text-[11px] font-semibold text-[#565E74]">
           <span>{t("company.fleet.depot", { city: data.company?.city ?? "" })}</span>
-          <span className="text-[#2563EB]">
+          <span className="text-[#142B4A]">
             {t("company.fleet.utilization", {
               value: fleet.utilizationPct,
             })}
@@ -94,7 +94,7 @@ export const CompanyFleetStatus: React.FC<CompanyFleetStatusProps> = ({
         {segments.map((s) => (
           <div
             key={s.labelKey}
-            className="flex items-center justify-between rounded-xl bg-[#E5EEFF] px-3 py-2.5"
+            className="flex items-center justify-between rounded-xl bg-[#F1F5F9] px-3 py-2.5"
           >
             <div className="flex items-center gap-2.5">
               <span className={`h-3 w-3 shrink-0 rounded-full ${s.dot}`} />
@@ -104,7 +104,7 @@ export const CompanyFleetStatus: React.FC<CompanyFleetStatusProps> = ({
               </div>
             </div>
             <div className="text-end">
-              <span className={`text-lg font-bold ${s.accent ? "text-[#004AC6]" : "text-[#0B1C30]"}`}>
+              <span className={`text-lg font-bold ${s.accent ? "text-[#142B4A]" : "text-[#0B1C30]"}`}>
                 {s.value}
               </span>
               <span className="block text-[11px] text-[#565E74]">
@@ -119,7 +119,7 @@ export const CompanyFleetStatus: React.FC<CompanyFleetStatusProps> = ({
         type="button"
         disabled
         title={t("company.layout.soon")}
-        className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-[#E5EEFF] py-2.5 text-sm font-bold text-[#2563EB] transition-all hover:bg-[#DCE9FF] disabled:opacity-70"
+        className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-[#F1F5F9] py-2.5 text-sm font-bold text-[#142B4A] transition-all hover:bg-[#F1F5F9] disabled:opacity-70"
       >
         {t("company.fleet.manageFull")}
         <span aria-hidden="true">›</span>

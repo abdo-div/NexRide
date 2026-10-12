@@ -91,7 +91,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
     ? "bg-[#E2E8F0] text-[#475569]"
     : isTerminated
     ? "bg-slate-100 text-slate-500"
-    : "bg-[#EFF6FF] text-[#1D4ED8]";
+    : "bg-[#EFF6FF] text-[#0D2039]";
 
   const statusLabel = isUpcoming
     ? t("myBookings.status.upcoming")
@@ -161,7 +161,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
         <div className="flex items-center gap-2.5 flex-wrap">
           <span
             dir="ltr"
-            className="px-2.5 py-1 rounded-md bg-[#2563EB] text-white text-xs font-bold tracking-wider"
+            className="px-2.5 py-1 rounded-md bg-[#142B4A] text-white text-xs font-bold tracking-wider"
           >
             {ref}
           </span>
@@ -184,7 +184,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
         </div>
 
         {isActive && (
-          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#2563EB]">
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#142B4A]">
             <ShieldCheck className="w-4 h-4" />
             {t("myBookings.securityNote")}
           </span>
@@ -239,7 +239,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           {provider && (
             <div className="flex items-center justify-between px-1 text-[11px] text-[#64748B]">
               <span className="flex items-center gap-1 min-w-0">
-                <Store className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
+                <Store className="w-3.5 h-3.5 text-[#142B4A] shrink-0" />
                 <span className="truncate">
                   {t("myBookings.provider", { name: provider.name })}
                 </span>
@@ -295,7 +295,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
                   label: t("myBookings.pickupStation"),
                   location: booking.pickupLocation,
                   date: formatDate(booking.startDate, lang, true),
-                  dot: "bg-[#2563EB]",
+                  dot: "bg-[#142B4A]",
                 },
                 {
                   label: t("myBookings.dropoffStation"),
@@ -326,7 +326,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
             /* Trip summary grid for the other variants */
             <div className="bg-[#F8FAFC] p-3.5 rounded-xl grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex items-center gap-2.5">
-                <MapPin className="w-4 h-4 text-[#2563EB] shrink-0" />
+                <MapPin className="w-4 h-4 text-[#142B4A] shrink-0" />
                 <div className="flex flex-col min-w-0">
                   <span className="text-[11px] text-[#64748B]">
                     {t("myBookings.pickupStation")}
@@ -370,7 +370,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
               )}
             </span>
             <div className="flex items-baseline gap-1.5 flex-wrap">
-              <span className="text-[24px] font-extrabold tracking-tight text-[#2563EB] tabular-nums">
+              <span className="text-[24px] font-extrabold tracking-tight text-[#142B4A] tabular-nums">
                 {formatLYD(booking.totalAmount)}
               </span>
               <span className="text-[13px] font-bold text-[#0F172A]">{currency}</span>
@@ -398,7 +398,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
               <button
                 type="button"
                 onClick={openDetails}
-                className="w-full py-2 px-4 bg-[#EFF4FF] hover:bg-[#DBEAFE] text-[#2563EB] text-sm font-bold rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                className="w-full py-2 px-4 bg-[#F8FAFC] hover:bg-[#DBEAFE] text-[#142B4A] text-sm font-bold rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
                 <Eye className="w-4 h-4" />
                 {t("myBookings.actions.viewDetails")}
@@ -409,7 +409,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
                 <button
                   type="button"
                   onClick={openDetails}
-                  className="w-full py-2.5 px-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold rounded-lg shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  className="w-full py-2.5 px-4 bg-[#142B4A] hover:bg-[#0D2039] text-white text-sm font-bold rounded-lg shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
                   {t("myBookings.actions.viewDetails")}
                 </button>
@@ -435,7 +435,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
                 <button
                   type="button"
                   onClick={() => onToast(t("myBookings.modifyInfo"))}
-                  className="py-1 text-center text-[11px] font-medium text-[#64748B] hover:text-[#2563EB] transition-colors cursor-pointer"
+                  className="py-1 text-center text-[11px] font-medium text-[#64748B] hover:text-[#142B4A] transition-colors cursor-pointer"
                 >
                   {t("myBookings.actions.modifyRequest")}
                 </button>
@@ -478,7 +478,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
                 <button
                   type="button"
                   onClick={rebook}
-                  className="w-full py-2 px-3 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold rounded-lg flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+                  className="w-full py-2 px-3 bg-[#142B4A] hover:bg-[#0D2039] text-white text-sm font-bold rounded-lg flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer"
                 >
                   <RotateCcw className="w-4 h-4" />
                   {t("myBookings.actions.rebook")}
@@ -500,7 +500,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
                 <button
                   type="button"
                   onClick={rebook}
-                  className="w-full py-2.5 px-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  className="w-full py-2.5 px-4 bg-[#142B4A] hover:bg-[#0D2039] text-white text-sm font-bold rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer"
                 >
                   <RotateCcw className="w-4 h-4" />
                   {t("myBookings.actions.rebook")}

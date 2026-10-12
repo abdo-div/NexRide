@@ -58,7 +58,7 @@ export const CompanyAspectScores: React.FC = () => {
               className="flex items-center justify-between gap-3 rounded-xl border border-dashed border-slate-200 bg-[#F8FAFC] px-4 py-3"
             >
               <div className="flex min-w-0 items-center gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#EFF4FF] text-[#2563EB]">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F8FAFC] text-[#142B4A]">
                   <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
                 </div>
                 <span className="text-[13px] font-semibold text-[#434655]">

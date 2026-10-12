@@ -104,7 +104,7 @@ export const CompanyReviewKpiCards: React.FC<CompanyReviewKpiCardsProps> = ({
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {/* Overall Rating */}
       <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
-        <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-[#E5EEFF]/60 blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-[#F1F5F9]/60 blur-2xl" />
         <div className="flex items-center justify-between gap-2">
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
             {t("company.reviewsPage.kpis.overall")}
@@ -143,7 +143,7 @@ export const CompanyReviewKpiCards: React.FC<CompanyReviewKpiCardsProps> = ({
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
             {t("company.reviewsPage.kpis.total")}
           </span>
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#E5EEFF] text-[#2563EB]">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F1F5F9] text-[#142B4A]">
             <MessageSquareText className="h-[18px] w-[18px]" aria-hidden="true" />
           </div>
         </div>

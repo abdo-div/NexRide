@@ -68,7 +68,7 @@ export const CompanyConversationContext: React.FC<
               className="h-12 w-12 shrink-0 rounded-full border border-slate-200 object-cover"
             />
           ) : (
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-sm font-bold text-white">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#142B4A] text-sm font-bold text-white">
               {customer.initials}
             </div>
           )}

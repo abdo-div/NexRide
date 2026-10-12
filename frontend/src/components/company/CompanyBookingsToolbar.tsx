@@ -103,7 +103,7 @@ export const CompanyBookingsToolbar: React.FC<CompanyBookingsToolbarProps> = ({
             onClick={() => onViewChange(tab.value)}
             className={`relative flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors cursor-pointer ${
               view === tab.value
-                ? "bg-[#E5EEFF] text-[#2563EB]"
+                ? "bg-[#F1F5F9] text-[#142B4A]"
                 : "text-[#565E74] hover:bg-[#F1F5F9] hover:text-[#0B1C30]"
             }`}
           >
@@ -111,8 +111,8 @@ export const CompanyBookingsToolbar: React.FC<CompanyBookingsToolbarProps> = ({
             <span
               className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${
                 view === tab.value
-                  ? "bg-[#2563EB] text-white"
-                  : "bg-[#EFF4FF] text-[#565E74]"
+                  ? "bg-[#142B4A] text-white"
+                  : "bg-[#F8FAFC] text-[#565E74]"
               }`}
             >
               {tabCounts[tab.countKey as keyof typeof tabCounts]}
@@ -134,7 +134,7 @@ export const CompanyBookingsToolbar: React.FC<CompanyBookingsToolbarProps> = ({
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder={t("company.bookingsPage.toolbar.searchPlaceholder")}
-            className="w-full rounded-lg border border-[#E5EEFF] bg-[#F8FAFF] py-2.5 pl-9 pr-3 text-sm font-medium text-[#0B1C30] outline-none transition-colors placeholder:text-[#9AA4B5] focus:border-[#2563EB] focus:ring-2 focus:ring-[#E5EEFF]"
+            className="w-full rounded-lg border border-[#F1F5F9] bg-[#F8FAFF] py-2.5 pl-9 pr-3 text-sm font-medium text-[#0B1C30] outline-none transition-colors placeholder:text-[#9AA4B5] focus:border-[#142B4A] focus:ring-2 focus:ring-[#F1F5F9]"
           />
         </label>
 
@@ -148,7 +148,7 @@ export const CompanyBookingsToolbar: React.FC<CompanyBookingsToolbarProps> = ({
             onChange={(event) =>
               onStatusChange(event.target.value as CompanyBookingsStatus | "ALL")
             }
-            className="w-full cursor-pointer appearance-none rounded-lg border border-[#E5EEFF] bg-[#F8FAFF] px-3 py-2.5 pl-16 pr-8 text-sm font-medium text-[#0B1C30] outline-none transition-colors focus:border-[#2563EB] focus:ring-2 focus:ring-[#E5EEFF]"
+            className="w-full cursor-pointer appearance-none rounded-lg border border-[#F1F5F9] bg-[#F8FAFF] px-3 py-2.5 pl-16 pr-8 text-sm font-medium text-[#0B1C30] outline-none transition-colors focus:border-[#142B4A] focus:ring-2 focus:ring-[#F1F5F9]"
           >
             {GROUP_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -172,7 +172,7 @@ export const CompanyBookingsToolbar: React.FC<CompanyBookingsToolbarProps> = ({
             onChange={(event) =>
               onPaymentChange(event.target.value as CompanyPaymentState | "ALL")
             }
-            className="w-full cursor-pointer appearance-none rounded-lg border border-[#E5EEFF] bg-[#F8FAFF] px-3 py-2.5 pl-16 pr-8 text-sm font-medium text-[#0B1C30] outline-none transition-colors focus:border-[#2563EB] focus:ring-2 focus:ring-[#E5EEFF]"
+            className="w-full cursor-pointer appearance-none rounded-lg border border-[#F1F5F9] bg-[#F8FAFF] px-3 py-2.5 pl-16 pr-8 text-sm font-medium text-[#0B1C30] outline-none transition-colors focus:border-[#142B4A] focus:ring-2 focus:ring-[#F1F5F9]"
           >
             {PAYMENT_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -194,7 +194,7 @@ export const CompanyBookingsToolbar: React.FC<CompanyBookingsToolbarProps> = ({
           <select
             value={vehicleId}
             onChange={(event) => onVehicleChange(event.target.value)}
-            className="w-full cursor-pointer appearance-none rounded-lg border border-[#E5EEFF] bg-[#F8FAFF] px-3 py-2.5 pl-10 pr-8 text-sm font-medium text-[#0B1C30] outline-none transition-colors focus:border-[#2563EB] focus:ring-2 focus:ring-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full cursor-pointer appearance-none rounded-lg border border-[#F1F5F9] bg-[#F8FAFF] px-3 py-2.5 pl-10 pr-8 text-sm font-medium text-[#0B1C30] outline-none transition-colors focus:border-[#142B4A] focus:ring-2 focus:ring-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <option value="">{t("company.bookingsPage.toolbar.allFleets")}</option>
             {vehicles.map((vehicle) => (
@@ -210,7 +210,7 @@ export const CompanyBookingsToolbar: React.FC<CompanyBookingsToolbarProps> = ({
         </label>
 
         {/* Date */}
-        <label className="relative flex items-center gap-2 rounded-lg border border-[#E5EEFF] bg-[#F8FAFF] px-3 py-2.5">
+        <label className="relative flex items-center gap-2 rounded-lg border border-[#F1F5F9] bg-[#F8FAFF] px-3 py-2.5">
           <Calendar className="h-4 w-4 text-[#9AA4B5]" aria-hidden="true" />
           <input
             type="date"
@@ -227,7 +227,7 @@ export const CompanyBookingsToolbar: React.FC<CompanyBookingsToolbarProps> = ({
               title={t("company.bookingsPage.toolbar.viewTable")}
               aria-label={t("company.bookingsPage.toolbar.viewTable")}
               aria-current="page"
-              className="flex h-8 w-8 items-center justify-center rounded-md bg-white text-[#2563EB] shadow-sm"
+              className="flex h-8 w-8 items-center justify-center rounded-md bg-white text-[#142B4A] shadow-sm"
             >
               <Table2 className="h-4 w-4" aria-hidden="true" />
             </span>

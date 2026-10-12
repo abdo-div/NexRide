@@ -165,7 +165,7 @@ function RouteLoadingFallback() {
       role="status"
       aria-label="Loading page"
     >
-      <LoaderCircle className="h-8 w-8 animate-spin text-[#2563EB]" />
+      <LoaderCircle className="h-8 w-8 animate-spin text-[#142B4A]" />
     </div>
   );
 }

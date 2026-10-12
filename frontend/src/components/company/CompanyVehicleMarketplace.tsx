@@ -73,7 +73,7 @@ export const CompanyVehicleMarketplace: React.FC<CompanyVehicleMarketplaceProps>
   return (
     <SectionCard
       icon={Globe2}
-      iconStyle="bg-[#E5EEFF] text-[#2563EB]"
+      iconStyle="bg-[#F1F5F9] text-[#142B4A]"
       title={t("company.vehiclePage.mkt.title")}
       titleAr={t("company.vehiclePage.mkt.titleAr")}
     >
@@ -91,7 +91,7 @@ export const CompanyVehicleMarketplace: React.FC<CompanyVehicleMarketplaceProps>
       <button
         type="button"
         onClick={() => navigate(`/company/fleet/${vehicle.id}/edit`)}
-        className="mt-4 w-full rounded-xl bg-[#F1F5F9] py-2.5 text-sm font-semibold text-[#0B1C30] transition-colors hover:bg-[#E5EEFF] cursor-pointer"
+        className="mt-4 w-full rounded-xl bg-[#F1F5F9] py-2.5 text-sm font-semibold text-[#0B1C30] transition-colors hover:bg-[#F1F5F9] cursor-pointer"
       >
         {t("company.vehiclePage.mkt.manage")}
       </button>

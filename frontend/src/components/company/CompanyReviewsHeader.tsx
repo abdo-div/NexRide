@@ -49,8 +49,8 @@ export const CompanyReviewsHeader: React.FC<CompanyReviewsHeaderProps> = ({
           <span className="text-[#0B1C30]">{t("company.reviewsPage.primary")}</span>
         </div>
         {company && (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EFF4FF] px-3 py-1 text-[11px] font-semibold text-[#565E74]">
-            <ShieldCheck className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden="true" />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8FAFC] px-3 py-1 text-[11px] font-semibold text-[#565E74]">
+            <ShieldCheck className="h-3.5 w-3.5 text-[#142B4A]" aria-hidden="true" />
             {t("company.reviewsPage.scopedTenant", { code: company.slug })}
           </span>
         )}
@@ -86,7 +86,7 @@ export const CompanyReviewsHeader: React.FC<CompanyReviewsHeaderProps> = ({
               type="button"
               onClick={() => setExportOpen((open) => !open)}
               disabled={loading}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
             >
               <Download className="h-[18px] w-[18px] text-[#565E74]" aria-hidden="true" />
               {t("company.reviewsPage.exportTitle")}
@@ -102,7 +102,7 @@ export const CompanyReviewsHeader: React.FC<CompanyReviewsHeaderProps> = ({
                   }}
                   className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] font-semibold text-[#0B1C30] transition-colors hover:bg-[#F8FAFF] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <Table2 className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+                  <Table2 className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
                   {t("company.reviewsPage.exportCsv")}
                 </button>
                 <button
@@ -127,7 +127,7 @@ export const CompanyReviewsHeader: React.FC<CompanyReviewsHeaderProps> = ({
               title={t("company.reviewsPage.viewDetailed")}
               className={`flex items-center gap-1 rounded-lg px-3 py-1.5 text-[12px] font-bold transition-colors cursor-pointer ${
                 view === "detailed"
-                  ? "bg-white text-[#2563EB] shadow-sm"
+                  ? "bg-white text-[#142B4A] shadow-sm"
                   : "text-[#565E74] hover:text-[#0B1C30]"
               }`}
             >
@@ -141,7 +141,7 @@ export const CompanyReviewsHeader: React.FC<CompanyReviewsHeaderProps> = ({
               title={t("company.reviewsPage.viewCompact")}
               className={`flex items-center gap-1 rounded-lg px-3 py-1.5 text-[12px] font-bold transition-colors cursor-pointer ${
                 view === "compact"
-                  ? "bg-white text-[#2563EB] shadow-sm"
+                  ? "bg-white text-[#142B4A] shadow-sm"
                   : "text-[#565E74] hover:text-[#0B1C30]"
               }`}
             >

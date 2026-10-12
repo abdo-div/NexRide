@@ -15,7 +15,7 @@ export interface SectionCardProps {
 /** The recurring white card shell used by every dossier section. */
 export const SectionCard: React.FC<SectionCardProps> = ({
   icon: Icon,
-  iconStyle = "bg-[#E5EEFF] text-[#2563EB]",
+  iconStyle = "bg-[#F1F5F9] text-[#142B4A]",
   title,
   titleAr,
   subtitle,

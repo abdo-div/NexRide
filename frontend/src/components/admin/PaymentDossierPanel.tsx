@@ -53,14 +53,14 @@ export const PaymentDossierPanel: React.FC<PaymentDossierPanelProps> = ({
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
       {/* Dossier header */}
-      <div className="rounded-t-2xl bg-gradient-to-r from-[#2563EB]/5 via-transparent to-transparent p-6">
+      <div className="rounded-t-2xl bg-gradient-to-r from-[#142B4A]/5 via-transparent to-transparent p-6">
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#2563EB] text-white shadow-[0_4px_12px_rgba(37,99,235,0.25)]">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#142B4A] text-white shadow-[0_4px_12px_rgba(37,99,235,0.25)]">
               <Receipt className="h-6 w-6" />
             </div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
+              <div className="text-xs font-bold uppercase tracking-wider text-[#142B4A]">
                 {t("admin.payments.dossier.title")}
               </div>
               <div className="mt-0.5 flex flex-wrap items-center gap-2">
@@ -74,7 +74,7 @@ export const PaymentDossierPanel: React.FC<PaymentDossierPanelProps> = ({
                 <button
                   type="button"
                   onClick={() => onOpenBooking(payment)}
-                  className="mt-1 inline-flex items-center gap-1 text-sm font-bold text-[#2563EB] transition-colors hover:underline cursor-pointer"
+                  className="mt-1 inline-flex items-center gap-1 text-sm font-bold text-[#142B4A] transition-colors hover:underline cursor-pointer"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
                   {t("admin.payments.dossier.linkedBooking")}: #{referenceCodeFrom(booking._id)}
@@ -110,12 +110,12 @@ export const PaymentDossierPanel: React.FC<PaymentDossierPanelProps> = ({
         <div className="flex flex-col gap-6 lg:col-span-7">
           <section>
             <h3 className="mb-3 flex items-center gap-2 text-sm font-extrabold text-[#0B1C30]">
-              <Percent className="h-4 w-4 text-[#2563EB]" />
+              <Percent className="h-4 w-4 text-[#142B4A]" />
               {t("admin.payments.dossier.ledgerTitle")}
             </h3>
             <div className="space-y-2">
               <LedgerRow
-                tone="bg-[#EFF4FF]"
+                tone="bg-[#F8FAFC]"
                 iconTone="bg-emerald-100 text-emerald-700"
                 icon={<BadgeCheck className="h-[18px] w-[18px]" />}
                 label={t("admin.payments.dossier.paidByCustomer")}
@@ -125,14 +125,14 @@ export const PaymentDossierPanel: React.FC<PaymentDossierPanelProps> = ({
               />
               <LedgerRow
                 tone="bg-white"
-                iconTone="bg-[#E5EEFF] text-[#2563EB]"
+                iconTone="bg-[#F1F5F9] text-[#142B4A]"
                 icon={<Percent className="h-[18px] w-[18px]" />}
                 label={t("admin.payments.dossier.commission", {
                   rate: payment.commissionRate,
                 })}
                 sub={t("admin.payments.dossier.commissionSub")}
                 value={`- ${formatLYD(payment.commissionAmount)} LYD`}
-                valueClass="text-[#2563EB]"
+                valueClass="text-[#142B4A]"
               />
               <LedgerRow
                 tone="bg-white"
@@ -146,9 +146,9 @@ export const PaymentDossierPanel: React.FC<PaymentDossierPanelProps> = ({
             </div>
           </section>
 
-          <section className="rounded-2xl bg-[#EFF4FF] p-4">
+          <section className="rounded-2xl bg-[#F8FAFC] p-4">
             <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#565E74]">
-              <ShieldCheck className="h-4 w-4 text-[#2563EB]" />
+              <ShieldCheck className="h-4 w-4 text-[#142B4A]" />
               {t("admin.payments.dossier.gatewayTitle")}
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -189,7 +189,7 @@ export const PaymentDossierPanel: React.FC<PaymentDossierPanelProps> = ({
         <div className="flex flex-col gap-4 lg:col-span-5">
           <section>
             <h3 className="mb-3 flex items-center gap-2 text-sm font-extrabold text-[#0B1C30]">
-              <Receipt className="h-4 w-4 text-[#2563EB]" />
+              <Receipt className="h-4 w-4 text-[#142B4A]" />
               {t("admin.payments.dossier.timelineTitle")}
             </h3>
             <div className="relative space-y-4 pl-5">
@@ -220,7 +220,7 @@ export const PaymentDossierPanel: React.FC<PaymentDossierPanelProps> = ({
             <button
               type="button"
               onClick={() => onOpenBooking(payment)}
-              className="flex items-center justify-between rounded-xl bg-[#EFF4FF] px-4 py-3 text-sm font-bold text-[#2563EB] transition-all hover:bg-[#E5EEFF] cursor-pointer"
+              className="flex items-center justify-between rounded-xl bg-[#F8FAFC] px-4 py-3 text-sm font-bold text-[#142B4A] transition-all hover:bg-[#F1F5F9] cursor-pointer"
             >
               <span className="inline-flex items-center gap-2">
                 <ArrowUpRight className="h-4 w-4" />

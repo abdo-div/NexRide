@@ -98,7 +98,7 @@ export const CompanyDashboardPage: React.FC = () => {
         <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
           <div className="min-w-0">
             <div className="mb-1 flex items-center gap-2 text-xs">
-              <span className="font-bold uppercase tracking-wider text-[#2563EB]">
+              <span className="font-bold uppercase tracking-wider text-[#142B4A]">
                 {t("company.overview.command")}
               </span>
               <span className="text-[#C3C6D7]">•</span>
@@ -115,16 +115,16 @@ export const CompanyDashboardPage: React.FC = () => {
               type="button"
               onClick={reload}
               disabled={loading}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-3.5 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#E5EEFF] disabled:opacity-60 cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-3.5 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#F1F5F9] disabled:opacity-60 cursor-pointer"
             >
-              <RefreshCw className={`h-4 w-4 text-[#2563EB] ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw className={`h-4 w-4 text-[#142B4A] ${loading ? "animate-spin" : ""}`} />
               {t("company.overview.refresh")}
             </button>
             <button
               type="button"
               onClick={handleExport}
               disabled={loading || data.upcomingBookings.length === 0}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.28)] transition-all hover:bg-[#1D4ED8] disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.28)] transition-all hover:bg-[#0D2039] disabled:opacity-50 cursor-pointer"
             >
               <Download className="h-4 w-4" />
               {t("company.overview.export")}
@@ -154,7 +154,7 @@ export const CompanyDashboardPage: React.FC = () => {
             <button
               type="button"
               onClick={reload}
-              className="mt-4 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+              className="mt-4 rounded-lg bg-[#142B4A] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#0D2039] cursor-pointer"
             >
               {t("company.overview.retry")}
             </button>
@@ -214,7 +214,7 @@ export const CompanyDashboardPage: React.FC = () => {
             <footer className="flex flex-col items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-[#434655] shadow-[0_4px_20px_-2px_rgba(15,23,42,0.04)] md:flex-row">
               <div className="flex items-center gap-3 text-center md:text-start">
                 <span
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E5EEFF] text-[#2563EB]"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F1F5F9] text-[#142B4A]"
                   aria-hidden="true"
                 >
                   ·
@@ -236,7 +236,7 @@ export const CompanyDashboardPage: React.FC = () => {
       {toast && (
         <div
           role="status"
-          className="fixed bottom-6 right-6 z-50 max-w-sm rounded-xl border border-[#E5EEFF] bg-white px-4 py-3 text-sm text-[#0B1C30] shadow-[0_8px_24px_rgba(15,23,42,0.12)]"
+          className="fixed bottom-6 right-6 z-50 max-w-sm rounded-xl border border-[#F1F5F9] bg-white px-4 py-3 text-sm text-[#0B1C30] shadow-[0_8px_24px_rgba(15,23,42,0.12)]"
         >
           {toast}
         </div>

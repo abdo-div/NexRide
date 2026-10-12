@@ -30,7 +30,7 @@ export const CompanyVehicleOperationalBar: React.FC<
     {
       label: t("company.vehiclePage.ops.gps"),
       icon: MapPin,
-      iconStyle: "text-[#2563EB]",
+      iconStyle: "text-[#142B4A]",
       main: vehicle.gpsActive
         ? t("company.vehiclePage.ops.online")
         : t("company.vehiclePage.ops.offline"),

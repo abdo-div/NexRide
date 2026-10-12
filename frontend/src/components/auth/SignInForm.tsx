@@ -90,7 +90,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onForgotPassword }) => {
               placeholder={t("auth.signin.identifierPlaceholder")}
               autoComplete="username"
               required
-              className="w-full ps-11 pe-4 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
+              className="w-full ps-11 pe-4 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#142B4A]/30 focus:border-[#142B4A] transition-all placeholder:text-slate-400"
             />
           </div>
           {fieldErrors.identifier && <FieldError>{fieldErrors.identifier}</FieldError>}
@@ -106,7 +106,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onForgotPassword }) => {
             <button
               type="button"
               onClick={onForgotPassword}
-              className="text-[11px] font-semibold text-[#2563EB] hover:text-blue-700 transition-colors focus:outline-none"
+              className="text-[11px] font-semibold text-[#142B4A] hover:text-blue-700 transition-colors focus:outline-none"
             >
               {t("auth.signin.forgotPassword")}
             </button>
@@ -121,7 +121,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onForgotPassword }) => {
               placeholder={t("auth.signin.passwordPlaceholder")}
               autoComplete="current-password"
               required
-              className="w-full ps-11 pe-11 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
+              className="w-full ps-11 pe-11 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#142B4A]/30 focus:border-[#142B4A] transition-all placeholder:text-slate-400"
             />
             <button
               type="button"
@@ -146,7 +146,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onForgotPassword }) => {
               type="checkbox"
               checked={trustDevice}
               onChange={(e) => setTrustDevice(e.target.checked)}
-              className="w-4 h-4 rounded text-[#2563EB] focus:ring-[#2563EB]/30"
+              className="w-4 h-4 rounded text-[#142B4A] focus:ring-[#142B4A]/30"
             />
             <span className="text-xs text-slate-600">
               {t("auth.signin.trustDevice")}
@@ -162,7 +162,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onForgotPassword }) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-1 w-full py-3.5 px-6 rounded-xl bg-[#2563EB] text-white text-sm font-semibold hover:bg-blue-700 transition-all shadow-[0_4px_16px_rgba(37,99,235,0.28)] flex items-center justify-center gap-2 group disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-[#2563EB]"
+          className="mt-1 w-full py-3.5 px-6 rounded-xl bg-[#142B4A] text-white text-sm font-semibold hover:bg-blue-700 transition-all shadow-[0_4px_16px_rgba(37,99,235,0.28)] flex items-center justify-center gap-2 group disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-[#142B4A]"
         >
           <span>{isSubmitting ? t("auth.state.signingIn") : t("auth.signin.submit")}</span>
           {isSubmitting ? (
@@ -189,7 +189,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onForgotPassword }) => {
           onClick={handleGovernmentSso}
           className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 transition-colors text-sm"
         >
-          <BadgeCheck className="w-5 h-5 text-[#2563EB]" />
+          <BadgeCheck className="w-5 h-5 text-[#142B4A]" />
           <span className="text-xs font-semibold">{t("auth.signin.libyanPassport")}</span>
         </button>
         <button
@@ -224,7 +224,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onForgotPassword }) => {
         <a
           href="#fleet-desk"
           onClick={(e) => e.preventDefault()}
-          className="text-[#2563EB] font-semibold hover:underline"
+          className="text-[#142B4A] font-semibold hover:underline"
         >
           {t("auth.signin.contactFleetDeskLink")}
         </a>

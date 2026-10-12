@@ -12,14 +12,14 @@ export const ItinerarySection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => 
     <section className="bg-white rounded-2xl p-6 shadow-sm border border-[#E2E8F0] flex flex-col gap-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold text-[14px]">
+          <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#142B4A] flex items-center justify-center font-bold text-[14px]">
             1
           </div>
           <h2 className="text-[18px] font-bold text-[#0F172A]">{t("checkout.itinerary.title")}</h2>
         </div>
         <button
           type="button"
-          className="px-3 py-1.5 rounded-lg bg-[#F8FAFC] text-[#2563EB] hover:bg-[#F1F5F9] text-[12px] font-semibold transition-colors flex items-center gap-1"
+          className="px-3 py-1.5 rounded-lg bg-[#F8FAFC] text-[#142B4A] hover:bg-[#F1F5F9] text-[12px] font-semibold transition-colors flex items-center gap-1"
         >
           <CalendarDays className="w-[15px] h-[15px]" />
           {t(changeLabel)}
@@ -30,7 +30,7 @@ export const ItinerarySection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => 
         {[pickup, dropoff].map((stop) => (
           <div key={t(stop.label)} className="flex flex-col gap-1.5">
             <span className="text-[11px] uppercase tracking-wider text-[#64748B] font-bold flex items-center gap-1.5">
-              <CheckoutIcon name={stop.icon} className="w-[16px] h-[16px] text-[#2563EB]" />
+              <CheckoutIcon name={stop.icon} className="w-[16px] h-[16px] text-[#142B4A]" />
               {t(stop.label)}
             </span>
             <p className="text-[15px] font-bold text-[#0F172A] leading-tight">{stop.location}</p>
@@ -50,7 +50,7 @@ export const ItinerarySection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => 
           {t(durationLabel, { days, hours: days * 24 })}
         </div>
         <div className="inline-flex items-center gap-1.5 text-[#64748B] text-[12px]">
-          <CheckoutIcon name="verified" className="w-[18px] h-[18px] text-[#2563EB]" />
+          <CheckoutIcon name="verified" className="w-[18px] h-[18px] text-[#142B4A]" />
           {t(cancelNote)}
         </div>
       </div>

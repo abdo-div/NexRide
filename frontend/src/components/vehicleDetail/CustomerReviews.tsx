@@ -26,7 +26,7 @@ export const CustomerReviews: React.FC<{ detail: VehicleDetail }> = ({ detail })
               ))}
             </div>
             <span className="text-[11px] text-[#64748B] font-semibold">
-              <BadgeCheck className="inline w-3.5 h-3.5 text-[#2563EB] -mt-0.5" />{" "}
+              <BadgeCheck className="inline w-3.5 h-3.5 text-[#142B4A] -mt-0.5" />{" "}
               {t(detail.ratingsTag)}
             </span>
           </div>
@@ -42,7 +42,7 @@ export const CustomerReviews: React.FC<{ detail: VehicleDetail }> = ({ detail })
             </div>
             <div className="w-full h-1.5 bg-[#E2E8F0] rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#2563EB] rounded-full"
+                className="h-full bg-[#142B4A] rounded-full"
                 style={{ width: `${b.percent}%` }}
               />
             </div>

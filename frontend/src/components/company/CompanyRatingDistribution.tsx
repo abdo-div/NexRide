@@ -70,7 +70,7 @@ export const CompanyRatingDistribution: React.FC<CompanyRatingDistributionProps>
                 </div>
                 <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#F1F5F9]">
                   <div
-                    className="h-full rounded-full bg-[#2563EB] transition-all"
+                    className="h-full rounded-full bg-[#142B4A] transition-all"
                     style={{ width: `${datum.percent}%` }}
                   />
                 </div>

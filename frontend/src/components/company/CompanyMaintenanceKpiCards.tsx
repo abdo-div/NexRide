@@ -26,7 +26,7 @@ export const CompanyMaintenanceKpiCards: React.FC<CompanyMaintenanceKpiCardsProp
       <KpiTile
         label={t("company.maintenance.kpis.inService")}
         icon={<Siren className="h-[18px] w-[18px]" />}
-        iconTone="bg-[#E5EEFF] text-[#2563EB]"
+        iconTone="bg-[#F1F5F9] text-[#142B4A]"
         value={summary ? formatCount(summary.inServiceVehicles) : "—"}
         suffix={t("company.maintenance.kpis.units")}
         sub={
@@ -38,7 +38,7 @@ export const CompanyMaintenanceKpiCards: React.FC<CompanyMaintenanceKpiCardsProp
             : t("company.maintenance.kpis.loading")
         }
         progress={summary?.inServicePct ?? 0}
-        barTone="bg-[#2563EB]"
+        barTone="bg-[#142B4A]"
       />
       <KpiTile
         label={t("company.maintenance.kpis.dueInspection")}
@@ -49,7 +49,7 @@ export const CompanyMaintenanceKpiCards: React.FC<CompanyMaintenanceKpiCardsProp
         sub={
           <span className="inline-flex items-center gap-1.5">
             {t("company.maintenance.kpis.soon")}
-            <span className="rounded-full bg-[#EFF4FF] px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-[#2563EB]">
+            <span className="rounded-full bg-[#F8FAFC] px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-[#142B4A]">
               {t("company.maintenance.soon")}
             </span>
           </span>
@@ -144,7 +144,7 @@ const KpiTile: React.FC<KpiTileProps> = ({
       {suffix && <span className="text-xs font-bold text-[#565E74]">{suffix}</span>}
     </div>
     <div className="mt-1 text-xs text-[#565E74]">{sub}</div>
-    <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#EFF4FF]">
+    <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#F8FAFC]">
       <div
         className={`h-full rounded-full ${barTone} transition-all`}
         style={{ width: `${Math.min(progress, 100)}%` }}

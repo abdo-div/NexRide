@@ -70,7 +70,7 @@ export const AdminReportsPage: React.FC = () => {
       <div className="mb-6 flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
         <div className="min-w-0 max-w-3xl">
           <div className="mb-1 flex items-center gap-2 text-xs">
-            <span className="font-bold uppercase tracking-wider text-[#2563EB]">
+            <span className="font-bold uppercase tracking-wider text-[#142B4A]">
               {t("admin.reports.command")}
             </span>
             <span className="text-[#C3C6D7]">•</span>
@@ -80,7 +80,7 @@ export const AdminReportsPage: React.FC = () => {
           </div>
           <h1 className="flex flex-wrap items-center gap-3 text-[28px] font-extrabold tracking-tight text-[#0B1C30]">
             {t("admin.reports.title")}
-            <span className="rounded-lg bg-[#EFF4FF] px-2.5 py-1 text-sm font-bold text-[#2563EB]">
+            <span className="rounded-lg bg-[#F8FAFC] px-2.5 py-1 text-sm font-bold text-[#142B4A]">
               {t("admin.reports.subtitleChip")}
             </span>
           </h1>
@@ -98,16 +98,16 @@ export const AdminReportsPage: React.FC = () => {
             type="button"
             onClick={reload}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-3.5 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#E5EEFF] disabled:opacity-60 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-3.5 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#F1F5F9] disabled:opacity-60 cursor-pointer"
           >
-            <RefreshCw className={`h-4 w-4 text-[#2563EB] ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw className={`h-4 w-4 text-[#142B4A] ${loading ? "animate-spin" : ""}`} />
             {t("admin.reports.refresh")}
           </button>
           <button
             type="button"
             onClick={handleExport}
             disabled={!summary || loading}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-4 py-2 text-sm font-semibold text-[#2563EB] shadow-sm transition-all hover:bg-[#E5EEFF] disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-4 py-2 text-sm font-semibold text-[#142B4A] shadow-sm transition-all hover:bg-[#F1F5F9] disabled:opacity-50 cursor-pointer"
           >
             <Download className="h-4 w-4" />
             {t("admin.reports.exportReport")}
@@ -117,7 +117,7 @@ export const AdminReportsPage: React.FC = () => {
 
       {/* Period selector + honest comparison pill */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div className="inline-flex flex-wrap items-center gap-1 rounded-xl bg-[#EFF4FF] p-1">
+        <div className="inline-flex flex-wrap items-center gap-1 rounded-xl bg-[#F8FAFC] p-1">
           {PERIODS.map((key) => (
             <button
               key={key}
@@ -125,7 +125,7 @@ export const AdminReportsPage: React.FC = () => {
               onClick={() => setPeriod(key)}
               className={`rounded-lg px-3 py-1.5 text-sm font-bold transition-all cursor-pointer ${
                 period === key
-                  ? "bg-[#2563EB] text-white shadow-[0_2px_8px_rgba(37,99,235,0.3)]"
+                  ? "bg-[#142B4A] text-white shadow-[0_2px_8px_rgba(37,99,235,0.3)]"
                   : "text-[#565E74] hover:bg-white"
               }`}
             >
@@ -160,7 +160,7 @@ export const AdminReportsPage: React.FC = () => {
           <button
             type="button"
             onClick={reload}
-            className="mt-4 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+            className="mt-4 rounded-lg bg-[#142B4A] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#0D2039] cursor-pointer"
           >
             {t("admin.reports.retry")}
           </button>
@@ -198,7 +198,7 @@ const ReportBody: React.FC<{ summary: ReportsSummary; onNavigate: (to: string) =
         <KpiCard
           label={t("admin.reports.kpis.bookings")}
           icon={<CalendarDays className="h-[18px] w-[18px]" />}
-          iconTone="bg-[#E5EEFF] text-[#2563EB]"
+          iconTone="bg-[#F1F5F9] text-[#142B4A]"
           value={formatCount(funnel.total)}
           sub={t("admin.reports.kpis.bookingsSub", {
             done: formatCount(funnel.completed),
@@ -206,7 +206,7 @@ const ReportBody: React.FC<{ summary: ReportsSummary; onNavigate: (to: string) =
             churn: funnel.churnPct.toFixed(1),
           })}
           progress={funnel.completionPct}
-          barTone="bg-[#2563EB]"
+          barTone="bg-[#142B4A]"
           delta={comparison.bookingsDeltaPct}
         />
         <div className="flex min-h-[148px] flex-col justify-between rounded-2xl bg-gradient-to-br from-[#0B1C30] to-[#10263F] p-4 text-white shadow-[0_2px_12px_rgba(15,23,42,0.04)]">
@@ -301,7 +301,7 @@ const ReportBody: React.FC<{ summary: ReportsSummary; onNavigate: (to: string) =
                 {t("admin.reports.revenue.gmv")}
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-sm bg-[#2563EB]" />
+                <span className="h-2.5 w-2.5 rounded-sm bg-[#142B4A]" />
                 {t("admin.reports.revenue.cut")}
               </span>
             </div>
@@ -331,7 +331,7 @@ const ReportBody: React.FC<{ summary: ReportsSummary; onNavigate: (to: string) =
                   <div key={i} className="flex h-full flex-1 flex-col items-center gap-1">
                     <div className="flex w-full flex-1 items-end justify-center rounded-md bg-[#F1F5F9]">
                       <div
-                        className="w-full rounded-md bg-[#2563EB]/70 transition-all"
+                        className="w-full rounded-md bg-[#142B4A]/70 transition-all"
                         style={{
                           height: `${d.gross > 0 ? Math.max(6, (d.gross / maxDow) * 100) : 3}%`,
                         }}
@@ -353,7 +353,7 @@ const ReportBody: React.FC<{ summary: ReportsSummary; onNavigate: (to: string) =
             {t("admin.reports.revenue.clearing")}
           </div>
           <div className="space-y-4">
-            <div className="rounded-xl bg-[#EFF4FF] p-4">
+            <div className="rounded-xl bg-[#F8FAFC] p-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-[#565E74]">
                   {t("admin.reports.revenue.clearing")}
@@ -377,12 +377,12 @@ const ReportBody: React.FC<{ summary: ReportsSummary; onNavigate: (to: string) =
               </div>
             </div>
 
-            <div className="rounded-xl bg-[#EFF4FF] p-4">
+            <div className="rounded-xl bg-[#F8FAFC] p-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-[#565E74]">
                   {t("admin.reports.revenue.peakDay")}
                 </span>
-                <CalendarClock className="h-4 w-4 text-[#2563EB]" />
+                <CalendarClock className="h-4 w-4 text-[#142B4A]" />
               </div>
               {funnel.peakDay ? (
                 <>
@@ -403,7 +403,7 @@ const ReportBody: React.FC<{ summary: ReportsSummary; onNavigate: (to: string) =
               )}
             </div>
 
-            <div className="rounded-xl bg-[#EFF4FF] p-4">
+            <div className="rounded-xl bg-[#F8FAFC] p-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-[#565E74]">
                   {t("admin.reports.revenue.topRenter")}
@@ -500,7 +500,7 @@ const WeeklyRevenueBars: React.FC<{ weekly: ReportsSummary["weekly"] }> = ({
               title={`GMV ${formatLYD(w.gross)}`}
             />
             <div
-              className="w-full rounded-t-md bg-[#2563EB]"
+              className="w-full rounded-t-md bg-[#142B4A]"
               style={{ height: `${cutH}%` }}
               title={`Commission ${formatLYD(w.cut)}`}
             />
@@ -524,7 +524,7 @@ const FulfillmentCard: React.FC<{ summary: ReportsSummary }> = ({ summary }) => 
   const total = Math.max(1, funnel.total);
   const segments = [
     { key: "completed", count: funnel.completed, cls: "bg-emerald-500" },
-    { key: "activeOnRoad", count: funnel.activeOnRoad, cls: "bg-[#2563EB]" },
+    { key: "activeOnRoad", count: funnel.activeOnRoad, cls: "bg-[#142B4A]" },
     { key: "pending", count: funnel.pending, cls: "bg-amber-500" },
     { key: "cancelled", count: funnel.cancelled, cls: "bg-slate-300" },
   ];
@@ -607,8 +607,8 @@ const CohortCard: React.FC<{ summary: ReportsSummary }> = ({ summary }) => {
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl bg-[#E5EEFF] p-4">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+            <div className="rounded-xl bg-[#F1F5F9] p-4">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-[#142B4A]">
                 {t("admin.reports.cohort.returningRenters")}
               </div>
               <div className="mt-1 text-2xl font-extrabold text-[#0B1C30]">
@@ -668,7 +668,7 @@ const TopCompaniesTable: React.FC<{ companies: ReportTopCompanyRow[] }> = ({
             {t("admin.reports.topCompanies.subtitle")}
           </div>
         </div>
-        <span className="rounded-full bg-[#E5EEFF] px-2 py-0.5 text-xs font-bold text-[#2563EB]">
+        <span className="rounded-full bg-[#F1F5F9] px-2 py-0.5 text-xs font-bold text-[#142B4A]">
           {formatCount(companies.length)}
         </span>
       </div>
@@ -710,14 +710,14 @@ const TopCompaniesTable: React.FC<{ companies: ReportTopCompanyRow[] }> = ({
                   className="border-t border-slate-100 transition-colors hover:bg-[#F8FAFC]"
                 >
                   <td className="px-4 py-3">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#EFF4FF] text-xs font-extrabold text-[#2563EB]">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#F8FAFC] text-xs font-extrabold text-[#142B4A]">
                       {c.rank}
                     </span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2.5">
                       <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-slate-200">
-                        <Building2 className="h-4 w-4 text-[#2563EB]" />
+                        <Building2 className="h-4 w-4 text-[#142B4A]" />
                       </span>
                       <div className="min-w-0">
                         <div className="truncate font-semibold text-[#0B1C30]">{c.name}</div>
@@ -744,7 +744,7 @@ const TopCompaniesTable: React.FC<{ companies: ReportTopCompanyRow[] }> = ({
                       <span className="text-xs font-bold text-[#0B1C30]">
                         {c.completionPct.toFixed(0)}%
                       </span>
-                      <span className="h-1.5 w-12 overflow-hidden rounded-full bg-[#EFF4FF]">
+                      <span className="h-1.5 w-12 overflow-hidden rounded-full bg-[#F8FAFC]">
                         <span
                           className="block h-full rounded-full bg-emerald-500"
                           style={{ width: `${Math.min(c.completionPct, 100)}%` }}
@@ -792,7 +792,7 @@ const TopVehiclesTable: React.FC<{
             {t("admin.reports.topVehicles.subtitle")}
           </div>
         </div>
-        <span className="rounded-full bg-[#E5EEFF] px-2 py-0.5 text-xs font-bold text-[#2563EB]">
+        <span className="rounded-full bg-[#F1F5F9] px-2 py-0.5 text-xs font-bold text-[#142B4A]">
           {formatCount(vehicles.length)}
         </span>
       </div>
@@ -837,7 +837,7 @@ const TopVehiclesTable: React.FC<{
                   className="border-t border-slate-100 transition-colors hover:bg-[#F8FAFC]"
                 >
                   <td className="px-4 py-3">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#EFF4FF] text-xs font-extrabold text-[#2563EB]">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#F8FAFC] text-xs font-extrabold text-[#142B4A]">
                       {v.rank}
                     </span>
                   </td>
@@ -885,9 +885,9 @@ const TopVehiclesTable: React.FC<{
                       <span className="text-xs font-bold text-[#0B1C30]">
                         {v.utilizationPct.toFixed(0)}%
                       </span>
-                      <span className="h-1.5 w-12 overflow-hidden rounded-full bg-[#EFF4FF]">
+                      <span className="h-1.5 w-12 overflow-hidden rounded-full bg-[#F8FAFC]">
                         <span
-                          className="block h-full rounded-full bg-[#2563EB]"
+                          className="block h-full rounded-full bg-[#142B4A]"
                           style={{ width: `${Math.min(v.utilizationPct, 100)}%` }}
                         />
                       </span>
@@ -901,7 +901,7 @@ const TopVehiclesTable: React.FC<{
                       type="button"
                       onClick={() => onNavigate("/admin/maintenance")}
                       title={t("admin.reports.topVehicles.viewFleet")}
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF4FF] text-[#2563EB] transition-colors hover:bg-[#E5EEFF] cursor-pointer"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8FAFC] text-[#142B4A] transition-colors hover:bg-[#F1F5F9] cursor-pointer"
                     >
                       <ExternalLink className="h-4 w-4" />
                     </button>
@@ -956,7 +956,7 @@ const KpiCard: React.FC<KpiCardProps> = ({
     </div>
     <div className="mt-1 text-xs text-[#565E74]">{sub}</div>
     <div className="mt-3 flex items-center gap-2">
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#EFF4FF]">
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#F8FAFC]">
         <div
           className={`h-full rounded-full ${barTone} transition-all`}
           style={{ width: `${Math.min(progress, 100)}%` }}

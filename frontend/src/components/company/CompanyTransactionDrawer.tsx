@@ -44,7 +44,7 @@ const METHOD_KEY: Record<PaymentMethod, string> = {
 const STATUS_STYLES: Record<string, string> = {
   refunded: "bg-[#FFF1F2] text-[#E11D48]",
   partiallyRefunded: "bg-[#FFF1F2] text-[#E11D48]",
-  disbursed: "bg-[#EFF4FF] text-[#2563EB]",
+  disbursed: "bg-[#F8FAFC] text-[#142B4A]",
   processing: "bg-[#FFF4E5] text-[#B45309]",
   completed: "bg-emerald-50 text-emerald-700",
 };
@@ -120,7 +120,7 @@ export const CompanyTransactionDrawer: React.FC<CompanyTransactionDrawerProps> =
         <div className="flex items-start justify-between gap-3 border-b border-slate-100 bg-[#F8FAFC] px-6 py-5">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#EFF4FF] px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-[#2563EB]">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#F8FAFC] px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-[#142B4A]">
                 <ReceiptText className="h-3 w-3" aria-hidden="true" />
                 {t("company.payoutsPage.drawer.badge")}
               </span>
@@ -128,12 +128,12 @@ export const CompanyTransactionDrawer: React.FC<CompanyTransactionDrawerProps> =
             <h2 className="mt-2 text-[16px] font-extrabold tracking-tight text-[#0B1C30]">
               {t("company.payoutsPage.drawer.title")}
             </h2>
-            <p className="font-mono text-[12px] font-bold text-[#2563EB]">{row.trxRef}</p>
+            <p className="font-mono text-[12px] font-bold text-[#142B4A]">{row.trxRef}</p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-2 text-[#565E74] transition-colors hover:bg-[#EFF4FF] hover:text-[#0B1C30] cursor-pointer"
+            className="rounded-lg p-2 text-[#565E74] transition-colors hover:bg-[#F8FAFC] hover:text-[#0B1C30] cursor-pointer"
             aria-label={t("company.payoutsPage.drawer.close")}
           >
             <CircleX className="h-5 w-5" />
@@ -172,7 +172,7 @@ export const CompanyTransactionDrawer: React.FC<CompanyTransactionDrawerProps> =
               {t("company.payoutsPage.drawer.customer")}
             </h3>
             <div className="mt-3 flex items-center gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#E5EEFF] text-[#2563EB]">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#F1F5F9] text-[#142B4A]">
                 {row.customer.photo ? (
                   <img
                     src={row.customer.photo}
@@ -198,7 +198,7 @@ export const CompanyTransactionDrawer: React.FC<CompanyTransactionDrawerProps> =
           {row.vehicle && (
             <section className="rounded-2xl border border-slate-100 bg-[#F8FAFF] p-4">
               <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#E5EEFF] text-[#2563EB]">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#F1F5F9] text-[#142B4A]">
                   {row.vehicle.photo ? (
                     <img
                       src={row.vehicle.photo}
@@ -222,7 +222,7 @@ export const CompanyTransactionDrawer: React.FC<CompanyTransactionDrawerProps> =
                         }`
                       : "—"}
                     {days !== null && days !== undefined && (
-                      <span className="rounded-full bg-[#EFF4FF] px-2 py-0.5 text-[10px] font-bold text-[#2563EB]">
+                      <span className="rounded-full bg-[#F8FAFC] px-2 py-0.5 text-[10px] font-bold text-[#142B4A]">
                         {t("company.payoutsPage.rows.rental", { days })}
                       </span>
                     )}
@@ -279,8 +279,8 @@ export const CompanyTransactionDrawer: React.FC<CompanyTransactionDrawerProps> =
           </section>
 
           {/* Settlement schedule */}
-          <div className="flex items-start gap-2.5 rounded-xl bg-[#EFF4FF] p-3.5">
-            <Landmark className="mt-0.5 h-4 w-4 shrink-0 text-[#2563EB]" aria-hidden="true" />
+          <div className="flex items-start gap-2.5 rounded-xl bg-[#F8FAFC] p-3.5">
+            <Landmark className="mt-0.5 h-4 w-4 shrink-0 text-[#142B4A]" aria-hidden="true" />
             <p className="text-[12px] font-medium leading-relaxed text-[#434655]">
               {t("company.payoutsPage.drawer.wire", {
                 schedule: settings.payoutSchedule,
@@ -296,7 +296,7 @@ export const CompanyTransactionDrawer: React.FC<CompanyTransactionDrawerProps> =
             type="button"
             disabled={busy}
             onClick={onClose}
-            className="rounded-xl bg-[#F1F5F9] px-4 py-2.5 text-[13px] font-bold text-[#565E74] transition-colors hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+            className="rounded-xl bg-[#F1F5F9] px-4 py-2.5 text-[13px] font-bold text-[#565E74] transition-colors hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
           >
             {t("company.payoutsPage.drawer.close")}
           </button>
@@ -304,7 +304,7 @@ export const CompanyTransactionDrawer: React.FC<CompanyTransactionDrawerProps> =
             type="button"
             disabled={busy}
             onClick={() => onDownloadPdf(row)}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-[13px] font-bold text-white shadow-sm transition-colors enabled:hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2.5 text-[13px] font-bold text-white shadow-sm transition-colors enabled:hover:bg-[#0D2039] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
           >
             <FileDown className="h-4 w-4" aria-hidden="true" />
             {t("company.payoutsPage.drawer.downloadPdf")}

@@ -52,7 +52,7 @@ export const BookingStats: React.FC<BookingStatsProps> = ({
       suffix: t("myBookings.totalTrips"),
       note: "",
       icon: <CarFront className="w-6 h-6" />,
-      tileClass: "bg-[#EFF2F7] text-[#2563EB]",
+      tileClass: "bg-[#EFF2F7] text-[#142B4A]",
       valueClass: "text-[#0F172A]",
     },
     {
@@ -64,7 +64,7 @@ export const BookingStats: React.FC<BookingStatsProps> = ({
       live: true,
       icon: <CalendarClock className="w-6 h-6" />,
       tileClass: "bg-[#ECFDF5] text-emerald-700",
-      valueClass: "text-[#2563EB]",
+      valueClass: "text-[#142B4A]",
     },
     {
       key: "paid",
@@ -73,7 +73,7 @@ export const BookingStats: React.FC<BookingStatsProps> = ({
       suffix: currency,
       note: t("myBookings.paidNote"),
       icon: <Wallet className="w-6 h-6" />,
-      tileClass: "bg-[#EFF6FF] text-[#2563EB]",
+      tileClass: "bg-[#EFF6FF] text-[#142B4A]",
       valueClass: "text-[#0F172A]",
     },
     {

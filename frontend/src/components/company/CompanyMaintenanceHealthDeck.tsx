@@ -50,7 +50,7 @@ export const CompanyMaintenanceHealthDeck: React.FC<CompanyMaintenanceHealthDeck
   const pct = (value: number) => Math.round((value / total) * 1000) / 10;
 
   const segments = [
-    { key: "available", count: available, label: t("company.maintenance.deck.available"), tone: "bg-[#2563EB]" },
+    { key: "available", count: available, label: t("company.maintenance.deck.available"), tone: "bg-[#142B4A]" },
     { key: "inService", count: inService, label: t("company.maintenance.deck.inService"), tone: "bg-[#EA8A00]" },
     { key: "unavailable", count: unavailable, label: t("company.maintenance.deck.unavailable"), tone: "bg-[#CBD5E1]" },
   ];
@@ -73,7 +73,7 @@ export const CompanyMaintenanceHealthDeck: React.FC<CompanyMaintenanceHealthDeck
           <h2 className="text-lg font-extrabold tracking-tight text-[#0B1C30]">
             {t("company.maintenance.deck.title")}
           </h2>
-          <span className="rounded-full bg-[#EFF4FF] px-2.5 py-1 text-[11px] font-bold text-[#2563EB]">
+          <span className="rounded-full bg-[#F8FAFC] px-2.5 py-1 text-[11px] font-bold text-[#142B4A]">
             {t("company.maintenance.deck.totalUnits", {
               count: formatCount(summary?.totalFleet ?? 0),
             })}
@@ -192,7 +192,7 @@ export const CompanyMaintenanceHealthDeck: React.FC<CompanyMaintenanceHealthDeck
               </button>
             ))}
             <span
-              className="inline-flex items-center gap-1 rounded-lg bg-[#EFF4FF] px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#2563EB]"
+              className="inline-flex items-center gap-1 rounded-lg bg-[#F8FAFC] px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#142B4A]"
               title={t("company.maintenance.soon")}
             >
               <Sparkles className="h-3 w-3" />
@@ -207,7 +207,7 @@ export const CompanyMaintenanceHealthDeck: React.FC<CompanyMaintenanceHealthDeck
             label={t("company.maintenance.expenses.mtd")}
             value={summary ? formatLYD(summary.mtdCost) : "—"}
             icon={<CircleDollarSign className="h-4 w-4" />}
-            tone="bg-[#EFF4FF] text-[#2563EB]"
+            tone="bg-[#F8FAFC] text-[#142B4A]"
           />
           <ExpenseTile
             label={t("company.maintenance.expenses.avgPerUnit")}

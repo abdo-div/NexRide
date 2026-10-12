@@ -67,7 +67,7 @@ export const CompanySettingsSecurityCard: React.FC<CompanySettingsSecurityCardPr
   };
 
   const inputClass =
-    "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-[#0B1C30] placeholder:text-[#A6ACBE] focus:border-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20";
+    "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-[#0B1C30] placeholder:text-[#A6ACBE] focus:border-[#142B4A] focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20";
 
   return (
     <CompanySettingsSection
@@ -79,7 +79,7 @@ export const CompanySettingsSecurityCard: React.FC<CompanySettingsSecurityCardPr
     >
       <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-5">
         <div className="flex items-center gap-2">
-          <KeyRound className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+          <KeyRound className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
           <h3 className="text-sm font-extrabold text-[#0B1C30]">
             {t("company.settings.security.changePassword")}
           </h3>
@@ -142,7 +142,7 @@ export const CompanySettingsSecurityCard: React.FC<CompanySettingsSecurityCardPr
         <button
           type="submit"
           disabled={busy || !current || !next || !confirm}
-          className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.25)] transition-all hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+          className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.25)] transition-all hover:bg-[#0D2039] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
         >
           <KeyRound className="h-4 w-4" aria-hidden="true" />
           {busy
@@ -174,7 +174,7 @@ export const CompanySettingsSecurityCard: React.FC<CompanySettingsSecurityCardPr
       <button
         type="button"
         onClick={onComingSoon}
-        className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-4 py-2 text-sm font-semibold text-[#565E74] transition-colors hover:bg-[#E5EEFF] hover:text-[#0B1C30] cursor-pointer"
+        className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-4 py-2 text-sm font-semibold text-[#565E74] transition-colors hover:bg-[#F1F5F9] hover:text-[#0B1C30] cursor-pointer"
       >
         <LogOut className="h-4 w-4" aria-hidden="true" />
         {t("company.settings.security.signOutAll")}

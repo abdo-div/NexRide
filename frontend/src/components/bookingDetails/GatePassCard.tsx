@@ -18,7 +18,7 @@ export const GatePassCard: React.FC<GatePassCardProps> = ({ booking }) => {
     <section className="bg-white rounded-2xl border border-slate-200 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)] p-6 flex flex-col gap-4">
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <h2 className="text-[15px] font-bold text-[#0F172A] flex items-center gap-2">
-          <span className="w-8 h-8 rounded-lg bg-[#EFF4FF] text-[#2563EB] flex items-center justify-center">
+          <span className="w-8 h-8 rounded-lg bg-[#F8FAFC] text-[#142B4A] flex items-center justify-center">
             <QrCode className="w-4 h-4" />
           </span>
           {t("bookingDetails.gate.title")}
@@ -45,7 +45,7 @@ export const GatePassCard: React.FC<GatePassCardProps> = ({ booking }) => {
           {code}
         </span>
         <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#64748B]">
-          <CalendarClock className="w-3.5 h-3.5 text-[#2563EB]" />
+          <CalendarClock className="w-3.5 h-3.5 text-[#142B4A]" />
           {t("bookingDetails.gate.validUntil", {
             date: formatDate(booking.startDate, lang),
           })}

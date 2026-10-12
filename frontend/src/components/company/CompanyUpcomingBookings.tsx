@@ -21,16 +21,16 @@ const STATUS_STYLES: Record<
   },
   PAID: {
     key: "company.bookings.statusPaid",
-    className: "bg-[#E5EEFF] text-[#434655]",
+    className: "bg-[#F1F5F9] text-[#434655]",
   },
   CONFIRMED: {
     key: "company.bookings.statusConfirmed",
-    className: "bg-[#DCE9FF] text-[#2563EB]",
+    className: "bg-[#F1F5F9] text-[#142B4A]",
     pulse: true,
   },
   ACTIVE: {
     key: "company.bookings.statusActive",
-    className: "bg-[#DCE9FF] text-[#2563EB]",
+    className: "bg-[#F1F5F9] text-[#142B4A]",
     pulse: true,
   },
 };
@@ -38,7 +38,7 @@ const STATUS_STYLES: Record<
 const statusStyle = (status: string) =>
   STATUS_STYLES[status] ?? {
     key: "company.bookings.statusUpcoming",
-    className: "bg-[#E5EEFF] text-[#2563EB]",
+    className: "bg-[#F1F5F9] text-[#142B4A]",
   };
 
 const initials = (name: string): string =>
@@ -81,7 +81,7 @@ export const CompanyUpcomingBookings: React.FC<CompanyUpcomingBookingsProps> = (
           type="button"
           disabled
           title={t("company.layout.soon")}
-          className="hidden shrink-0 items-center gap-1 text-sm font-bold text-[#2563EB] transition-colors hover:underline disabled:opacity-60 disabled:cursor-not-allowed sm:inline-flex"
+          className="hidden shrink-0 items-center gap-1 text-sm font-bold text-[#142B4A] transition-colors hover:underline disabled:opacity-60 disabled:cursor-not-allowed sm:inline-flex"
         >
           {t("company.bookings.viewAll", { count: rows.length })}
           <span aria-hidden="true">›</span>
@@ -96,7 +96,7 @@ export const CompanyUpcomingBookings: React.FC<CompanyUpcomingBookingsProps> = (
         <div className="w-full overflow-x-auto">
           <table className="w-full border-collapse text-start">
             <thead>
-              <tr className="bg-[#E5EEFF] text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
+              <tr className="bg-[#F1F5F9] text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
                 <th className="rounded-s-xl px-4 py-3 text-start">{t("company.bookings.colRef")}</th>
                 <th className="px-4 py-3 text-start">{t("company.bookings.colCustomer")}</th>
                 <th className="px-4 py-3 text-start">{t("company.bookings.colVehicle")}</th>
@@ -105,14 +105,14 @@ export const CompanyUpcomingBookings: React.FC<CompanyUpcomingBookingsProps> = (
                 <th className="rounded-e-xl px-4 py-3 text-start">{t("company.bookings.colStatus")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E5EEFF]">
+            <tbody className="divide-y divide-[#F1F5F9]">
               {rows.map((b) => {
                 const style = statusStyle(b.bookingStatus);
                 return (
                   <tr key={b.id} className="transition-colors hover:bg-[#F1F5F9]">
                     <td className="px-4 py-3.5">
                       <div className="flex flex-col">
-                        <span className="font-mono text-sm font-bold text-[#2563EB]">
+                        <span className="font-mono text-sm font-bold text-[#142B4A]">
                           {b.reference}
                         </span>
                         <span className="text-[11px] text-[#565E74]">
@@ -122,7 +122,7 @@ export const CompanyUpcomingBookings: React.FC<CompanyUpcomingBookingsProps> = (
                     </td>
                     <td className="px-4 py-3.5">
                       <div className="flex items-center gap-2">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#DCE9FF] text-xs font-bold text-[#2563EB]">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#F1F5F9] text-xs font-bold text-[#142B4A]">
                           {initials(b.customerName)}
                         </span>
                         <span className="text-sm font-semibold text-[#0B1C30]">
@@ -161,7 +161,7 @@ export const CompanyUpcomingBookings: React.FC<CompanyUpcomingBookingsProps> = (
                       <span
                         className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-bold ${style.className}`}
                       >
-                        {style.pulse && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#2563EB]" />}
+                        {style.pulse && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#142B4A]" />}
                         {t(style.key)}
                       </span>
                     </td>

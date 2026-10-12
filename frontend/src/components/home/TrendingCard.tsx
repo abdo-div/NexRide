@@ -39,8 +39,7 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car, index = 0 }) =>
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
-      whileHover={{ y: -6, transition: { duration: 0.2 } }}
-      className="bg-white rounded-3xl border border-slate-200/80 overflow-hidden hover:shadow-xl hover:shadow-blue-500/5 transition-shadow duration-300 group flex flex-col justify-between"
+      className="premium-card bg-white rounded-3xl border border-slate-200/80 overflow-hidden group flex flex-col justify-between"
     >
       {/* Top Image Box */}
       <div className="relative w-full h-56 bg-slate-900 overflow-hidden">
@@ -92,7 +91,7 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car, index = 0 }) =>
                   className="h-7 w-7 shrink-0 rounded-full border border-blue-100 object-cover"
                 />
               ) : (
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-blue-100 bg-blue-50 text-[9px] font-black text-blue-600">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-slate-100 bg-slate-50 text-[9px] font-black text-blue-600">
                   {initialsFrom(car.companyName)}
                 </span>
               )}
@@ -147,7 +146,7 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car, index = 0 }) =>
 
           <Link
             to={car.href ?? `/cars/${car.id}`}
-            className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 flex items-center gap-1.5 transition-all active:scale-95"
+            className="premium-button px-4 py-2.5 text-xs font-bold flex items-center gap-1.5"
           >
             <span>{t("home.trending.reserveRide")}</span>
             <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />

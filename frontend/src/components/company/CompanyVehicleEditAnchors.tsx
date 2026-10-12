@@ -23,7 +23,7 @@ export const CompanyVehicleEditAnchors: React.FC = () => {
           <a
             key={key}
             href={`#section-${key}`}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[#F7F9FC] px-3.5 py-1.5 text-xs font-semibold text-[#565E74] transition-colors hover:bg-[#E5EEFF] hover:text-[#2563EB]"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[#F7F9FC] px-3.5 py-1.5 text-xs font-semibold text-[#565E74] transition-colors hover:bg-[#F1F5F9] hover:text-[#142B4A]"
           >
             <span className="flex h-4 w-4 items-center justify-center rounded-full bg-white font-mono text-[10px] font-bold text-[#0B1C30]">
               {index + 1}

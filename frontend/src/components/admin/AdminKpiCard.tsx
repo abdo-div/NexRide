@@ -18,7 +18,7 @@ interface KpiCardProps {
 }
 
 const toneStyles: Record<KpiTone, string> = {
-  default: "bg-[#EFF4FF] text-[#2563EB]",
+  default: "bg-[#F8FAFC] text-[#142B4A]",
   emerald: "bg-emerald-50 text-emerald-600",
   amber: "bg-amber-50 text-amber-600",
 };
@@ -77,13 +77,13 @@ export const AdminKpiCard: React.FC<KpiCardProps> = ({
 
       {progress !== null && progress !== undefined && (
         <div className="mt-3 flex items-center justify-between">
-          <div className="mr-2 h-2 w-full overflow-hidden rounded-full bg-[#EFF4FF]">
+          <div className="mr-2 h-2 w-full overflow-hidden rounded-full bg-[#F8FAFC]">
             <div
-              className="h-full rounded-full bg-[#2563EB]"
+              className="h-full rounded-full bg-[#142B4A]"
               style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
             />
           </div>
-          <span className="text-[11px] font-bold text-[#2563EB]">
+          <span className="text-[11px] font-bold text-[#142B4A]">
             {progress}%
           </span>
         </div>

@@ -11,17 +11,17 @@ interface AdminFeedProps {
 const kindConfig = {
   approval: {
     icon: ShieldCheck,
-    box: "bg-[#2563EB] text-white",
+    box: "bg-[#142B4A] text-white",
     actionKey: "admin.feed.reviewDossier",
-    actionClass: "text-white bg-[#2563EB]/[0.92] hover:bg-[#2563EB]",
+    actionClass: "text-white bg-[#142B4A]/[0.92] hover:bg-[#142B4A]",
     metaClass: "bg-white text-[#565E74]",
   },
   vehicle: {
     icon: Car,
-    box: "bg-white text-[#2563EB] shadow-[0_1px_4px_rgba(15,23,42,0.08)]",
+    box: "bg-white text-[#142B4A] shadow-[0_1px_4px_rgba(15,23,42,0.08)]",
     actionKey: "admin.feed.verifyVin",
     actionClass: "text-[#565E74] bg-white shadow-[0_1px_4px_rgba(15,23,42,0.08)]",
-    metaClass: "bg-[#EFF4FF] text-[#2563EB]",
+    metaClass: "bg-[#F8FAFC] text-[#142B4A]",
   },
   maintenance: {
     icon: Wrench,
@@ -50,7 +50,7 @@ export const AdminFeed: React.FC<AdminFeedProps> = ({ items }) => {
       <div>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold text-[#0B1C30]">{t("admin.feed.title")}</h2>
-          <span className="rounded-full bg-[#EFF4FF] px-2 py-0.5 text-[11px] font-bold text-[#2563EB]">
+          <span className="rounded-full bg-[#F8FAFC] px-2 py-0.5 text-[11px] font-bold text-[#142B4A]">
             {t("admin.feed.actionItems", { count: items.length })}
           </span>
         </div>
@@ -68,7 +68,7 @@ export const AdminFeed: React.FC<AdminFeedProps> = ({ items }) => {
               return (
                 <div
                   key={item.id}
-                  className="flex items-start justify-between gap-3 rounded-xl bg-[#EFF4FF] p-3 transition-all hover:bg-[#E5EEFF]"
+                  className="flex items-start justify-between gap-3 rounded-xl bg-[#F8FAFC] p-3 transition-all hover:bg-[#F1F5F9]"
                 >
                   <div className="flex min-w-0 items-start gap-3">
                     <div
@@ -117,7 +117,7 @@ export const AdminFeed: React.FC<AdminFeedProps> = ({ items }) => {
       <div className="mt-4 border-t border-slate-100 pt-3 text-center">
         <Link
           to="/admin/bookings"
-          className="inline-flex items-center gap-1 text-sm font-bold text-[#2563EB] hover:underline"
+          className="inline-flex items-center gap-1 text-sm font-bold text-[#142B4A] hover:underline"
         >
           {t("admin.feed.openLog")}
         </Link>

@@ -13,7 +13,7 @@ export const OptionsSection: React.FC<{
     <section className="bg-white rounded-2xl p-6 shadow-sm border border-[#E2E8F0] flex flex-col gap-5">
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold text-[14px]">
+          <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#142B4A] flex items-center justify-center font-bold text-[14px]">
             3
           </div>
           <h2 className="text-[18px] font-bold text-[#0F172A]">{t(meta.optionsTitle)}</h2>
@@ -34,14 +34,14 @@ export const OptionsSection: React.FC<{
                 type="checkbox"
                 checked={checked}
                 onChange={() => onToggle(addon.id)}
-                className="mt-1 w-5 h-5 rounded accent-[#2563EB]"
+                className="mt-1 w-5 h-5 rounded accent-[#142B4A]"
               />
               <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex flex-col gap-0.5">
                   <div className="flex items-center gap-2">
                     <span className="text-[15px] font-bold text-[#0F172A]">{t(addon.name)}</span>
                     {addon.recommended && (
-                      <span className="px-2 py-0.5 rounded-full bg-[#2563EB] text-white text-[11px] font-bold">
+                      <span className="px-2 py-0.5 rounded-full bg-[#142B4A] text-white text-[11px] font-bold">
                         {t("checkout.options.recommended")}
                       </span>
                     )}

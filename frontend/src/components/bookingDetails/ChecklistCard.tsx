@@ -8,7 +8,7 @@ export const ChecklistCard: React.FC = () => {
   return (
     <section className="bg-white rounded-2xl border border-slate-200 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)] p-6 flex flex-col gap-4">
       <h2 className="text-[15px] font-bold text-[#0F172A] flex items-center gap-2">
-        <span className="w-8 h-8 rounded-lg bg-[#EFF4FF] text-[#2563EB] flex items-center justify-center">
+        <span className="w-8 h-8 rounded-lg bg-[#F8FAFC] text-[#142B4A] flex items-center justify-center">
           <ListChecks className="w-4 h-4" />
         </span>
         {t("bookingDetails.checklist.title")}

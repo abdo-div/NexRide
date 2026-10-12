@@ -72,7 +72,7 @@ export const CompanyVehiclePage: React.FC = () => {
             <button
               type="button"
               onClick={reload}
-              className="mt-4 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+              className="mt-4 rounded-lg bg-[#142B4A] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#0D2039] cursor-pointer"
             >
               {t("company.overview.retry")}
             </button>

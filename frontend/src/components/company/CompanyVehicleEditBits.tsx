@@ -110,7 +110,7 @@ export const EditField: React.FC<EditFieldProps> = ({
   required = false,
 }) => {
   const fieldId = useId();
-  const inputClass = `w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none transition-colors placeholder:text-[#9AA4B5] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 ${
+  const inputClass = `w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none transition-colors placeholder:text-[#9AA4B5] focus:border-[#142B4A] focus:ring-2 focus:ring-[#142B4A]/15 ${
     error ? "border-[#E24A55]" : "border-[#E5E7EB]"
   } ${disabled ? "cursor-not-allowed bg-[#F7F9FC] text-[#9AA4B5] opacity-70" : "hover:border-[#C3C6D7]"} ${
     unit && type !== "select" ? "pr-16" : ""

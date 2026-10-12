@@ -22,7 +22,7 @@ export const SimilarVehicles: React.FC<{ detail: VehicleDetail }> = ({ detail })
         </div>
         <Link
           to="/FleetPage"
-          className="text-[13px] text-[#2563EB] font-bold hover:underline flex items-center gap-1"
+          className="text-[13px] text-[#142B4A] font-bold hover:underline flex items-center gap-1"
         >
           {t(detail.similarLinkLabel)}
           <ArrowRight className="w-4 h-4 rtl:rotate-180" />
@@ -41,7 +41,7 @@ export const SimilarVehicles: React.FC<{ detail: VehicleDetail }> = ({ detail })
                 alt={s.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
-              <span className="absolute top-3 start-3 px-3 py-1 rounded-xl bg-white/95 backdrop-blur-md text-[#2563EB] text-[11px] font-bold shadow-sm border border-slate-200">
+              <span className="absolute top-3 start-3 px-3 py-1 rounded-xl bg-white/95 backdrop-blur-md text-[#142B4A] text-[11px] font-bold shadow-sm border border-slate-200">
                 {t(s.tag)}
               </span>
             </div>
@@ -67,9 +67,9 @@ export const SimilarVehicles: React.FC<{ detail: VehicleDetail }> = ({ detail })
                       sp.value === "" && (
                         <span key={sp.label} className="flex items-center gap-1">
                           {i === 0 ? (
-                            <Armchair className="w-4 h-4 text-[#2563EB]" />
+                            <Armchair className="w-4 h-4 text-[#142B4A]" />
                           ) : (
-                            <Settings className="w-4 h-4 text-[#2563EB]" />
+                            <Settings className="w-4 h-4 text-[#142B4A]" />
                           )}
                           {localizeSpec(sp.label)}
                         </span>

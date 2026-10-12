@@ -145,7 +145,7 @@ export const CompanyFleetPage: React.FC = () => {
 
           {loading ? (
             <div className="space-y-3">
-              <div className="h-3 w-2/3 animate-pulse rounded-full bg-[#E5EEFF]" />
+              <div className="h-3 w-2/3 animate-pulse rounded-full bg-[#F1F5F9]" />
               <div className="h-80 animate-pulse rounded-2xl border border-slate-200 bg-white" />
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 3 }).map((_, index) => (
@@ -165,7 +165,7 @@ export const CompanyFleetPage: React.FC = () => {
               <button
                 type="button"
                 onClick={reload}
-                className="mt-4 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+                className="mt-4 rounded-lg bg-[#142B4A] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#0D2039] cursor-pointer"
               >
                 {t("company.overview.retry")}
               </button>
@@ -192,8 +192,8 @@ export const CompanyFleetPage: React.FC = () => {
         </div>
 
         {!loading && !error && list.length === 0 && (
-          <div className="flex items-center gap-2 rounded-2xl border border-[#E5EEFF] bg-[#F8FAFF] px-4 py-3 text-xs text-[#565E74]">
-            <CarFront className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+          <div className="flex items-center gap-2 rounded-2xl border border-[#F1F5F9] bg-[#F8FAFF] px-4 py-3 text-xs text-[#565E74]">
+            <CarFront className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
             {t("company.fleetPage.empty.hint")}
           </div>
         )}

@@ -9,6 +9,7 @@ import { HowItWorks } from "../components/home/HowItWorks";
 import { PartnerSection } from "../components/home/PartnerSection";
 import { TrustedOperators } from "../components/home/trustedOperators";
 import { UncompromisingStandards } from "../components/home/UncompromisingStandards";
+import { TrustStrip } from "../components/home/TrustStrip";
 import { ReadyToHitTheRoad } from "../components/layouts/ReadyToHitTheRoad";
 import { IconContext } from "@phosphor-icons/react";
 
@@ -21,15 +22,10 @@ export const HomePage: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="w-full overflow-x-clip overflow-y-visible"
+      className="landing-shell w-full overflow-x-clip overflow-y-visible"
     >
       <Hero />
-      <VehicleCategories
-        categories={home.categories}
-        loading={home.loading}
-        error={home.error}
-        onRetry={home.reload}
-      />
+      <TrustStrip />
       <TrendingRentals
         cars={home.trending}
         types={home.types}
@@ -38,14 +34,19 @@ export const HomePage: React.FC = () => {
         error={home.error}
         onRetry={home.reload}
       />
+      <VehicleCategories
+        categories={home.categories}
+        loading={home.loading}
+        error={home.error}
+        onRetry={home.reload}
+      />
+      <HowItWorks />
       <NationwidePresence
         hubs={home.regions}
         loading={home.loading}
         error={home.error}
         onRetry={home.reload}
       />
-      <HowItWorks />
-      <PartnerSection />
       <TrustedOperators
         operators={home.operators}
         loading={home.loading}
@@ -53,6 +54,7 @@ export const HomePage: React.FC = () => {
         onRetry={home.reload}
       />
       <UncompromisingStandards />
+      <PartnerSection />
       <ReadyToHitTheRoad />
     </motion.div>
     </IconContext.Provider>

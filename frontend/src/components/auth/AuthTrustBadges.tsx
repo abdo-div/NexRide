@@ -37,7 +37,7 @@ export const AuthTrustBadges: React.FC = () => {
     <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mt-10 pt-5 bg-white rounded-xl p-5 shadow-sm border border-[#E2E8F0]">
       {BADGES.map((badge) => (
         <div key={badge.title} className="flex items-center gap-3">
-          <badge.icon className="w-6 h-6 text-[#2563EB] flex-shrink-0" />
+          <badge.icon className="w-6 h-6 text-[#142B4A] flex-shrink-0" />
           <div>
             <p className="text-xs font-bold text-[#0F172A]">{badge.title}</p>
             <p className="text-[11px] text-slate-500">{badge.subtitle}</p>

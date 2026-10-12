@@ -80,7 +80,7 @@ export const TrustedOperators: React.FC<TrustedOperatorsProps> = ({
               <button
                 type="button"
                 onClick={() => navigate("/companies")}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-slate-200 shadow-sm hover:border-[#2563EB] hover:text-[#2563EB] text-slate-800 text-sm font-bold transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-slate-200 shadow-sm hover:border-[#142B4A] hover:text-[#142B4A] text-slate-800 text-sm font-bold transition-all"
               >
                 <span>{t("home.operators.showAllCompanies")}</span>
                 <ArrowRight className="w-4 h-4 rtl:rotate-180" />

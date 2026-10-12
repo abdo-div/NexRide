@@ -44,7 +44,7 @@ export const CompanySettingsBusinessCard: React.FC<CompanySettingsBusinessCardPr
       <div className="rounded-xl bg-[#F8FAFC] p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#2563EB] shadow-sm">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#142B4A] shadow-sm">
               <Landmark className="h-5 w-5" aria-hidden="true" />
             </span>
             <div className="min-w-0">
@@ -81,7 +81,7 @@ export const CompanySettingsBusinessCard: React.FC<CompanySettingsBusinessCardPr
       <button
         type="button"
         onClick={onComingSoon}
-        className="mt-3 inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-4 py-2 text-sm font-semibold text-[#2563EB] transition-colors hover:bg-[#E5EEFF] cursor-pointer"
+        className="mt-3 inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-4 py-2 text-sm font-semibold text-[#142B4A] transition-colors hover:bg-[#F1F5F9] cursor-pointer"
       >
         <FileClock className="h-4 w-4" aria-hidden="true" />
         {t("company.settings.business.review")}

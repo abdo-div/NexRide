@@ -85,7 +85,7 @@ const Field: React.FC<{
 const TextInput: React.FC<
   React.InputHTMLAttributes<HTMLInputElement> & { withIcon?: React.ReactNode }
 > = ({ withIcon, className, ...props }) => (
-  <div className="flex items-center rounded-xl bg-[#EFF4FF] px-3">
+  <div className="flex items-center rounded-xl bg-[#F8FAFC] px-3">
     {withIcon ? <span className="pe-2 text-[#565E74]">{withIcon}</span> : null}
     <input
       {...props}
@@ -99,7 +99,7 @@ const TextInput: React.FC<
 const SelectInput: React.FC<
   React.SelectHTMLAttributes<HTMLSelectElement> & { withIcon?: React.ReactNode }
 > = ({ withIcon, className, children, ...props }) => (
-  <div className="flex items-center rounded-xl bg-[#EFF4FF] px-3">
+  <div className="flex items-center rounded-xl bg-[#F8FAFC] px-3">
     {withIcon ? <span className="pe-2 text-[#565E74]">{withIcon}</span> : null}
     <select
       {...props}
@@ -124,7 +124,7 @@ const Switch: React.FC<{
     aria-label={ariaLabel}
     onClick={() => onChange(!checked)}
     className={`relative h-6 w-12 shrink-0 cursor-pointer rounded-full p-0.5 transition-colors ${
-      checked ? "bg-[#2563EB]" : "bg-[#C3C6D7]"
+      checked ? "bg-[#142B4A]" : "bg-[#C3C6D7]"
     }`}
   >
     <span
@@ -143,7 +143,7 @@ const SectionShell: React.FC<{
   arSubtitle: string;
   statusBadge?: React.ReactNode;
   children: React.ReactNode;
-}> = ({ id, dotClass = "bg-[#2563EB]", title, chip, arSubtitle, statusBadge, children }) => (
+}> = ({ id, dotClass = "bg-[#142B4A]", title, chip, arSubtitle, statusBadge, children }) => (
   <section
     id={id}
     className="scroll-mt-24 rounded-xl border border-[#E2E8F0] bg-white p-6 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]"
@@ -162,7 +162,7 @@ const SectionShell: React.FC<{
       </div>
       <div className="flex items-center gap-2">
         {statusBadge}
-        <span className="rounded-full bg-[#EFF4FF] px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-[#2563EB]">
+        <span className="rounded-full bg-[#F8FAFC] px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-[#142B4A]">
           {chip}
         </span>
       </div>
@@ -300,7 +300,7 @@ export const AdminSettingsPage: React.FC = () => {
   if (loading && !settings) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center gap-2 text-sm text-[#565E74]">
-        <LoaderCircle className="h-5 w-5 animate-spin text-[#2563EB]" />
+        <LoaderCircle className="h-5 w-5 animate-spin text-[#142B4A]" />
         <span>{t("admin.settings.retry")}…</span>
       </div>
     );
@@ -316,7 +316,7 @@ export const AdminSettingsPage: React.FC = () => {
           <button
             type="button"
             onClick={reload}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white cursor-pointer"
+            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2 text-sm font-semibold text-white cursor-pointer"
           >
             <RefreshCw className="h-4 w-4" />
             {t("admin.settings.retry")}
@@ -332,7 +332,7 @@ export const AdminSettingsPage: React.FC = () => {
       <div className="mb-6 flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
         <div className="min-w-0 max-w-4xl">
           <div className="mb-1 flex items-center gap-2 text-xs">
-            <span className="font-bold uppercase tracking-wider text-[#2563EB]">
+            <span className="font-bold uppercase tracking-wider text-[#142B4A]">
               {t("admin.settings.command")}
             </span>
             <span className="text-[#C3C6D7]">•</span>
@@ -342,7 +342,7 @@ export const AdminSettingsPage: React.FC = () => {
           </div>
           <h1 className="flex flex-wrap items-center gap-3 text-[28px] font-extrabold tracking-tight text-[#0B1C30]">
             {t("admin.settings.title")}
-            <span className="rounded-lg bg-[#EFF4FF] px-2.5 py-1 text-sm font-bold text-[#2563EB]">
+            <span className="rounded-lg bg-[#F8FAFC] px-2.5 py-1 text-sm font-bold text-[#142B4A]">
               {t("admin.settings.subtitleChip")}
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
@@ -359,7 +359,7 @@ export const AdminSettingsPage: React.FC = () => {
           <button
             type="button"
             onClick={handleRevert}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-3.5 py-2 text-sm font-semibold text-[#565E74] transition-colors hover:text-[#0B1C30] hover:bg-[#E5EEFF] cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-3.5 py-2 text-sm font-semibold text-[#565E74] transition-colors hover:text-[#0B1C30] hover:bg-[#F1F5F9] cursor-pointer"
           >
             <RotateCcw className="h-4 w-4" />
             {t("admin.settings.cancel")}
@@ -367,7 +367,7 @@ export const AdminSettingsPage: React.FC = () => {
           <button
             type="button"
             onClick={handleReset}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-3.5 py-2 text-sm font-semibold text-[#565E74] transition-colors hover:text-[#0B1C30] hover:bg-[#E5EEFF] cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-3.5 py-2 text-sm font-semibold text-[#565E74] transition-colors hover:text-[#0B1C30] hover:bg-[#F1F5F9] cursor-pointer"
           >
             <RefreshCw className="h-4 w-4" />
             {t("admin.settings.resetDefaults")}
@@ -376,7 +376,7 @@ export const AdminSettingsPage: React.FC = () => {
             type="button"
             onClick={handleSave}
             disabled={!dirty || saving}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_16px_rgba(0,74,198,0.28)] transition-all hover:bg-[#004AC6] disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_16px_rgba(0,74,198,0.28)] transition-all hover:bg-[#142B4A] disabled:opacity-50 cursor-pointer"
           >
             <Save className="h-4 w-4" />
             {saving ? t("admin.settings.saving") : t("admin.settings.saveChanges")}
@@ -386,9 +386,9 @@ export const AdminSettingsPage: React.FC = () => {
 
       {/* Compliance banner */}
       {registry ? (
-        <div className="mb-6 flex flex-col justify-between gap-3 rounded-xl bg-[#EFF4FF] p-4 shadow-sm sm:flex-row sm:items-center">
+        <div className="mb-6 flex flex-col justify-between gap-3 rounded-xl bg-[#F8FAFC] p-4 shadow-sm sm:flex-row sm:items-center">
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#2563EB] text-white">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#142B4A] text-white">
               <Lock className="h-[18px] w-[18px]" />
             </div>
             <p className="text-sm text-[#0B1C30]">
@@ -404,7 +404,7 @@ export const AdminSettingsPage: React.FC = () => {
               type="button"
               onClick={handleCopyHash}
               title={registry.hash}
-              className="inline-flex items-center gap-1 rounded bg-[#E5EEFF] px-2 py-0.5 font-mono text-[11px] font-bold text-[#2563EB] transition-colors hover:bg-[#DCE9FF] cursor-pointer"
+              className="inline-flex items-center gap-1 rounded bg-[#F1F5F9] px-2 py-0.5 font-mono text-[11px] font-bold text-[#142B4A] transition-colors hover:bg-[#F1F5F9] cursor-pointer"
             >
               <span dir="ltr">SHA256:{registry.short}</span>
               <Copy className="h-3 w-3" />
@@ -440,10 +440,10 @@ export const AdminSettingsPage: React.FC = () => {
                       isActive
                         ? isDanger
                           ? "bg-[#FFDAD6] font-semibold text-[#93000A]"
-                          : "bg-[#2563EB] font-semibold text-white"
+                          : "bg-[#142B4A] font-semibold text-white"
                         : isDanger
                           ? "font-semibold text-[#BA1A1A] hover:bg-[#FFE4E1] hover:text-[#93000A]"
-                          : "text-[#565E74] hover:bg-[#EFF4FF] hover:text-[#0B1C30]"
+                          : "text-[#565E74] hover:bg-[#F8FAFC] hover:text-[#0B1C30]"
                     }`}
                   >
                     <Icon className="h-[19px] w-[19px] shrink-0" />
@@ -455,7 +455,7 @@ export const AdminSettingsPage: React.FC = () => {
 
             {/* Operational audit */}
             {governance && gateways ? (
-              <div className="mt-6 rounded-xl bg-[#EFF4FF] p-3.5">
+              <div className="mt-6 rounded-xl bg-[#F8FAFC] p-3.5">
                 <div className="flex items-center justify-between text-[11px] font-bold tracking-wider text-[#565E74]">
                   <span>{t("admin.settings.audit.title").toUpperCase()}</span>
                   <span className={auditStatus ? "text-emerald-600" : "text-[#BA1A1A]"}>
@@ -471,7 +471,7 @@ export const AdminSettingsPage: React.FC = () => {
                 <div className="mt-3 space-y-1.5 text-[11px] text-[#565E74]">
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
-                      <Gauge className="h-3.5 w-3.5 text-[#2563EB]" />
+                      <Gauge className="h-3.5 w-3.5 text-[#142B4A]" />
                       {t("admin.settings.audit.takeRate")}
                     </span>
                     <span className="font-semibold text-[#0B1C30]">
@@ -480,7 +480,7 @@ export const AdminSettingsPage: React.FC = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
-                      <Activity className="h-3.5 w-3.5 text-[#2563EB]" />
+                      <Activity className="h-3.5 w-3.5 text-[#142B4A]" />
                       {t("admin.settings.audit.onRoad")}
                     </span>
                     <span className="font-semibold text-[#0B1C30]">
@@ -489,7 +489,7 @@ export const AdminSettingsPage: React.FC = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
-                      <Banknote className="h-3.5 w-3.5 text-[#2563EB]" />
+                      <Banknote className="h-3.5 w-3.5 text-[#142B4A]" />
                       {t("admin.settings.audit.pending")}
                     </span>
                     <span className="font-semibold text-[#0B1C30]">
@@ -498,7 +498,7 @@ export const AdminSettingsPage: React.FC = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
-                      <CreditCard className="h-3.5 w-3.5 text-[#2563EB]" />
+                      <CreditCard className="h-3.5 w-3.5 text-[#142B4A]" />
                       {t("admin.settings.gateways.moamalatTitle")}
                     </span>
                     <span
@@ -510,7 +510,7 @@ export const AdminSettingsPage: React.FC = () => {
                     </span>
                   </div>
                 </div>
-                <div className="mt-3 flex items-center justify-between border-t border-[#DCE9FF] pt-2 text-[11px] text-[#565E74]">
+                <div className="mt-3 flex items-center justify-between border-t border-[#F1F5F9] pt-2 text-[11px] text-[#565E74]">
                   <span>{t("admin.settings.audit.lastSync")}:</span>
                   <span className="font-semibold text-[#0B1C30]">{lastSyncLabel}</span>
                 </div>
@@ -598,11 +598,11 @@ export const AdminSettingsPage: React.FC = () => {
                     label={t("admin.settings.general.currency")}
                     hint={t("admin.settings.general.currencyHint")}
                   >
-                    <div className="flex items-center justify-between rounded-xl bg-[#E5EEFF] px-3 py-2">
+                    <div className="flex items-center justify-between rounded-xl bg-[#F1F5F9] px-3 py-2">
                       <span className="text-sm font-semibold text-[#0B1C30]" dir="rtl">
                         {t("admin.settings.general.currencyValue")}
                       </span>
-                      <span className="rounded bg-[#2563EB] px-2 py-0.5 text-[11px] font-bold text-white">
+                      <span className="rounded bg-[#142B4A] px-2 py-0.5 text-[11px] font-bold text-white">
                         {t("admin.settings.general.currencyLocked")}
                       </span>
                     </div>
@@ -611,7 +611,7 @@ export const AdminSettingsPage: React.FC = () => {
                     label={t("admin.settings.general.country")}
                     hint={t("admin.settings.general.countryHint")}
                   >
-                    <div className="flex items-center rounded-xl bg-[#E5EEFF] px-3 py-2">
+                    <div className="flex items-center rounded-xl bg-[#F1F5F9] px-3 py-2">
                       <Globe className="mr-2 h-[18px] w-[18px] text-[#565E74]" />
                       <input
                         disabled
@@ -668,7 +668,7 @@ export const AdminSettingsPage: React.FC = () => {
                 arSubtitle={t("admin.settings.booking.arSubtitle")}
               >
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                  <div className="rounded-xl bg-[#EFF4FF] p-4">
+                  <div className="rounded-xl bg-[#F8FAFC] p-4">
                     <span className="block text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
                       {t("admin.settings.booking.freeCancel")}
                     </span>
@@ -683,7 +683,7 @@ export const AdminSettingsPage: React.FC = () => {
                       {t("admin.settings.booking.freeCancelHint")}
                     </p>
                   </div>
-                  <div className="rounded-xl bg-[#EFF4FF] p-4">
+                  <div className="rounded-xl bg-[#F8FAFC] p-4">
                     <span className="block text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
                       {t("admin.settings.booking.latePenalty")}
                     </span>
@@ -698,11 +698,11 @@ export const AdminSettingsPage: React.FC = () => {
                       {t("admin.settings.booking.latePenaltyHint")}
                     </p>
                   </div>
-                  <div className="rounded-xl bg-[#EFF4FF] p-4">
+                  <div className="rounded-xl bg-[#F8FAFC] p-4">
                     <span className="block text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
                       {t("admin.settings.booking.reservationExpiry")}
                     </span>
-                    <div className="mt-1 text-[22px] font-bold text-[#2563EB]">
+                    <div className="mt-1 text-[22px] font-bold text-[#142B4A]">
                       <span className="mr-1">
                         {t("admin.settings.booking.optReservation", {
                           m: draft.booking.reservationExpiryMinutes,
@@ -716,9 +716,9 @@ export const AdminSettingsPage: React.FC = () => {
                 </div>
 
                 <div className="mt-5 space-y-3">
-                  <div className="flex flex-col justify-between gap-3 rounded-xl bg-[#EFF4FF] p-3 sm:flex-row sm:items-center">
+                  <div className="flex flex-col justify-between gap-3 rounded-xl bg-[#F8FAFC] p-3 sm:flex-row sm:items-center">
                     <div className="flex items-center gap-3">
-                      <Timer className="text-[22px] text-[#2563EB]" />
+                      <Timer className="text-[22px] text-[#142B4A]" />
                       <div>
                         <div className="text-sm font-semibold text-[#0B1C30]">
                           {t("admin.settings.booking.freeCancel")}
@@ -748,7 +748,7 @@ export const AdminSettingsPage: React.FC = () => {
                     </SelectInput>
                   </div>
 
-                  <div className="flex flex-col justify-between gap-3 rounded-xl bg-[#EFF4FF] p-3 sm:flex-row sm:items-center">
+                  <div className="flex flex-col justify-between gap-3 rounded-xl bg-[#F8FAFC] p-3 sm:flex-row sm:items-center">
                     <div className="flex items-center gap-3">
                       <Lock className="text-[22px] text-[#BA1A1A]" />
                       <div>
@@ -780,7 +780,7 @@ export const AdminSettingsPage: React.FC = () => {
                     </SelectInput>
                   </div>
 
-                  <div className="flex flex-col justify-between gap-3 rounded-xl bg-[#EFF4FF] p-3 sm:flex-row sm:items-center">
+                  <div className="flex flex-col justify-between gap-3 rounded-xl bg-[#F8FAFC] p-3 sm:flex-row sm:items-center">
                     <div className="flex items-center gap-3">
                       <CheckCircle2 className="text-[22px] text-emerald-600" />
                       <div>
@@ -812,7 +812,7 @@ export const AdminSettingsPage: React.FC = () => {
                     </SelectInput>
                   </div>
 
-                  <div className="flex flex-col justify-between gap-3 rounded-xl bg-[#EFF4FF] p-3 sm:flex-row sm:items-center">
+                  <div className="flex flex-col justify-between gap-3 rounded-xl bg-[#F8FAFC] p-3 sm:flex-row sm:items-center">
                     <div className="flex items-center gap-3">
                       <HourglassIcon className="text-[22px] text-amber-600" />
                       <div>
@@ -856,13 +856,13 @@ export const AdminSettingsPage: React.FC = () => {
                 arSubtitle={t("admin.settings.commission.arSubtitle")}
               >
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div className="flex flex-col justify-between rounded-xl bg-[#EFF4FF] p-4">
+                  <div className="flex flex-col justify-between rounded-xl bg-[#F8FAFC] p-4">
                     <div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-bold text-[#0B1C30]">
                           {t("admin.settings.commission.standardRate")}
                         </span>
-                        <span className="rounded-full bg-[#2563EB] px-2 py-0.5 text-xs font-bold text-white">
+                        <span className="rounded-full bg-[#142B4A] px-2 py-0.5 text-xs font-bold text-white">
                           {t("admin.settings.commission.standardRateBadge")}
                         </span>
                       </div>
@@ -886,7 +886,7 @@ export const AdminSettingsPage: React.FC = () => {
                             },
                           })
                         }
-                        className="w-20 rounded-lg border border-[#E2E8F0] bg-white px-2 py-1 text-center text-[22px] font-extrabold text-[#2563EB] outline-none focus:ring-2 focus:ring-[#2563EB]"
+                        className="w-20 rounded-lg border border-[#E2E8F0] bg-white px-2 py-1 text-center text-[22px] font-extrabold text-[#142B4A] outline-none focus:ring-2 focus:ring-[#142B4A]"
                       />
                       <span className="text-lg font-bold text-[#0B1C30]">%</span>
                       <span className="ml-2 text-xs text-[#565E74]">
@@ -895,7 +895,7 @@ export const AdminSettingsPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-col justify-between rounded-xl bg-[#EFF4FF] p-4">
+                  <div className="flex flex-col justify-between rounded-xl bg-[#F8FAFC] p-4">
                     <div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-bold text-[#0B1C30]">
@@ -922,7 +922,7 @@ export const AdminSettingsPage: React.FC = () => {
                 </div>
 
                 <div className="mt-4 grid grid-cols-1 gap-3 text-xs md:grid-cols-3">
-                  <div className="flex flex-col gap-1 rounded-xl bg-[#EFF4FF] p-3">
+                  <div className="flex flex-col gap-1 rounded-xl bg-[#F8FAFC] p-3">
                     <span className="uppercase font-semibold text-[#565E74]">
                       {t("admin.settings.commission.payoutSchedule")}
                     </span>
@@ -943,7 +943,7 @@ export const AdminSettingsPage: React.FC = () => {
                       {t("admin.settings.commission.batchTime")}
                     </span>
                   </div>
-                  <div className="flex flex-col gap-1 rounded-xl bg-[#EFF4FF] p-3">
+                  <div className="flex flex-col gap-1 rounded-xl bg-[#F8FAFC] p-3">
                     <span className="uppercase font-semibold text-[#565E74]">
                       {t("admin.settings.commission.minThreshold")}
                     </span>
@@ -967,7 +967,7 @@ export const AdminSettingsPage: React.FC = () => {
                       {t("admin.settings.commission.rollover")}
                     </span>
                   </div>
-                  <div className="flex flex-col gap-1 rounded-xl bg-[#EFF4FF] p-3">
+                  <div className="flex flex-col gap-1 rounded-xl bg-[#F8FAFC] p-3">
                     <span className="uppercase font-semibold text-[#565E74]">
                       {t("admin.settings.commission.clearingBank")}
                     </span>
@@ -1022,10 +1022,10 @@ export const AdminSettingsPage: React.FC = () => {
               >
                 <div className="space-y-4">
                   {/* Moamalat */}
-                  <div className="rounded-xl bg-[#EFF4FF] p-4">
+                  <div className="rounded-xl bg-[#F8FAFC] p-4">
                     <div className="flex flex-col justify-between gap-3 pb-3 sm:flex-row sm:items-center">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xs font-black text-[#2563EB] shadow-sm">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xs font-black text-[#142B4A] shadow-sm">
                           MOAM
                         </div>
                         <div>
@@ -1054,7 +1054,7 @@ export const AdminSettingsPage: React.FC = () => {
                           className={`rounded-full px-2.5 py-1 font-bold ${
                             moamalat?.enabled
                               ? "bg-emerald-100 text-emerald-700"
-                              : "bg-[#E5EEFF] text-[#565E74]"
+                              : "bg-[#F1F5F9] text-[#565E74]"
                           }`}
                         >
                           {moamalat?.env || t("admin.settings.gateways.disabled")}
@@ -1091,7 +1091,7 @@ export const AdminSettingsPage: React.FC = () => {
                   </div>
 
                   {/* Sadad */}
-                  <div className="rounded-xl bg-[#EFF4FF] p-4">
+                  <div className="rounded-xl bg-[#F8FAFC] p-4">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xs font-black text-amber-700 shadow-sm">
                         SADAD
@@ -1101,7 +1101,7 @@ export const AdminSettingsPage: React.FC = () => {
                           <h3 className="text-sm font-bold text-[#0B1C30]">
                             {t("admin.settings.gateways.sadadTitle")}
                           </h3>
-                          <span className="rounded bg-[#E5EEFF] px-2 py-0.5 text-[10px] font-extrabold uppercase text-[#565E74]">
+                          <span className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[10px] font-extrabold uppercase text-[#565E74]">
                             {t("admin.settings.gateways.disabled")}
                           </span>
                         </div>
@@ -1116,7 +1116,7 @@ export const AdminSettingsPage: React.FC = () => {
                   </div>
 
                   {/* Tadawul */}
-                  <div className="rounded-xl bg-[#EFF4FF] p-4">
+                  <div className="rounded-xl bg-[#F8FAFC] p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xs font-black text-[#565E74] shadow-sm">
@@ -1127,7 +1127,7 @@ export const AdminSettingsPage: React.FC = () => {
                             <h3 className="text-sm font-bold text-[#0B1C30]">
                               {t("admin.settings.gateways.tadawulTitle")}
                             </h3>
-                            <span className="rounded bg-[#E5EEFF] px-2 py-0.5 text-[10px] font-extrabold uppercase text-[#565E74]">
+                            <span className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[10px] font-extrabold uppercase text-[#565E74]">
                               {t("admin.settings.gateways.disabled")}
                             </span>
                           </div>
@@ -1143,8 +1143,8 @@ export const AdminSettingsPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-start gap-2 rounded-xl bg-[#E5EEFF] p-3 text-xs text-[#565E74]">
-                  <Lock className="mt-0.5 h-[18px] w-[18px] shrink-0 text-[#2563EB]" />
+                <div className="mt-4 flex items-start gap-2 rounded-xl bg-[#F1F5F9] p-3 text-xs text-[#565E74]">
+                  <Lock className="mt-0.5 h-[18px] w-[18px] shrink-0 text-[#142B4A]" />
                   <span>{t("admin.settings.gateways.complianceNote")}</span>
                 </div>
               </SectionShell>
@@ -1160,7 +1160,7 @@ export const AdminSettingsPage: React.FC = () => {
               >
                 <div className="space-y-3">
                   <ToggleRow
-                    icon={<Antenna className="text-[22px] text-[#2563EB]" />}
+                    icon={<Antenna className="text-[22px] text-[#142B4A]" />}
                     title={t("admin.settings.telemetry.smsTitle")}
                     hint={t("admin.settings.telemetry.smsHint")}
                     checked={draft.telemetry.smsDispatchEnabled}
@@ -1189,7 +1189,7 @@ export const AdminSettingsPage: React.FC = () => {
                     ariaLabel={t("admin.settings.telemetry.maintenanceTitle")}
                   />
                   <ToggleRow
-                    icon={<BellIcon className="text-[22px] text-[#2563EB]" />}
+                    icon={<BellIcon className="text-[22px] text-[#142B4A]" />}
                     title={t("admin.settings.telemetry.escalationTitle")}
                     hint={t("admin.settings.telemetry.escalationHint")}
                     checked={draft.telemetry.settlementEscalationEnabled}
@@ -1219,7 +1219,7 @@ export const AdminSettingsPage: React.FC = () => {
                   />
                 </div>
                 <p className="mt-3 flex items-center gap-2 text-xs text-[#565E74]">
-                  <Activity className="h-4 w-4 text-[#2563EB]" />
+                  <Activity className="h-4 w-4 text-[#142B4A]" />
                   {t("admin.settings.telemetry.note")}
                 </p>
               </SectionShell>
@@ -1234,7 +1234,7 @@ export const AdminSettingsPage: React.FC = () => {
                 arSubtitle={t("admin.settings.governance.arSubtitle")}
               >
                 {/* Admin accounts */}
-                <div className="rounded-xl bg-[#EFF4FF] p-4">
+                <div className="rounded-xl bg-[#F8FAFC] p-4">
                   <div className="mb-2 text-xs font-bold uppercase tracking-wider text-[#565E74]">
                     {t("admin.settings.governance.accounts")} (
                     {governance?.admins.length ?? 0})
@@ -1248,7 +1248,7 @@ export const AdminSettingsPage: React.FC = () => {
                           key={admin._id}
                           className="flex items-center gap-3 rounded-xl bg-white p-3 shadow-sm"
                         >
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#2563EB] text-sm font-bold text-white">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#142B4A] text-sm font-bold text-white">
                             {admin.name.slice(0, 1).toUpperCase()}
                           </div>
                           <div className="min-w-0 flex-1">
@@ -1283,7 +1283,7 @@ export const AdminSettingsPage: React.FC = () => {
                                 </span>
                               ) : null}
                             </div>
-                            <span className="text-[11px] font-semibold text-[#2563EB]">
+                            <span className="text-[11px] font-semibold text-[#142B4A]">
                               {t("admin.settings.governance.role")}
                             </span>
                           </div>
@@ -1303,9 +1303,9 @@ export const AdminSettingsPage: React.FC = () => {
 
                 <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                   {/* 2FA */}
-                  <div className="rounded-xl bg-[#EFF4FF] p-4">
+                  <div className="rounded-xl bg-[#F8FAFC] p-4">
                     <div className="mb-2 flex items-center gap-2">
-                      <Fingerprint className="h-5 w-5 text-[#2563EB]" />
+                      <Fingerprint className="h-5 w-5 text-[#142B4A]" />
                       <span className="text-sm font-bold text-[#0B1C30]">
                         {t("admin.settings.governance.twoFactor.title")}
                       </span>
@@ -1323,9 +1323,9 @@ export const AdminSettingsPage: React.FC = () => {
                   </div>
 
                   {/* Current session */}
-                  <div className="rounded-xl bg-[#EFF4FF] p-4">
+                  <div className="rounded-xl bg-[#F8FAFC] p-4">
                     <div className="mb-2 flex items-center gap-2">
-                      <MonitorSmartphone className="h-5 w-5 text-[#2563EB]" />
+                      <MonitorSmartphone className="h-5 w-5 text-[#142B4A]" />
                       <span className="text-sm font-bold text-[#0B1C30]">
                         {t("admin.settings.governance.currentSession")}
                       </span>
@@ -1479,7 +1479,7 @@ export const AdminSettingsPage: React.FC = () => {
               type="button"
               onClick={handleSave}
               disabled={!dirty || saving}
-              className="rounded-xl bg-[#2563EB] px-5 py-2 text-sm font-bold text-white shadow-[0_4px_12px_rgba(0,74,198,0.25)] transition-all hover:bg-[#004AC6] disabled:opacity-50 cursor-pointer"
+              className="rounded-xl bg-[#142B4A] px-5 py-2 text-sm font-bold text-white shadow-[0_4px_12px_rgba(0,74,198,0.25)] transition-all hover:bg-[#142B4A] disabled:opacity-50 cursor-pointer"
             >
               {saving ? t("admin.settings.saving") : t("admin.settings.footer.save")}
             </button>
@@ -1529,7 +1529,7 @@ const HourglassIcon: React.FC<{ className?: string }> = ({ className }) => (
 
 const BellIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg
-    className={`text-[#2563EB] ${className ?? ""}`}
+    className={`text-[#142B4A] ${className ?? ""}`}
     width="22"
     height="22"
     viewBox="0 0 24 24"
@@ -1568,7 +1568,7 @@ const ToggleRow: React.FC<{
   onChange: (next: boolean) => void;
   ariaLabel: string;
 }> = ({ icon, title, hint, checked, onChange, ariaLabel }) => (
-  <div className="flex items-center justify-between rounded-xl bg-[#EFF4FF] p-3">
+  <div className="flex items-center justify-between rounded-xl bg-[#F8FAFC] p-3">
     <div className="flex items-start gap-3">
       <span className="mt-0.5">{icon}</span>
       <div>

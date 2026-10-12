@@ -63,7 +63,7 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
             </span>
           )}
           {vehicle.badgeTagSecondary && (
-            <span className="px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-[#2563EB] border border-[#E2E8F0] text-[10px] font-bold uppercase tracking-wider shadow-sm">
+            <span className="px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-[#142B4A] border border-[#E2E8F0] text-[10px] font-bold uppercase tracking-wider shadow-sm">
               {vehicle.badgeTagSecondary}
             </span>
           )}
@@ -82,7 +82,7 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
         <div className="flex flex-col gap-2">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#142B4A]">
                 {vehicle.category}
               </span>
               <h2 className="text-xl font-bold text-[#0F172A] mt-0.5">{vehicle.title}</h2>
@@ -102,9 +102,9 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
           <div className="flex items-center gap-3 pt-1 flex-wrap">
             <Link
               to={vehicle.operator.id ? `/companies/${vehicle.operator.id}` : "#"}
-              className="flex items-center gap-2 text-sm font-semibold text-slate-800 hover:text-[#2563EB]"
+              className="flex items-center gap-2 text-sm font-semibold text-slate-800 hover:text-[#142B4A]"
             >
-              {companyLogoUrl(vehicle.operator.logo) ? <img src={companyLogoUrl(vehicle.operator.logo) ?? ""} alt={vehicle.operator.name} className="h-6 w-6 rounded-full border border-blue-200 object-cover" /> : <span className="flex h-6 w-6 items-center justify-center rounded-full border border-blue-200 bg-blue-100 text-[10px] font-bold text-[#2563EB]">{vehicle.operator.initials}</span>}
+              {companyLogoUrl(vehicle.operator.logo) ? <img src={companyLogoUrl(vehicle.operator.logo) ?? ""} alt={vehicle.operator.name} className="h-6 w-6 rounded-full border border-slate-200 object-cover" /> : <span className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-[10px] font-bold text-[#142B4A]">{vehicle.operator.initials}</span>}
               <span>{vehicle.operator.name}</span>
             </Link>
             <span className="text-slate-300 text-xs">•</span>
@@ -141,7 +141,7 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
           <div className="flex flex-col gap-1">
             {vehicle.perks.map((perk, i) => (
               <span key={i} className="flex items-center gap-1.5 text-xs text-slate-600">
-                <CheckCircle2 className="w-4 h-4 text-[#2563EB] shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-[#142B4A] shrink-0" />
                 {perk}
               </span>
             ))}
@@ -155,7 +155,7 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
             </Link>
             <Link
               to={`/cars/${vehicle.id}`}
-              className="px-6 py-2.5 rounded-xl bg-[#2563EB] text-white text-xs font-bold shadow-sm hover:bg-blue-700 active:scale-[0.99] transition-all inline-flex items-center"
+              className="px-6 py-2.5 rounded-xl bg-[#142B4A] text-white text-xs font-bold shadow-sm hover:bg-blue-700 active:scale-[0.99] transition-all inline-flex items-center"
             >
               {t("fleet.card.reserve", { total: vehicle.totalForPeriod.toLocaleString() })}
             </Link>

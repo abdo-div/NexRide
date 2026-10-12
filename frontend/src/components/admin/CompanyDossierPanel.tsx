@@ -95,7 +95,7 @@ export const CompanyDossierPanel: React.FC<CompanyDossierPanelProps> = ({
       {/* -------------------------------------------------------------------- */}
       <div className="flex flex-col justify-between gap-4 border-b border-slate-100 bg-[#EAF0FF] px-6 py-5 xl:flex-row xl:items-center">
         <div className="flex items-start gap-4">
-          {companyLogoUrl(company.logo) ? <img src={companyLogoUrl(company.logo) ?? ""} alt={company.name} className="h-16 w-16 shrink-0 rounded-2xl border border-white object-cover shadow-md" /> : <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#2563EB] text-[22px] font-extrabold text-white shadow-md">{initialsFrom(company.name)}</div>}
+          {companyLogoUrl(company.logo) ? <img src={companyLogoUrl(company.logo) ?? ""} alt={company.name} className="h-16 w-16 shrink-0 rounded-2xl border border-white object-cover shadow-md" /> : <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#142B4A] text-[22px] font-extrabold text-white shadow-md">{initialsFrom(company.name)}</div>}
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="truncate text-[22px] font-extrabold tracking-tight text-[#0B1C30]">
@@ -113,7 +113,7 @@ export const CompanyDossierPanel: React.FC<CompanyDossierPanelProps> = ({
                 )}
                 {t(`admin.companies.dossier.${company.status === "APPROVED" ? "approved" : company.status === "SUSPENDED" ? "suspended" : company.status === "REJECTED" ? "rejected" : "underReview"}`)}
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#E5EEFF] px-2.5 py-1 text-[11px] font-bold text-[#2563EB]">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#F1F5F9] px-2.5 py-1 text-[11px] font-bold text-[#142B4A]">
                 <BadgeCheck className="h-3.5 w-3.5" />
                 {t("admin.companies.dossier.verified")}
               </span>
@@ -227,7 +227,7 @@ export const CompanyDossierPanel: React.FC<CompanyDossierPanelProps> = ({
         <div className="grid grid-cols-1 gap-6 p-6 lg:grid-cols-12">
           {/* Left: corporate & legal profile */}
           <div className="space-y-4 lg:col-span-4">
-            <div className="rounded-xl bg-[#EFF4FF] p-4">
+            <div className="rounded-xl bg-[#F8FAFC] p-4">
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#565E74]">
                 {t("admin.companies.dossier.creds.title")}
               </h4>
@@ -250,33 +250,33 @@ export const CompanyDossierPanel: React.FC<CompanyDossierPanelProps> = ({
               </div>
             </div>
 
-            <div className="rounded-xl bg-[#EFF4FF] p-4">
+            <div className="rounded-xl bg-[#F8FAFC] p-4">
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#565E74]">
                 {t("admin.companies.dossier.creds.hq")}
               </h4>
               <div className="mt-3 flex items-start gap-2 text-sm text-[#0B1C30]">
-                <MapPin className="mt-0.5 h-[18px] w-[18px] shrink-0 text-[#2563EB]" />
+                <MapPin className="mt-0.5 h-[18px] w-[18px] shrink-0 text-[#142B4A]" />
                 <span>{company.address || company.city || "—"}</span>
               </div>
             </div>
 
-            <div className="rounded-xl bg-[#EFF4FF] p-4">
+            <div className="rounded-xl bg-[#F8FAFC] p-4">
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#565E74]">
                 {t("admin.companies.dossier.creds.contact")}
               </h4>
               <div className="mt-3 space-y-2 text-sm">
                 <div className="flex items-center gap-2 text-[#0B1C30]">
-                  <Mail className="h-4 w-4 shrink-0 text-[#2563EB]" />
+                  <Mail className="h-4 w-4 shrink-0 text-[#142B4A]" />
                   <span className="truncate">{company.email || "—"}</span>
                 </div>
                 <div className="flex items-center gap-2 text-[#0B1C30]">
-                  <Phone className="h-4 w-4 shrink-0 text-[#2563EB]" />
+                  <Phone className="h-4 w-4 shrink-0 text-[#142B4A]" />
                   <span className="truncate">{company.phone || "—"}</span>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-xl bg-[#EFF4FF] p-4">
+            <div className="rounded-xl bg-[#F8FAFC] p-4">
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#565E74]">
                 {t("admin.companies.dossier.creds.settlement")}
               </h4>
@@ -361,10 +361,10 @@ export const CompanyDossierPanel: React.FC<CompanyDossierPanelProps> = ({
             </div>
 
             {/* Active fleet register */}
-            <div className="rounded-xl bg-[#EFF4FF] p-4">
+            <div className="rounded-xl bg-[#F8FAFC] p-4">
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Car className="h-5 w-5 text-[#2563EB]" />
+                  <Car className="h-5 w-5 text-[#142B4A]" />
                   <h3 className="text-sm font-bold text-[#0B1C30]">
                     {t("admin.companies.dossier.dispatches.title")}
                   </h3>
@@ -373,7 +373,7 @@ export const CompanyDossierPanel: React.FC<CompanyDossierPanelProps> = ({
                   <button
                     type="button"
                     onClick={() => setTab("bookings")}
-                    className="cursor-pointer text-xs font-bold text-[#2563EB] hover:underline"
+                    className="cursor-pointer text-xs font-bold text-[#142B4A] hover:underline"
                   >
                     {t("admin.companies.dossier.dispatches.viewBookings")} →
                   </button>
@@ -394,7 +394,7 @@ export const CompanyDossierPanel: React.FC<CompanyDossierPanelProps> = ({
                         className="flex items-center justify-between gap-3 rounded-lg bg-white p-3 shadow-sm"
                       >
                         <div className="flex min-w-0 items-center gap-3">
-                          <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-[#EFF4FF]">
+                          <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-[#F8FAFC]">
                             <img src={photoUrl(v.photos?.[0])} alt="" className="h-full w-full object-cover" />
                           </div>
                           <div className="min-w-0">
@@ -431,7 +431,7 @@ export const CompanyDossierPanel: React.FC<CompanyDossierPanelProps> = ({
             </div>
 
             {/* Escrow settlement ledger (overview shows recent records) */}
-            <div className="rounded-xl bg-[#EFF4FF] p-4">
+            <div className="rounded-xl bg-[#F8FAFC] p-4">
               <div className="mb-3 flex items-center justify-between">
                 <h3 className="text-sm font-bold text-[#0B1C30]">
                   {t("admin.companies.dossier.ledgerTitle")}
@@ -439,7 +439,7 @@ export const CompanyDossierPanel: React.FC<CompanyDossierPanelProps> = ({
                 <button
                   type="button"
                   onClick={() => setTab("escrow")}
-                  className="cursor-pointer text-xs font-bold text-[#2563EB] hover:underline"
+                  className="cursor-pointer text-xs font-bold text-[#142B4A] hover:underline"
                 >
                   {t("admin.companies.dossier.ledgerSubtitle")}
                 </button>
@@ -459,7 +459,7 @@ export const CompanyDossierPanel: React.FC<CompanyDossierPanelProps> = ({
             <h3 className="text-base font-bold text-[#0B1C30]">
               {t("admin.companies.dossier.vehiclesTitle")}
             </h3>
-            <span className="rounded-full bg-[#E5EEFF] px-2.5 py-1 text-xs font-bold text-[#2563EB]">
+            <span className="rounded-full bg-[#F1F5F9] px-2.5 py-1 text-xs font-bold text-[#142B4A]">
               {t("admin.companies.table.records", { count: fleet.length })}
             </span>
           </div>
@@ -470,7 +470,7 @@ export const CompanyDossierPanel: React.FC<CompanyDossierPanelProps> = ({
                   key={v._id}
                   className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
                 >
-                  <div className="relative h-32 w-full overflow-hidden bg-[#EFF4FF]">
+                  <div className="relative h-32 w-full overflow-hidden bg-[#F8FAFC]">
                     <img src={photoUrl(v.photos?.[0])} alt="" className="h-full w-full object-cover" />
                     <div className="absolute left-2 top-2">
                       <span className="rounded-full bg-white/90 px-2 py-0.5 font-mono text-[10px] font-bold text-[#0B1C30] shadow-sm backdrop-blur">
@@ -525,7 +525,7 @@ export const CompanyDossierPanel: React.FC<CompanyDossierPanelProps> = ({
                 })}
               </p>
             </div>
-            <span className="rounded-full bg-[#E5EEFF] px-2.5 py-1 text-xs font-bold text-[#2563EB]">
+            <span className="rounded-full bg-[#F1F5F9] px-2.5 py-1 text-xs font-bold text-[#142B4A]">
               {t("admin.companies.table.records", { count: bookingsOf(bookings, company).length })}
             </span>
           </div>
@@ -542,11 +542,11 @@ export const CompanyDossierPanel: React.FC<CompanyDossierPanelProps> = ({
                     key={b._id}
                     type="button"
                     onClick={() => onViewBooking(b._id)}
-                    className="flex w-full cursor-pointer items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-[#EFF4FF]/60"
+                    className="flex w-full cursor-pointer items-center justify-between gap-4 px-4 py-3 text-left transition-colors hover:bg-[#F8FAFC]/60"
                   >
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 text-sm font-bold text-[#0B1C30]">
-                        <span className="font-mono text-[#2563EB]">
+                        <span className="font-mono text-[#142B4A]">
                           #{referenceCodeFrom(b._id)}
                         </span>
                         <span className="truncate">{vehicleFullTitleRef(b)}</span>
@@ -637,7 +637,7 @@ const TabButton: React.FC<TabButtonProps> = ({ active, onClick, children }) => (
     onClick={onClick}
     className={`flex shrink-0 items-center gap-1.5 border-b-2 py-3 text-sm transition-all cursor-pointer ${
       active
-        ? "border-[#2563EB] font-bold text-[#2563EB]"
+        ? "border-[#142B4A] font-bold text-[#142B4A]"
         : "border-transparent font-semibold text-[#565E74] hover:text-[#0B1C30]"
     }`}
   >
@@ -652,10 +652,10 @@ const TabCount: React.FC<{ tone: "surface" | "primary" | "amber"; children: Reac
   <span
     className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${
       tone === "primary"
-        ? "bg-[#E5EEFF] text-[#2563EB]"
+        ? "bg-[#F1F5F9] text-[#142B4A]"
         : tone === "amber"
           ? "bg-amber-100 text-amber-900"
-          : "bg-[#EFF4FF] text-[#565E74]"
+          : "bg-[#F8FAFC] text-[#565E74]"
     }`}
   >
     {children}
@@ -674,7 +674,7 @@ const CredRow: React.FC<CredRowProps> = ({ label, value, mono, tone }) => (
     <span className="shrink-0 text-xs text-[#565E74]">{label}</span>
     <span
       className={`truncate text-sm font-bold ${
-        tone === "brand" ? "text-[#2563EB]" : "text-[#0B1C30]"
+        tone === "brand" ? "text-[#142B4A]" : "text-[#0B1C30]"
       } ${mono ? "font-mono" : ""}`}
     >
       {value}
@@ -691,11 +691,11 @@ interface KpiTileProps {
 }
 
 const KpiTile: React.FC<KpiTileProps> = ({ label, value, sub, tone, icon }) => (
-  <div className="rounded-xl bg-[#EFF4FF] p-3">
+  <div className="rounded-xl bg-[#F8FAFC] p-3">
     <div className="text-[10px] font-bold uppercase tracking-wider text-[#565E74]">{label}</div>
     <div
       className={`mt-1 flex items-center gap-1 text-[22px] font-extrabold tracking-tight ${
-        tone === "brand" ? "text-[#2563EB]" : tone === "tertiary" ? "text-[#B54E00]" : "text-[#0B1C30]"
+        tone === "brand" ? "text-[#142B4A]" : tone === "tertiary" ? "text-[#B54E00]" : "text-[#0B1C30]"
       }`}
     >
       {value}
@@ -783,7 +783,7 @@ const SettlementLedger: React.FC<SettlementLedgerProps> = ({ payments, limit }) 
           {rows.map((p) => (
             <tr key={p._id} className="text-xs">
               <td className="px-3 py-2">
-                <div className="font-mono font-bold text-[#2563EB]">
+                <div className="font-mono font-bold text-[#142B4A]">
                   #{referenceCodeFrom(paymentRefOf(p))}
                 </div>
                 <div className="text-[10px] text-[#565E74]">{methodLabel(p, t)}</div>

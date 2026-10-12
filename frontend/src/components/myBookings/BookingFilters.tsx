@@ -54,7 +54,7 @@ export const BookingFilters: React.FC<BookingFiltersProps> = ({
                 onClick={() => onTabChange(item.key)}
                 className={`px-4 py-1.5 rounded-md text-sm font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                   active
-                    ? "bg-white text-[#2563EB] shadow-sm"
+                    ? "bg-white text-[#142B4A] shadow-sm"
                     : "text-[#64748B] hover:text-[#0F172A]"
                 }`}
               >
@@ -62,7 +62,7 @@ export const BookingFilters: React.FC<BookingFiltersProps> = ({
                 {item.count !== undefined && (
                   <span
                     className={`px-1.5 py-0.5 rounded-full text-[11px] font-bold ${
-                      active ? "bg-[#DBEAFE] text-[#1D4ED8]" : "bg-[#E2E8F0] text-[#64748B]"
+                      active ? "bg-[#DBEAFE] text-[#0D2039]" : "bg-[#E2E8F0] text-[#64748B]"
                     }`}
                   >
                     {item.count}
@@ -74,7 +74,7 @@ export const BookingFilters: React.FC<BookingFiltersProps> = ({
         </div>
 
         <div className="flex items-center gap-2 text-[12px] text-[#64748B]">
-          <CalendarDays className="w-4 h-4 text-[#2563EB]" />
+          <CalendarDays className="w-4 h-4 text-[#142B4A]" />
           <span>{t("myBookings.period")}</span>
         </div>
       </div>

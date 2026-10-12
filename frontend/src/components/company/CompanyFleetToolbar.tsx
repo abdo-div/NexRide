@@ -31,7 +31,7 @@ interface CompanyFleetToolbarProps {
 }
 
 const selectClass =
-  "appearance-none rounded-xl border border-[#E5E7EB] bg-white py-2 pl-3 pr-8 text-sm font-medium text-[#565E74] shadow-sm outline-none transition-colors hover:border-[#C9D2E0] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 cursor-pointer";
+  "appearance-none rounded-xl border border-[#E5E7EB] bg-white py-2 pl-3 pr-8 text-sm font-medium text-[#565E74] shadow-sm outline-none transition-colors hover:border-[#C9D2E0] focus:border-[#142B4A] focus:ring-2 focus:ring-[#142B4A]/20 cursor-pointer";
 
 const Select = <T extends string>({
   value,
@@ -100,7 +100,7 @@ export const CompanyFleetToolbar: React.FC<CompanyFleetToolbarProps> = ({
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder={t("company.fleetPage.searchPlaceholder")}
-            className="w-full rounded-xl border border-[#E5E7EB] bg-white py-2 pl-9 pr-3 text-sm text-[#0B1C30] shadow-sm outline-none transition-colors placeholder:text-[#9AA4B5] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
+            className="w-full rounded-xl border border-[#E5E7EB] bg-white py-2 pl-9 pr-3 text-sm text-[#0B1C30] shadow-sm outline-none transition-colors placeholder:text-[#9AA4B5] focus:border-[#142B4A] focus:ring-2 focus:ring-[#142B4A]/20"
           />
         </div>
 
@@ -111,7 +111,7 @@ export const CompanyFleetToolbar: React.FC<CompanyFleetToolbarProps> = ({
               onClick={() => onViewChange("list")}
               className={`flex items-center gap-1.5 rounded-[10px] px-3 py-1.5 text-sm font-semibold transition-colors cursor-pointer ${
                 view === "list"
-                  ? "bg-[#2563EB] text-white shadow-sm"
+                  ? "bg-[#142B4A] text-white shadow-sm"
                   : "text-[#565E74] hover:bg-[#F7F9FC]"
               }`}
             >
@@ -123,7 +123,7 @@ export const CompanyFleetToolbar: React.FC<CompanyFleetToolbarProps> = ({
               onClick={() => onViewChange("grid")}
               className={`flex items-center gap-1.5 rounded-[10px] px-3 py-1.5 text-sm font-semibold transition-colors cursor-pointer ${
                 view === "grid"
-                  ? "bg-[#2563EB] text-white shadow-sm"
+                  ? "bg-[#142B4A] text-white shadow-sm"
                   : "text-[#565E74] hover:bg-[#F7F9FC]"
               }`}
             >
@@ -137,7 +137,7 @@ export const CompanyFleetToolbar: React.FC<CompanyFleetToolbarProps> = ({
             onClick={onQuickInspect}
             className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-sm font-semibold shadow-sm transition-colors cursor-pointer ${
               quickInspectOn
-                ? "border-[#2563EB] bg-[#EFF4FF] text-[#2563EB]"
+                ? "border-[#142B4A] bg-[#F8FAFC] text-[#142B4A]"
                 : "border-[#E5E7EB] bg-white text-[#565E74] hover:border-[#C9D2E0]"
             }`}
           >

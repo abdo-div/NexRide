@@ -98,7 +98,7 @@ export const CompanyVehicleEditPreview: React.FC<CompanyVehicleEditPreviewProps>
       <section className="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
-            <Eye className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+            <Eye className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
             <span className="text-sm font-bold text-[#0B1C30]">
               {t("company.editVehiclePage.preview.title")}
             </span>
@@ -135,7 +135,7 @@ export const CompanyVehicleEditPreview: React.FC<CompanyVehicleEditPreviewProps>
               )}
             </div>
             {previewVehicle.listingStatus === "PUBLISHED" && (
-              <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-[#2563EB]/90 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
+              <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-[#142B4A]/90 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
                 <span className="h-1.5 w-1.5 rounded-full bg-white" />
                 {t("company.editVehiclePage.preview.instant")}
               </span>
@@ -172,7 +172,7 @@ export const CompanyVehicleEditPreview: React.FC<CompanyVehicleEditPreviewProps>
 
             <div className="flex items-end justify-between gap-2 border-t border-[#F1F5F9] pt-3">
               <div>
-                <p className="text-xl font-extrabold text-[#004AC6]">
+                <p className="text-xl font-extrabold text-[#142B4A]">
                   {formatLYD(previewVehicle.dailyPrice)}
                   <span className="ml-1 text-xs font-normal text-[#0B1C30]">
                     {t("company.editVehiclePage.preview.day")}
@@ -189,7 +189,7 @@ export const CompanyVehicleEditPreview: React.FC<CompanyVehicleEditPreviewProps>
                 type="button"
                 disabled
                 title={t("company.vehiclePage.soon")}
-                className="rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-xl bg-[#142B4A] px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {t("company.editVehiclePage.preview.bookNow")}
               </button>
@@ -253,7 +253,7 @@ export const CompanyVehicleEditPreview: React.FC<CompanyVehicleEditPreviewProps>
           type="button"
           onClick={saveChanges}
           disabled={!dirty || saving}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#2563EB] px-4 py-3 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-colors hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-70"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#142B4A] px-4 py-3 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-colors hover:bg-[#0D2039] disabled:cursor-not-allowed disabled:opacity-70"
         >
           {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
           {saving
@@ -270,7 +270,7 @@ export const CompanyVehicleEditPreview: React.FC<CompanyVehicleEditPreviewProps>
             type="button"
             onClick={saveDraft}
             disabled={!dirty || saving}
-            className="rounded-xl bg-[#F1F5F9] px-3 py-2.5 text-xs font-bold text-[#0B1C30] transition-colors hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-xl bg-[#F1F5F9] px-3 py-2.5 text-xs font-bold text-[#0B1C30] transition-colors hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {t("company.editVehiclePage.actions.saveDraft")}
           </button>

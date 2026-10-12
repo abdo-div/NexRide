@@ -62,8 +62,8 @@ export const CompanyMessagesHeader: React.FC<CompanyMessagesHeaderProps> = ({
           <span className="text-[#0B1C30]">{t("company.messagesPage.primary")}</span>
         </div>
         {company && (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EFF4FF] px-3 py-1 text-[11px] font-semibold text-[#565E74]">
-            <ShieldCheck className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden="true" />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8FAFC] px-3 py-1 text-[11px] font-semibold text-[#565E74]">
+            <ShieldCheck className="h-3.5 w-3.5 text-[#142B4A]" aria-hidden="true" />
             {t("company.messagesPage.scopedTenant", { code: company.slug })}
           </span>
         )}
@@ -97,7 +97,7 @@ export const CompanyMessagesHeader: React.FC<CompanyMessagesHeaderProps> = ({
               type="button"
               onClick={() => setChannelOpen((open) => !open)}
               disabled={loading}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
             >
               <Radio className="h-[18px] w-[18px] text-[#565E74]" aria-hidden="true" />
               {t(activeOption.labelKey)}
@@ -122,7 +122,7 @@ export const CompanyMessagesHeader: React.FC<CompanyMessagesHeaderProps> = ({
                       }}
                       className={`flex w-full items-center rounded-lg px-3 py-2 text-left text-[13px] font-semibold transition-colors ${
                         option.value === channel
-                          ? "bg-[#EFF4FF] text-[#2563EB]"
+                          ? "bg-[#F8FAFC] text-[#142B4A]"
                           : "text-[#0B1C30] hover:bg-[#F8FAFF]"
                       }`}
                     >
@@ -138,7 +138,7 @@ export const CompanyMessagesHeader: React.FC<CompanyMessagesHeaderProps> = ({
             type="button"
             onClick={onMarkAllRead}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
           >
             <MailCheck className="h-[18px] w-[18px] text-[#565E74]" aria-hidden="true" />
             {t("company.messagesPage.actions.markAllRead")}
@@ -148,7 +148,7 @@ export const CompanyMessagesHeader: React.FC<CompanyMessagesHeaderProps> = ({
             type="button"
             onClick={onOpenBroadcast}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.25)] transition-all hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.25)] transition-all hover:bg-[#0D2039] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
           >
             <Megaphone className="h-[18px] w-[18px]" aria-hidden="true" />
             {t("company.messagesPage.actions.broadcast")}

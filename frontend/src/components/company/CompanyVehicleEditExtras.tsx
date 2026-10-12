@@ -31,7 +31,7 @@ export const CompanyVehicleEditFeatures: React.FC<CompanyVehicleEditMediaProps> 
       </label>
       <textarea id="vehicle-features" value={draft.features} onChange={(e) => setField("features", e.target.value)} rows={3}
         placeholder={t("company.editVehiclePage.features.placeholder")}
-        className="w-full resize-none rounded-xl border border-[#E5E7EB] bg-white px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15" />
+        className="w-full resize-none rounded-xl border border-[#E5E7EB] bg-white px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none focus:border-[#142B4A] focus:ring-2 focus:ring-[#142B4A]/15" />
       <p className={`mt-1 text-[11px] ${fieldErrors.features ? "text-[#DC2626]" : "text-[#9AA4B5]"}`}>{fieldErrors.features || t("company.editVehiclePage.features.hint")}</p>
     </SectionCard>
   );
@@ -134,7 +134,7 @@ export const CompanyVehicleEditMedia: React.FC<CompanyVehicleEditMediaProps> = (
               </button>
               <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-gradient-to-t from-black/70 to-transparent p-2">
                 {index === 0 ? (
-                  <span className="rounded-full bg-[#2563EB] px-2 py-0.5 text-[10px] font-bold text-white">
+                  <span className="rounded-full bg-[#142B4A] px-2 py-0.5 text-[10px] font-bold text-white">
                     {t("company.editVehiclePage.media.primary")}
                   </span>
                 ) : (
@@ -154,7 +154,7 @@ export const CompanyVehicleEditMedia: React.FC<CompanyVehicleEditMediaProps> = (
           {newImages.map((file, index) => (
             <div
               key={`${file.name}-${file.size}-${index}`}
-              className="relative overflow-hidden rounded-xl border border-[#2563EB] bg-[#F1F5F9] shadow-sm"
+              className="relative overflow-hidden rounded-xl border border-[#142B4A] bg-[#F1F5F9] shadow-sm"
             >
               <LocalFilePreview file={file} alt={file.name} />
               <button
@@ -166,7 +166,7 @@ export const CompanyVehicleEditMedia: React.FC<CompanyVehicleEditMediaProps> = (
                 <X className="h-3.5 w-3.5" aria-hidden="true" />
               </button>
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2">
-                <span className="rounded-full bg-[#2563EB] px-2 py-0.5 text-[10px] font-bold text-white">
+                <span className="rounded-full bg-[#142B4A] px-2 py-0.5 text-[10px] font-bold text-white">
                   {t("company.editVehiclePage.media.pending", { count: newImages.length })}
                 </span>
               </div>
@@ -187,9 +187,9 @@ export const CompanyVehicleEditMedia: React.FC<CompanyVehicleEditMediaProps> = (
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="inline-flex items-center gap-2 rounded-xl bg-[#F1F5F9] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] transition-colors hover:bg-[#E5EEFF] cursor-pointer"
+          className="inline-flex items-center gap-2 rounded-xl bg-[#F1F5F9] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] transition-colors hover:bg-[#F1F5F9] cursor-pointer"
         >
-          <ImagePlus className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+          <ImagePlus className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
           {t("company.editVehiclePage.media.selectFile")}
         </button>
         <span className="text-[11px] text-[#9AA4B5]">

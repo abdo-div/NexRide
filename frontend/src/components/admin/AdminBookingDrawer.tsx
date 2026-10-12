@@ -69,7 +69,7 @@ export const AdminBookingDrawer: React.FC<AdminBookingDrawerProps> = ({
             type="button"
             onClick={onClose}
             aria-label={t("admin.drawer.close")}
-            className="rounded-lg p-2 text-[#565E74] transition-colors hover:bg-[#EFF4FF] hover:text-[#0B1C30] cursor-pointer"
+            className="rounded-lg p-2 text-[#565E74] transition-colors hover:bg-[#F8FAFC] hover:text-[#0B1C30] cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
@@ -84,7 +84,7 @@ export const AdminBookingDrawer: React.FC<AdminBookingDrawerProps> = ({
           {/* Vehicle */}
           <section className="rounded-2xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#EFF4FF]">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#F8FAFC]">
                 {photo ? (
                   <img src={photo} alt="" className="h-full w-full object-cover" />
                 ) : (
@@ -97,7 +97,7 @@ export const AdminBookingDrawer: React.FC<AdminBookingDrawerProps> = ({
                   {vehicle?.transmission ?? "—"} • {vehicle?.fuelType ?? "—"} •{" "}
                   {t("admin.drawer.seats", { count: vehicle?.seats ?? 0 })}
                 </p>
-                <p className="mt-0.5 text-xs font-semibold text-[#2563EB]">
+                <p className="mt-0.5 text-xs font-semibold text-[#142B4A]">
                   {formatLYD(booking.dailyRate)} LYD {t("admin.drawer.perDay")}
                 </p>
               </div>
@@ -110,7 +110,7 @@ export const AdminBookingDrawer: React.FC<AdminBookingDrawerProps> = ({
               {t("admin.drawer.client")}
             </h4>
             <div className="mt-2 flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-white">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#142B4A] text-white">
                 <User className="h-4 w-4" />
               </div>
               <div className="min-w-0">
@@ -132,7 +132,7 @@ export const AdminBookingDrawer: React.FC<AdminBookingDrawerProps> = ({
               {t("admin.drawer.provider")}
             </h4>
             <div className="mt-2 flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#EFF4FF] text-[#2563EB]">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F8FAFC] text-[#142B4A]">
                 <Building2 className="h-4 w-4" />
               </div>
               <div className="min-w-0">
@@ -157,7 +157,7 @@ export const AdminBookingDrawer: React.FC<AdminBookingDrawerProps> = ({
             </h4>
             <div className="mt-2 space-y-2 text-sm">
               <div className="flex items-start gap-2 text-[#0B1C30]">
-                <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-[#2563EB]" />
+                <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-[#142B4A]" />
                 <div>
                   <p className="font-semibold">
                     {formatDate(booking.startDate, i18n.language, true)} →{" "}
@@ -169,7 +169,7 @@ export const AdminBookingDrawer: React.FC<AdminBookingDrawerProps> = ({
                 </div>
               </div>
               <div className="flex items-start gap-2 text-[#0B1C30]">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#2563EB]" />
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#142B4A]" />
                 <p className="font-semibold">{booking.pickupLocation}</p>
               </div>
             </div>

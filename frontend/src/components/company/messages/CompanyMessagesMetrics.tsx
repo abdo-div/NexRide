@@ -40,8 +40,8 @@ export const CompanyMessagesMetrics: React.FC<CompanyMessagesMetricsProps> = ({
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Dashboard
-        icon={<MessagesSquare className="h-5 w-5 text-[#2563EB]" aria-hidden="true" />}
-        tone="bg-[#EFF4FF]"
+        icon={<MessagesSquare className="h-5 w-5 text-[#142B4A]" aria-hidden="true" />}
+        tone="bg-[#F8FAFC]"
         value={value(String(summary.active))}
         title={t("company.messagesPage.metrics.activeTitle")}
         sub={t("company.messagesPage.metrics.activeSub", {

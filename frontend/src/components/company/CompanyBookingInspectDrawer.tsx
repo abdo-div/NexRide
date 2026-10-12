@@ -149,7 +149,7 @@ export const CompanyBookingInspectDrawer: React.FC<
             <h2 className="text-base font-extrabold tracking-tight text-[#0B1C30]">
               {t("company.bookingsPage.inspect.title")}
             </h2>
-            <span className="font-mono text-[11px] font-bold text-[#2563EB]">
+            <span className="font-mono text-[11px] font-bold text-[#142B4A]">
               {row.reference}
             </span>
           </div>
@@ -165,7 +165,7 @@ export const CompanyBookingInspectDrawer: React.FC<
 
         <div className="flex flex-col gap-4 p-5">
           {/* Vehicle */}
-          <div className="flex items-center gap-3 rounded-xl border border-[#E5EEFF] bg-[#F8FAFF] p-3">
+          <div className="flex items-center gap-3 rounded-xl border border-[#F1F5F9] bg-[#F8FAFF] p-3">
             {detail.photo ? (
               <img
                 src={detail.photo}
@@ -174,7 +174,7 @@ export const CompanyBookingInspectDrawer: React.FC<
                 loading="lazy"
               />
             ) : (
-              <span className="flex h-14 w-20 shrink-0 items-center justify-center rounded-lg bg-[#E5EEFF] text-[#2563EB]">
+              <span className="flex h-14 w-20 shrink-0 items-center justify-center rounded-lg bg-[#F1F5F9] text-[#142B4A]">
                 <Car className="h-6 w-6" aria-hidden="true" />
               </span>
             )}
@@ -184,12 +184,12 @@ export const CompanyBookingInspectDrawer: React.FC<
               </p>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {detail.vehicleType && (
-                  <span className="rounded bg-[#E5EEFF] px-1.5 py-0.5 text-[10px] font-bold text-[#2563EB]">
+                  <span className="rounded bg-[#F1F5F9] px-1.5 py-0.5 text-[10px] font-bold text-[#142B4A]">
                     {detail.vehicleType}
                   </span>
                 )}
                 {detail.vehicleHub && (
-                  <span className="rounded bg-[#EFF4FF] px-1.5 py-0.5 text-[10px] font-bold text-[#565E74]">
+                  <span className="rounded bg-[#F8FAFC] px-1.5 py-0.5 text-[10px] font-bold text-[#565E74]">
                     {t("company.bookingsPage.inspect.vehicleHub", {
                       hub: detail.vehicleHub,
                     })}
@@ -202,7 +202,7 @@ export const CompanyBookingInspectDrawer: React.FC<
           {/* Customer */}
           <div className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-2.5">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#DCE9FF] text-xs font-bold text-[#2563EB]">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F1F5F9] text-xs font-bold text-[#142B4A]">
                 {row.customer.initials}
               </span>
               <div className="min-w-0 flex items-center gap-1.5">
@@ -229,7 +229,7 @@ export const CompanyBookingInspectDrawer: React.FC<
               {digits && (
                 <a
                   href={`tel:${digits}`}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF4FF] text-[#2563EB] transition-colors hover:bg-[#E5EEFF]"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8FAFC] text-[#142B4A] transition-colors hover:bg-[#F1F5F9]"
                   aria-label={t("company.bookingsPage.inspect.directCall")}
                 >
                   <Phone className="h-4 w-4" aria-hidden="true" />
@@ -250,8 +250,8 @@ export const CompanyBookingInspectDrawer: React.FC<
             <span
               className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${
                 detail.pickupMethod === "DELIVERY"
-                  ? "bg-[#DCE9FF] text-[#2563EB]"
-                  : "bg-[#EFF4FF] text-[#565E74]"
+                  ? "bg-[#F1F5F9] text-[#142B4A]"
+                  : "bg-[#F8FAFC] text-[#565E74]"
               }`}
             >
               {detail.pickupMethod === "DELIVERY"
@@ -312,9 +312,9 @@ export const CompanyBookingInspectDrawer: React.FC<
                 {doneCount}/{detail.checks.length}
               </span>
             </div>
-            <div className="mb-3 h-1.5 w-full overflow-hidden rounded-full bg-[#E5EEFF]">
+            <div className="mb-3 h-1.5 w-full overflow-hidden rounded-full bg-[#F1F5F9]">
               <div
-                className="h-full rounded-full bg-[#2563EB] transition-all duration-500"
+                className="h-full rounded-full bg-[#142B4A] transition-all duration-500"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -350,7 +350,7 @@ export const CompanyBookingInspectDrawer: React.FC<
               disabled={busy || !primary.action}
               title={primary.hint}
               onClick={primary.action}
-              className="w-full rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_12px_rgba(37,99,235,0.25)] transition-all hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:bg-[#9AA4B5] disabled:opacity-60"
+              className="w-full rounded-xl bg-[#142B4A] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_12px_rgba(37,99,235,0.25)] transition-all hover:bg-[#0D2039] disabled:cursor-not-allowed disabled:bg-[#9AA4B5] disabled:opacity-60"
             >
               {busy
                 ? t("company.bookingsPage.inspect.saving")
@@ -387,9 +387,9 @@ export const CompanyBookingInspectDrawer: React.FC<
       </div>
 
       {/* Protocol card */}
-      <div className="rounded-2xl border border-[#E5EEFF] bg-[#F8FAFF] p-4">
+      <div className="rounded-2xl border border-[#F1F5F9] bg-[#F8FAFF] p-4">
         <div className="flex items-center gap-2">
-          <ScrollText className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+          <ScrollText className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
           <h3 className="text-[13px] font-bold text-[#0B1C30]">
             {t("company.bookingsPage.inspect.protocolTitle")}
           </h3>

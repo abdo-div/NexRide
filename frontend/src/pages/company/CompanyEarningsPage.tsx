@@ -158,7 +158,7 @@ export const CompanyEarningsPage: React.FC = () => {
             <button
               type="button"
               onClick={reload}
-              className="mt-4 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+              className="mt-4 rounded-lg bg-[#142B4A] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#0D2039] cursor-pointer"
             >
               {t("company.payoutsPage.states.retry")}
             </button>
@@ -167,7 +167,7 @@ export const CompanyEarningsPage: React.FC = () => {
           <>
             {loading && summary.gross === 0 ? (
               <div className="space-y-3">
-                <div className="h-3 w-2/3 animate-pulse rounded-full bg-[#E5EEFF]" />
+                <div className="h-3 w-2/3 animate-pulse rounded-full bg-[#F1F5F9]" />
                 <div className="h-40 animate-pulse rounded-2xl border border-slate-200 bg-white" />
               </div>
             ) : (
@@ -244,7 +244,7 @@ export const CompanyEarningsPage: React.FC = () => {
 
               {loading && list.length === 0 ? (
                 <div className="space-y-3">
-                  <div className="h-3 w-2/3 animate-pulse rounded-full bg-[#E5EEFF]" />
+                  <div className="h-3 w-2/3 animate-pulse rounded-full bg-[#F1F5F9]" />
                   <div className="h-80 animate-pulse rounded-2xl border border-slate-200 bg-white" />
                 </div>
               ) : error ? (
@@ -256,7 +256,7 @@ export const CompanyEarningsPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={reload}
-                    className="mt-4 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+                    className="mt-4 rounded-lg bg-[#142B4A] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#0D2039] cursor-pointer"
                   >
                     {t("company.payoutsPage.states.retry")}
                   </button>

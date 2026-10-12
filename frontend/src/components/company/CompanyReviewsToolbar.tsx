@@ -21,7 +21,7 @@ interface CompanyReviewsToolbarProps {
 }
 
 const baseSelect =
-  "w-full cursor-pointer appearance-none rounded-lg border border-[#E5EEFF] bg-[#F8FAFF] px-3 py-2.5 pr-8 text-sm font-medium text-[#0B1C30] outline-none transition-colors focus:border-[#2563EB] focus:ring-2 focus:ring-[#E5EEFF]";
+  "w-full cursor-pointer appearance-none rounded-lg border border-[#F1F5F9] bg-[#F8FAFF] px-3 py-2.5 pr-8 text-sm font-medium text-[#0B1C30] outline-none transition-colors focus:border-[#142B4A] focus:ring-2 focus:ring-[#F1F5F9]";
 
 const StackedLabel: React.FC<{ label: string; children: React.ReactNode }> = ({
   label,

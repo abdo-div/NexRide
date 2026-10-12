@@ -20,7 +20,7 @@ export const MaintenanceStatusChip: React.FC<MaintenanceStatusChipProps> = ({
     { tone: string; icon: React.ReactNode }
   > = {
     SCHEDULED: {
-      tone: "bg-[#EFF4FF] text-[#2563EB]",
+      tone: "bg-[#F8FAFC] text-[#142B4A]",
       icon: <Clock className="h-3.5 w-3.5" />,
     },
     IN_PROGRESS: {

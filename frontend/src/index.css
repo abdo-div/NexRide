@@ -1,19 +1,30 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Syne:wght@500;600;700&display=swap");
 @import "tailwindcss";
 
 :root {
-  --app-font: "Outfit", sans-serif;
+  --app-font: "Manrope", sans-serif;
+  --premium-navy: #142b4a;
+  --premium-navy-hover: #0d2039;
+  --primary-action: linear-gradient(135deg, #0f1f36 0%, var(--premium-navy) 100%);
+  --primary-action-shadow: 0 12px 28px -12px rgb(15 23 42 / 65%), inset 0 1px rgb(255 255 255 / 14%);
 }
 
 [dir="rtl"] {
-  --app-font: "Cairo", "Outfit", sans-serif;
+  --app-font: "Cairo", "Manrope", sans-serif;
 }
 
 body {
   font-family: var(--app-font);
   min-width: 0;
   overflow-x: clip;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
 html,
@@ -28,50 +39,103 @@ svg {
   max-width: 100%;
 }
 
-.hero-perspective {
-  perspective: 2500px;
-  perspective-origin: center 45%;
+.landing-shell {
+  font-family: var(--app-font);
 }
 
-.hero-3d-scene,
-.hero-car-layers,
-.hero-car-layer {
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
+.landing-shell .font-display {
+  font-family: "Syne", "Manrope", var(--app-font);
 }
 
-.hero-car-layer {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  will-change: transform, opacity;
-  pointer-events: auto;
+.premium-card {
+  box-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 10px 35px rgb(15 23 42 / 4%);
+  transition: transform 320ms cubic-bezier(.22, 1, .36, 1), border-color 320ms ease, box-shadow 320ms ease;
 }
 
-.hero-car-layer img {
-  backface-visibility: hidden;
-  transform: translateZ(0);
-  transition: filter 280ms ease, opacity 280ms ease, transform 280ms ease;
-  will-change: transform, opacity;
+.premium-card:hover {
+  transform: translateY(-4px);
+  border-color: rgb(148 163 184 / 55%);
+  box-shadow: 0 24px 65px -18px rgb(15 23 42 / 24%), 0 8px 22px rgb(37 99 235 / 8%);
 }
 
-.hero-car-left { clip-path: polygon(0 42%, 40% 42%, 40% 83%, 0 83%); }
-.hero-car-center { clip-path: polygon(32% 45%, 67% 45%, 67% 88%, 32% 88%); }
-.hero-car-right { clip-path: polygon(61% 43%, 100% 43%, 100% 82%, 61% 82%); }
-
-.hero-car-layers:hover .hero-car-layer img { filter: brightness(.72) saturate(.8); }
-.hero-car-layers .hero-car-layer:hover img {
-  filter: brightness(1.06) saturate(1.08);
-  transform: translateZ(30px) scale(1.015);
+.premium-button {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 0.875rem;
+  color: white;
+  background: var(--primary-action);
+  box-shadow: var(--primary-action-shadow);
+  transition: transform 240ms cubic-bezier(.22, 1, .36, 1), box-shadow 240ms ease, filter 240ms ease;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .hero-car-layer,
-  [data-hero-word],
-  [data-hero-search] {
-    animation: none !important;
-    transition: none !important;
-  }
+/* Keep primary actions consistent across customer, company, and admin views. */
+:is(button, a)[class~="bg-blue-600"],
+:is(button, a)[class~="bg-blue-700"],
+:is(button, a)[class~="bg-[#142B4A]"],
+:is(button, a)[class~="from-blue-600"] {
+  color: white;
+  background: var(--primary-action) !important;
+  border-color: rgb(255 255 255 / 12%);
+  box-shadow: var(--primary-action-shadow);
+  transition: transform 240ms cubic-bezier(.22, 1, .36, 1), box-shadow 240ms ease, filter 240ms ease;
+}
+
+/* One premium accent for interactive icons throughout the application. */
+svg[class*="text-blue-"],
+svg[class*="text-cyan-"],
+svg[class*="text-violet-"],
+svg[class*="text-orange-"],
+svg[class*="text-amber-"],
+svg[class*="text-emerald-"] {
+  color: var(--premium-navy) !important;
+}
+
+:is(button, a)[class~="bg-slate-500"],
+:is(button, a)[class~="bg-blue-600"],
+:is(button, a)[class~="bg-blue-700"],
+:is(button, a)[class~="bg-blue-800"],
+:is(button, a)[class*="from-blue-"] {
+  background: var(--primary-action) !important;
+}
+
+:is(button, a)[class~="bg-slate-500"]:hover,
+:is(button, a)[class~="bg-blue-600"]:hover,
+:is(button, a)[class~="bg-blue-700"]:hover,
+:is(button, a)[class~="bg-blue-800"]:hover,
+:is(button, a)[class*="from-blue-"]:hover {
+  background: var(--premium-navy-hover) !important;
+}
+
+:is(button, a)[class~="bg-blue-600"]:hover,
+:is(button, a)[class~="bg-blue-700"]:hover,
+:is(button, a)[class~="bg-[#142B4A]"]:hover,
+:is(button, a)[class~="from-blue-600"]:hover {
+  background: var(--primary-action) !important;
+  filter: brightness(1.08);
+  box-shadow: 0 18px 36px -14px rgb(15 23 42 / 72%), 0 8px 24px -12px rgb(37 99 235 / 65%), inset 0 1px rgb(255 255 255 / 18%);
+}
+
+:is(button, a)[class~="bg-blue-600"]:active,
+:is(button, a)[class~="bg-blue-700"]:active,
+:is(button, a)[class~="bg-[#142B4A]"]:active,
+:is(button, a)[class~="from-blue-600"]:active {
+  filter: brightness(.96);
+}
+
+:is(button, a):disabled {
+  transform: none;
+  filter: none;
+  box-shadow: none;
+}
+
+.premium-button:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 18px 36px -14px rgb(15 23 42 / 72%), 0 8px 24px -12px rgb(37 99 235 / 65%), inset 0 1px rgb(255 255 255 / 18%);
+}
+
+.premium-button:active {
+  filter: brightness(.96);
 }
 /* Keep the legally required map credit compact and visually unobtrusive. */
 .vehicle-location-map .leaflet-control-attribution {

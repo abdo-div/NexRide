@@ -13,7 +13,7 @@ import Tilt from "react-parallax-tilt";
 const HeroLine = ({ text, accent = false }: { text: string; accent?: boolean }) => (
   <span className={`block ${accent ? "text-blue-600" : ""}`}>
     {text.split(/\s+/).map((word, index) => (
-      <span key={`${word}-${index}`} data-hero-word style={{ opacity: 0 }} className="inline-block will-change-[transform,opacity] [backface-visibility:hidden]">
+      <span key={`${word}-${index}`} className="inline-block">
         {word}{index < text.split(/\s+/).length - 1 ? "\u00a0" : ""}
       </span>
     ))}
@@ -26,7 +26,7 @@ export const HeroHeader: React.FC = () => {
   return (
     <div className="max-w-2xl flex flex-col items-start relative z-10">
       <h1
-        className="font-extrabold text-4xl sm:text-5xl lg:text-[56px] tracking-tight leading-[1.08] text-slate-900"
+        className="font-display text-4xl font-semibold sm:text-5xl lg:text-[62px] tracking-[-0.045em] leading-[1.02] text-slate-950"
       >
         <HeroLine text={t("home.hero.line1")} />
         <HeroLine text={t("home.hero.line2")} />
@@ -53,7 +53,7 @@ export const HeroHeader: React.FC = () => {
         <motion.div whileHover={{ scale: 1.045 }} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 400, damping: 17 }}>
           <Link
             to="/FleetPage"
-            className="group flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-md transition-shadow hover:bg-blue-700 hover:shadow-[0_12px_34px_rgba(37,99,235,0.42)]"
+            className="premium-button group flex items-center gap-2 px-7 py-3.5 text-sm font-bold"
           >
             <span>{t("home.hero.browseCars")}</span>
             <ArrowRight weight="bold" className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1.5 rtl:rotate-180 rtl:group-hover:-translate-x-1.5" />
@@ -70,7 +70,7 @@ export const HeroHeader: React.FC = () => {
         className="mt-8 flex items-center gap-6 text-xs text-slate-600 font-medium"
       >
         <Tilt tiltMaxAngleX={8} tiltMaxAngleY={8} scale={1.02} transitionSpeed={1000} glareEnable glareMaxOpacity={0.12} glareColor="#ffffff" glareBorderRadius="14px" className="flex items-center gap-2 rounded-xl">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 ring-1 ring-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
+          <div className="w-10 h-10 rounded-xl bg-slate-50 ring-1 ring-slate-100 flex items-center justify-center text-blue-600 shadow-sm">
             <CarSimple weight="duotone" className="w-5 h-5" />
           </div>
           <div>
