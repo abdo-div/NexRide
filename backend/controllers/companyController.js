@@ -259,3 +259,4 @@ export const deleteCompany = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+

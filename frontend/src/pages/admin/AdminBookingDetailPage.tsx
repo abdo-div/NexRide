@@ -152,7 +152,7 @@ export const AdminBookingDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
+      <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
         <div className="h-20 animate-pulse rounded-2xl border border-slate-200 bg-white" />
         <div className="mt-6 grid grid-cols-12 gap-6">
           <div className="col-span-8 space-y-6">
@@ -172,7 +172,7 @@ export const AdminBookingDetailPage: React.FC = () => {
       ? t("admin.bookings.loadError")
       : t("admin.detail.notFoundBody");
     return (
-      <div className="mx-auto flex min-h-[60vh] w-full max-w-[1440px] items-center justify-center px-8 py-8">
+      <div className="mx-auto flex min-h-[60vh] w-full max-w-[1440px] items-center justify-center px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
         <div className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white px-10 py-12 text-center shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EFF4FF] text-[#2563EB]">
             <CalendarDays className="h-7 w-7" />
@@ -263,7 +263,7 @@ export const AdminBookingDetailPage: React.FC = () => {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
+    <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
       {/* ------------------------------------------------------------------ */}
       {/* Breadcrumb bar */}
       {/* ------------------------------------------------------------------ */}

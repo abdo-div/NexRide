@@ -66,6 +66,29 @@ export const getCompanyMaintenanceSummary = catchAsync(async (req, res, next) =>
   });
 });
 
+export const getCompanyMaintenanceVehicles = catchAsync(async (req, res, next) => {
+  const companyId = resolveTenant(req, next);
+  if (!companyId) return;
+  const result = await maintenanceService.listMaintenanceVehicles(companyId, req.query);
+  res.status(200).json({
+    status: "success",
+    results: result.vehicles.length,
+    pagination: result.pagination,
+    data: { vehicles: result.vehicles },
+  });
+});
+
+export const updateCompanyVehicleOdometer = catchAsync(async (req, res, next) => {
+  const companyId = resolveTenant(req, next);
+  if (!companyId) return;
+  const vehicle = await maintenanceService.updateVehicleOdometer(
+    req.body.vehicleId,
+    req.body.currentOdometer,
+    companyId,
+  );
+  res.status(200).json({ status: "success", data: { vehicle } });
+});
+
 /**
  * POST /companies/maintenance — schedule a maintenance event for one of the
  * operator's own vehicles. The vehicle's owning company is authoritative and is

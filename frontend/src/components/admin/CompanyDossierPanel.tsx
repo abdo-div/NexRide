@@ -15,6 +15,7 @@ import {
   Star,
   Wallet,
   XCircle,
+  Trash2,
 } from "lucide-react";
 import type { AdminCompanyDto, AdminPaymentDto } from "../../types/admin";
 import type { BookingDto } from "../../types/booking";
@@ -50,6 +51,7 @@ export interface CompanyDossierPanelProps {
   onReject: () => void;
   onSuspend: () => void;
   onReactivate: () => void;
+  onRemove: () => void;
 }
 
 /** Inline operator dossier inspected below the Companies register (real data). */
@@ -65,6 +67,7 @@ export const CompanyDossierPanel: React.FC<CompanyDossierPanelProps> = ({
   onReject,
   onSuspend,
   onReactivate,
+  onRemove,
 }) => {
   const { t, i18n } = useTranslation();
   const [tab, setTab] = useState<CompanyTab>("overview");
@@ -175,6 +178,15 @@ export const CompanyDossierPanel: React.FC<CompanyDossierPanelProps> = ({
               {mutating ? t("admin.companies.dossier.saving") : t("admin.companies.dossier.reactivate")}
             </button>
           )}
+          <button
+            type="button"
+            disabled={mutating}
+            onClick={onRemove}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-3.5 py-2 text-sm font-bold text-white shadow-sm transition-all hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+          >
+            <Trash2 className="h-4 w-4" />
+            {mutating ? t("admin.companies.dossier.saving") : t("admin.companies.dossier.remove")}
+          </button>
         </div>
       </div>
 

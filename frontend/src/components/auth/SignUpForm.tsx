@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import {
   User,
   Building2,
@@ -22,6 +22,13 @@ export const SignUpForm: React.FC = () => {
   const { t } = useTranslation();
   const { signUp } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const requestedDestination = (location.state as { from?: string } | null)?.from;
+  const redirectTo =
+    requestedDestination?.startsWith("/") && !requestedDestination.startsWith("//")
+      ? requestedDestination
+      : "/";
 
   const [accountType, setAccountType] = useState<AccountType>("client");
   const [fullName, setFullName] = useState("");
@@ -56,7 +63,7 @@ export const SignUpForm: React.FC = () => {
         passwordConfirm: confirmPassword,
         role: accountType === "corporate" ? "company" : "customer",
       });
-      navigate("/", { replace: true });
+      navigate(redirectTo, { replace: true });
     } catch (error) {
       if (error instanceof ApiError) {
         setFormError(error.message);

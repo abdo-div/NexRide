@@ -47,6 +47,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { token, data } = await authApi.signIn({ identifier, password });
     setToken(token);
     setUser(data.user);
+    return data.user;
   }, []);
 
   const signUp = useCallback(async (input: SignUpInput) => {

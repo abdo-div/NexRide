@@ -5,6 +5,7 @@ import { validate } from "../middlewares/validate.middleware.js";
 import {
   getAllAdminCompanies,
   updateCompanyStatus,
+  deleteCompany,
 } from "../controllers/companyController.js";
 import { getAllVehicles } from "../controllers/vehicleController.js";
 import { getAllBookings } from "../controllers/bookingController.js";
@@ -384,5 +385,8 @@ router.patch(
   validate(updateCompanyStatusSchema),
   updateCompanyStatus,
 );
+
+/** Soft-delete any company, including an approved partner. */
+router.delete("/companies/:id", deleteCompany);
 
 export default router;

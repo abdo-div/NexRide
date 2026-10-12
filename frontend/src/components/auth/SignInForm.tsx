@@ -32,7 +32,11 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onForgotPassword }) => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const redirectTo = (location.state as { from?: string } | null)?.from ?? "/";
+  const requestedDestination = (location.state as { from?: string } | null)?.from;
+  const customerRedirect =
+    requestedDestination?.startsWith("/") && !requestedDestination.startsWith("//")
+      ? requestedDestination
+      : "/";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +45,10 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onForgotPassword }) => {
     setIsSubmitting(true);
 
     try {
-      await signIn({ identifier, password });
+      const user = await signIn({ identifier, password });
+      const role = user.role.trim();
+      const redirectTo =
+        role === "admin" ? "/admin" : role === "company" ? "/company" : customerRedirect;
       navigate(redirectTo, { replace: true });
     } catch (error) {
       if (error instanceof ApiError) {

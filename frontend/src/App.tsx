@@ -11,12 +11,14 @@ import { LoaderCircle } from "lucide-react";
 import NavBar from "./components/layouts/NavBar";
 import { Footer } from "./components/layouts/Footer";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { StaffLandingRoute } from "./components/auth/StaffLandingRoute";
 import { AuthProvider } from "./context/AuthContext";
 import HomePage from "./pages/HomePage";
 import { AdminRoute } from "./components/admin/AdminRoute";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import { CompanyRoute } from "./components/company/CompanyRoute";
 import { CompanyLayout } from "./components/company/CompanyLayout";
+import { SmoothScroll } from "./components/SmoothScroll";
 
 // Only the landing page is needed for the initial public load. Browsing, auth,
 // booking, checkout and payment screens are separate chunks so a first-time
@@ -127,8 +129,8 @@ const CompanyVehicleAddPage = lazy(() =>
   })),
 );
 const CompanyMaintenancePage = lazy(() =>
-  import("./pages/company/CompanyMaintenancePage").then((module) => ({
-    default: module.CompanyMaintenancePage,
+  import("./pages/company/CompanyMaintenanceHubPage").then((module) => ({
+    default: module.CompanyMaintenanceHubPage,
   })),
 );
 
@@ -220,9 +222,9 @@ function App() {
     <BrowserRouter>
       <ScrollToTop />
       <AuthProvider>
-        <Routes>
+        <SmoothScroll><Routes>
           <Route element={<PublicShell />}>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<StaffLandingRoute><HomePage /></StaffLandingRoute>} />
             <Route
               path="/companies"
               element={
@@ -304,17 +306,21 @@ function App() {
             <Route
               path="/login"
               element={
-                <LazyRoute>
-                  <AuthPage />
-                </LazyRoute>
+                <StaffLandingRoute>
+                  <LazyRoute>
+                    <AuthPage />
+                  </LazyRoute>
+                </StaffLandingRoute>
               }
             />
             <Route
               path="/auth"
               element={
-                <LazyRoute>
-                  <AuthPage />
-                </LazyRoute>
+                <StaffLandingRoute>
+                  <LazyRoute>
+                    <AuthPage />
+                  </LazyRoute>
+                </StaffLandingRoute>
               }
             />
             <Route
@@ -419,7 +425,7 @@ function App() {
             <Route path="payouts" element={<CompanyEarningsPage />} />
             <Route path="settings" element={<CompanySettingsPage />} />
           </Route>
-        </Routes>
+        </Routes></SmoothScroll>
       </AuthProvider>
     </BrowserRouter>
   );

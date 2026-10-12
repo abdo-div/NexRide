@@ -7,7 +7,7 @@ import { AuthTrustBadges } from "../components/auth/AuthTrustBadges";
 export const AuthPage: React.FC = () => {
   return (
     <div className="bg-[#F8FAFC] min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-28 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-8 sm:pb-12">
         <AuthBreadcrumb />
 
         {/* Master Layout Split Grid */}

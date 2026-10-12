@@ -41,6 +41,8 @@ import {
   createCompanyMaintenance,
   completeCompanyMaintenance,
   releaseCompanyMaintenanceVehicle,
+  getCompanyMaintenanceVehicles,
+  updateCompanyVehicleOdometer,
 } from "../controllers/companyMaintenanceController.js";
 import {
   createCompanySchema,
@@ -437,6 +439,34 @@ router.get(
   protect,
   restrictTo("company", "admin"),
   getCompanyMaintenanceSummary,
+);
+
+router.get(
+  "/maintenance/vehicles",
+  protect,
+  restrictTo("company", "admin"),
+  getCompanyMaintenanceVehicles,
+);
+
+router.patch(
+  "/maintenance/odometer",
+  protect,
+  restrictTo("company", "admin"),
+  updateCompanyVehicleOdometer,
+);
+
+router.post(
+  "/maintenance/log",
+  protect,
+  restrictTo("company", "admin"),
+  createCompanyMaintenance,
+);
+
+router.patch(
+  "/maintenance/events/:id/complete",
+  protect,
+  restrictTo("company", "admin"),
+  completeCompanyMaintenance,
 );
 
 /**

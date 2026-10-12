@@ -12,6 +12,66 @@
 
 body {
   font-family: var(--app-font);
+  min-width: 0;
+  overflow-x: clip;
+}
+
+html,
+#root {
+  width: 100%;
+  min-width: 0;
+}
+
+img,
+video,
+svg {
+  max-width: 100%;
+}
+
+.hero-perspective {
+  perspective: 2500px;
+  perspective-origin: center 45%;
+}
+
+.hero-3d-scene,
+.hero-car-layers,
+.hero-car-layer {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.hero-car-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  will-change: transform, opacity;
+  pointer-events: auto;
+}
+
+.hero-car-layer img {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  transition: filter 280ms ease, opacity 280ms ease, transform 280ms ease;
+  will-change: transform, opacity;
+}
+
+.hero-car-left { clip-path: polygon(0 42%, 40% 42%, 40% 83%, 0 83%); }
+.hero-car-center { clip-path: polygon(32% 45%, 67% 45%, 67% 88%, 32% 88%); }
+.hero-car-right { clip-path: polygon(61% 43%, 100% 43%, 100% 82%, 61% 82%); }
+
+.hero-car-layers:hover .hero-car-layer img { filter: brightness(.72) saturate(.8); }
+.hero-car-layers .hero-car-layer:hover img {
+  filter: brightness(1.06) saturate(1.08);
+  transform: translateZ(30px) scale(1.015);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-car-layer,
+  [data-hero-word],
+  [data-hero-search] {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 /* Keep the legally required map credit compact and visually unobtrusive. */
 .vehicle-location-map .leaflet-control-attribution {

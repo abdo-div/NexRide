@@ -13,6 +13,8 @@ import {
   Check,
   MapTrifold as Map,
 } from "@phosphor-icons/react";
+import { motion } from "framer-motion";
+import Tilt from "react-parallax-tilt";
 
 // ----------------------------------------------------------------------------
 // Data
@@ -601,7 +603,7 @@ export const SearchConsole: React.FC = () => {
   return (
     <div id="search-engine" className="relative z-[60] mt-8 w-full overflow-visible">
       {/* Card */}
-      <div className="rounded-2xl bg-slate-200 shadow-2xl shadow-slate-900/15 border border-slate-200">
+      <Tilt tiltEnable={!openPicker} tiltMaxAngleX={8} tiltMaxAngleY={8} scale={1.02} transitionSpeed={1000} glareEnable glareMaxOpacity={0.1} glareColor="#ffffff" glareBorderRadius="16px" className="rounded-2xl bg-slate-200 shadow-2xl shadow-slate-900/15 border border-slate-200 will-change-transform [backface-visibility:hidden]">
         {/* Main row */}
         <form
           className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr_1fr_auto] gap-px rounded-2xl overflow-visible"
@@ -677,14 +679,17 @@ export const SearchConsole: React.FC = () => {
 
           {/* Search CTA */}
           <div className="bg-white rounded-b-2xl lg:rounded-bl-none lg:rounded-r-2xl lg:rounded-br-2xl p-2">
-            <button
+            <motion.button
               type="submit"
-              className="w-full h-full min-h-[56px] rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-bold text-sm flex items-center justify-center gap-2 px-6 transition-colors shadow-lg shadow-blue-600/25"
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              className="group flex h-full min-h-[56px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-6 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition-shadow hover:from-blue-700 hover:to-blue-600 hover:shadow-[0_12px_34px_rgba(37,99,235,0.42)]"
             >
               <Search weight="bold" className="w-4 h-4" />
               <span>{t("home.search.search")}</span>
-              <ArrowRight weight="bold" className="w-4 h-4 rtl:rotate-180" />
-            </button>
+              <ArrowRight weight="bold" className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1.5 rtl:rotate-180 rtl:group-hover:-translate-x-1.5" />
+            </motion.button>
           </div>
         </form>
 
@@ -730,7 +735,7 @@ export const SearchConsole: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
+      </Tilt>
 
       {/* Popular picks */}
       <div className="flex flex-wrap items-center gap-2 mt-3">

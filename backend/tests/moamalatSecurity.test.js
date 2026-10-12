@@ -9,6 +9,11 @@ import { createPayment, verifyPayment } from "../controllers/moamalatController.
 import { protect } from "../middlewares/authMiddleware.js";
 import moamalatRouter from "../routes/moamalatRoutes.js";
 import { initiatePaymentSchema } from "../validations/moamalat.validation.js";
+import {
+  formatDateParam,
+  formatTrxDateTime,
+  formatVerificationDateTime,
+} from "../services/moamalat.service.js";
 
 const customerA = "aaaaaaaaaaaaaaaaaaaaaaaa";
 const customerB = "bbbbbbbbbbbbbbbbbbbbbbbb";
@@ -70,6 +75,14 @@ const routeHandlers = (path) => {
   assert.ok(layer, `expected Moamalat route ${path}`);
   return layer.route.stack.map((item) => item.handle);
 };
+
+test("Moamalat timestamps use Libya time independently of the server timezone", () => {
+  const utcDate = new Date("2026-10-11T22:30:45.000Z");
+
+  assert.equal(formatTrxDateTime(utcDate), "202610120030");
+  assert.equal(formatVerificationDateTime(utcDate), "261012003045");
+  assert.equal(formatDateParam(utcDate), "20261012");
+});
 
 test("Moamalat create and init are protected and customer-only", async () => {
   for (const path of ["/create", "/init"]) {
