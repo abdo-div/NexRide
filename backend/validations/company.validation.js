@@ -82,3 +82,4 @@ export const updateCompanyStatusSchema = z.object({
     status: z.enum(["PENDING", "APPROVED", "SUSPENDED", "REJECTED"]),
   }),
 });
+

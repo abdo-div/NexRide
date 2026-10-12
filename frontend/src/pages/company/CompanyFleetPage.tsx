@@ -115,7 +115,7 @@ export const CompanyFleetPage: React.FC = () => {
   const { summary, list, pagination } = data;
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
+    <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
       <div className="flex flex-col gap-6">
         <CompanyFleetHeader data={data} loading={loading} onExport={handleExport} />
 

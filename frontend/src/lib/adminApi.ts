@@ -260,6 +260,13 @@ export const adminApi = {
       { method: "PATCH", body: { status }, signal },
     ),
 
+  /** Removes a company from the platform directory and suspends its account. */
+  deleteCompany: (id: string, signal?: AbortSignal) =>
+    request<void>(`/admin/companies/${id}`, {
+      method: "DELETE",
+      signal,
+    }),
+
   /**
    * Platform-wide commission & settlement KPIs (aggregation pipeline). The
    * numbers are live sums over the real Payment ledger.

@@ -6,7 +6,7 @@ export interface AuthContextValue {
   /** True while the stored token is being exchanged for a session on boot. */
   isInitialising: boolean;
   isAuthenticated: boolean;
-  signIn: (input: SignInInput) => Promise<void>;
+  signIn: (input: SignInInput) => Promise<AuthUser>;
   signUp: (input: SignUpInput) => Promise<void>;
   signOut: () => Promise<void>;
   /** Adopts a token + user pair issued outside sign-in/sign-up (password reset). */

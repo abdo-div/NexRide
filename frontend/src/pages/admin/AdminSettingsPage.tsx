@@ -308,7 +308,7 @@ export const AdminSettingsPage: React.FC = () => {
 
   if (error && !settings) {
     return (
-      <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
+      <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
         <div className="rounded-xl border border-[#FECACA] bg-[#FEF2F2] p-8 text-center">
           <p className="text-sm font-semibold text-[#93000A]">
             {t("admin.settings.loadError")}
@@ -327,7 +327,7 @@ export const AdminSettingsPage: React.FC = () => {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
+    <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
       {/* Header */}
       <div className="mb-6 flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
         <div className="min-w-0 max-w-4xl">

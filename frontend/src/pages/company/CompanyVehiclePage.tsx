@@ -41,7 +41,7 @@ export const CompanyVehiclePage: React.FC = () => {
   const pagination = data.trips.pagination;
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
+    <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
       <div className="flex flex-col gap-6">
         <CompanyVehicleHeader data={data} loading={loading} />
 
@@ -50,7 +50,7 @@ export const CompanyVehiclePage: React.FC = () => {
             <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
               <div className="flex flex-col gap-6 xl:col-span-7">
                 <div className="h-[420px] animate-pulse rounded-2xl border border-slate-200 bg-white" />
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {Array.from({ length: 4 }).map((_, index) => (
                     <div key={index} className="h-24 animate-pulse rounded-xl border border-slate-200 bg-white" />
                   ))}

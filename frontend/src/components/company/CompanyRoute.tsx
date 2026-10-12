@@ -28,12 +28,12 @@ export const CompanyRoute: React.FC<CompanyRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    return <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}${location.hash}` }} />;
   }
 
   // Roles may arrive with surrounding whitespace from legacy seed data.
   if (user?.role?.trim() !== "company") {
-    return <Navigate to="/" replace />;
+    return <Navigate to={user?.role?.trim() === "admin" ? "/admin" : "/"} replace />;
   }
 
   return <>{children}</>;

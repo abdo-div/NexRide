@@ -261,6 +261,24 @@ export const AdminCompaniesPage: React.FC = () => {
     }
   };
 
+  const removeCompany = async (company: AdminCompanyDto) => {
+    const confirmed = window.confirm(
+      t("admin.companies.dossier.removeConfirm", { name: company.name }),
+    );
+    if (!confirmed) return;
+    setMutationError(false);
+    setMutatingId(company._id);
+    try {
+      await adminApi.deleteCompany(company._id);
+      setSelectedId("");
+      reload();
+    } catch {
+      setMutationError(true);
+    } finally {
+      setMutatingId(null);
+    }
+  };
+
   const handleSelect = (company: AdminCompanyDto) => {
     setSelectedId(company._id);
   };
@@ -298,7 +316,7 @@ export const AdminCompaniesPage: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
+    <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
       {/* Header */}
       <div className="mb-6 flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
         <div className="min-w-0 max-w-3xl">
@@ -544,7 +562,7 @@ export const AdminCompaniesPage: React.FC = () => {
       {/* Search + status + hub filter ribbon */}
       {!loading && !error && (
         <section className="mb-6 space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
-          <div className="relative min-w-[280px] flex-1">
+          <div className="relative min-w-0 flex-1 sm:min-w-[280px]">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#565E74]">
               <Search className="h-[18px] w-[18px]" />
             </div>
@@ -675,6 +693,7 @@ export const AdminCompaniesPage: React.FC = () => {
             onReject={() => void applyStatus(selected, "REJECTED")}
             onSuspend={() => void applyStatus(selected, "SUSPENDED")}
             onReactivate={() => void applyStatus(selected, "APPROVED")}
+            onRemove={() => void removeCompany(selected)}
           />
         ) : !loading && !error ? (
           <div className="flex h-48 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white text-center">

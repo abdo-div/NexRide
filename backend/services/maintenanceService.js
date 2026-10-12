@@ -51,6 +51,79 @@ const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const tenantFilterOf = (companyId) =>
   companyId ? { companyId: new mongoose.Types.ObjectId(String(companyId)) } : {};
 
+const DAY_MS = 86400000;
+const daysUntil = (date, now = new Date()) =>
+  date ? Math.ceil((new Date(date).getTime() - now.getTime()) / DAY_MS) : null;
+
+/** Pure telemetry diagnostic used by both the dashboard and tests. */
+export const calculateVehicleHealth = (vehicle, now = new Date()) => {
+  const currentKm = Number(vehicle.currentOdometer ?? vehicle.odometer ?? 0);
+  const oilTarget = Number(vehicle.lastOilChangeOdometer ?? 0) + Number(vehicle.oilChangeInterval ?? 10000);
+  const brakeTarget = Number(vehicle.lastBrakeServiceOdometer ?? 0) + Number(vehicle.brakeServiceInterval ?? 20000);
+  const oilRemaining = oilTarget - currentKm;
+  const brakeRemaining = brakeTarget - currentKm;
+  const licenseDays = daysUntil(vehicle.licenseExpiryDate, now);
+  const insuranceDays = daysUntil(vehicle.insuranceExpiryDate, now);
+  const expired = [licenseDays, insuranceDays].some((days) => days !== null && days < 0);
+  const critical = oilRemaining <= 0 || expired;
+  const dueSoon = oilRemaining <= 500 || brakeRemaining <= 500 ||
+    [licenseDays, insuranceDays].some((days) => days !== null && days >= 0 && days <= 14);
+  const targetKm = Math.min(oilTarget, brakeTarget);
+
+  return {
+    healthStatus: critical ? "CRITICAL_OVERDUE" : dueSoon ? "DUE_SOON" : "HEALTHY",
+    nextServiceMilestone: {
+      currentKm,
+      targetKm,
+      percentageUsed: targetKm > 0 ? Math.max(0, Math.round((currentKm / targetKm) * 100)) : 0,
+      kmRemaining: targetKm - currentKm,
+    },
+    paperworkStatus: { licenseDays, insuranceDays },
+  };
+};
+
+export const listMaintenanceVehicles = async (companyId, query = {}) => {
+  const vehicles = await Vehicle.find(tenantFilterOf(companyId)).sort({ updatedAt: -1 });
+  const search = String(query.search ?? "").trim().toLowerCase();
+  const status = String(query.healthStatus ?? "ALL");
+  const enriched = vehicles.map((vehicle) => ({ ...vehicle.toObject(), ...calculateVehicleHealth(vehicle) }));
+  const filtered = enriched.filter((vehicle) => {
+    const matchesSearch = !search || [vehicle.make, vehicle.model, vehicle.plateNumber, vehicle.vin]
+      .some((value) => String(value ?? "").toLowerCase().includes(search));
+    return matchesSearch && (status === "ALL" || vehicle.healthStatus === status);
+  });
+  const page = Math.max(1, Number(query.page) || 1);
+  const limit = Math.min(100, Math.max(1, Number(query.limit) || 10));
+  const pages = Math.max(1, Math.ceil(filtered.length / limit));
+  return {
+    vehicles: filtered.slice((page - 1) * limit, page * limit),
+    pagination: {
+      page,
+      limit,
+      total: filtered.length,
+      totalPages: filtered.length === 0 ? 0 : pages,
+      hasNextPage: page < pages,
+      hasPreviousPage: page > 1,
+    },
+  };
+};
+
+export const updateVehicleOdometer = async (vehicleId, currentOdometer, companyId) => {
+  const vehicle = await Vehicle.findOne({ _id: vehicleId, ...tenantFilterOf(companyId) });
+  if (!vehicle) throw new AppError("Vehicle not found", 404);
+  const next = Number(currentOdometer);
+  const previous = Number(vehicle.currentOdometer ?? vehicle.odometer ?? 0);
+  if (!Number.isFinite(next) || next < previous) {
+    throw new AppError("Odometer cannot be lower than the current reading", 400);
+  }
+  vehicle.currentOdometer = next;
+  vehicle.odometer = next;
+  const health = calculateVehicleHealth(vehicle);
+  if (health.healthStatus === "CRITICAL_OVERDUE") vehicle.operationalStatus = "MAINTENANCE";
+  await vehicle.save();
+  return { ...vehicle.toObject(), ...health };
+};
+
 /**
  * Fleet Health summary — every figure is computed live from the real Vehicle
  * registry and the MaintenanceEvent ledger. Overdue is derived from scheduled
@@ -144,6 +217,33 @@ export const buildMaintenanceSummary = async (companyId) => {
   const mtdCost = stats?.mtdCost ?? 0;
   const mtdVehicles = stats?.mtdVehicles ?? [];
 
+  const today = new Date();
+  const soon = new Date(today.getTime() + 14 * DAY_MS);
+  const criticalFilter = {
+    ...tenantFilter,
+    $or: [
+      { $expr: { $gte: [{ $ifNull: ["$currentOdometer", { $ifNull: ["$odometer", 0] }] }, { $add: [{ $ifNull: ["$lastOilChangeOdometer", 0] }, { $ifNull: ["$oilChangeInterval", 10000] }] }] } },
+      { licenseExpiryDate: { $lt: today } },
+      { insuranceExpiryDate: { $lt: today } },
+    ],
+  };
+  const upcomingFilter = {
+    ...tenantFilter,
+    $and: [
+      { $nor: criticalFilter.$or },
+      { $or: [
+        { $expr: { $lte: [{ $subtract: [{ $add: [{ $ifNull: ["$lastOilChangeOdometer", 0] }, { $ifNull: ["$oilChangeInterval", 10000] }] }, { $ifNull: ["$currentOdometer", { $ifNull: ["$odometer", 0] }] }] }, 500] } },
+        { $expr: { $lte: [{ $subtract: [{ $add: [{ $ifNull: ["$lastBrakeServiceOdometer", 0] }, { $ifNull: ["$brakeServiceInterval", 20000] }] }, { $ifNull: ["$currentOdometer", { $ifNull: ["$odometer", 0] }] }] }, 500] } },
+        { licenseExpiryDate: { $gte: today, $lte: soon } },
+        { insuranceExpiryDate: { $gte: today, $lte: soon } },
+      ] },
+    ],
+  };
+  const [criticalAlertsCount, upcomingServicesCount] = await Promise.all([
+    Vehicle.countDocuments(criticalFilter),
+    Vehicle.countDocuments(upcomingFilter),
+  ]);
+
   return {
     totalFleet,
     inServiceVehicles,
@@ -162,6 +262,10 @@ export const buildMaintenanceSummary = async (companyId) => {
       month: "short",
       year: "2-digit",
     }).format(new Date()),
+    quarantinedCount: inServiceVehicles,
+    criticalAlertsCount,
+    upcomingServicesCount,
+    mtdExpenditureLYD: mtdCost,
   };
 };
 
@@ -341,6 +445,14 @@ export const createMaintenanceEvent = async (payload, userId, tenantCompanyId) =
 
   const event = await MaintenanceEvent.create({
     ...payload,
+    category: payload.category ?? ({
+      OIL_CHANGE: "OIL_FILTER", BRAKES: "BRAKES", TIRES: "TIRES",
+      ENGINE: "DIAGNOSTICS", ROUTINE_INSPECTION: "ROUTINE_SERVICE",
+    }[payload.serviceType] ?? "OTHER"),
+    triggerReason: payload.triggerReason ?? payload.detail ?? "Maintenance service",
+    estCost: payload.estCost ?? payload.cost ?? 0,
+    cost: payload.cost ?? payload.estCost ?? 0,
+    workshop: payload.workshop ?? payload.workshopName ?? "",
     companyId: vehicle.companyId,
     createdBy: userId ?? null,
   });
@@ -378,6 +490,12 @@ export const completeMaintenanceEvent = async (eventId, tenantCompanyId) => {
     await event.save();
 
     const vehicle = await Vehicle.findById(event.vehicleId);
+    if (vehicle && event.odometerAtService !== null) {
+      vehicle.currentOdometer = Math.max(Number(vehicle.currentOdometer ?? 0), Number(event.odometerAtService));
+      vehicle.odometer = vehicle.currentOdometer;
+      if (event.serviceType === "OIL_CHANGE") vehicle.lastOilChangeOdometer = event.odometerAtService;
+      if (event.serviceType === "BRAKES") vehicle.lastBrakeServiceOdometer = event.odometerAtService;
+    }
     if (vehicle && vehicle.operationalStatus !== "AVAILABLE") {
       // A second open event on the same unit keeps the maintenance lock;
       // completing one event must not return a still-quarantined vehicle to
@@ -389,8 +507,10 @@ export const completeMaintenanceEvent = async (eventId, tenantCompanyId) => {
       });
       if (!otherOpenEvent) {
         vehicle.operationalStatus = "AVAILABLE";
-        await vehicle.save();
       }
+      await vehicle.save();
+    } else if (vehicle) {
+      await vehicle.save();
     }
   }
 

@@ -16,7 +16,30 @@ import { addEmailToQueue } from "../queues/emailQueue.js";
 // Formatting helpers (Moamalat field formats)
 // -----------------------------------------------------------------------------
 
-const pad2 = (value) => String(value).padStart(2, "0");
+/**
+ * Moamalat validates DateTimeLocalTrxn as Libyan local time. Production hosts
+ * commonly run in UTC, so Date#getHours() can make an otherwise valid signed
+ * order two hours stale and the LightBox reports it as "Order not found".
+ */
+const moamalatDateParts = (date) => {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: moamalatConfig.timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  });
+
+  return Object.fromEntries(
+    formatter
+      .formatToParts(date)
+      .filter(({ type }) => type !== "literal")
+      .map(({ type, value }) => [type, value]),
+  );
+};
 
 /**
  * 1 LYD = 1000 Moamalat units. AmountTrxn must be the truncated integer of
@@ -25,20 +48,25 @@ const pad2 = (value) => String(value).padStart(2, "0");
 export const amountToUnits = (amountLyd) => Math.round(amountLyd * 1000);
 
 /** YYYYMMDDHHmm — used in the checkout SecureHash string. */
-export const formatTrxDateTime = (date = new Date()) =>
-  `${date.getFullYear()}${pad2(date.getMonth() + 1)}${pad2(date.getDate())}${pad2(
-    date.getHours(),
-  )}${pad2(date.getMinutes())}`;
+export const formatTrxDateTime = (date = new Date()) => {
+  const parts = moamalatDateParts(date);
+  return `${parts.year}${parts.month}${parts.day}${parts.hour}${parts.minute}`;
+};
 
 /** YYMMDDHHmmss — used in the verification SecureHash string + API body. */
-export const formatVerificationDateTime = (date = new Date()) =>
-  `${pad2(date.getFullYear() % 100)}${pad2(date.getMonth() + 1)}${pad2(
-    date.getDate(),
-  )}${pad2(date.getHours())}${pad2(date.getMinutes())}${pad2(date.getSeconds())}`;
+export const formatVerificationDateTime = (date = new Date()) => {
+  const parts = moamalatDateParts(date);
+  return (
+    `${parts.year.slice(-2)}${parts.month}${parts.day}` +
+    `${parts.hour}${parts.minute}${parts.second}`
+  );
+};
 
 /** YYYYMMDD — FilterTransactions DateFrom/DateTo window. */
-export const formatDateParam = (date = new Date()) =>
-  `${date.getFullYear()}${pad2(date.getMonth() + 1)}${pad2(date.getDate())}`;
+export const formatDateParam = (date = new Date()) => {
+  const parts = moamalatDateParts(date);
+  return `${parts.year}${parts.month}${parts.day}`;
+};
 
 /**
  * Unique reference for a payment attempt, tied to the booking so the verify

@@ -321,7 +321,7 @@ export const AdminFleetPage: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
+    <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
       {/* Header */}
       <div className="mb-6 flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
         <div className="min-w-0 max-w-3xl">
@@ -462,7 +462,7 @@ export const AdminFleetPage: React.FC = () => {
       {!registryLoading && !registryError && (
         <section className="mb-6 space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
           <div className="flex flex-col justify-between gap-4 2xl:flex-row 2xl:items-center">
-            <div className="relative min-w-[280px] flex-1">
+            <div className="relative min-w-0 flex-1 sm:min-w-[280px]">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#565E74]">
                 <Search className="h-[18px] w-[18px]" />
               </div>

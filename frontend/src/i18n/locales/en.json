@@ -3984,6 +3984,8 @@
         "reject": "Reject",
         "suspend": "Suspend",
         "reactivate": "Re-activate",
+        "remove": "Remove Company",
+        "removeConfirm": "Remove {{name}}? The company and its vehicles will no longer be visible on the platform. This action cannot be undone from the dashboard.",
         "saving": "Saving...",
         "approveHint": "Approving publishes this partner as a verified operator.",
         "mutationError": "Could not update partner status. Please try again.",

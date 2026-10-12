@@ -92,7 +92,7 @@ export const CompanyDashboardPage: React.FC = () => {
   }, [payoutBusy, data.kpis.pendingPayout, reload, showToast, t]);
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
+    <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
       <div className="flex flex-col gap-6">
         {/* Page top bar */}
         <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">

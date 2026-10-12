@@ -19,6 +19,7 @@ const COMPANY_SEARCH_FIELDS = [
   "status",
 ];
 
+
 /** Fetch approved, non-deleted companies for the public directory. */
 export const fetchAllCompanies = async (queryParams) => {
   const features = new APIFeatures(
