@@ -8,7 +8,7 @@ export const StaffLandingRoute = ({ children }: { children: ReactNode }) => {
   const { user, isInitialising } = useAuth();
 
   if (isInitialising) {
-    return <div className="flex min-h-[60vh] items-center justify-center"><LoaderCircle className="h-8 w-8 animate-spin text-[#2563EB]" /></div>;
+    return <div className="flex min-h-[60vh] items-center justify-center"><LoaderCircle className="h-8 w-8 animate-spin text-[#142B4A]" /></div>;
   }
 
   const role = user?.role?.trim();

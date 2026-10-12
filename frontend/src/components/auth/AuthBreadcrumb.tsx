@@ -11,7 +11,7 @@ export const AuthBreadcrumb: React.FC = () => {
       <div className="flex items-center gap-1.5 text-slate-500">
         <Link
           to="/"
-          className="text-xs font-semibold hover:text-[#2563EB] transition-colors"
+          className="text-xs font-semibold hover:text-[#142B4A] transition-colors"
         >
           {t("auth.breadcrumb.home")}
         </Link>
@@ -25,7 +25,7 @@ export const AuthBreadcrumb: React.FC = () => {
         <span className="text-[11px] font-semibold text-slate-600">
           {t("auth.breadcrumb.status")}
         </span>
-        <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB]" />
+        <ShieldCheck className="w-3.5 h-3.5 text-[#142B4A]" />
       </div>
     </div>
   );

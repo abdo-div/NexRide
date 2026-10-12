@@ -70,8 +70,8 @@ export const CompanyEarningsHeader: React.FC<CompanyEarningsHeaderProps> = ({
           <span className="text-[#0B1C30]">{t("company.payoutsPage.primary")}</span>
         </div>
         {company && (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EFF4FF] px-3 py-1 text-[11px] font-semibold text-[#565E74]">
-            <ShieldCheck className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden="true" />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8FAFC] px-3 py-1 text-[11px] font-semibold text-[#565E74]">
+            <ShieldCheck className="h-3.5 w-3.5 text-[#142B4A]" aria-hidden="true" />
             {t("company.payoutsPage.scopedTenant", { code: company.slug })}
           </span>
         )}
@@ -102,8 +102,8 @@ export const CompanyEarningsHeader: React.FC<CompanyEarningsHeaderProps> = ({
 
         <div className="flex shrink-0 flex-wrap items-center gap-3">
           {/* Date range selector */}
-          <div className="relative flex items-center rounded-xl bg-[#EFF4FF] px-3 py-2">
-            <CalendarRange className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+          <div className="relative flex items-center rounded-xl bg-[#F8FAFC] px-3 py-2">
+            <CalendarRange className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
             <label className="relative">
               <span className="sr-only">{t("company.payoutsPage.range.label")}</span>
               <select
@@ -133,7 +133,7 @@ export const CompanyEarningsHeader: React.FC<CompanyEarningsHeaderProps> = ({
               type="button"
               onClick={() => setExportOpen((open) => !open)}
               disabled={loading}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
             >
               <Download className="h-[18px] w-[18px] text-[#565E74]" aria-hidden="true" />
               {t("company.payoutsPage.exportTitle")}
@@ -149,7 +149,7 @@ export const CompanyEarningsHeader: React.FC<CompanyEarningsHeaderProps> = ({
                   }}
                   className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] font-semibold text-[#0B1C30] transition-colors hover:bg-[#F8FAFF] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <Table2 className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+                  <Table2 className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
                   {t("company.payoutsPage.exportCsv")}
                 </button>
                 <button

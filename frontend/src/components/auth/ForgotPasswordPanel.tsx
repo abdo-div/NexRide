@@ -38,7 +38,7 @@ export const ForgotPasswordPanel: React.FC<ForgotPasswordPanelProps> = ({
   return (
     <div className="flex flex-col gap-5 p-5 bg-slate-100 rounded-xl">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-[#2563EB] text-sm font-bold">
+        <div className="flex items-center gap-2 text-[#142B4A] text-sm font-bold">
           <RotateCcw className="w-4 h-4" />
           <span>{t("auth.forgot.title")}</span>
         </div>
@@ -66,7 +66,7 @@ export const ForgotPasswordPanel: React.FC<ForgotPasswordPanelProps> = ({
               placeholder={t("auth.forgot.placeholder")}
               autoComplete="username"
               required
-              className="w-full ps-11 pe-4 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
+              className="w-full ps-11 pe-4 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#142B4A]/30 focus:border-[#142B4A] transition-all placeholder:text-slate-400"
             />
           </div>
         </div>

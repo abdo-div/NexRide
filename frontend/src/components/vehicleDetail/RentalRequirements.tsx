@@ -14,10 +14,10 @@ export const RentalRequirements: React.FC<{
     <section className="bg-white p-6 rounded-2xl border border-[#E2E8F0] shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-[20px] font-bold text-[#0F172A] flex items-center gap-2">
-          <ScrollText className="w-5 h-5 text-[#2563EB]" />
+          <ScrollText className="w-5 h-5 text-[#142B4A]" />
           {t("vehicleDetail.requirementsHeading")}
         </h2>
-        <span className="text-[11px] font-bold text-[#2563EB]">{t(meta)}</span>
+        <span className="text-[11px] font-bold text-[#142B4A]">{t(meta)}</span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {requirements.map((r) => (
@@ -25,7 +25,7 @@ export const RentalRequirements: React.FC<{
             key={r.title}
             className="p-4 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] flex items-start gap-3 hover:border-blue-200 transition-colors"
           >
-            <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 text-[#2563EB]">
+            <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 text-[#142B4A]">
               <DetailIcon name={r.icon} className="w-5 h-5" />
             </div>
             <div>

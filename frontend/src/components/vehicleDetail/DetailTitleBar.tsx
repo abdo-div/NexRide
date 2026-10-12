@@ -45,11 +45,11 @@ export const DetailTitleBar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
           </div>
           <span className="text-[#CBD5E1]">•</span>
           <div className="flex items-center gap-1.5">
-            <BadgeCheck className="w-[18px] h-[18px] text-[#2563EB]" />
+            <BadgeCheck className="w-[18px] h-[18px] text-[#142B4A]" />
             <span className="text-[#0F172A] font-semibold">
               {detail.vehicle.operator.name}
             </span>
-            <span className="px-1.5 py-0.5 rounded bg-blue-50 text-[#2563EB] text-[10px] font-bold">
+            <span className="px-1.5 py-0.5 rounded bg-blue-50 text-[#142B4A] text-[10px] font-bold">
               {t(detail.operatorTier)}
             </span>
           </div>

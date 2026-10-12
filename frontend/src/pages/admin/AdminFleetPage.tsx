@@ -326,7 +326,7 @@ export const AdminFleetPage: React.FC = () => {
       <div className="mb-6 flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
         <div className="min-w-0 max-w-3xl">
           <div className="mb-1 flex items-center gap-2 text-xs">
-            <span className="font-bold uppercase tracking-wider text-[#2563EB]">
+            <span className="font-bold uppercase tracking-wider text-[#142B4A]">
               {t("admin.fleet.command")}
             </span>
             <span className="text-[#C3C6D7]">•</span>
@@ -343,23 +343,23 @@ export const AdminFleetPage: React.FC = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-full bg-[#EFF4FF] px-3 py-1 text-xs font-bold text-[#2563EB]">
+          <span className="rounded-full bg-[#F8FAFC] px-3 py-1 text-xs font-bold text-[#142B4A]">
             {t("admin.fleet.count", { count: pagination.total })}
           </span>
           <button
             type="button"
             onClick={reload}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-3.5 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#E5EEFF] disabled:opacity-60 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-3.5 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#F1F5F9] disabled:opacity-60 cursor-pointer"
           >
-            <RefreshCw className={`h-4 w-4 text-[#2563EB] ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw className={`h-4 w-4 text-[#142B4A] ${loading ? "animate-spin" : ""}`} />
             {t("admin.fleet.refresh")}
           </button>
           <button
             type="button"
             onClick={handleExport}
             disabled={filtered.length === 0}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.28)] transition-all hover:bg-[#1D4ED8] disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.28)] transition-all hover:bg-[#0D2039] disabled:opacity-50 cursor-pointer"
           >
             <Download className="h-4 w-4" />
             {t("admin.fleet.export")}
@@ -373,7 +373,7 @@ export const AdminFleetPage: React.FC = () => {
           <KpiCard
             label={t("admin.fleet.kpis.totalFleet")}
             icon={<Warehouse className="h-[18px] w-[18px]" />}
-            iconTone="bg-[#E5EEFF] text-[#2563EB]"
+            iconTone="bg-[#F1F5F9] text-[#142B4A]"
             value={String(kpis.total)}
             suffix={t("admin.fleet.kpis.vehicles")}
             sub={
@@ -386,7 +386,7 @@ export const AdminFleetPage: React.FC = () => {
               </>
             }
             progress={pct(kpis.available + kpis.maintenance, kpis.total)}
-            barTone="bg-[#2563EB]"
+            barTone="bg-[#142B4A]"
           />
           <KpiCard
             label={t("admin.fleet.kpis.activeRentals")}
@@ -401,7 +401,7 @@ export const AdminFleetPage: React.FC = () => {
           <KpiCard
             label={t("admin.fleet.kpis.readyDepots")}
             icon={<CalendarCheck className="h-[18px] w-[18px]" />}
-            iconTone="bg-[#E5EEFF] text-[#2563EB]"
+            iconTone="bg-[#F1F5F9] text-[#142B4A]"
             value={String(kpis.available)}
             suffix={t("admin.fleet.kpis.available")}
             sub={
@@ -413,7 +413,7 @@ export const AdminFleetPage: React.FC = () => {
                 : "—"
             }
             progress={pct(kpis.available, kpis.total)}
-            barTone="bg-[#2563EB]"
+            barTone="bg-[#142B4A]"
           />
           <KpiCard
             label={t("admin.fleet.kpis.maintenance")}
@@ -473,7 +473,7 @@ export const AdminFleetPage: React.FC = () => {
                   resetPage();
                 }}
                 placeholder={t("admin.fleet.searchPlaceholder")}
-                className="w-full rounded-xl bg-[#EFF4FF] py-2.5 pl-11 pr-4 text-sm text-[#0B1C30] outline-none transition-all placeholder:text-[#565E74] focus:bg-white focus:ring-2 focus:ring-[#2563EB]"
+                className="w-full rounded-xl bg-[#F8FAFC] py-2.5 pl-11 pr-4 text-sm text-[#0B1C30] outline-none transition-all placeholder:text-[#565E74] focus:bg-white focus:ring-2 focus:ring-[#142B4A]"
               />
             </div>
 
@@ -575,7 +575,7 @@ export const AdminFleetPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleClear}
-                className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#EFF4FF] px-3 py-2 text-sm font-semibold text-[#2563EB] transition-all hover:bg-[#E5EEFF] cursor-pointer xl:h-[42px]"
+                className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#F8FAFC] px-3 py-2 text-sm font-semibold text-[#142B4A] transition-all hover:bg-[#F1F5F9] cursor-pointer xl:h-[42px]"
               >
                 <RotateCcw className="h-4 w-4" />
                 {t("admin.fleet.clearFilters")}
@@ -595,7 +595,7 @@ export const AdminFleetPage: React.FC = () => {
                 <span className="text-base font-bold text-[#0B1C30]">
                   {t("admin.fleet.table.registered")}
                 </span>
-                <span className="rounded-full bg-[#E5EEFF] px-2 py-0.5 text-xs font-bold text-[#2563EB]">
+                <span className="rounded-full bg-[#F1F5F9] px-2 py-0.5 text-xs font-bold text-[#142B4A]">
                   {t("admin.fleet.table.records", { count: pagination.total })}
                 </span>
               </div>
@@ -608,7 +608,7 @@ export const AdminFleetPage: React.FC = () => {
                     resetPage();
                   }}
                   aria-label={t("admin.fleet.sort")}
-                  className="cursor-pointer rounded-lg bg-[#EFF4FF] px-2 py-1.5 text-xs font-semibold text-[#0B1C30] outline-none"
+                  className="cursor-pointer rounded-lg bg-[#F8FAFC] px-2 py-1.5 text-xs font-semibold text-[#0B1C30] outline-none"
                 >
                   <option value="created">{t("admin.fleet.sortByCreated")}</option>
                   <option value="priceLow">{t("admin.fleet.sortByPriceLow")}</option>
@@ -636,7 +636,7 @@ export const AdminFleetPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={reload}
-                  className="mt-4 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+                  className="mt-4 rounded-lg bg-[#142B4A] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#0D2039] cursor-pointer"
                 >
                   {t("admin.bookings.retry")}
                 </button>
@@ -684,7 +684,7 @@ export const AdminFleetPage: React.FC = () => {
       {!registryLoading && !registryError && fleetVehicles.length > 0 && (
         <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_2px_12px_rgba(15,23,42,0.03)] md:flex-row">
           <div className="flex items-start gap-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E5EEFF] text-[#2563EB]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F1F5F9] text-[#142B4A]">
               <ShieldCheck className="h-6 w-6" />
             </div>
             <div>
@@ -748,7 +748,7 @@ const KpiCard: React.FC<KpiCardProps> = ({
       </div>
       <div className="mt-1 flex items-center gap-1.5 text-xs text-[#565E74]">{sub}</div>
     </div>
-    <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#EFF4FF]">
+    <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#F8FAFC]">
       <div
         className={`h-full rounded-full ${barTone}`}
         style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
@@ -770,8 +770,8 @@ const SegmentChip: React.FC<SegmentChipProps> = ({ active, label, count, onClick
     onClick={onClick}
     className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
       active
-        ? "bg-[#2563EB] text-white shadow-[0_2px_8px_rgba(37,99,235,0.2)]"
-        : "bg-[#EFF4FF] text-[#434655] hover:bg-[#E5EEFF]"
+        ? "bg-[#142B4A] text-white shadow-[0_2px_8px_rgba(37,99,235,0.2)]"
+        : "bg-[#F8FAFC] text-[#434655] hover:bg-[#F1F5F9]"
     }`}
   >
     {label} <span className="opacity-70">({count})</span>
@@ -799,7 +799,7 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
     <label className="mb-1 ml-1 block text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
       {label}
     </label>
-    <div className="flex h-[42px] items-center rounded-xl bg-[#EFF4FF] px-3">
+    <div className="flex h-[42px] items-center rounded-xl bg-[#F8FAFC] px-3">
       <span className="mr-2 text-[#565E74]">{icon}</span>
       <select
         value={value}
@@ -879,7 +879,7 @@ const VehicleProfilePanel: React.FC<VehicleProfilePanelProps> = ({
       {/* Drawer header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <ShieldCheck className="h-5 w-5 text-[#2563EB]" />
+          <ShieldCheck className="h-5 w-5 text-[#142B4A]" />
           <span className="text-sm font-bold text-[#0B1C30]">
             {t("admin.fleet.drawer.title")}
           </span>
@@ -933,7 +933,7 @@ const VehicleProfilePanel: React.FC<VehicleProfilePanelProps> = ({
         ) : (
           <StatusPill status={vehicle.operationalStatus} kind="vehicle" size="md" />
         )}
-        <span className="rounded-lg bg-[#EFF4FF] px-3 py-1.5 text-xs font-semibold text-[#565E74]">
+        <span className="rounded-lg bg-[#F8FAFC] px-3 py-1.5 text-xs font-semibold text-[#565E74]">
           {t("admin.fleet.drawer.listingStatus", {
             status: t(`admin.status.${vehicle.listingStatus}`),
           })}
@@ -945,25 +945,25 @@ const VehicleProfilePanel: React.FC<VehicleProfilePanelProps> = ({
         <h4 className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[#565E74]">
           {t("admin.fleet.drawer.specsTitle")}
         </h4>
-        <div className="grid grid-cols-2 gap-2 rounded-xl bg-[#EFF4FF] p-3">
+        <div className="grid grid-cols-2 gap-2 rounded-xl bg-[#F8FAFC] p-3">
           <SpecTile
-            icon={<Gauge className="h-4 w-4 text-[#2563EB]" />}
+            icon={<Gauge className="h-4 w-4 text-[#142B4A]" />}
             label={t("admin.detail.specTransmission")}
             value={transmissionLabel(vehicle.transmission)}
           />
           <SpecTile
-            icon={<Fuel className="h-4 w-4 text-[#2563EB]" />}
+            icon={<Fuel className="h-4 w-4 text-[#142B4A]" />}
             label={t("admin.detail.specFuel")}
             value={vehicle.fuelType}
           />
           <SpecTile
-            icon={<Armchair className="h-4 w-4 text-[#2563EB]" />}
+            icon={<Armchair className="h-4 w-4 text-[#142B4A]" />}
             label={t("admin.detail.specSeats")}
             value={t("admin.fleet.table.seats", { count: vehicle.seats })}
             sub={t("admin.fleet.table.doors", { count: vehicle.doors })}
           />
           <SpecTile
-            icon={<Star className="h-4 w-4 text-[#2563EB]" />}
+            icon={<Star className="h-4 w-4 text-[#142B4A]" />}
             label={t("admin.detail.specRating")}
             value={String(vehicle.ratingsAverage)}
             sub={t("admin.fleet.drawer.ratingSub", {
@@ -983,15 +983,15 @@ const VehicleProfilePanel: React.FC<VehicleProfilePanelProps> = ({
         <div className="mb-2 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-[#565E74]">
           <span>{t("admin.fleet.drawer.partnerTitle")}</span>
         </div>
-        <div className="flex items-center justify-between rounded-xl bg-[#EFF4FF] p-3">
+        <div className="flex items-center justify-between rounded-xl bg-[#F8FAFC] p-3">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#E5EEFF] text-sm font-bold text-[#2563EB]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#F1F5F9] text-sm font-bold text-[#142B4A]">
               {initialsFrom(company?.name ?? "NexRide")}
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1 text-sm font-bold text-[#0B1C30]">
                 <span className="truncate">{company ? company.name : "—"}</span>
-                <BadgeCheck className="h-4 w-4 shrink-0 text-[#2563EB]" />
+                <BadgeCheck className="h-4 w-4 shrink-0 text-[#142B4A]" />
               </div>
               <span className="text-xs text-[#565E74]">
                 {t("admin.fleet.drawer.partnerCity", {
@@ -1021,12 +1021,12 @@ const VehicleProfilePanel: React.FC<VehicleProfilePanelProps> = ({
       <div>
         <div className="mb-2 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-[#565E74]">
           <span>{t("admin.fleet.drawer.historyTitle")}</span>
-          <span className="text-[#2563EB]">
+          <span className="text-[#142B4A]">
             {t("admin.fleet.drawer.totalEarned", { value: formatLYD(earned) })}
           </span>
         </div>
         {history.length > 0 ? (
-          <div className="divide-y divide-[#D3E4FE]/60 rounded-xl bg-[#EFF4FF] p-3">
+          <div className="divide-y divide-[#E2E8F0]/60 rounded-xl bg-[#F8FAFC] p-3">
             {history.map((b) => {
               const reserved = markedReserved(b);
               const label =
@@ -1048,7 +1048,7 @@ const VehicleProfilePanel: React.FC<VehicleProfilePanelProps> = ({
                   </div>
                   <div className="text-right">
                     <div
-                      className={`text-xs font-bold ${reserved ? "text-[#2563EB]" : "text-[#0B1C30]"}`}
+                      className={`text-xs font-bold ${reserved ? "text-[#142B4A]" : "text-[#0B1C30]"}`}
                     >
                       {formatLYD(b.rentalPrice)} LYD
                     </div>
@@ -1065,7 +1065,7 @@ const VehicleProfilePanel: React.FC<VehicleProfilePanelProps> = ({
             })}
           </div>
         ) : (
-          <div className="rounded-xl bg-[#EFF4FF] p-4 text-center text-xs text-[#565E74]">
+          <div className="rounded-xl bg-[#F8FAFC] p-4 text-center text-xs text-[#565E74]">
             {t("admin.fleet.drawer.noBookings")}
           </div>
         )}
@@ -1076,7 +1076,7 @@ const VehicleProfilePanel: React.FC<VehicleProfilePanelProps> = ({
         <button
           type="button"
           onClick={onOpenDossier}
-          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_16px_rgba(37,99,235,0.25)] transition-all hover:bg-[#1D4ED8]"
+          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_16px_rgba(37,99,235,0.25)] transition-all hover:bg-[#0D2039]"
         >
           <FolderOpen className="h-4 w-4" />
           {t("admin.fleet.drawer.openDossier")}
@@ -1085,7 +1085,7 @@ const VehicleProfilePanel: React.FC<VehicleProfilePanelProps> = ({
           <button
             type="button"
             onClick={onExport}
-            className="inline-flex cursor-pointer items-center justify-center gap-1 rounded-xl bg-[#EFF4FF] px-3 py-2 text-xs font-semibold text-[#0B1C30] transition-all hover:bg-[#E5EEFF]"
+            className="inline-flex cursor-pointer items-center justify-center gap-1 rounded-xl bg-[#F8FAFC] px-3 py-2 text-xs font-semibold text-[#0B1C30] transition-all hover:bg-[#F1F5F9]"
           >
             <FileDown className="h-4 w-4 text-[#565E74]" />
             {t("admin.fleet.drawer.downloadCsv")}
@@ -1093,7 +1093,7 @@ const VehicleProfilePanel: React.FC<VehicleProfilePanelProps> = ({
           <button
             type="button"
             onClick={onOpenLedger}
-            className="inline-flex cursor-pointer items-center justify-center gap-1 rounded-xl bg-[#EFF4FF] px-3 py-2 text-xs font-semibold text-[#0B1C30] transition-all hover:bg-[#E5EEFF]"
+            className="inline-flex cursor-pointer items-center justify-center gap-1 rounded-xl bg-[#F8FAFC] px-3 py-2 text-xs font-semibold text-[#0B1C30] transition-all hover:bg-[#F1F5F9]"
           >
             <ListOrdered className="h-4 w-4 text-[#565E74]" />
             {t("admin.fleet.drawer.openLedger")}
@@ -1123,7 +1123,7 @@ const SpecTile: React.FC<SpecTileProps> = ({ icon, label, value, sub }) => (
 );
 
 const MiniStat: React.FC<{ label: string; value: string }> = ({ label, value }) => (
-  <div className="rounded-lg bg-[#EFF4FF] py-1.5">
+  <div className="rounded-lg bg-[#F8FAFC] py-1.5">
     <span className="block text-xs font-bold text-[#0B1C30]">{value}</span>
     <span className="text-[10px] text-[#565E74]">{label}</span>
   </div>

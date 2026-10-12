@@ -9,18 +9,7 @@ export const ReadyToHitTheRoad: React.FC = () => {
 
   return (
     <section className="py-20 px-6 lg:px-12 text-center border-b border-slate-900 bg-gradient-to-b from-[#020617] via-[#080e21] to-[#020617] relative overflow-hidden">
-      <motion.div
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.12, 0.22, 0.12],
-        }}
-        transition={{
-          duration: 6,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-600 blur-[120px] rounded-full pointer-events-none"
-      />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-600/15 blur-[120px] rounded-full pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 25 }}
@@ -43,7 +32,7 @@ export const ReadyToHitTheRoad: React.FC = () => {
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4">
-          <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
+          <div>
             <Link
               to="/fleet"
               className="px-6 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-lg shadow-blue-600/25 flex items-center gap-2 transition-all"
@@ -51,9 +40,9 @@ export const ReadyToHitTheRoad: React.FC = () => {
               <span>{t("cta.exploreVehicles")}</span>
               <ArrowRight className="w-4 h-4 rtl:rotate-180" />
             </Link>
-          </motion.div>
+          </div>
 
-          <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
+          <div>
             <Link
               to="/#contact"
               className="px-6 py-3.5 rounded-2xl bg-[#0b1220] border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white font-extrabold text-xs flex items-center gap-2 transition-all"
@@ -61,7 +50,7 @@ export const ReadyToHitTheRoad: React.FC = () => {
               <span>{t("cta.contactConcierge")}</span>
               <Phone className="w-3.5 h-3.5 text-slate-400" />
             </Link>
-          </motion.div>
+          </div>
         </div>
       </motion.div>
     </section>

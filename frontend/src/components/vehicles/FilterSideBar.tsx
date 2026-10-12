@@ -41,7 +41,7 @@ const BoxRow: React.FC<{
         type="checkbox"
         checked={checked}
         onChange={onToggle}
-        className="accent-[#2563EB] w-4 h-4 rounded focus:ring-blue-500 border-slate-300"
+        className="accent-[#142B4A] w-4 h-4 rounded focus:ring-blue-500 border-slate-300"
       />
       {label}
     </span>
@@ -73,13 +73,13 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
       {/* Header */}
       <div className="flex items-center justify-between pb-2 border-b border-[#E2E8F0]">
         <div className="flex items-center gap-2">
-          <Filter className="text-[#2563EB] w-5 h-5" />
+          <Filter className="text-[#142B4A] w-5 h-5" />
           <span className="text-lg font-bold text-[#0F172A]">{t("fleet.filters.title")}</span>
         </div>
         <button
           type="button"
           onClick={onReset}
-          className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 hover:text-[#2563EB] transition-colors"
+          className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 hover:text-[#142B4A] transition-colors"
         >
           {t("fleet.filters.resetAll")}
         </button>
@@ -111,7 +111,7 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
           <span className="text-xs font-bold uppercase tracking-wider text-[#0F172A]">
             {t("fleet.filters.ratePerDay")}
           </span>
-          <span className="text-xs font-bold text-[#2563EB]">
+          <span className="text-xs font-bold text-[#142B4A]">
             {t("fleet.filters.priceRange", { max: maxPrice.toLocaleString() })}
           </span>
         </div>
@@ -119,7 +119,7 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
           {HISTOGRAM.map((h, i) => (
             <div
               key={i}
-              className={`flex-1 rounded-t-sm ${i === 4 || i === 5 ? "bg-[#2563EB]" : i === 3 ? "bg-blue-200" : "bg-slate-200"}`}
+              className={`flex-1 rounded-t-sm ${i === 4 || i === 5 ? "bg-[#142B4A]" : i === 3 ? "bg-slate-200" : "bg-slate-200"}`}
               style={{ height: `${h * 10}%` }}
             />
           ))}
@@ -131,7 +131,7 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
           step={50}
           value={maxPrice}
           onChange={(e) => onMaxPriceChange(Number(e.target.value))}
-          className="w-full accent-[#2563EB] bg-slate-200 rounded-lg h-1.5 cursor-pointer"
+          className="w-full accent-[#142B4A] bg-slate-200 rounded-lg h-1.5 cursor-pointer"
         />
         <div className="flex justify-between text-[10px] font-semibold text-slate-500">
           <span>{t("fleet.filters.priceMin")}</span>
@@ -154,7 +154,7 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
                 type="checkbox"
                 checked={selectedBodies.includes(b.id)}
                 onChange={() => onToggleBody(b.id)}
-                className="accent-[#2563EB] w-4 h-4 rounded focus:ring-blue-500 border-slate-300"
+                className="accent-[#142B4A] w-4 h-4 rounded focus:ring-blue-500 border-slate-300"
               />
               <span>
                 {t("fleet.filters.bodyCount", {
@@ -225,7 +225,7 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
                 type="checkbox"
                 checked={selectedPerks.includes(p.id)}
                 onChange={() => onTogglePerk(p.id)}
-                className="accent-[#2563EB] w-4 h-4 rounded focus:ring-blue-500 border-slate-300"
+                className="accent-[#142B4A] w-4 h-4 rounded focus:ring-blue-500 border-slate-300"
               />
               <CheckSquare className="w-3.5 h-3.5 text-slate-300" />
               <span>{t(p.label)}</span>
@@ -237,7 +237,7 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
       {/* Apply CTA */}
       <button
         type="button"
-        className="w-full py-3 rounded-xl bg-[#2563EB] text-white text-sm font-bold shadow-sm hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
+        className="w-full py-3 rounded-xl bg-[#142B4A] text-white text-sm font-bold shadow-sm hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
       >
         {t("fleet.filters.apply", { count: resultCount })}
       </button>

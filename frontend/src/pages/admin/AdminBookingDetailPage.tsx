@@ -174,7 +174,7 @@ export const AdminBookingDetailPage: React.FC = () => {
     return (
       <div className="mx-auto flex min-h-[60vh] w-full max-w-[1440px] items-center justify-center px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
         <div className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white px-10 py-12 text-center shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EFF4FF] text-[#2563EB]">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F8FAFC] text-[#142B4A]">
             <CalendarDays className="h-7 w-7" />
           </div>
           <h2 className="mt-4 text-lg font-extrabold text-[#0B1C30]">
@@ -184,7 +184,7 @@ export const AdminBookingDetailPage: React.FC = () => {
           <div className="mt-5 flex items-center gap-3">
             <Link
               to="/admin/bookings"
-              className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.28)] transition-colors hover:bg-[#1D4ED8]"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.28)] transition-colors hover:bg-[#0D2039]"
             >
               <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
               {t("admin.detail.backToLedger")}
@@ -192,9 +192,9 @@ export const AdminBookingDetailPage: React.FC = () => {
             <button
               type="button"
               onClick={reload}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] transition-colors hover:bg-[#E5EEFF] cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] transition-colors hover:bg-[#F1F5F9] cursor-pointer"
             >
-              <RefreshCw className="h-4 w-4 text-[#2563EB]" />
+              <RefreshCw className="h-4 w-4 text-[#142B4A]" />
               {t("admin.bookings.retry")}
             </button>
           </div>
@@ -271,7 +271,7 @@ export const AdminBookingDetailPage: React.FC = () => {
         <div className="flex items-center gap-2 text-sm text-[#565E74]">
           <Link
             to="/admin/bookings"
-            className="flex items-center gap-1 font-semibold transition-colors hover:text-[#2563EB]"
+            className="flex items-center gap-1 font-semibold transition-colors hover:text-[#142B4A]"
           >
             <CalendarDays className="h-[18px] w-[18px]" />
             {t("admin.layout.navBookings")}
@@ -284,7 +284,7 @@ export const AdminBookingDetailPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EFF4FF] px-3 py-1 text-xs font-semibold text-[#565E74]">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8FAFC] px-3 py-1 text-xs font-semibold text-[#565E74]">
             <Clock className="h-3.5 w-3.5" />
             {t("admin.detail.bookedOn", { date: formatDate(booking.createdAt, lang) })}
           </span>
@@ -310,7 +310,7 @@ export const AdminBookingDetailPage: React.FC = () => {
                 </span>
               )}
               {payment?.status === "COMPLETED" && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E5EEFF] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F1F5F9] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#142B4A]">
                   <KeyRound className="h-3.5 w-3.5" />
                   {t("admin.detail.badgePaid")}
                 </span>
@@ -332,15 +332,15 @@ export const AdminBookingDetailPage: React.FC = () => {
               type="button"
               onClick={reload}
               disabled={loading}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-[#EFF4FF] px-3.5 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-colors hover:bg-[#E5EEFF] disabled:opacity-60 cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-[#F8FAFC] px-3.5 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-colors hover:bg-[#F1F5F9] disabled:opacity-60 cursor-pointer"
             >
-              <RefreshCw className={`h-4 w-4 text-[#2563EB] ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw className={`h-4 w-4 text-[#142B4A] ${loading ? "animate-spin" : ""}`} />
               {t("admin.detail.refresh")}
             </button>
             <button
               type="button"
               onClick={handleDownload}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-[#2563EB] px-3.5 py-2 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.28)] transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-[#142B4A] px-3.5 py-2 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.28)] transition-colors hover:bg-[#0D2039] cursor-pointer"
             >
               <Download className="h-4 w-4" />
               {t("admin.detail.downloadCsv")}
@@ -359,7 +359,7 @@ export const AdminBookingDetailPage: React.FC = () => {
           <section className="rounded-2xl bg-white p-6 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
             <div className="mb-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2563EB] text-white">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#142B4A] text-white">
                   <Route className="h-[22px] w-[22px]" />
                 </div>
                 <div>
@@ -379,7 +379,7 @@ export const AdminBookingDetailPage: React.FC = () => {
               </span>
             </div>
 
-            <ol className="relative space-y-5 before:absolute before:bottom-3 before:start-3 before:top-2 before:w-0.5 before:bg-[#D3E4FE]">
+            <ol className="relative space-y-5 before:absolute before:bottom-3 before:start-3 before:top-2 before:w-0.5 before:bg-[#E2E8F0]">
               {steps.map((step) => (
                 <li key={step.id} className="relative">
                   <span
@@ -389,8 +389,8 @@ export const AdminBookingDetailPage: React.FC = () => {
                         : step.active
                           ? "bg-emerald-500 text-white"
                           : step.done
-                            ? "bg-[#2563EB] text-white"
-                            : "bg-[#D3E4FE] text-[#565E74]"
+                            ? "bg-[#142B4A] text-white"
+                            : "bg-[#E2E8F0] text-[#565E74]"
                     }`}
                   >
                     {step.error ? (
@@ -406,7 +406,7 @@ export const AdminBookingDetailPage: React.FC = () => {
                   )}
                   <div
                     className={`flex flex-col gap-1 rounded-xl p-3 sm:flex-row sm:items-baseline sm:justify-between ${
-                      step.active ? "bg-[#EFF4FF]" : ""
+                      step.active ? "bg-[#F8FAFC]" : ""
                     }`}
                   >
                     <span
@@ -422,7 +422,7 @@ export const AdminBookingDetailPage: React.FC = () => {
                       )}
                     </span>
                     <span
-                      className={`text-xs ${step.active || step.error ? "font-bold text-[#2563EB]" : "text-[#565E74]"}`}
+                      className={`text-xs ${step.active || step.error ? "font-bold text-[#142B4A]" : "text-[#565E74]"}`}
                     >
                       {step.time}
                     </span>
@@ -434,7 +434,7 @@ export const AdminBookingDetailPage: React.FC = () => {
 
           {/* SECTION 2: Vehicle & fleet */}
           <section className="overflow-hidden rounded-2xl bg-white shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
-            <div className="relative flex h-56 w-full items-end bg-[#EFF4FF] sm:h-64">
+            <div className="relative flex h-56 w-full items-end bg-[#F8FAFC] sm:h-64">
               <img
                 src={hero}
                 alt=""
@@ -443,7 +443,7 @@ export const AdminBookingDetailPage: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C30]/85 via-[#0B1C30]/30 to-transparent" />
               <div className="relative z-10 flex w-full flex-wrap items-end justify-between gap-3 px-6 pb-5 text-white">
                 <div>
-                  <span className="inline-flex rounded bg-[#2563EB] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">
+                  <span className="inline-flex rounded bg-[#142B4A] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">
                     {vehicle?.type ?? t("admin.detail.vehicleUnit")}
                   </span>
                   <h3 className="mt-1 text-xl font-extrabold">{vehicleTitle(booking)}</h3>
@@ -464,7 +464,7 @@ export const AdminBookingDetailPage: React.FC = () => {
             <div className="p-6">
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 {specCells.map((cell) => (
-                  <div key={cell.label} className="rounded-xl bg-[#EFF4FF] p-3">
+                  <div key={cell.label} className="rounded-xl bg-[#F8FAFC] p-3">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
                       {cell.label}
                     </span>
@@ -475,7 +475,7 @@ export const AdminBookingDetailPage: React.FC = () => {
 
               <div className="mt-5 flex flex-col justify-between gap-4 border-t border-slate-100 pt-5 sm:flex-row sm:items-center">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#E5EEFF] text-lg font-extrabold text-[#2563EB]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F1F5F9] text-lg font-extrabold text-[#142B4A]">
                     {providerInitials}
                   </div>
                   <div>
@@ -484,7 +484,7 @@ export const AdminBookingDetailPage: React.FC = () => {
                         {company?.name ?? "—"}
                       </span>
                       {companyFull?.status === "APPROVED" && (
-                        <ShieldCheck className="h-4 w-4 text-[#2563EB]" />
+                        <ShieldCheck className="h-4 w-4 text-[#142B4A]" />
                       )}
                     </div>
                     <p className="text-xs text-[#565E74]">
@@ -507,18 +507,18 @@ export const AdminBookingDetailPage: React.FC = () => {
               <div>
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <User className="h-5 w-5 text-[#2563EB]" />
+                    <User className="h-5 w-5 text-[#142B4A]" />
                     <span className="text-[16px] font-extrabold text-[#0B1C30]">
                       {t("admin.detail.customerTitle")}
                     </span>
                   </div>
-                  <span className="rounded-full bg-[#EFF4FF] px-2.5 py-0.5 text-[11px] font-bold text-[#2563EB]">
+                  <span className="rounded-full bg-[#F8FAFC] px-2.5 py-0.5 text-[11px] font-bold text-[#142B4A]">
                     {t("admin.detail.badgeCustomer")}
                   </span>
                 </div>
 
                 <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#E5EEFF] text-lg font-extrabold text-[#2563EB]">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#F1F5F9] text-lg font-extrabold text-[#142B4A]">
                     {customerInitials}
                   </div>
                   <div className="min-w-0">
@@ -536,19 +536,19 @@ export const AdminBookingDetailPage: React.FC = () => {
                 <dl className="space-y-1 text-sm">
                   {customer?.email && (
                     <Row label={t("admin.detail.email")} value={customer.email}>
-                      <Mail className="h-4 w-4 text-[#2563EB]" />
+                      <Mail className="h-4 w-4 text-[#142B4A]" />
                     </Row>
                   )}
                   {customer?.phoneNumber && (
                     <Row label={t("admin.detail.phone")} value={customer.phoneNumber}>
-                      <Phone className="h-4 w-4 text-[#2563EB]" />
+                      <Phone className="h-4 w-4 text-[#142B4A]" />
                     </Row>
                   )}
                   <Row label={t("admin.detail.tripDates")} value={`${formatDate(booking.startDate, lang)} → ${formatDate(booking.endDate, lang)}`}>
-                    <CalendarDays className="h-4 w-4 text-[#2563EB]" />
+                    <CalendarDays className="h-4 w-4 text-[#142B4A]" />
                   </Row>
                   <Row label={t("admin.detail.pickupProtocol")} value={t(`admin.detail.pickup.${booking.pickupMethod}`)}>
-                    <MapPin className="h-4 w-4 text-[#2563EB]" />
+                    <MapPin className="h-4 w-4 text-[#142B4A]" />
                   </Row>
                 </dl>
               </div>
@@ -558,31 +558,31 @@ export const AdminBookingDetailPage: React.FC = () => {
               <div>
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Layers className="h-5 w-5 text-[#2563EB]" />
+                    <Layers className="h-5 w-5 text-[#142B4A]" />
                     <span className="text-[16px] font-extrabold text-[#0B1C30]">
                       {t("admin.detail.tripTitle")}
                     </span>
                   </div>
-                  <span className="rounded-full bg-[#EFF4FF] px-2.5 py-0.5 text-[11px] font-bold text-[#565E74]">
+                  <span className="rounded-full bg-[#F8FAFC] px-2.5 py-0.5 text-[11px] font-bold text-[#565E74]">
                     {t("admin.detail.duration", { count: booking.totalDays })}
                   </span>
                 </div>
 
                 <dl className="space-y-1 text-sm">
                   <Row label={t("admin.detail.pickupFrom")} value={booking.pickupLocation}>
-                    <MapPin className="h-4 w-4 text-[#2563EB]" />
+                    <MapPin className="h-4 w-4 text-[#142B4A]" />
                   </Row>
                   <Row
                     label={t("admin.detail.specRate")}
                     value={`${formatLYD(booking.dailyRate)} LYD`}
                   >
-                    <Banknote className="h-4 w-4 text-[#2563EB]" />
+                    <Banknote className="h-4 w-4 text-[#142B4A]" />
                   </Row>
                   <Row
                     label={t("admin.detail.rentalPeriod")}
                     value={`${formatDate(booking.startDate, lang)} — ${formatDate(booking.endDate, lang)}`}
                   >
-                    <Gauge className="h-4 w-4 text-[#2563EB]" />
+                    <Gauge className="h-4 w-4 text-[#142B4A]" />
                   </Row>
                 </dl>
               </div>
@@ -596,7 +596,7 @@ export const AdminBookingDetailPage: React.FC = () => {
           <section className="rounded-2xl bg-white p-6 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#E5EEFF] text-[#2563EB]">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F1F5F9] text-[#142B4A]">
                   <ReceiptText className="h-5 w-5" />
                 </div>
                 <h3 className="text-[16px] font-extrabold text-[#0B1C30]">
@@ -606,12 +606,12 @@ export const AdminBookingDetailPage: React.FC = () => {
               <StatusPill status={booking.paymentStatus} kind="payment" size="sm" />
             </div>
 
-            <div className="mb-4 rounded-xl bg-[#EFF4FF] p-4">
+            <div className="mb-4 rounded-xl bg-[#F8FAFC] p-4">
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
                 {t("admin.detail.grossLabel")}
               </span>
               <div className="mt-0.5 flex items-baseline gap-1">
-                <span className="text-[28px] font-extrabold leading-tight text-[#2563EB]">
+                <span className="text-[28px] font-extrabold leading-tight text-[#142B4A]">
                   {formatLYD(booking.totalAmount)}
                 </span>
                 <span className="text-sm font-bold text-[#0B1C30]">LYD</span>
@@ -634,14 +634,14 @@ export const AdminBookingDetailPage: React.FC = () => {
                 })}
                 value={`${formatLYD(booking.rentalPrice)} LYD`}
               >
-                <Gauge className="h-4 w-4 text-[#2563EB]" />
+                <Gauge className="h-4 w-4 text-[#142B4A]" />
               </Row>
               {booking.discountAmount > 0 && (
                 <Row
                   label={t("admin.drawer.discount")}
                   value={`− ${formatLYD(booking.discountAmount)} LYD`}
                 >
-                  <Banknote className="h-4 w-4 text-[#2563EB]" />
+                  <Banknote className="h-4 w-4 text-[#142B4A]" />
                 </Row>
               )}
               <div className="flex items-center justify-between border-t border-slate-100 pt-2">
@@ -652,12 +652,12 @@ export const AdminBookingDetailPage: React.FC = () => {
               </div>
             </dl>
 
-            <div className="mb-4 space-y-2 rounded-xl bg-[#EFF4FF] p-4">
+            <div className="mb-4 space-y-2 rounded-xl bg-[#F8FAFC] p-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#142B4A]">
                   {t("admin.detail.splitTitle")}
                 </span>
-                <KeyRound className="h-4 w-4 text-[#2563EB]" />
+                <KeyRound className="h-4 w-4 text-[#142B4A]" />
               </div>
               <div className="flex items-center justify-between text-sm">
                 <div>
@@ -666,7 +666,7 @@ export const AdminBookingDetailPage: React.FC = () => {
                   </p>
                   <span className="text-[11px] text-[#565E74]">{t("admin.detail.feeDetail")}</span>
                 </div>
-                <span className="text-sm font-extrabold text-[#2563EB]">
+                <span className="text-sm font-extrabold text-[#142B4A]">
                   {formatLYD(booking.commissionAmount)} LYD
                 </span>
               </div>
@@ -701,7 +701,7 @@ export const AdminBookingDetailPage: React.FC = () => {
           {/* SECTION 5: Dispatch snapshot */}
           <section className="rounded-2xl bg-white p-6 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
             <div className="mb-4 flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#E5EEFF] text-[#2563EB]">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F1F5F9] text-[#142B4A]">
                 <Users className="h-5 w-5" />
               </div>
               <h3 className="text-[16px] font-extrabold text-[#0B1C30]">
@@ -711,22 +711,22 @@ export const AdminBookingDetailPage: React.FC = () => {
 
             <dl className="space-y-1 text-sm">
               <Row label={t("admin.detail.createdOn")} value={formatDate(booking.createdAt, lang, true)}>
-                <Clock className="h-4 w-4 text-[#2563EB]" />
+                <Clock className="h-4 w-4 text-[#142B4A]" />
               </Row>
               <Row label={t("admin.detail.updatedOn")} value={formatDate(booking.updatedAt ?? booking.createdAt, lang, true)}>
-                <RefreshCw className="h-4 w-4 text-[#2563EB]" />
+                <RefreshCw className="h-4 w-4 text-[#142B4A]" />
               </Row>
               <Row label={t("admin.detail.hubLabel")} value={companyFull?.city ?? company?.city ?? "—"}>
-                <Building2 className="h-4 w-4 text-[#2563EB]" />
+                <Building2 className="h-4 w-4 text-[#142B4A]" />
               </Row>
               <Row label={t("admin.detail.protocol")} value={t(`admin.detail.pickup.${booking.pickupMethod}`)}>
-                <MapPin className="h-4 w-4 text-[#2563EB]" />
+                <MapPin className="h-4 w-4 text-[#142B4A]" />
               </Row>
             </dl>
 
             <div className="mt-4 space-y-2 text-sm">
               {payment && (
-                <div className="flex items-center justify-between rounded-xl bg-[#EFF4FF] px-4 py-3">
+                <div className="flex items-center justify-between rounded-xl bg-[#F8FAFC] px-4 py-3">
                   <span className="text-xs font-bold uppercase tracking-wider text-[#565E74]">
                     {t("admin.detail.ledger")}
                   </span>
@@ -737,7 +737,7 @@ export const AdminBookingDetailPage: React.FC = () => {
               )}
               <Link
                 to="/admin/bookings"
-                className="flex w-full items-center justify-between rounded-xl bg-[#EFF4FF] px-4 py-3 text-sm font-bold text-[#2563EB] transition-colors hover:bg-[#E5EEFF]"
+                className="flex w-full items-center justify-between rounded-xl bg-[#F8FAFC] px-4 py-3 text-sm font-bold text-[#142B4A] transition-colors hover:bg-[#F1F5F9]"
               >
                 <span className="flex items-center gap-2">
                   <Fuel className="h-4 w-4" />
@@ -758,7 +758,7 @@ const Row: React.FC<{
   value: string;
   children?: React.ReactNode;
 }> = ({ label, value, children }) => (
-  <div className="flex items-center justify-between gap-3 rounded-lg bg-[#EFF4FF] px-3 py-1.5">
+  <div className="flex items-center justify-between gap-3 rounded-lg bg-[#F8FAFC] px-3 py-1.5">
     <dt className="flex items-center gap-1.5 text-xs text-[#565E74]">
       {children}
       <span>{label}</span>

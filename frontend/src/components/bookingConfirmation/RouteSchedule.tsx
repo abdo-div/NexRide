@@ -21,7 +21,7 @@ export const RouteSchedule: React.FC<{ data: ConfirmationData }> = ({ data }) =>
           <div key={stop.label} className="flex items-start gap-3 relative">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-                stop.primary ? "bg-[#DBE1FF] text-[#2563EB]" : "bg-[#F8FAFC] text-[#64748B]"
+                stop.primary ? "bg-[#DBE1FF] text-[#142B4A]" : "bg-[#F8FAFC] text-[#64748B]"
               }`}
             >
               <ConfirmationIcon name={stop.icon} className="w-[18px] h-[18px]" />
@@ -29,7 +29,7 @@ export const RouteSchedule: React.FC<{ data: ConfirmationData }> = ({ data }) =>
             <div className="flex flex-col">
               <span
                 className={`text-[11px] font-bold uppercase ${
-                  stop.primary ? "text-[#2563EB]" : "text-[#64748B]"
+                  stop.primary ? "text-[#142B4A]" : "text-[#64748B]"
                 }`}
               >
                 {t(stop.label)}

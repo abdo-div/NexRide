@@ -41,21 +41,21 @@ export const PartnerRail: React.FC<RailProps> = ({ activeStep, draft }) => {
       <div className="bg-white rounded-xl shadow-md p-6 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-[10px] uppercase font-bold tracking-wider text-[#2563EB] block">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-[#142B4A] block">
               {t("partner.rail.status")}
             </span>
             <span className="text-lg font-bold text-[#0B1C30] block mt-0.5">
               {t("partner.rail.stepOf", { n: activeStep })}
             </span>
           </div>
-          <span className="text-xl font-black text-[#2563EB]">
+          <span className="text-xl font-black text-[#142B4A]">
             {t("partner.rail.percent", { p: percent })}
           </span>
         </div>
 
-        <div className="w-full h-2 rounded-full bg-[#E5EEFF] overflow-hidden">
+        <div className="w-full h-2 rounded-full bg-[#F1F5F9] overflow-hidden">
           <div
-            className="h-full bg-[#2563EB] rounded-full transition-all duration-500"
+            className="h-full bg-[#142B4A] rounded-full transition-all duration-500"
             style={{ width: `${percent}%` }}
           />
         </div>
@@ -68,16 +68,16 @@ export const PartnerRail: React.FC<RailProps> = ({ activeStep, draft }) => {
               <div
                 key={step}
                 className={`flex items-start gap-3 rounded-xl ${
-                  isActive ? "bg-[#EFF4FF] p-2.5" : ""
+                  isActive ? "bg-[#F8FAFC] p-2.5" : ""
                 }`}
               >
                 <div
                   className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-[11px] font-bold ${
                     isCompleted
-                      ? "bg-[#D3E4FE] text-[#2563EB]"
+                      ? "bg-[#E2E8F0] text-[#142B4A]"
                       : isActive
-                        ? "bg-[#2563EB] text-white"
-                        : "bg-[#E5EEFF] text-[#434655]"
+                        ? "bg-[#142B4A] text-white"
+                        : "bg-[#F1F5F9] text-[#434655]"
                   }`}
                 >
                   {isCompleted ? <Check className="w-3.5 h-3.5" /> : step}
@@ -86,7 +86,7 @@ export const PartnerRail: React.FC<RailProps> = ({ activeStep, draft }) => {
                   <span
                     className={`text-sm block truncate ${
                       isActive
-                        ? "text-[#2563EB] font-bold"
+                        ? "text-[#142B4A] font-bold"
                         : isCompleted
                           ? "text-[#0B1C30] font-bold"
                           : "text-[#0B1C30] font-medium"
@@ -109,13 +109,13 @@ export const PartnerRail: React.FC<RailProps> = ({ activeStep, draft }) => {
       {/* Mandatory requirements */}
       <div className="bg-white rounded-xl shadow-md p-6 flex flex-col gap-3.5">
         <div className="flex items-center gap-2 text-[#0B1C30]">
-          <ListChecks className="w-5 h-5 text-[#2563EB]" />
+          <ListChecks className="w-5 h-5 text-[#142B4A]" />
           <span className="text-sm font-bold">{t("partner.rail.requirements")}</span>
         </div>
         <ul className="flex flex-col gap-2.5 text-[13px] text-[#434655]">
           {REQUIREMENT_KEYS.map((key) => (
             <li key={key} className="flex items-center gap-2">
-              <Check className="w-4 h-4 text-[#2563EB] shrink-0" />
+              <Check className="w-4 h-4 text-[#142B4A] shrink-0" />
               <span>{t(`partner.rail.${key}`)}</span>
             </li>
           ))}
@@ -125,28 +125,28 @@ export const PartnerRail: React.FC<RailProps> = ({ activeStep, draft }) => {
       {/* Concierge desk */}
       <div className="bg-[#213145] text-[#EAF1FF] rounded-xl shadow-md p-6 flex flex-col gap-4 relative overflow-hidden">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#2563EB] text-white flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-[#142B4A] text-white flex items-center justify-center shrink-0">
             <Headset className="w-5 h-5" />
           </div>
           <div>
             <span className="text-sm font-bold block">{t("partner.rail.conciergeTitle")}</span>
-            <span className="text-[11px] text-[#B4C5FF]">{t("partner.rail.conciergeSub")}</span>
+            <span className="text-[11px] text-[#CBD5E1]">{t("partner.rail.conciergeSub")}</span>
           </div>
         </div>
-        <p className="text-[13px] text-[#D3E4FE] leading-relaxed">
+        <p className="text-[13px] text-[#E2E8F0] leading-relaxed">
           {t("partner.rail.conciergeDesc")}
         </p>
         <div className="flex flex-col gap-2 pt-1">
           <a
             href="tel:+218910008820"
-            className="flex items-center gap-2 text-sm font-bold hover:text-[#B4C5FF] transition-colors"
+            className="flex items-center gap-2 text-sm font-bold hover:text-[#CBD5E1] transition-colors"
           >
             <PhoneCall className="w-[18px] h-[18px] text-[#DBE1FF]" />
             {t("partner.rail.conciergePhone")}
           </a>
           <a
             href="#"
-            className="flex items-center gap-2 text-sm font-bold hover:text-[#B4C5FF] transition-colors"
+            className="flex items-center gap-2 text-sm font-bold hover:text-[#CBD5E1] transition-colors"
           >
             <MessageCircle className="w-[18px] h-[18px] text-[#FFDBCA]" />
             {t("partner.rail.conciergeWhatsApp")}

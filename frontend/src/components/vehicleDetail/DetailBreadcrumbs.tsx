@@ -30,7 +30,7 @@ export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave
       <nav className="flex items-center gap-2 text-[#64748B] font-medium text-[13px] overflow-x-auto py-1">
         <Link
           to="/FleetPage"
-          className="hover:text-[#2563EB] transition-colors flex items-center gap-1 shrink-0"
+          className="hover:text-[#142B4A] transition-colors flex items-center gap-1 shrink-0"
         >
           <Car className="w-4 h-4" />
           {t(crumbs[0] ?? "vehicleDetail.crumbCars")}
@@ -38,7 +38,7 @@ export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave
         {crumbs.slice(1, -1).map((c) => (
           <React.Fragment key={c}>
             <Separator />
-            <Link to="/FleetPage" className="hover:text-[#2563EB] transition-colors shrink-0">
+            <Link to="/FleetPage" className="hover:text-[#142B4A] transition-colors shrink-0">
               {t(c)}
             </Link>
           </React.Fragment>
@@ -62,10 +62,10 @@ export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave
           type="button"
           onClick={onToggleSave}
           className={`flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors shadow-sm text-[13px] font-medium ${
-            saved ? "text-[#2563EB]" : "text-[#64748B] hover:text-[#0F172A]"
+            saved ? "text-[#142B4A]" : "text-[#64748B] hover:text-[#0F172A]"
           }`}
         >
-          <Heart className={`w-[18px] h-[18px] ${saved ? "fill-[#2563EB] text-[#2563EB]" : ""}`} />
+          <Heart className={`w-[18px] h-[18px] ${saved ? "fill-[#142B4A] text-[#142B4A]" : ""}`} />
           {saved ? t("nav.saved") : t("vehicleDetail.save")}
         </button>
         <button

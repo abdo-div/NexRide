@@ -19,7 +19,7 @@ export const CompanyFinancialBar: React.FC<CompanyFinancialBarProps> = ({
 
   return (
     <div className="grid grid-cols-2 gap-3 pt-1 lg:grid-cols-4">
-      <div className="flex flex-col rounded-xl bg-[#E5EEFF] p-3">
+      <div className="flex flex-col rounded-xl bg-[#F1F5F9] p-3">
         <span className="text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
           {t("company.financial.gross")}
         </span>
@@ -31,7 +31,7 @@ export const CompanyFinancialBar: React.FC<CompanyFinancialBarProps> = ({
         </span>
       </div>
 
-      <div className="flex flex-col rounded-xl bg-[#E5EEFF] p-3">
+      <div className="flex flex-col rounded-xl bg-[#F1F5F9] p-3">
         <span className="text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
           {t("company.financial.take", { rate: financial.takeRatePct })}
         </span>
@@ -43,11 +43,11 @@ export const CompanyFinancialBar: React.FC<CompanyFinancialBarProps> = ({
         </span>
       </div>
 
-      <div className="flex flex-col rounded-xl bg-[#DCE9FF] p-3">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+      <div className="flex flex-col rounded-xl bg-[#F1F5F9] p-3">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-[#142B4A]">
           {t("company.financial.net")}
         </span>
-        <span className="mt-0.5 text-lg font-extrabold text-[#2563EB]">
+        <span className="mt-0.5 text-lg font-extrabold text-[#142B4A]">
           {formatLYD(financial.net)} <span className="text-sm font-bold text-[#565E74]">LYD</span>
         </span>
         <span className="text-xs text-[#565E74]">
@@ -55,7 +55,7 @@ export const CompanyFinancialBar: React.FC<CompanyFinancialBarProps> = ({
         </span>
       </div>
 
-      <div className="flex flex-col rounded-xl bg-[#E5EEFF] p-3">
+      <div className="flex flex-col rounded-xl bg-[#F1F5F9] p-3">
         <span className="text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
           {t("company.financial.avgDaily")}
         </span>

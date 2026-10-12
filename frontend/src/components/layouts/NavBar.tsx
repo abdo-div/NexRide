@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Menu, X, Zap } from "lucide-react";
@@ -16,11 +16,29 @@ export const NavBar: React.FC = () => {
   const isAdmin = user?.role?.trim() === "admin";
   const canApplyAsPartner = !isCompany && !isAdmin;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const isHomePage = location.pathname === "/";
 
+  useEffect(() => {
+    const updateNav = () => setIsScrolled(window.scrollY > 24);
+    updateNav();
+    window.addEventListener("scroll", updateNav, { passive: true });
+    return () => window.removeEventListener("scroll", updateNav);
+  }, []);
+
   return (
-    <header className="fixed top-3 sm:top-4 left-0 right-0 z-50 w-full px-3 sm:px-6 pointer-events-none flex justify-center">
-      <div className="pointer-events-auto w-full max-w-7xl bg-white/95 backdrop-blur-md rounded-full shadow-[0_10px_35px_-5px_rgba(0,0,0,0.08),0_1px_3px_rgba(0,0,0,0.05)] border border-slate-200/80 px-3 sm:px-5 py-2 sm:py-2.5 flex items-center justify-between gap-3 transition-all duration-300">
+    <header
+      className={`fixed left-0 right-0 z-50 flex w-full justify-center pointer-events-none transition-all duration-300 ease-out ${
+        isScrolled ? "top-0 px-0" : "top-3 px-3 sm:top-4 sm:px-6"
+      }`}
+    >
+      <div
+        className={`pointer-events-auto flex w-full items-center justify-between gap-3 bg-white/95 px-3 py-2 backdrop-blur-md transition-all duration-300 ease-out sm:px-5 sm:py-2.5 ${
+          isScrolled
+            ? "max-w-none rounded-none border-x-0 border-b border-t-0 border-slate-200/80 shadow-[0_8px_28px_-12px_rgba(15,23,42,0.22)]"
+            : "max-w-7xl rounded-full border border-slate-200/80 shadow-[0_10px_35px_-5px_rgba(0,0,0,0.08),0_1px_3px_rgba(0,0,0,0.05)]"
+        }`}
+      >
         {/* Right side: Logo & Brand Tagline */}
         <NavBarLogo />
 

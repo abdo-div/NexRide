@@ -65,8 +65,8 @@ export const CompanyPayoutSettlements: React.FC<CompanyPayoutSettlementsProps> =
       value: moneyOf(summary.disbursed),
       caption: t("company.payoutsPage.settlements.disbursedSub"),
       cue: t("company.payoutsPage.settlements.disbursedTag"),
-      dot: "bg-[#2563EB]",
-      chip: "bg-[#EFF4FF] text-[#2563EB]",
+      dot: "bg-[#142B4A]",
+      chip: "bg-[#F8FAFC] text-[#142B4A]",
       icon: Send,
     },
   ];
@@ -111,7 +111,7 @@ export const CompanyPayoutSettlements: React.FC<CompanyPayoutSettlementsProps> =
               style={{ width: `${pct(summary.inEscrow)}%` }}
             />
             <div
-              className="bg-[#2563EB]"
+              className="bg-[#142B4A]"
               style={{ width: `${pct(summary.disbursed)}%` }}
             />
           </div>
@@ -125,7 +125,7 @@ export const CompanyPayoutSettlements: React.FC<CompanyPayoutSettlementsProps> =
               {t("company.payoutsPage.settlements.escrowShort")}
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-[#2563EB]" />
+              <span className="h-2 w-2 rounded-full bg-[#142B4A]" />
               {t("company.payoutsPage.settlements.disbursedShort")}
             </span>
           </div>
@@ -180,7 +180,7 @@ export const CompanyPayoutSettlements: React.FC<CompanyPayoutSettlementsProps> =
         <button
           type="button"
           onClick={onOpenSettings}
-          className="inline-flex items-center gap-1 text-[11px] font-bold text-[#2563EB] transition-colors hover:text-[#1D4ED8] cursor-pointer"
+          className="inline-flex items-center gap-1 text-[11px] font-bold text-[#142B4A] transition-colors hover:text-[#0D2039] cursor-pointer"
         >
           {t("company.payoutsPage.settlements.manage")}
           <ArrowRight className="h-3 w-3 rtl:rotate-180" aria-hidden="true" />

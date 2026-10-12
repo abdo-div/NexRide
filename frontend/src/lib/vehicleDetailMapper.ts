@@ -182,7 +182,7 @@ export const buildVehicleDetail = (
         author: name,
         initials,
         avatarClass:
-          index % 2 === 0 ? "bg-blue-100 text-[#2563EB]" : "bg-slate-200 text-[#0F172A]",
+          index % 2 === 0 ? "bg-blue-100 text-[#142B4A]" : "bg-slate-200 text-[#0F172A]",
         context: "vehicleDetail.reviewCtxCompleted",
         timeAgo: review.createdAt
           ? new Date(review.createdAt).toLocaleDateString()

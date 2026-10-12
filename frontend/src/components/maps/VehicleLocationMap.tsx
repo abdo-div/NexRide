@@ -86,7 +86,7 @@ export const VehicleLocationMap: React.FC<VehicleLocationMapProps> = ({
           <CircleMarker
             center={center}
             radius={10}
-            pathOptions={{ color: "#ffffff", weight: 3, fillColor: "#2563EB", fillOpacity: 1 }}
+            pathOptions={{ color: "#ffffff", weight: 3, fillColor: "#142B4A", fillOpacity: 1 }}
           >
             {label && <Popup>{label}</Popup>}
           </CircleMarker>

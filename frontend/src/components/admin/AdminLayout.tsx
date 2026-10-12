@@ -124,8 +124,8 @@ export const AdminLayout: React.FC = () => {
         {/* ------------------------------------------------------------------ */}
         <aside className={`fixed inset-y-0 start-0 z-50 flex h-full w-[min(18rem,86vw)] select-none flex-col justify-between bg-white shadow-xl transition-transform duration-200 lg:!translate-x-0 lg:w-72 lg:shadow-[0_1px_8px_rgba(0,0,0,0.04)] ${sidebarOpen ? "translate-x-0" : "ltr:-translate-x-full rtl:translate-x-full"}`}>
           <div className="flex h-full flex-col">
-            <div className="flex h-16 items-center gap-3 border-b border-slate-200 bg-[#EFF4FF] px-6">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2563EB] text-sm font-extrabold text-white">
+            <div className="flex h-16 items-center gap-3 border-b border-slate-200 bg-[#F8FAFC] px-6">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#142B4A] text-sm font-extrabold text-white">
                 Nx
               </div>
               <button type="button" onClick={() => setSidebarOpen(false)} className="ms-auto rounded-lg p-2 text-slate-500 hover:bg-white lg:hidden" aria-label="Close navigation"><X className="h-5 w-5" /></button>
@@ -140,14 +140,14 @@ export const AdminLayout: React.FC = () => {
             </div>
 
             <div className="px-4 py-2">
-              <div className="flex items-center justify-between rounded-xl bg-[#EFF4FF] px-4 py-2">
+              <div className="flex items-center justify-between rounded-xl bg-[#F8FAFC] px-4 py-2">
                 <div className="flex items-center gap-2">
                   <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
                   <span className="text-xs font-semibold text-[#0B1C30]">
                     {currentHubLabel} {t("admin.layout.liveSuffix")}
                   </span>
                 </div>
-                <span className="text-xs font-bold text-[#2563EB]">UTC+2</span>
+                <span className="text-xs font-bold text-[#142B4A]">UTC+2</span>
               </div>
             </div>
 
@@ -160,9 +160,9 @@ export const AdminLayout: React.FC = () => {
                     : location.pathname.startsWith(entry.path);
                 const className = `flex items-center gap-3 rounded-xl px-4 py-2 text-sm transition-all ${
                   isActive
-                    ? "bg-[#2563EB] font-semibold text-white shadow-[0_4px_12px_rgba(37,99,235,0.2)]"
+                    ? "bg-[#142B4A] font-semibold text-white shadow-[0_4px_12px_rgba(37,99,235,0.2)]"
                     : entry.enabled
-                      ? "font-normal text-[#434655] hover:bg-[#E5EEFF] hover:text-[#0B1C30]"
+                      ? "font-normal text-[#434655] hover:bg-[#F1F5F9] hover:text-[#0B1C30]"
                       : "cursor-not-allowed text-[#A6ACBE]"
                 }`;
                 return entry.enabled ? (
@@ -190,17 +190,17 @@ export const AdminLayout: React.FC = () => {
               })}
             </nav>
 
-            <div className="border-t border-slate-200 bg-[#EFF4FF] p-4">
+            <div className="border-t border-slate-200 bg-[#F8FAFC] p-4">
               <Link
                 to="/"
-                className="mb-3 flex items-center gap-3 rounded-xl border border-[#C9D8F8] bg-white px-4 py-2.5 text-sm font-semibold text-[#2563EB] shadow-[0_1px_8px_rgba(0,0,0,0.04)] transition-colors hover:border-[#2563EB] hover:bg-[#E5EEFF]"
+                className="mb-3 flex items-center gap-3 rounded-xl border border-[#C9D8F8] bg-white px-4 py-2.5 text-sm font-semibold text-[#142B4A] shadow-[0_1px_8px_rgba(0,0,0,0.04)] transition-colors hover:border-[#142B4A] hover:bg-[#F1F5F9]"
               >
                 <Globe2 className="h-5 w-5" />
                 <span>{viewWebsiteLabel}</span>
               </Link>
               <div className="flex items-center justify-between rounded-xl bg-white p-3 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
                 <div className="flex min-w-0 items-center gap-2">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-white">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#142B4A] text-white">
                     <span className="text-sm font-bold">
                       {(user?.name ?? "A").slice(0, 1).toUpperCase()}
                     </span>
@@ -218,7 +218,7 @@ export const AdminLayout: React.FC = () => {
                   type="button"
                   onClick={() => void handleLogout()}
                   title={t("admin.layout.logoutTitle")}
-                  className="shrink-0 rounded-lg p-2 text-[#565E74] transition-colors hover:bg-[#E5EEFF] hover:text-[#BA1A1A] cursor-pointer"
+                  className="shrink-0 rounded-lg p-2 text-[#565E74] transition-colors hover:bg-[#F1F5F9] hover:text-[#BA1A1A] cursor-pointer"
                 >
                   <LogOut className="h-5 w-5" />
                 </button>
@@ -232,14 +232,14 @@ export const AdminLayout: React.FC = () => {
         {/* ------------------------------------------------------------------ */}
         <header className="fixed start-0 end-0 top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-white/85 px-3 shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-xl sm:px-5 lg:start-72 lg:px-8">
           <div className="flex items-center gap-6">
-            <button type="button" onClick={() => setSidebarOpen(true)} className="rounded-xl p-2 text-slate-700 hover:bg-[#EFF4FF] lg:hidden" aria-label="Open navigation"><Menu className="h-5 w-5" /></button>
+            <button type="button" onClick={() => setSidebarOpen(true)} className="rounded-xl p-2 text-slate-700 hover:bg-[#F8FAFC] lg:hidden" aria-label="Open navigation"><Menu className="h-5 w-5" /></button>
             <div className="hidden items-center gap-1.5 text-xs font-semibold text-[#0B1C30] xl:inline-flex">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EFF4FF] px-3 py-1.5">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8FAFC] px-3 py-1.5">
                 <span className="h-2 w-2 rounded-full bg-emerald-500" />
                 {currentHubLabel} {t("admin.layout.dispatchSuffix")}
               </span>
             </div>
-            <div className="hidden items-center gap-2 rounded-xl bg-[#EFF4FF] px-4 py-1.5 text-sm w-72 xl:flex">
+            <div className="hidden items-center gap-2 rounded-xl bg-[#F8FAFC] px-4 py-1.5 text-sm w-72 xl:flex">
               <Search className="h-[18px] w-[18px] text-[#565E74]" />
               <input
                 value={search}
@@ -252,7 +252,7 @@ export const AdminLayout: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-3 lg:gap-4">
-            <div className="hidden items-center gap-2 rounded-xl bg-[#EFF4FF] px-3 py-1 md:flex">
+            <div className="hidden items-center gap-2 rounded-xl bg-[#F8FAFC] px-3 py-1 md:flex">
               <MapPin className="h-4 w-4 text-[#565E74]" />
               <select
                 value={hub}
@@ -270,15 +270,15 @@ export const AdminLayout: React.FC = () => {
               {hubsFailed && <LoaderCircle className="h-4 w-4 animate-spin text-[#BA1A1A]" />}
             </div>
 
-            <div className="hidden items-center gap-1.5 rounded-xl bg-[#EFF4FF] px-3 py-1 sm:flex">
+            <div className="hidden items-center gap-1.5 rounded-xl bg-[#F8FAFC] px-3 py-1 sm:flex">
               <Banknote className="h-4 w-4 text-[#565E74]" />
               <span className="text-[11px] font-bold uppercase text-[#565E74]">
                 {t("admin.layout.currency")}
               </span>
-              <span className="text-sm font-bold text-[#2563EB]">LYD</span>
+              <span className="text-sm font-bold text-[#142B4A]">LYD</span>
             </div>
 
-            <div className="hidden items-center gap-1 rounded-xl bg-[#EFF4FF] px-3 py-1 text-xs text-[#565E74] lg:flex">
+            <div className="hidden items-center gap-1 rounded-xl bg-[#F8FAFC] px-3 py-1 text-xs text-[#565E74] lg:flex">
               <Clock className="h-4 w-4" />
               <span>{clockLabel}</span>
             </div>
@@ -286,16 +286,16 @@ export const AdminLayout: React.FC = () => {
             <button
               type="button"
               aria-label={t("admin.layout.notifications")}
-              className="relative rounded-xl p-2 text-[#434655] transition-colors hover:bg-[#E5EEFF]"
+              className="relative rounded-xl p-2 text-[#434655] transition-colors hover:bg-[#F1F5F9]"
             >
               <Bell className="h-[22px] w-[22px]" />
-              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-[#2563EB] ring-2 ring-white" />
+              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-[#142B4A] ring-2 ring-white" />
             </button>
 
             <Link
               to="/admin"
               aria-label={t("admin.layout.account")}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-[#2563EB] text-sm font-bold text-white"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-[#142B4A] text-sm font-bold text-white"
             >
               {(user?.name ?? "A").slice(0, 1).toUpperCase()}
             </Link>

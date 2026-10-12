@@ -35,7 +35,7 @@ export const StepCard: React.FC<StepCardProps> = ({ step, index = 0 }) => {
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
       whileHover={{ y: -6, transition: { duration: 0.2 } }}
-      className="bg-white rounded-3xl border border-slate-200/80 p-6 flex flex-col justify-between hover:shadow-xl hover:shadow-blue-500/5 transition-shadow duration-300 group hover:border-blue-200"
+      className="premium-card bg-white rounded-3xl border border-slate-200/80 p-6 flex flex-col justify-between group"
     >
       <div>
         {/* Header Row: Icon Box & Step Number */}
@@ -44,7 +44,7 @@ export const StepCard: React.FC<StepCardProps> = ({ step, index = 0 }) => {
             className={`w-10 h-10 rounded-2xl flex items-center justify-center border transition-transform duration-300 group-hover:scale-110 ${
               isDriveStep
                 ? "bg-emerald-50/80 border-emerald-100"
-                : "bg-blue-50/80 border-blue-100"
+                : "bg-slate-50/80 border-slate-100"
             }`}
           >
             {renderIcon()}

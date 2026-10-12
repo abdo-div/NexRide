@@ -78,7 +78,7 @@ export const CompanyFleetTable: React.FC<CompanyFleetTableProps> = ({
                 key={row.id}
                 onClick={() => onSelect(row)}
                 className={`cursor-pointer border-b border-[#F1F5F9] transition-colors last:border-0 hover:bg-[#F7F9FC] ${
-                  selectedId === row.id ? "bg-[#EFF4FF]" : ""
+                  selectedId === row.id ? "bg-[#F8FAFC]" : ""
                 }`}
               >
                 <td className="px-4 py-3">
@@ -150,7 +150,7 @@ export const CompanyFleetTable: React.FC<CompanyFleetTableProps> = ({
                         event.stopPropagation();
                         navigate(`/company/fleet/${row.id}`);
                       }}
-                      className="rounded-lg bg-[#EFF4FF] px-3 py-1.5 text-xs font-bold text-[#2563EB] transition-colors hover:bg-[#E5EEFF] cursor-pointer"
+                      className="rounded-lg bg-[#F8FAFC] px-3 py-1.5 text-xs font-bold text-[#142B4A] transition-colors hover:bg-[#F1F5F9] cursor-pointer"
                     >
                       {t("company.fleetPage.actions.view")}
                     </button>
@@ -160,7 +160,7 @@ export const CompanyFleetTable: React.FC<CompanyFleetTableProps> = ({
                         event.stopPropagation();
                         navigate(`/company/fleet/${row.id}/edit`);
                       }}
-                      className="rounded-lg p-1.5 text-[#565E74] transition-colors hover:bg-[#EFF4FF] hover:text-[#2563EB] cursor-pointer"
+                      className="rounded-lg p-1.5 text-[#565E74] transition-colors hover:bg-[#F8FAFC] hover:text-[#142B4A] cursor-pointer"
                       title={t("company.fleetPage.actions.edit")}
                     >
                       <Pencil className="h-4 w-4" aria-hidden="true" />

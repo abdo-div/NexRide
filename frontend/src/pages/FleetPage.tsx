@@ -306,7 +306,7 @@ export const FleetPage: React.FC = () => {
                   <h2 className="text-2xl font-bold text-[#0F172A]">
                     {t("fleet.results.title")}
                   </h2>
-                  <span className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[10px] font-bold text-[#2563EB]">
+                  <span className="px-2.5 py-0.5 rounded-full bg-slate-50 border border-slate-200 text-[10px] font-bold text-[#142B4A]">
                     {t("fleet.results.availableCount", {
                       count: companyParam ? vehicles.length : filteredVehicles.length,
                     })}
@@ -323,7 +323,7 @@ export const FleetPage: React.FC = () => {
                 <select
                   value={sort}
                   onChange={(e) => setSort(e.target.value)}
-                  className="bg-slate-50 border border-[#E2E8F0] text-slate-800 text-xs font-semibold px-3.5 py-2 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                  className="bg-slate-50 border border-[#E2E8F0] text-slate-800 text-xs font-semibold px-3.5 py-2 rounded-xl focus:outline-none focus:ring-1 focus:ring-slate-500 cursor-pointer"
                 >
                   <option value="recommended">{t("fleet.sort.recommended")}</option>
                   <option value="price-desc">{t("fleet.sort.priceDesc")}</option>
@@ -345,7 +345,7 @@ export const FleetPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={t.onRemove}
-                      className="text-slate-400 hover:text-[#2563EB]"
+                      className="text-slate-400 hover:text-[#142B4A]"
                     >
                       ✕
                     </button>
@@ -354,7 +354,7 @@ export const FleetPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={filters.resetFilters}
-                  className="text-xs font-semibold text-[#2563EB] hover:underline px-2"
+                  className="text-xs font-semibold text-[#142B4A] hover:underline px-2"
                 >
                   {t("fleet.results.clearAll")}
                 </button>
@@ -384,7 +384,7 @@ export const FleetPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={reload}
-                  className="mt-5 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+                  className="mt-5 px-5 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
                 >
                   {t("fleet.error.retry")}
                 </button>
@@ -407,7 +407,7 @@ export const FleetPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => navigate("/fleet")}
-                    className="mt-5 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+                    className="mt-5 px-5 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
                   >
                     {t("fleet.emptySearch.action")}
                   </button>
@@ -441,7 +441,7 @@ export const FleetPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => navigate("/companies")}
-                    className="px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+                    className="px-5 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
                   >
                     {t("fleet.emptyCompany.back")}
                   </button>
@@ -471,7 +471,7 @@ export const FleetPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={filters.resetFilters}
-                  className="mt-5 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+                  className="mt-5 px-5 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
                 >
                   {t("fleet.empty.action")}
                 </button>
@@ -506,7 +506,7 @@ export const FleetPage: React.FC = () => {
                   </button>
                   <button
                     type="button"
-                    className="w-9 h-9 rounded-xl bg-[#2563EB] text-white text-xs font-bold shadow-sm"
+                    className="w-9 h-9 rounded-xl bg-[#142B4A] text-white text-xs font-bold shadow-sm"
                   >
                     1
                   </button>
@@ -522,9 +522,9 @@ export const FleetPage: React.FC = () => {
             )}
 
             {/* Trust banner */}
-            <div className="bg-blue-50/60 border border-blue-200/80 p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 mt-4">
+            <div className="bg-slate-50/60 border border-slate-200/80 p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 mt-4">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-[#2563EB] text-white flex items-center justify-center shrink-0 shadow-sm">
+                <div className="w-12 h-12 rounded-xl bg-[#142B4A] text-white flex items-center justify-center shrink-0 shadow-sm">
                   <ShieldCheck className="w-7 h-7" />
                 </div>
                 <div>

@@ -73,7 +73,7 @@ export const CustomerDossierPanel: React.FC<CustomerDossierPanelProps> = ({
       {/* -------------------------------------------------------------------- */}
       <div className="flex flex-col justify-between gap-4 border-b border-slate-100 bg-[#EAF0FF] px-6 py-5 xl:flex-row xl:items-center">
         <div className="flex items-start gap-4">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#2563EB] text-[22px] font-extrabold text-white shadow-md">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#142B4A] text-[22px] font-extrabold text-white shadow-md">
             {initialsFrom(customer.name)}
           </div>
           <div className="min-w-0">
@@ -82,7 +82,7 @@ export const CustomerDossierPanel: React.FC<CustomerDossierPanelProps> = ({
                 {customer.name}
               </h2>
               <StatusPill status={status} kind="user" />
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#E5EEFF] px-2.5 py-1 text-[11px] font-bold text-[#2563EB]">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#F1F5F9] px-2.5 py-1 text-[11px] font-bold text-[#142B4A]">
                 <BadgeCheck className="h-3.5 w-3.5" />
                 {t("admin.customers.dossier.verified")}
               </span>
@@ -208,7 +208,7 @@ export const CustomerDossierPanel: React.FC<CustomerDossierPanelProps> = ({
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h3 className="flex items-center gap-2 text-base font-bold text-[#0B1C30]">
-              <Wallet className="h-5 w-5 text-[#2563EB]" />
+              <Wallet className="h-5 w-5 text-[#142B4A]" />
               {t("admin.customers.dossier.history")}
             </h3>
             <p className="text-xs text-[#565E74]">
@@ -218,7 +218,7 @@ export const CustomerDossierPanel: React.FC<CustomerDossierPanelProps> = ({
               })}
             </p>
           </div>
-          <span className="rounded-full bg-[#E5EEFF] px-2.5 py-1 text-xs font-bold text-[#2563EB]">
+          <span className="rounded-full bg-[#F1F5F9] px-2.5 py-1 text-xs font-bold text-[#142B4A]">
             {t("admin.customers.table.records", { count: customerBookings.length })}
           </span>
         </div>
@@ -227,7 +227,7 @@ export const CustomerDossierPanel: React.FC<CustomerDossierPanelProps> = ({
           <div className="overflow-x-auto rounded-xl border border-slate-100">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="bg-[#EFF4FF] text-[10px] font-bold uppercase tracking-wider text-[#565E74]">
+                <tr className="bg-[#F8FAFC] text-[10px] font-bold uppercase tracking-wider text-[#565E74]">
                   <th className="px-4 py-2.5">{t("admin.customers.dossier.ref")}</th>
                   <th className="px-4 py-2.5">{t("admin.customers.dossier.vehicle")}</th>
                   <th className="px-4 py-2.5">{t("admin.customers.dossier.company")}</th>
@@ -251,8 +251,8 @@ export const CustomerDossierPanel: React.FC<CustomerDossierPanelProps> = ({
                   const companyName =
                     typeof b.companyId === "object" ? b.companyId?.name ?? "" : "";
                   return (
-                    <tr key={b._id} className="text-xs hover:bg-[#EFF4FF]/40">
-                      <td className="px-4 py-3 font-mono font-bold text-[#2563EB]">
+                    <tr key={b._id} className="text-xs hover:bg-[#F8FAFC]/40">
+                      <td className="px-4 py-3 font-mono font-bold text-[#142B4A]">
                         #{referenceCodeFrom(b._id)}
                       </td>
                       <td className="px-4 py-3">
@@ -284,7 +284,7 @@ export const CustomerDossierPanel: React.FC<CustomerDossierPanelProps> = ({
                         <button
                           type="button"
                           onClick={() => onViewBooking(b._id)}
-                          className="inline-flex items-center gap-1 rounded-lg bg-[#EFF4FF] px-2.5 py-1 text-[11px] font-bold text-[#2563EB] transition-colors hover:bg-[#E5EEFF] cursor-pointer"
+                          className="inline-flex items-center gap-1 rounded-lg bg-[#F8FAFC] px-2.5 py-1 text-[11px] font-bold text-[#142B4A] transition-colors hover:bg-[#F1F5F9] cursor-pointer"
                         >
                           {t("admin.customers.dossier.viewBooking")}
                         </button>
@@ -320,14 +320,14 @@ interface KpiTileProps {
 }
 
 const KpiTile: React.FC<KpiTileProps> = ({ label, value, sub, tone }) => (
-  <div className="rounded-xl bg-[#EFF4FF] p-4">
+  <div className="rounded-xl bg-[#F8FAFC] p-4">
     <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#565E74]">
       <CreditCard className="h-3.5 w-3.5 text-[#94A3B8]" />
       {label}
     </div>
     <div
       className={`mt-1 truncate text-[20px] font-extrabold tracking-tight ${
-        tone === "brand" ? "text-[#2563EB]" : tone === "tertiary" ? "text-[#B54E00]" : "text-[#0B1C30]"
+        tone === "brand" ? "text-[#142B4A]" : tone === "tertiary" ? "text-[#B54E00]" : "text-[#0B1C30]"
       }`}
     >
       {value}

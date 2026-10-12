@@ -82,7 +82,7 @@ export const CompanyRevenueChart: React.FC<CompanyRevenueChartProps> = ({
         <span className="text-xs font-bold uppercase tracking-wider text-[#565E74]">
           {t("company.chart.seriesTitle")}
         </span>
-        <div className="inline-flex rounded-xl bg-[#E5EEFF] p-1">
+        <div className="inline-flex rounded-xl bg-[#F1F5F9] p-1">
           {COMPANY_PERIODS.map((p) => (
             <button
               key={p}
@@ -90,7 +90,7 @@ export const CompanyRevenueChart: React.FC<CompanyRevenueChartProps> = ({
               onClick={() => onPeriodChange(p)}
               className={`rounded-lg px-3 py-1 text-xs font-bold cursor-pointer transition-all ${
                 period === p
-                  ? "bg-white text-[#2563EB] shadow-sm"
+                  ? "bg-white text-[#142B4A] shadow-sm"
                   : "text-[#434655] hover:text-[#0B1C30]"
               }`}
             >
@@ -101,18 +101,18 @@ export const CompanyRevenueChart: React.FC<CompanyRevenueChartProps> = ({
       </div>
 
       {/* Chart */}
-      <div className="flex w-full flex-col rounded-xl bg-[#E5EEFF]/60 p-4">
+      <div className="flex w-full flex-col rounded-xl bg-[#F1F5F9]/60 p-4">
         <div className="mb-3 flex items-center justify-between text-xs">
           <span className="font-semibold uppercase tracking-wider text-[#565E74]">
             {t("company.chart.periodLabel", { count: n })}
           </span>
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 font-semibold text-[#0B1C30]">
-              <span className="h-3 w-3 rounded-sm bg-[#2563EB]" />
+              <span className="h-3 w-3 rounded-sm bg-[#142B4A]" />
               {t("company.chart.legendGross")}
             </span>
             <span className="flex items-center gap-1.5 font-semibold text-[#434655]">
-              <span className="h-3 w-3 rounded-sm bg-[#D3E4FE]" />
+              <span className="h-3 w-3 rounded-sm bg-[#E2E8F0]" />
               {t("company.chart.legendNet")}
             </span>
           </div>
@@ -167,7 +167,7 @@ export const CompanyRevenueChart: React.FC<CompanyRevenueChartProps> = ({
                     width={barW}
                     height={BOTTOM - gY}
                     rx="3"
-                    fill="#2563EB"
+                    fill="#142B4A"
                   />
                   <rect
                     x={cx}
@@ -175,7 +175,7 @@ export const CompanyRevenueChart: React.FC<CompanyRevenueChartProps> = ({
                     width={barW}
                     height={BOTTOM - nY}
                     rx="3"
-                    fill="#D3E4FE"
+                    fill="#E2E8F0"
                   />
                 </g>
               );
@@ -206,7 +206,7 @@ export const CompanyRevenueChart: React.FC<CompanyRevenueChartProps> = ({
           <span>
             {t("company.chart.totalsGross", { value: formatLYD(grossTotal) })}
           </span>
-          <span className="font-semibold text-[#2563EB]">
+          <span className="font-semibold text-[#142B4A]">
             {t("company.chart.totalsNet", { value: formatLYD(netTotal) })}
           </span>
         </div>

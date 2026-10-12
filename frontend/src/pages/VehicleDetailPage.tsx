@@ -87,7 +87,7 @@ export const VehicleDetailPage: React.FC = () => {
             <button
               type="button"
               onClick={reload}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
               {t("vehicleDetail.error.retry")}
@@ -120,7 +120,7 @@ export const VehicleDetailPage: React.FC = () => {
           </p>
           <Link
             to="/fleet"
-            className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+            className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
           >
             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             {t("vehicleDetail.notFound.backToFleet")}

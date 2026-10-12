@@ -37,7 +37,7 @@ export const CompanyDirectoryCard: React.FC<CompanyDirectoryCardProps> = ({
                   {company.name}
                 </h3>
                 {company.isVerified && (
-                  <ShieldCheck className="w-4 h-4 text-[#2563EB] shrink-0" />
+                  <ShieldCheck className="w-4 h-4 text-[#142B4A] shrink-0" />
                 )}
               </div>
               <span className="text-[11px] font-semibold text-slate-500 truncate">
@@ -51,7 +51,7 @@ export const CompanyDirectoryCard: React.FC<CompanyDirectoryCardProps> = ({
               {t("companies.topRated")}
             </span>
           ) : company.isVerified ? (
-            <span className="px-2 py-0.5 rounded-full bg-blue-50 text-[#2563EB] text-[11px] font-bold shrink-0">
+            <span className="px-2 py-0.5 rounded-full bg-blue-50 text-[#142B4A] text-[11px] font-bold shrink-0">
               {t("companies.verified")}
             </span>
           ) : null}
@@ -82,7 +82,7 @@ export const CompanyDirectoryCard: React.FC<CompanyDirectoryCardProps> = ({
           </span>
           <span
             className={`text-[13px] font-bold ${
-              company.fleetSize > 0 ? "text-[#2563EB]" : "text-slate-500"
+              company.fleetSize > 0 ? "text-[#142B4A]" : "text-slate-500"
             }`}
           >
             {t("companies.availableVehicles", { count: company.fleetSize })}
@@ -99,7 +99,7 @@ export const CompanyDirectoryCard: React.FC<CompanyDirectoryCardProps> = ({
               <Link
                 key={vehicle.id}
                 to={vehicle.href}
-                className="flex items-center justify-between gap-3 p-2 rounded-xl bg-slate-50 hover:bg-blue-50 transition-colors"
+                className="flex items-center justify-between gap-3 p-2 rounded-xl bg-slate-50 hover:bg-slate-50 transition-colors"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <img
@@ -118,7 +118,7 @@ export const CompanyDirectoryCard: React.FC<CompanyDirectoryCardProps> = ({
                   </div>
                 </div>
                 <div className="flex flex-col items-end shrink-0 pl-1">
-                  <span className="text-[13px] font-bold text-[#2563EB]">
+                  <span className="text-[13px] font-bold text-[#142B4A]">
                     {vehicle.dailyPrice} {t("companies.currency")}
                   </span>
                   <span className="text-[10px] text-slate-400">
@@ -145,7 +145,7 @@ export const CompanyDirectoryCard: React.FC<CompanyDirectoryCardProps> = ({
       <div className="p-5 pt-0">
         <Link
           to={`/companies/${encodeURIComponent(company.id)}`}
-          className="w-full py-2.5 rounded-xl bg-[#2563EB] text-white hover:bg-blue-700 transition-colors text-sm font-bold flex items-center justify-center gap-1.5 shadow-sm"
+          className="w-full py-2.5 rounded-xl bg-[#142B4A] text-white hover:bg-blue-700 transition-colors text-sm font-bold flex items-center justify-center gap-1.5 shadow-sm"
         >
           <span>{t("companies.viewFleet")}</span>
           <ArrowRight className="w-4 h-4 rtl:rotate-180" />
@@ -174,7 +174,7 @@ export const CompanyDirectoryRow: React.FC<CompanyDirectoryCardProps> = ({
           <div className="flex items-center gap-1.5">
             <h3 className="font-bold text-slate-900 truncate">{company.name}</h3>
             {company.isVerified && (
-              <ShieldCheck className="w-4 h-4 text-[#2563EB] shrink-0" />
+              <ShieldCheck className="w-4 h-4 text-[#142B4A] shrink-0" />
             )}
           </div>
           <span className="text-[11px] font-semibold text-slate-500 truncate">
@@ -201,7 +201,7 @@ export const CompanyDirectoryRow: React.FC<CompanyDirectoryCardProps> = ({
 
         <span
           className={`font-bold shrink-0 ${
-            company.fleetSize > 0 ? "text-[#2563EB]" : "text-slate-500"
+            company.fleetSize > 0 ? "text-[#142B4A]" : "text-slate-500"
           }`}
         >
           {t("companies.availableVehicles", { count: company.fleetSize })}
@@ -209,7 +209,7 @@ export const CompanyDirectoryRow: React.FC<CompanyDirectoryCardProps> = ({
 
         <Link
           to={`/companies/${encodeURIComponent(company.id)}`}
-          className="px-4 py-2 rounded-xl bg-[#2563EB] text-white hover:bg-blue-700 transition-colors text-xs font-bold flex items-center gap-1.5 shadow-sm shrink-0"
+          className="px-4 py-2 rounded-xl bg-[#142B4A] text-white hover:bg-blue-700 transition-colors text-xs font-bold flex items-center gap-1.5 shadow-sm shrink-0"
         >
           <span>{t("companies.viewFleet")}</span>
           <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />

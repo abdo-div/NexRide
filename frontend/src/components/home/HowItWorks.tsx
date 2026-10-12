@@ -8,6 +8,7 @@ export const HowItWorks: React.FC = () => {
   const { t } = useTranslation();
   return (
     <section id="how-it-works" className="w-full py-20 px-6 lg:px-12 bg-white border-b border-slate-100 overflow-hidden">
+      <div className="mx-auto max-w-7xl">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -32,6 +33,7 @@ export const HowItWorks: React.FC = () => {
         {HOW_IT_WORKS_STEPS.map((step, index) => (
           <StepCard key={step.stepNumber} step={step} index={index} />
         ))}
+      </div>
       </div>
     </section>
   );

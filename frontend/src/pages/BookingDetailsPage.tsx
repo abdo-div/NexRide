@@ -142,7 +142,7 @@ export const BookingDetailsPage: React.FC = () => {
             <button
               type="button"
               onClick={() => loadBooking()}
-              className="mt-4 px-5 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold rounded-lg transition-colors cursor-pointer"
+              className="mt-4 px-5 py-2.5 bg-[#142B4A] hover:bg-[#0D2039] text-white text-sm font-bold rounded-lg transition-colors cursor-pointer"
             >
               {t("myBookings.retry")}
             </button>

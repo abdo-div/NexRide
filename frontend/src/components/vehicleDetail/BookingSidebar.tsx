@@ -74,7 +74,7 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
   const trustIcons = { check: CheckCircle2, lock: Lock, shield: ShieldCheck };
 
   const selectCls =
-    "w-full bg-white border border-[#E2E8F0] text-[#0F172A] text-[12px] px-2.5 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB]";
+    "w-full bg-white border border-[#E2E8F0] text-[#0F172A] text-[12px] px-2.5 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 focus:border-[#142B4A]";
 
   const labelCls = "block mb-1 text-[11px] text-[#64748B] font-bold uppercase tracking-wider";
 
@@ -177,7 +177,7 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
                     name="protection"
                     checked={protection === p.id}
                     onChange={() => setProtection(p.id)}
-                    className="accent-[#2563EB] w-4 h-4"
+                    className="accent-[#142B4A] w-4 h-4"
                   />
                   <div>
                     <span className="block text-[13px] font-bold text-[#0F172A]">{t(p.name)}</span>
@@ -188,7 +188,7 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
                   className={`text-[11px] font-bold px-2 py-0.5 rounded-lg border ${
                     p.included
                       ? "text-[#0F172A] bg-white border-[#E2E8F0]"
-                      : "text-[#2563EB] bg-blue-50 border-blue-200"
+                      : "text-[#142B4A] bg-slate-50 border-slate-200"
                   }`}
                 >
                   {t(p.priceNote)}
@@ -206,7 +206,7 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
           {detail.freeIncluded.map((line) => (
             <div key={line} className="flex justify-between">
               <span>{t(line)}</span>
-              <span className="font-bold text-[#2563EB]">{t("vehicleDetail.included")}</span>
+              <span className="font-bold text-[#142B4A]">{t("vehicleDetail.included")}</span>
             </div>
           ))}
           <div className="flex justify-between pb-2">
@@ -224,7 +224,7 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
               <span className="text-[16px] font-bold text-[#0F172A]">{t("vehicleDetail.totalLabel")}</span>
             </div>
             <div className="text-end">
-              <span className="text-[#2563EB] text-[28px] font-extrabold leading-none tabular-nums">
+              <span className="text-[#142B4A] text-[28px] font-extrabold leading-none tabular-nums">
                 {gross.toLocaleString()}
               </span>
               <span className="ms-1 text-[#0F172A] text-[13px]">LYD</span>
@@ -255,7 +255,7 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
           className={`w-full py-4 rounded-2xl text-white text-[15px] font-extrabold tracking-wide shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 group ${
             detail.isReservable === false || check === "checking"
               ? "bg-slate-300 cursor-not-allowed"
-              : "bg-[#2563EB] hover:bg-blue-700"
+              : "bg-[#142B4A] hover:bg-blue-700"
           }`}
         >
           {check === "checking" && (
@@ -274,7 +274,7 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
             const Icon = trustIcons[signal.icon];
             return (
               <div key={signal.text} className="flex items-center gap-2">
-                <Icon className="w-4 h-4 text-[#2563EB]" />
+                <Icon className="w-4 h-4 text-[#142B4A]" />
                 {t(signal.text)}
               </div>
             );
@@ -284,7 +284,7 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
 
       <div className="bg-white border border-[#E2E8F0] p-4 rounded-2xl shadow-sm flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#2563EB]">
+          <div className="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-[#142B4A]">
             <Headphones className="w-5 h-5" />
           </div>
           <div>
@@ -300,7 +300,7 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
         </div>
         <button
           type="button"
-          className="px-3 py-1.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] hover:bg-[#F1F5F9] text-[#2563EB] text-[12px] font-bold transition-colors"
+          className="px-3 py-1.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] hover:bg-[#F1F5F9] text-[#142B4A] text-[12px] font-bold transition-colors"
         >
           {t("vehicleDetail.inquire")}
         </button>
@@ -308,7 +308,7 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
 
       {plan && (
         <div className="hidden lg:flex items-center justify-between text-[11px] text-[#64748B] px-1">
-          <DetailIcon name="life" className="w-4 h-4 text-[#2563EB]" />
+          <DetailIcon name="life" className="w-4 h-4 text-[#142B4A]" />
           <span>{t("vehicleDetail.planApplied", { plan: t(plan.name) })}</span>
         </div>
       )}

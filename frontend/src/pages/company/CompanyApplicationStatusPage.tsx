@@ -199,7 +199,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
     return (
       <div className="bg-[#F8FAFC] min-h-screen">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-28 pb-12 flex items-center justify-center min-h-[50vh]">
-          <LoaderCircle className="h-8 w-8 animate-spin text-[#2563EB]" />
+          <LoaderCircle className="h-8 w-8 animate-spin text-[#142B4A]" />
         </div>
       </div>
     );
@@ -220,7 +220,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
             <button
               type="button"
               onClick={retry}
-              className="px-6 py-2.5 rounded-xl bg-[#2563EB] text-white text-sm font-bold hover:bg-[#004AC6] transition-colors"
+              className="px-6 py-2.5 rounded-xl bg-[#142B4A] text-white text-sm font-bold hover:bg-[#142B4A] transition-colors"
             >
               {t("partner.status.retry")}
             </button>
@@ -303,17 +303,17 @@ export const CompanyApplicationStatusPage: React.FC = () => {
     if (state === "done" || state === "passed")
       return "bg-emerald-500 text-white shadow-sm";
     if (state === "active")
-      return "bg-[#2563EB] text-white shadow-md ring-4 ring-[#2563EB]/20";
+      return "bg-[#142B4A] text-white shadow-md ring-4 ring-[#142B4A]/20";
     if (state === "error") return "bg-[#BA1A1A] text-white shadow-md";
-    return "bg-[#E5EEFF] text-[#737686]";
+    return "bg-[#F1F5F9] text-[#737686]";
   };
 
   const stepBadge = (state: StepState): string => {
     if (state === "done" || state === "passed")
       return "bg-emerald-50 text-emerald-700";
-    if (state === "active") return "bg-[#E5EEFF] text-[#004AC6]";
+    if (state === "active") return "bg-[#F1F5F9] text-[#142B4A]";
     if (state === "error") return "bg-[#FFDAD6] text-[#93000A]";
-    return "bg-[#EFF4FF] text-[#737686]";
+    return "bg-[#F8FAFC] text-[#737686]";
   };
 
   const stepTitle = (state: StepState): string =>
@@ -338,7 +338,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
         >
           <Link
             to="/"
-            className="hover:text-[#2563EB] transition-colors flex items-center gap-1.5"
+            className="hover:text-[#142B4A] transition-colors flex items-center gap-1.5"
           >
             <Home className="w-4 h-4" />
             <span>{t("partner.status.breadcrumbHome")}</span>
@@ -346,7 +346,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
           <span className="text-[#C3C6D7]">/</span>
           <Link
             to="/partner/apply"
-            className="hover:text-[#2563EB] transition-colors"
+            className="hover:text-[#142B4A] transition-colors"
           >
             {t("partner.status.breadcrumbBecomePartner")}
           </Link>
@@ -379,11 +379,11 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                 {t("partner.status.bannerPendingDesc")}
               </p>
             </div>
-            <div className="shrink-0 flex md:flex-col items-center md:items-end gap-0.5 text-[#737686] bg-[#EFF4FF] px-4 py-3 rounded-xl">
+            <div className="shrink-0 flex md:flex-col items-center md:items-end gap-0.5 text-[#737686] bg-[#F8FAFC] px-4 py-3 rounded-xl">
               <span className="text-[10px] text-[#737686] uppercase font-bold tracking-wider">
                 {t("partner.status.queueLabel")}
               </span>
-              <span className="text-lg font-extrabold text-[#004AC6]">
+              <span className="text-lg font-extrabold text-[#142B4A]">
                 {t("partner.status.queueValue", { position, hub })}
               </span>
             </div>
@@ -394,7 +394,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
         {bannerKind === "approved" ? (
           <section className="rounded-2xl bg-white p-8 lg:p-10 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="flex items-center gap-5">
-              <div className="w-16 h-16 rounded-full bg-[#2563EB]/10 flex items-center justify-center text-[#2563EB] shrink-0">
+              <div className="w-16 h-16 rounded-full bg-[#142B4A]/10 flex items-center justify-center text-[#142B4A] shrink-0">
                 <CheckCircle2 className="w-9 h-9" />
               </div>
               <div className="flex flex-col gap-1">
@@ -418,7 +418,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
             </div>
             <Link
               to="/company"
-              className="shrink-0 px-6 py-3 rounded-xl bg-[#2563EB] text-white text-sm font-bold hover:bg-[#004AC6] transition-colors flex items-center gap-2 shadow-md"
+              className="shrink-0 px-6 py-3 rounded-xl bg-[#142B4A] text-white text-sm font-bold hover:bg-[#142B4A] transition-colors flex items-center gap-2 shadow-md"
             >
               <span>{t("partner.status.bannerApprovedCta")}</span>
               <ArrowRight className="w-5 h-5" />
@@ -475,7 +475,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
             <div className="bg-white rounded-2xl p-6 lg:p-8 shadow-sm flex flex-col gap-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#E5EEFF] flex items-center justify-center text-[#004AC6]">
+                  <div className="w-12 h-12 rounded-xl bg-[#F1F5F9] flex items-center justify-center text-[#142B4A]">
                     <FolderOpen className="w-6 h-6" />
                   </div>
                   <div className="flex flex-col">
@@ -490,7 +490,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                         type="button"
                         onClick={() => void copyReference()}
                         title={t("partner.status.refCopyHint")}
-                        className="p-1.5 text-[#565E74] hover:text-[#2563EB] rounded hover:bg-[#EFF4FF] transition-colors"
+                        className="p-1.5 text-[#565E74] hover:text-[#142B4A] rounded hover:bg-[#F8FAFC] transition-colors"
                       >
                         {copied ? (
                           <Check className="w-4 h-4 text-emerald-600" />
@@ -514,7 +514,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#EFF4FF] p-4 lg:p-5 rounded-xl">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#F8FAFC] p-4 lg:p-5 rounded-xl">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[11px] text-[#737686] uppercase font-semibold">
                     {t("partner.status.metaCompanyName")}
@@ -543,7 +543,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                   <span className="text-[11px] text-[#737686] uppercase font-semibold">
                     {t("partner.status.metaReviewWindow")}
                   </span>
-                  <div className="flex items-center gap-2 text-[#004AC6] font-bold">
+                  <div className="flex items-center gap-2 text-[#142B4A] font-bold">
                     <Timer className="w-4 h-4" />
                     <span className="text-sm">
                       {t("partner.status.reviewWindowValue")}
@@ -564,7 +564,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                     {t("partner.status.stepperSubtitle")}
                   </p>
                 </div>
-                <span className="px-2.5 py-1 rounded bg-[#E5EEFF] text-[11px] font-bold text-[#565E74] shrink-0">
+                <span className="px-2.5 py-1 rounded bg-[#F1F5F9] text-[11px] font-bold text-[#565E74] shrink-0">
                   {t("partner.status.stepperStep", {
                     current: stepperCount,
                     total: 4,
@@ -582,7 +582,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                         {stepIcon(step.state)}
                       </div>
                       {index < submittedHistory.length - 1 ? (
-                        <div className="w-0.5 h-12 bg-[#D3E4FE] mt-2"></div>
+                        <div className="w-0.5 h-12 bg-[#E2E8F0] mt-2"></div>
                       ) : null}
                     </div>
                     <div className="flex flex-col pb-6">
@@ -614,7 +614,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                 {/* HQ & hubs */}
                 <div className="bg-white p-5 rounded-2xl shadow-sm flex flex-col justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#DCE9FF] flex items-center justify-center text-[#2563EB] shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-[#F1F5F9] flex items-center justify-center text-[#142B4A] shrink-0">
                       <Building2 className="w-5 h-5" />
                     </div>
                     <div className="flex flex-col">
@@ -647,7 +647,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                 {/* Fleet volume */}
                 <div className="bg-white p-5 rounded-2xl shadow-sm flex flex-col justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#DCE9FF] flex items-center justify-center text-[#2563EB] shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-[#F1F5F9] flex items-center justify-center text-[#142B4A] shrink-0">
                       <Car className="w-5 h-5" />
                     </div>
                     <div className="flex flex-col">
@@ -671,7 +671,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-full bg-[#EFF4FF] text-[11px] text-[#565E74]">
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#F8FAFC] text-[11px] text-[#565E74]">
                       {company.vehicleCategories.length}{" "}
                       {t("partner.status.bentoFleetCategories")}
                     </span>
@@ -681,7 +681,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                 {/* Documents */}
                 <div className="bg-white p-5 rounded-2xl shadow-sm flex flex-col justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#DCE9FF] flex items-center justify-center text-[#2563EB] shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-[#F1F5F9] flex items-center justify-center text-[#142B4A] shrink-0">
                       <FileText className="w-5 h-5" />
                     </div>
                     <div className="flex flex-col gap-1">
@@ -723,7 +723,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                 {/* Payout */}
                 <div className="bg-white p-5 rounded-2xl shadow-sm flex flex-col justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#DCE9FF] flex items-center justify-center text-[#2563EB] shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-[#F1F5F9] flex items-center justify-center text-[#142B4A] shrink-0">
                       <Landmark className="w-5 h-5" />
                     </div>
                     <div className="flex flex-col">
@@ -759,14 +759,14 @@ export const CompanyApplicationStatusPage: React.FC = () => {
             {/* Next steps */}
             <div className="bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-4">
               <div className="flex items-center gap-2.5 pb-1">
-                <ShieldCheck className="w-6 h-6 text-[#2563EB]" />
+                <ShieldCheck className="w-6 h-6 text-[#142B4A]" />
                 <h4 className="text-base font-bold text-[#0B1C30]">
                   {t("partner.status.nextTitle")}
                 </h4>
               </div>
               <ol className="flex flex-col gap-4 text-sm text-[#737686]">
                 <li className="flex items-start gap-2.5">
-                  <span className="w-6 h-6 rounded-full bg-[#D3E4FE] text-[#004AC6] font-bold text-xs flex items-center justify-center shrink-0">
+                  <span className="w-6 h-6 rounded-full bg-[#E2E8F0] text-[#142B4A] font-bold text-xs flex items-center justify-center shrink-0">
                     1
                   </span>
                   <div>
@@ -777,7 +777,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                   </div>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="w-6 h-6 rounded-full bg-[#D3E4FE] text-[#004AC6] font-bold text-xs flex items-center justify-center shrink-0">
+                  <span className="w-6 h-6 rounded-full bg-[#E2E8F0] text-[#142B4A] font-bold text-xs flex items-center justify-center shrink-0">
                     2
                   </span>
                   <div>
@@ -790,7 +790,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                   </div>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="w-6 h-6 rounded-full bg-[#D3E4FE] text-[#004AC6] font-bold text-xs flex items-center justify-center shrink-0">
+                  <span className="w-6 h-6 rounded-full bg-[#E2E8F0] text-[#142B4A] font-bold text-xs flex items-center justify-center shrink-0">
                     3
                   </span>
                   <div>
@@ -801,8 +801,8 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                   </div>
                 </li>
               </ol>
-              <div className="p-4 rounded-xl bg-[#EFF4FF] flex flex-col gap-1">
-                <div className="flex items-center gap-2 text-[#004AC6] font-bold text-[12px]">
+              <div className="p-4 rounded-xl bg-[#F8FAFC] flex flex-col gap-1">
+                <div className="flex items-center gap-2 text-[#142B4A] font-bold text-[12px]">
                   <Timer className="w-4 h-4" />
                   <span>{t("partner.status.nextTurnaroundLabel")}</span>
                 </div>
@@ -820,7 +820,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                 {t("partner.status.scanLabel")}
               </span>
               {firstDocument && !imgFailed ? (
-                <div className="relative rounded-xl overflow-hidden bg-[#E5EEFF] h-44 flex items-center justify-center">
+                <div className="relative rounded-xl overflow-hidden bg-[#F1F5F9] h-44 flex items-center justify-center">
                   <img
                     src={`${MEDIA_ORIGIN}${firstDocument.url}`}
                     alt={firstDocument.name}
@@ -833,7 +833,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                         <span className="text-[12px] font-bold truncate">
                           {firstDocument.name}
                         </span>
-                        <span className="text-[10px] text-[#D3E4FE]">
+                        <span className="text-[10px] text-[#E2E8F0]">
                           {t("partner.status.scanSeal")}
                         </span>
                       </div>
@@ -842,7 +842,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="rounded-xl bg-[#E5EEFF] h-44 flex items-center justify-center text-[#737686]">
+                <div className="rounded-xl bg-[#F1F5F9] h-44 flex items-center justify-center text-[#737686]">
                   <FileText className="w-8 h-8" />
                 </div>
               )}
@@ -858,17 +858,17 @@ export const CompanyApplicationStatusPage: React.FC = () => {
             {/* Support hotline */}
             <div className="bg-[#213145] rounded-2xl p-6 text-white shadow-md flex flex-col gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#2563EB] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-[#142B4A] flex items-center justify-center">
                   <Headset className="w-5 h-5" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-[#B4C5FF] uppercase tracking-wider font-bold">
+                  <span className="text-[10px] text-[#CBD5E1] uppercase tracking-wider font-bold">
                     {t("partner.status.supportLabel")}
                   </span>
                   <span className="text-sm font-bold">{t("partner.status.supportTitle")}</span>
                 </div>
               </div>
-              <p className="text-[12px] text-[#D3E4FE]">
+              <p className="text-[12px] text-[#E2E8F0]">
                 {t("partner.status.supportDesc")}
               </p>
               <div className="flex flex-col gap-2.5">
@@ -876,9 +876,9 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                   href={`tel:${t("partner.status.supportHotlineValue").replace(/\s/g, "")}`}
                   className="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
                 >
-                  <Phone className="w-5 h-5 text-[#B4C5FF]" />
+                  <Phone className="w-5 h-5 text-[#CBD5E1]" />
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-[#D3E4FE]">
+                    <span className="text-[10px] text-[#E2E8F0]">
                       {t("partner.status.supportHotline")}
                     </span>
                     <span className="text-sm font-bold font-mono">
@@ -890,9 +890,9 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                   href={`mailto:${t("partner.status.supportEmailValue")}`}
                   className="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
                 >
-                  <Mail className="w-5 h-5 text-[#B4C5FF]" />
+                  <Mail className="w-5 h-5 text-[#CBD5E1]" />
                   <div className="flex flex-col min-w-0">
-                    <span className="text-[10px] text-[#D3E4FE]">
+                    <span className="text-[10px] text-[#E2E8F0]">
                       {t("partner.status.supportEmail")}
                     </span>
                     <span className="text-sm font-bold truncate">
@@ -901,7 +901,7 @@ export const CompanyApplicationStatusPage: React.FC = () => {
                   </div>
                 </a>
               </div>
-              <span className="text-[11px] text-[#B4C5FF] text-center">
+              <span className="text-[11px] text-[#CBD5E1] text-center">
                 {t("partner.status.supportHours")}
               </span>
             </div>
@@ -911,14 +911,14 @@ export const CompanyApplicationStatusPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="w-full py-3 px-5 rounded-xl bg-[#2563EB] text-white text-sm font-bold hover:bg-[#004AC6] transition-colors flex items-center justify-center gap-2 shadow-md"
+                className="w-full py-3 px-5 rounded-xl bg-[#142B4A] text-white text-sm font-bold hover:bg-[#142B4A] transition-colors flex items-center justify-center gap-2 shadow-md"
               >
                 <Download className="w-5 h-5" />
                 <span>{t("partner.status.printCta")}</span>
               </button>
               <Link
                 to="/"
-                className="w-full py-3 px-5 rounded-xl bg-white text-[#0B1C30] text-sm font-bold hover:bg-[#EFF4FF] transition-colors flex items-center justify-center gap-2 shadow-sm"
+                className="w-full py-3 px-5 rounded-xl bg-white text-[#0B1C30] text-sm font-bold hover:bg-[#F8FAFC] transition-colors flex items-center justify-center gap-2 shadow-sm"
               >
                 <ArrowLeft className="w-5 h-5" />
                 <span>{t("partner.status.homeCta")}</span>

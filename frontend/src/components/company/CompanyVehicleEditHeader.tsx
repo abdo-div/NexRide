@@ -34,7 +34,7 @@ export const CompanyVehicleEditHeader: React.FC<CompanyVehicleEditHeaderProps> =
         <button
           type="button"
           onClick={() => navigate("/company/fleet")}
-          className="hover:text-[#2563EB] hover:underline cursor-pointer"
+          className="hover:text-[#142B4A] hover:underline cursor-pointer"
         >
           {t("company.fleetPage.primary")}
         </button>
@@ -42,7 +42,7 @@ export const CompanyVehicleEditHeader: React.FC<CompanyVehicleEditHeaderProps> =
         <button
           type="button"
           onClick={() => navigate(`/company/fleet/${vehicle.id}`)}
-          className="hover:text-[#2563EB] hover:underline cursor-pointer"
+          className="hover:text-[#142B4A] hover:underline cursor-pointer"
         >
           {vehicle.make} {vehicle.model}
           {vehicle.year ? ` (${vehicle.year})` : ""}
@@ -55,7 +55,7 @@ export const CompanyVehicleEditHeader: React.FC<CompanyVehicleEditHeaderProps> =
         <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
           <div className="min-w-0 space-y-3">
             <div className="flex flex-wrap items-center gap-3">
-              <PenLine className="h-6 w-6 text-[#2563EB]" aria-hidden="true" />
+              <PenLine className="h-6 w-6 text-[#142B4A]" aria-hidden="true" />
               <h1 className="text-[26px] font-extrabold leading-tight tracking-tight text-[#0B1C30]">
                 {t("company.editVehiclePage.title")} — {vehicle.make} {vehicle.model}
                 {vehicle.year ? ` (${vehicle.year})` : ""}
@@ -70,7 +70,7 @@ export const CompanyVehicleEditHeader: React.FC<CompanyVehicleEditHeaderProps> =
                   {t("company.editVehiclePage.actions.unsaved")}
                 </span>
               )}
-              <span className="rounded-md bg-[#F1F5F9] px-2 py-0.5 font-mono text-xs font-bold text-[#2563EB]">
+              <span className="rounded-md bg-[#F1F5F9] px-2 py-0.5 font-mono text-xs font-bold text-[#142B4A]">
                 {vehicle.code}
               </span>
             </div>
@@ -99,7 +99,7 @@ export const CompanyVehicleEditHeader: React.FC<CompanyVehicleEditHeaderProps> =
 
           <div className="flex shrink-0 flex-wrap items-center gap-2 rounded-2xl border border-[#E5E7EB] bg-[#F7F9FC] p-1.5">
             <span className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#0B1C30] shadow-sm">
-              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#E5EEFF] text-[#2563EB]">
+              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#F1F5F9] text-[#142B4A]">
                 <PenLine className="h-3.5 w-3.5" aria-hidden="true" />
               </span>
               {t("company.editVehiclePage.editMode")} ({vehicle.make} {vehicle.model})
@@ -109,7 +109,7 @@ export const CompanyVehicleEditHeader: React.FC<CompanyVehicleEditHeaderProps> =
             </span>
             <Link
               to="/company/fleet/new"
-              className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold text-[#565E74] transition-colors hover:bg-white hover:text-[#2563EB]"
+              className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold text-[#565E74] transition-colors hover:bg-white hover:text-[#142B4A]"
             >
               <Plus className="h-4 w-4" aria-hidden="true" />
               {t("company.editVehiclePage.addMode")}

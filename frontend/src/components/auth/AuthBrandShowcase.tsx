@@ -31,7 +31,7 @@ export const AuthBrandShowcase: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col justify-between rounded-xl p-6 lg:p-10 bg-gradient-to-br from-[#0b1c30] via-[#132842] to-[#004ac6] text-white shadow-[0_12px_32px_-4px_rgba(15,23,42,0.18)] relative overflow-hidden">
+    <div className="flex flex-col justify-between rounded-xl p-6 lg:p-10 bg-gradient-to-br from-[#0b1c30] via-[#132842] to-[#142b4a] text-white shadow-[0_12px_32px_-4px_rgba(15,23,42,0.18)] relative overflow-hidden">
       {/* Inset Ambient Design Elements */}
       <div className="absolute -top-24 -end-24 w-80 h-80 rounded-full bg-blue-500/20 blur-3xl pointer-events-none"></div>
       <div className="absolute -bottom-24 -start-24 w-80 h-80 rounded-full bg-orange-500/15 blur-3xl pointer-events-none"></div>

@@ -66,7 +66,7 @@ export const CompanyFleetGrid: React.FC<CompanyFleetGridProps> = ({ rows, onSele
                 onClick={() => navigate(`/company/fleet/${row.id}`)}
                 className="group/title text-left cursor-pointer"
               >
-                <h3 className="text-sm font-bold text-[#0B1C30] group-hover/title:text-[#2563EB]">
+                <h3 className="text-sm font-bold text-[#0B1C30] group-hover/title:text-[#142B4A]">
                   {row.make} {row.model}
                   {row.year ? (
                     <span className="ml-1.5 rounded-md bg-[#F1F5F9] px-1.5 py-0.5 text-[11px] font-bold text-[#565E74]">
@@ -74,7 +74,7 @@ export const CompanyFleetGrid: React.FC<CompanyFleetGridProps> = ({ rows, onSele
                     </span>
                   ) : null}
                 </h3>
-                <span className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-semibold text-[#2563EB] opacity-0 transition-opacity group-hover/title:opacity-100">
+                <span className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-semibold text-[#142B4A] opacity-0 transition-opacity group-hover/title:opacity-100">
                   {t("company.vehiclePage.openDossier")}
                   <ChevronRight className="h-3 w-3" aria-hidden="true" />
                 </span>
@@ -97,7 +97,7 @@ export const CompanyFleetGrid: React.FC<CompanyFleetGridProps> = ({ rows, onSele
               <button
                 type="button"
                 onClick={() => onSelect(row)}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-[#2563EB] px-3.5 py-2 text-xs font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[#142B4A] px-3.5 py-2 text-xs font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-colors hover:bg-[#0D2039] cursor-pointer"
               >
                 <ScanLine className="h-3.5 w-3.5" aria-hidden="true" />
                 {t("company.fleetPage.actions.inspect")}

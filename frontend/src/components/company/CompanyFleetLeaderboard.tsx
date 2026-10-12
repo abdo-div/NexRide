@@ -117,7 +117,7 @@ export const CompanyFleetLeaderboard: React.FC<CompanyFleetLeaderboardProps> = (
 
       <Link
         to="/company/fleet"
-        className="mt-6 inline-flex items-center gap-1.5 rounded-xl bg-[#EFF4FF] px-4 py-2.5 text-[13px] font-bold text-[#2563EB] transition-colors hover:bg-[#E5EEFF]"
+        className="mt-6 inline-flex items-center gap-1.5 rounded-xl bg-[#F8FAFC] px-4 py-2.5 text-[13px] font-bold text-[#142B4A] transition-colors hover:bg-[#F1F5F9]"
       >
         {t("company.reviewsPage.leaderboard.manage")}
         <ArrowUpRight className="h-4 w-4" aria-hidden="true" />

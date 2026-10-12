@@ -79,7 +79,7 @@ export const CompanyVehicleEditLocation: React.FC<CompanyVehicleEditLocationProp
       </div>
       <div className="mt-4 flex items-center justify-between rounded-xl bg-[#F1F5F9] px-4 py-3">
         <span className="flex items-center gap-2 text-xs font-semibold text-[#0B1C30]">
-          <Navigation className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+          <Navigation className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
           {t("company.editVehiclePage.location.coords")}
         </span>
         {coordinates ? (

@@ -34,7 +34,7 @@ export const AuthFormPanel: React.FC = () => {
     <div className="bg-white rounded-xl shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)] border border-[#E2E8F0] p-6 md:p-10">
       {/* Brand Badge and Headline */}
       <div className="mb-6">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-[#2563EB] text-[11px] font-bold uppercase tracking-wider mb-3">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-[#142B4A] text-[11px] font-bold uppercase tracking-wider mb-3">
           <KeyRound className="w-3.5 h-3.5" />
           <span>{t("auth.panel.badge")}</span>
         </div>

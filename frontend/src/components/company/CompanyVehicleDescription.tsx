@@ -24,7 +24,7 @@ export const CompanyVehicleDescription: React.FC<CompanyVehicleDescriptionProps>
           type="button"
           disabled
           title={t("company.vehiclePage.soon")}
-          className="inline-flex items-center gap-1 text-xs font-semibold text-[#2563EB] disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center gap-1 text-xs font-semibold text-[#142B4A] disabled:cursor-not-allowed disabled:opacity-60"
         >
           <PencilLine className="h-3.5 w-3.5" aria-hidden="true" />
           {t("company.vehiclePage.desc.edit")}

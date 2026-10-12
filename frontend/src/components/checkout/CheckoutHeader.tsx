@@ -28,12 +28,12 @@ export const CheckoutHeader: React.FC<{
                 <React.Fragment key={i}>
                   {i > 0 && <ChevronRight className="w-4 h-4 text-[#CBD5E1] shrink-0 rtl:rotate-180" />}
                   {crumb.to ? (
-                    <Link to={crumb.to} className="hover:text-[#2563EB] transition-colors shrink-0 font-medium">
+                    <Link to={crumb.to} className="hover:text-[#142B4A] transition-colors shrink-0 font-medium">
                       {t(crumb.label)}
                     </Link>
                   ) : (
                     <span
-                      className={last ? "text-[#2563EB] font-bold shrink-0" : "truncate max-w-[200px] font-medium"}
+                      className={last ? "text-[#142B4A] font-bold shrink-0" : "truncate max-w-[200px] font-medium"}
                     >
                       {t(crumb.label)}
                     </span>
@@ -43,8 +43,8 @@ export const CheckoutHeader: React.FC<{
             })}
           </nav>
         </div>
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 text-[#2563EB] text-[12px] font-bold self-start lg:self-auto">
-          <span className="w-2 h-2 rounded-full bg-[#2563EB] animate-pulse" />
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 text-[#142B4A] text-[12px] font-bold self-start lg:self-auto">
+          <span className="w-2 h-2 rounded-full bg-[#142B4A] animate-pulse" />
           {t(meta.stepLabel)}
         </div>
       </div>

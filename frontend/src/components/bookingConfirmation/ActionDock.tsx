@@ -23,7 +23,7 @@ export const ActionDock: React.FC<{ meta: ConfirmationMeta }> = ({ meta }) => {
             to={action.to}
             className={`w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 rounded-xl text-[12px] font-bold transition-all shadow-sm ${
               action.primary
-                ? "bg-[#2563EB] hover:bg-blue-700 text-white shadow-[0_4px_12px_rgba(37,99,235,0.25)]"
+                ? "bg-[#142B4A] hover:bg-blue-700 text-white shadow-[0_4px_12px_rgba(37,99,235,0.25)]"
                 : "bg-[#F8FAFC] hover:bg-[#F1F5F9] text-[#0F172A]"
             }`}
           >

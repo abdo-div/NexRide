@@ -77,13 +77,13 @@ export const CompanyVehicleTripsHistory: React.FC<CompanyVehicleTripsHistoryProp
               value={search}
               onChange={(event) => onSearchChange(event.target.value)}
               placeholder={t("company.vehiclePage.trips.searchPlaceholder")}
-              className="h-10 w-64 rounded-xl border border-transparent bg-[#F1F5F9] pl-9 pr-3 text-sm text-[#0B1C30] placeholder:text-[#9AA4B5] focus:border-[#2563EB] focus:outline-none"
+              className="h-10 w-64 rounded-xl border border-transparent bg-[#F1F5F9] pl-9 pr-3 text-sm text-[#0B1C30] placeholder:text-[#9AA4B5] focus:border-[#142B4A] focus:outline-none"
             />
           </div>
           <button
             type="button"
             onClick={onViewAll}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-[#E5EEFF] px-4 py-2 text-sm font-semibold text-[#2563EB] transition-colors hover:bg-[#DCE9FF] cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-[#F1F5F9] px-4 py-2 text-sm font-semibold text-[#142B4A] transition-colors hover:bg-[#F1F5F9] cursor-pointer"
           >
             {t("company.vehiclePage.trips.viewAll")}
             <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
@@ -127,7 +127,7 @@ export const CompanyVehicleTripsHistory: React.FC<CompanyVehicleTripsHistoryProp
                   key={trip.id}
                   className="border-b border-[#F1F5F9] transition-colors last:border-0 hover:bg-[#F7F9FC]"
                 >
-                  <td className="px-4 py-3.5 font-mono text-xs font-bold text-[#2563EB]">
+                  <td className="px-4 py-3.5 font-mono text-xs font-bold text-[#142B4A]">
                     {trip.reference}
                   </td>
                   <td className="px-4 py-3.5">
@@ -151,9 +151,9 @@ export const CompanyVehicleTripsHistory: React.FC<CompanyVehicleTripsHistoryProp
                   <td className="px-4 py-3.5">
                     <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0B1C30]">
                       {trip.service.delivery ? (
-                        <Plane className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+                        <Plane className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
                       ) : (
-                        <MapPin className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+                        <MapPin className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
                       )}
                       {trip.service.delivery
                         ? `${t("company.vehiclePage.trips.delivery")} · ${trip.service.label}`
@@ -178,7 +178,7 @@ export const CompanyVehicleTripsHistory: React.FC<CompanyVehicleTripsHistoryProp
                       type="button"
                       disabled
                       title={t("company.vehiclePage.soon")}
-                      className="rounded-lg px-2 py-1 text-xs font-semibold text-[#2563EB] disabled:cursor-not-allowed disabled:opacity-40"
+                      className="rounded-lg px-2 py-1 text-xs font-semibold text-[#142B4A] disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       {t("company.vehiclePage.trips.view")}
                     </button>
@@ -211,7 +211,7 @@ export const CompanyVehicleTripsHistory: React.FC<CompanyVehicleTripsHistoryProp
               onClick={() => onPageChange(p)}
               className={`h-9 min-w-9 rounded-lg px-2 text-sm font-semibold transition-colors cursor-pointer ${
                 p === page
-                  ? "bg-[#2563EB] text-white shadow-sm"
+                  ? "bg-[#142B4A] text-white shadow-sm"
                   : "text-[#565E74] hover:bg-[#F7F9FC]"
               }`}
             >

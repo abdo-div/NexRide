@@ -62,7 +62,7 @@ export const VerificationStep: React.FC<Props> = ({
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-start gap-4">
-        <div className="w-10 h-10 rounded-xl bg-[#2563EB] text-white flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-[#142B4A] text-white flex items-center justify-center shrink-0">
           <ShieldCheck className="w-5 h-5" />
         </div>
         <div>
@@ -72,9 +72,9 @@ export const VerificationStep: React.FC<Props> = ({
       </div>
 
       {documents.map((doc, index) => (
-        <div key={doc.id} className="p-4 rounded-xl bg-[#EFF4FF] shadow-sm flex flex-col gap-3">
+        <div key={doc.id} className="p-4 rounded-xl bg-[#F8FAFC] shadow-sm flex flex-col gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#DCE9FF] flex items-center justify-center shrink-0 text-[#2563EB]">
+            <div className="w-10 h-10 rounded-xl bg-[#F1F5F9] flex items-center justify-center shrink-0 text-[#142B4A]">
               <FileText className="w-5 h-5" />
             </div>
             <div className="flex-1 min-w-0">
@@ -94,7 +94,7 @@ export const VerificationStep: React.FC<Props> = ({
             <button
               type="button"
               onClick={() => removeDocument(index)}
-              className="p-1.5 rounded-lg text-[#737686] hover:bg-[#E5EEFF] hover:text-[#BA1A1A] transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg text-[#737686] hover:bg-[#F1F5F9] hover:text-[#BA1A1A] transition-colors cursor-pointer"
               aria-label={t("partner.step4.remove")}
             >
               <Trash2 className="w-[18px] h-[18px]" />
@@ -140,7 +140,7 @@ export const VerificationStep: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={() => fileRefs.current.get(doc.id)?.click()}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#2563EB] text-white text-xs font-bold hover:bg-[#004AC6] transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#142B4A] text-white text-xs font-bold hover:bg-[#142B4A] transition-colors cursor-pointer"
               >
                 <Upload className="w-4 h-4" />
                 {t("partner.step4.selectFile")}
@@ -158,7 +158,7 @@ export const VerificationStep: React.FC<Props> = ({
         <button
           type="button"
           onClick={addDocument}
-          className="inline-flex items-center gap-1.5 text-sm font-bold text-[#2563EB] hover:underline cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-sm font-bold text-[#142B4A] hover:underline cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           {t("partner.step4.add")}

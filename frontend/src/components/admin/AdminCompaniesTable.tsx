@@ -71,7 +71,7 @@ export const AdminCompaniesTable: React.FC<AdminCompaniesTableProps> = ({
       <div className="w-full overflow-x-auto">
         <table className="w-full border-collapse text-left">
           <thead>
-            <tr className="bg-[#EFF4FF] text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
+            <tr className="bg-[#F8FAFC] text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
               <th className="rounded-s-2xl px-4 py-3">{t("admin.companies.table.company")}</th>
               <th className="px-4 py-3">{t("admin.companies.table.contact")}</th>
               <th className="px-4 py-3">{t("admin.companies.table.fleetSize")}</th>
@@ -107,24 +107,24 @@ export const AdminCompaniesTable: React.FC<AdminCompaniesTableProps> = ({
                   onClick={() => onSelect(c)}
                   className={`cursor-pointer border-b border-slate-100 transition-colors last:border-0 ${
                     selected
-                      ? "bg-[#EFF4FF]/80"
+                      ? "bg-[#F8FAFC]/80"
                       : c.status === "SUSPENDED"
                         ? "bg-red-50/30 hover:bg-red-50/50"
                         : c.status === "PENDING"
                           ? "hover:bg-amber-50/30"
-                          : "hover:bg-[#EFF4FF]/40"
+                          : "hover:bg-[#F8FAFC]/40"
                   }`}
                 >
                   <td className="py-3.5 pl-4 pr-4">
                     <div className="flex min-w-[190px] items-center gap-3">
-                      {companyLogoUrl(c.logo) ? <img src={companyLogoUrl(c.logo) ?? ""} alt={c.name} className="h-11 w-11 shrink-0 rounded-xl border border-slate-200 object-cover shadow-sm" /> : <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#E5EEFF] text-sm font-bold text-[#2563EB] shadow-sm">{initialsFrom(c.name)}</div>}
+                      {companyLogoUrl(c.logo) ? <img src={companyLogoUrl(c.logo) ?? ""} alt={c.name} className="h-11 w-11 shrink-0 rounded-xl border border-slate-200 object-cover shadow-sm" /> : <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#F1F5F9] text-sm font-bold text-[#142B4A] shadow-sm">{initialsFrom(c.name)}</div>}
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5">
                           <span className="truncate text-sm font-bold text-[#0B1C30]">
                             {c.name}
                           </span>
                           {c.status === "APPROVED" && (
-                            <BadgeCheck className="h-4 w-4 shrink-0 text-[#2563EB]" />
+                            <BadgeCheck className="h-4 w-4 shrink-0 text-[#142B4A]" />
                           )}
                         </div>
                         <div className="mt-0.5 flex items-center gap-1 truncate text-xs text-[#565E74]">
@@ -164,12 +164,12 @@ export const AdminCompaniesTable: React.FC<AdminCompaniesTableProps> = ({
                     <div
                       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${
                         active.length > 0
-                          ? "bg-[#EFF4FF] text-[#2563EB]"
+                          ? "bg-[#F8FAFC] text-[#142B4A]"
                           : "bg-slate-100 text-slate-500"
                       }`}
                     >
                       <span
-                        className={`h-1.5 w-1.5 rounded-full ${active.length > 0 ? "animate-pulse bg-[#2563EB]" : "bg-slate-400"}`}
+                        className={`h-1.5 w-1.5 rounded-full ${active.length > 0 ? "animate-pulse bg-[#142B4A]" : "bg-slate-400"}`}
                       />
                       {t("admin.companies.table.activeBookings")}: {active.length}
                     </div>
@@ -240,8 +240,8 @@ export const AdminCompaniesTable: React.FC<AdminCompaniesTableProps> = ({
                         onClick={() => openDossier(c)}
                         className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
                           selected
-                            ? "bg-[#2563EB] text-white shadow-[0_2px_8px_rgba(37,99,235,0.2)]"
-                            : "bg-[#EFF4FF] text-[#2563EB] hover:bg-[#2563EB] hover:text-white"
+                            ? "bg-[#142B4A] text-white shadow-[0_2px_8px_rgba(37,99,235,0.2)]"
+                            : "bg-[#F8FAFC] text-[#142B4A] hover:bg-[#142B4A] hover:text-white"
                         }`}
                       >
                         {c.status === "PENDING"
@@ -251,7 +251,7 @@ export const AdminCompaniesTable: React.FC<AdminCompaniesTableProps> = ({
                       <button
                         type="button"
                         onClick={() => onSelect(c)}
-                        className="rounded-lg p-1 text-[#565E74] transition-colors hover:bg-[#EFF4FF] hover:text-[#0B1C30] cursor-pointer"
+                        className="rounded-lg p-1 text-[#565E74] transition-colors hover:bg-[#F8FAFC] hover:text-[#0B1C30] cursor-pointer"
                         aria-label={t("admin.companies.table.actions")}
                       >
                         <MoreHorizontal className="h-5 w-5" />

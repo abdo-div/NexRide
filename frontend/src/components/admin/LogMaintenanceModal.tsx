@@ -68,7 +68,7 @@ export const LogMaintenanceModal: React.FC<LogMaintenanceModalProps> = ({
       <div className="w-full max-w-2xl rounded-2xl bg-white shadow-[0_20px_60px_rgba(8,19,31,0.35)]">
         <div className="flex items-start justify-between gap-4 border-b border-slate-100 p-6">
           <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#2563EB] text-white shadow-[0_4px_12px_rgba(37,99,235,0.25)]">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#142B4A] text-white shadow-[0_4px_12px_rgba(37,99,235,0.25)]">
               <Wrench className="h-5 w-5" />
             </span>
             <div>
@@ -83,7 +83,7 @@ export const LogMaintenanceModal: React.FC<LogMaintenanceModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-2 text-[#565E74] transition-colors hover:bg-[#EFF4FF] hover:text-[#0B1C30] cursor-pointer"
+            className="rounded-lg p-2 text-[#565E74] transition-colors hover:bg-[#F8FAFC] hover:text-[#0B1C30] cursor-pointer"
             aria-label="close"
           >
             <CircleX className="h-5 w-5" />
@@ -95,7 +95,7 @@ export const LogMaintenanceModal: React.FC<LogMaintenanceModalProps> = ({
             <select
               value={vehicleId}
               onChange={(e) => setVehicleId(e.target.value)}
-              className="w-full cursor-pointer rounded-xl bg-[#EFF4FF] px-3.5 py-2.5 text-sm font-semibold text-[#0B1C30] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#2563EB]"
+              className="w-full cursor-pointer rounded-xl bg-[#F8FAFC] px-3.5 py-2.5 text-sm font-semibold text-[#0B1C30] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#142B4A]"
             >
               <option value="">{t("admin.maintenance.modal.vehiclePlaceholder")}</option>
               {vehicles.map((v) => (
@@ -111,7 +111,7 @@ export const LogMaintenanceModal: React.FC<LogMaintenanceModalProps> = ({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as MaintenanceCategory)}
-                className="w-full cursor-pointer rounded-xl bg-[#EFF4FF] px-3.5 py-2.5 text-sm font-semibold text-[#0B1C30] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#2563EB]"
+                className="w-full cursor-pointer rounded-xl bg-[#F8FAFC] px-3.5 py-2.5 text-sm font-semibold text-[#0B1C30] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#142B4A]"
               >
                 {categoryOptions.map((c) => (
                   <option key={c} value={c}>
@@ -124,7 +124,7 @@ export const LogMaintenanceModal: React.FC<LogMaintenanceModalProps> = ({
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as MaintenancePriority)}
-                className="w-full cursor-pointer rounded-xl bg-[#EFF4FF] px-3.5 py-2.5 text-sm font-semibold text-[#0B1C30] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#2563EB]"
+                className="w-full cursor-pointer rounded-xl bg-[#F8FAFC] px-3.5 py-2.5 text-sm font-semibold text-[#0B1C30] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#142B4A]"
               >
                 {priorityOptions.map((p) => (
                   <option key={p} value={p}>
@@ -137,7 +137,7 @@ export const LogMaintenanceModal: React.FC<LogMaintenanceModalProps> = ({
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as MaintenanceStoredStatus)}
-                className="w-full cursor-pointer rounded-xl bg-[#EFF4FF] px-3.5 py-2.5 text-sm font-semibold text-[#0B1C30] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#2563EB]"
+                className="w-full cursor-pointer rounded-xl bg-[#F8FAFC] px-3.5 py-2.5 text-sm font-semibold text-[#0B1C30] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#142B4A]"
               >
                 <option value="SCHEDULED">
                   {t("admin.maintenance.statuses.SCHEDULED")}
@@ -154,7 +154,7 @@ export const LogMaintenanceModal: React.FC<LogMaintenanceModalProps> = ({
               value={triggerReason}
               onChange={(e) => setTriggerReason(e.target.value)}
               placeholder={t("admin.maintenance.modal.triggerPlaceholder")}
-              className="w-full rounded-xl bg-[#EFF4FF] px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none transition-all placeholder:text-[#565E74] focus:bg-white focus:ring-2 focus:ring-[#2563EB]"
+              className="w-full rounded-xl bg-[#F8FAFC] px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none transition-all placeholder:text-[#565E74] focus:bg-white focus:ring-2 focus:ring-[#142B4A]"
             />
           </Field>
 
@@ -164,7 +164,7 @@ export const LogMaintenanceModal: React.FC<LogMaintenanceModalProps> = ({
               onChange={(e) => setDetail(e.target.value)}
               rows={3}
               placeholder={t("admin.maintenance.modal.detailPlaceholder")}
-              className="w-full resize-none rounded-xl bg-[#EFF4FF] px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none transition-all placeholder:text-[#565E74] focus:bg-white focus:ring-2 focus:ring-[#2563EB]"
+              className="w-full resize-none rounded-xl bg-[#F8FAFC] px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none transition-all placeholder:text-[#565E74] focus:bg-white focus:ring-2 focus:ring-[#142B4A]"
             />
           </Field>
 
@@ -174,7 +174,7 @@ export const LogMaintenanceModal: React.FC<LogMaintenanceModalProps> = ({
                 value={workshop}
                 onChange={(e) => setWorkshop(e.target.value)}
                 placeholder={t("admin.maintenance.modal.workshopPlaceholder")}
-                className="w-full rounded-xl bg-[#EFF4FF] px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none transition-all placeholder:text-[#565E74] focus:bg-white focus:ring-2 focus:ring-[#2563EB]"
+                className="w-full rounded-xl bg-[#F8FAFC] px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none transition-all placeholder:text-[#565E74] focus:bg-white focus:ring-2 focus:ring-[#142B4A]"
               />
             </Field>
             <Field label={t("admin.maintenance.modal.technician")}>
@@ -182,7 +182,7 @@ export const LogMaintenanceModal: React.FC<LogMaintenanceModalProps> = ({
                 value={technician}
                 onChange={(e) => setTechnician(e.target.value)}
                 placeholder={t("admin.maintenance.modal.technicianPlaceholder")}
-                className="w-full rounded-xl bg-[#EFF4FF] px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none transition-all placeholder:text-[#565E74] focus:bg-white focus:ring-2 focus:ring-[#2563EB]"
+                className="w-full rounded-xl bg-[#F8FAFC] px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none transition-all placeholder:text-[#565E74] focus:bg-white focus:ring-2 focus:ring-[#142B4A]"
               />
             </Field>
           </div>
@@ -197,7 +197,7 @@ export const LogMaintenanceModal: React.FC<LogMaintenanceModalProps> = ({
                   type="date"
                   value={intakeDate}
                   onChange={(e) => setIntakeDate(e.target.value)}
-                  className="w-full rounded-xl bg-[#EFF4FF] px-3.5 py-2.5 pl-10 text-sm font-semibold text-[#0B1C30] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#2563EB]"
+                  className="w-full rounded-xl bg-[#F8FAFC] px-3.5 py-2.5 pl-10 text-sm font-semibold text-[#0B1C30] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#142B4A]"
                 />
               </div>
             </Field>
@@ -206,7 +206,7 @@ export const LogMaintenanceModal: React.FC<LogMaintenanceModalProps> = ({
                 type="date"
                 value={estReturnDate}
                 onChange={(e) => setEstReturnDate(e.target.value)}
-                className="w-full rounded-xl bg-[#EFF4FF] px-3.5 py-2.5 text-sm font-semibold text-[#0B1C30] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#2563EB]"
+                className="w-full rounded-xl bg-[#F8FAFC] px-3.5 py-2.5 text-sm font-semibold text-[#0B1C30] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#142B4A]"
               />
             </Field>
             <Field label={t("admin.maintenance.modal.estCost")}>
@@ -216,7 +216,7 @@ export const LogMaintenanceModal: React.FC<LogMaintenanceModalProps> = ({
                 value={estCost}
                 onChange={(e) => setEstCost(e.target.value)}
                 placeholder="0"
-                className="w-full rounded-xl bg-[#EFF4FF] px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none transition-all placeholder:text-[#565E74] focus:bg-white focus:ring-2 focus:ring-[#2563EB]"
+                className="w-full rounded-xl bg-[#F8FAFC] px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none transition-all placeholder:text-[#565E74] focus:bg-white focus:ring-2 focus:ring-[#142B4A]"
               />
             </Field>
           </div>
@@ -233,7 +233,7 @@ export const LogMaintenanceModal: React.FC<LogMaintenanceModalProps> = ({
             type="button"
             onClick={onClose}
             disabled={busy}
-            className="rounded-xl bg-[#EFF4FF] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] transition-colors hover:bg-[#E5EEFF] disabled:opacity-50 cursor-pointer"
+            className="rounded-xl bg-[#F8FAFC] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] transition-colors hover:bg-[#F1F5F9] disabled:opacity-50 cursor-pointer"
           >
             {t("admin.drawer.close")}
           </button>
@@ -241,7 +241,7 @@ export const LogMaintenanceModal: React.FC<LogMaintenanceModalProps> = ({
             type="button"
             onClick={submit}
             disabled={busy}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-colors enabled:hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-colors enabled:hover:bg-[#0D2039] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
           >
             <Hammer className="h-4 w-4" />
             {busy ? t("admin.maintenance.modal.saving") : t("admin.maintenance.modal.save")}

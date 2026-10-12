@@ -41,7 +41,7 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
               </div>
             )}
             {vehicle.badgeTagSecondary && (
-              <div className="absolute top-3 end-3 px-2.5 py-1 rounded-md bg-[#2563EB] text-white text-[11px] font-bold">
+              <div className="absolute top-3 end-3 px-2.5 py-1 rounded-md bg-[#142B4A] text-white text-[11px] font-bold">
                 {vehicle.badgeTagSecondary}
               </div>
             )}
@@ -62,13 +62,13 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
 
           <div className="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC]">
             <div className="flex items-center gap-2.5">
-              {companyLogoUrl(vehicle.operator.logo) ? <img src={companyLogoUrl(vehicle.operator.logo) ?? ""} alt={vehicle.operator.name} className="h-8 w-8 rounded-full border border-slate-200 object-cover" /> : <div className="w-8 h-8 rounded-full bg-[#2563EB] text-white flex items-center justify-center font-bold text-[12px]">{vehicle.operator.initials}</div>}
+              {companyLogoUrl(vehicle.operator.logo) ? <img src={companyLogoUrl(vehicle.operator.logo) ?? ""} alt={vehicle.operator.name} className="h-8 w-8 rounded-full border border-slate-200 object-cover" /> : <div className="w-8 h-8 rounded-full bg-[#142B4A] text-white flex items-center justify-center font-bold text-[12px]">{vehicle.operator.initials}</div>}
               <div className="flex flex-col">
                 <div className="flex items-center gap-1">
                   <span className="text-[12px] font-bold text-[#0F172A]">
                     {vehicle.operator.name}
                   </span>
-                  {vehicle.operator.isVerified && <BadgeCheck className="w-[14px] h-[14px] text-[#2563EB]" />}
+                  {vehicle.operator.isVerified && <BadgeCheck className="w-[14px] h-[14px] text-[#142B4A]" />}
                 </div>
                 <span className="text-[11px] text-[#64748B]">
                   {t("checkout.summary.ratingAndReviews", {
@@ -142,7 +142,7 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
 
           <div className="p-3 rounded-xl bg-[#F1F5F9] flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Shield className="w-[18px] h-[18px] text-[#2563EB]" />
+              <Shield className="w-[18px] h-[18px] text-[#142B4A]" />
               <div className="flex flex-col">
                 <span className="text-[11px] font-bold text-[#0F172A]">{t(securityDeposit.label)}</span>
                 <span className="text-[10px] text-[#64748B]">{t(securityDeposit.note)}</span>
@@ -161,7 +161,7 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
               <span className="text-[10px] text-[#94A3B8]">{t(totalNote)}</span>
             </div>
             <div className="text-end">
-              <span className="text-[28px] font-extrabold text-[#2563EB] tracking-tight tabular-nums">
+              <span className="text-[28px] font-extrabold text-[#142B4A] tracking-tight tabular-nums">
                 {totalLyd(totals.total)}
               </span>
             </div>
@@ -186,8 +186,8 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
               disabled={phase === "processing"}
               className={`w-full py-4 px-6 rounded-xl text-white text-[16px] font-bold shadow-lg flex items-center justify-center gap-2 transition-all transform active:scale-[0.98] ${
                 phase === "processing"
-                  ? "bg-[#2563EB] opacity-80 cursor-not-allowed"
-                  : "bg-[#2563EB] hover:bg-blue-700 shadow-[0_4px_12px_rgba(37,99,235,0.25)]"
+                  ? "bg-[#142B4A] opacity-80 cursor-not-allowed"
+                  : "bg-[#142B4A] hover:bg-blue-700 shadow-[0_4px_12px_rgba(37,99,235,0.25)]"
               }`}
             >
               {phase === "processing" ? (
@@ -211,7 +211,7 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
           )}
           <div className="flex flex-col gap-2 text-center">
             <p className="text-[11px] text-[#64748B] flex items-center justify-center gap-1.5">
-              <Shield className="w-[14px] h-[14px] text-[#2563EB]" />
+              <Shield className="w-[14px] h-[14px] text-[#142B4A]" />
               {t(meta.secureNote)}
             </p>
             <p className="text-[10px] text-[#94A3B8] leading-tight">
@@ -227,7 +227,7 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
               key={prop.title}
               className="p-2.5 rounded-lg bg-[#F8FAFC] text-center flex flex-col items-center gap-1"
             >
-              <CheckoutIcon name={prop.icon} className="w-[18px] h-[18px] text-[#2563EB]" />
+              <CheckoutIcon name={prop.icon} className="w-[18px] h-[18px] text-[#142B4A]" />
               <span className="text-[11px] font-bold text-[#0F172A]">{t(prop.title)}</span>
               <span className="text-[10px] text-[#94A3B8]">{t(prop.sub)}</span>
             </div>

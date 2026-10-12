@@ -11,11 +11,11 @@ export const OperatorProfile: React.FC<{ detail: VehicleDetail }> = ({ detail })
   return (
     <section className="bg-white p-6 rounded-2xl border border-[#E2E8F0] shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
       <div className="flex items-start gap-4">
-        {companyLogoUrl(op.logo) ? <img src={companyLogoUrl(op.logo) ?? ""} alt={op.name} className="h-16 w-16 shrink-0 rounded-2xl border border-blue-100 object-cover shadow-sm" /> : <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 shadow-sm text-[#2563EB]"><Car className="w-8 h-8" /></div>}
+        {companyLogoUrl(op.logo) ? <img src={companyLogoUrl(op.logo) ?? ""} alt={op.name} className="h-16 w-16 shrink-0 rounded-2xl border border-slate-100 object-cover shadow-sm" /> : <div className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 shadow-sm text-[#142B4A]"><Car className="w-8 h-8" /></div>}
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h3 className="text-[18px] font-bold text-[#0F172A]">{op.name}</h3>
-            {op.isVerified && <BadgeCheck className="w-5 h-5 text-[#2563EB]" />}
+            {op.isVerified && <BadgeCheck className="w-5 h-5 text-[#142B4A]" />}
           </div>
           <p className="text-[13px] text-[#64748B]">{t(detail.operator.meta)}</p>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 text-[12px] text-[#64748B]">
@@ -26,7 +26,7 @@ export const OperatorProfile: React.FC<{ detail: VehicleDetail }> = ({ detail })
             <span>•</span>
             <span>{t(detail.operator.completedRentals, { count: op.reviewsCount })}</span>
             <span>•</span>
-            <span className="text-[#2563EB] font-bold">{t(detail.operator.responseTime)}</span>
+            <span className="text-[#142B4A] font-bold">{t(detail.operator.responseTime)}</span>
           </div>
         </div>
       </div>
@@ -35,14 +35,14 @@ export const OperatorProfile: React.FC<{ detail: VehicleDetail }> = ({ detail })
           type="button"
           className="flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] hover:bg-[#F1F5F9] text-[#0F172A] text-[13px] font-semibold flex items-center justify-center gap-2 transition-colors"
         >
-          <MessageCircle className="w-[18px] h-[18px] text-[#2563EB]" />
+          <MessageCircle className="w-[18px] h-[18px] text-[#142B4A]" />
           {t("vehicleDetail.agencyWhatsapp")}
         </button>
         <button
           type="button"
           className="flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] hover:bg-[#F1F5F9] text-[#0F172A] text-[13px] font-semibold flex items-center justify-center gap-2 transition-colors"
         >
-          <Phone className="w-[18px] h-[18px] text-[#2563EB]" />
+          <Phone className="w-[18px] h-[18px] text-[#142B4A]" />
           {t("vehicleDetail.directCall")}
         </button>
       </div>

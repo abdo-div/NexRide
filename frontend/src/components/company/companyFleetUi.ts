@@ -17,7 +17,7 @@ export const fleetStatusTone = (
     case "available":
       return { label, chip: "bg-[#ECFDF5] text-[#0BA05F]", dot: "bg-[#0BA05F]" };
     case "rented":
-      return { label, chip: "bg-[#E5EEFF] text-[#2563EB]", dot: "bg-[#2563EB]" };
+      return { label, chip: "bg-[#F1F5F9] text-[#142B4A]", dot: "bg-[#142B4A]" };
     case "maintenance":
       return { label, chip: "bg-[#FFF0E1] text-[#B54E00]", dot: "bg-[#EA8A00]" };
     case "draft":

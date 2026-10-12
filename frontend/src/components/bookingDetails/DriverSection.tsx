@@ -26,7 +26,7 @@ export const DriverSection: React.FC<DriverSectionProps> = ({ booking }) => {
     <section className="bg-white rounded-2xl border border-slate-200 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)] p-6 lg:p-8 flex flex-col gap-5">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="text-[17px] font-bold text-[#0F172A] flex items-center gap-2">
-          <span className="w-8 h-8 rounded-lg bg-[#EFF4FF] text-[#2563EB] flex items-center justify-center">
+          <span className="w-8 h-8 rounded-lg bg-[#F8FAFC] text-[#142B4A] flex items-center justify-center">
             <UserRound className="w-4 h-4" />
           </span>
           {t("bookingDetails.driver.title")}
@@ -40,7 +40,7 @@ export const DriverSection: React.FC<DriverSectionProps> = ({ booking }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Renter */}
         <div className="bg-[#F8FAFC] rounded-xl p-5 flex flex-col gap-3">
-          <span className="text-[11px] font-bold text-[#2563EB] uppercase tracking-wide">
+          <span className="text-[11px] font-bold text-[#142B4A] uppercase tracking-wide">
             {t("bookingDetails.driver.renterLabel")}
           </span>
           <div className="flex items-center gap-3">
@@ -61,18 +61,18 @@ export const DriverSection: React.FC<DriverSectionProps> = ({ booking }) => {
             {phone && (
               <a
                 href={`tel:${phone.replace(/[^+\d]/g, "")}`}
-                className="inline-flex items-center gap-1.5 font-semibold hover:text-[#2563EB] transition-colors"
+                className="inline-flex items-center gap-1.5 font-semibold hover:text-[#142B4A] transition-colors"
               >
-                <Phone className="w-3.5 h-3.5 text-[#2563EB]" />
+                <Phone className="w-3.5 h-3.5 text-[#142B4A]" />
                 <span dir="ltr">{phone}</span>
               </a>
             )}
             {email && (
               <a
                 href={`mailto:${email}`}
-                className="inline-flex items-center gap-1.5 font-semibold hover:text-[#2563EB] transition-colors truncate"
+                className="inline-flex items-center gap-1.5 font-semibold hover:text-[#142B4A] transition-colors truncate"
               >
-                <MessageCircle className="w-3.5 h-3.5 text-[#2563EB]" />
+                <MessageCircle className="w-3.5 h-3.5 text-[#142B4A]" />
                 <span className="truncate">{email}</span>
               </a>
             )}

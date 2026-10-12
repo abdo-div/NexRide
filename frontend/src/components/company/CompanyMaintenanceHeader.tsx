@@ -34,8 +34,8 @@ export const CompanyMaintenanceHeader: React.FC<CompanyMaintenanceHeaderProps> =
           <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
           <span className="text-[#0B1C30]">{t("company.maintenance.title")}</span>
         </div>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EFF4FF] px-3 py-1 text-[11px] font-semibold text-[#565E74]">
-          <SearchCheck className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden="true" />
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8FAFC] px-3 py-1 text-[11px] font-semibold text-[#565E74]">
+          <SearchCheck className="h-3.5 w-3.5 text-[#142B4A]" aria-hidden="true" />
           {t("company.maintenance.scopedTenant")}
         </span>
       </div>
@@ -49,7 +49,7 @@ export const CompanyMaintenanceHeader: React.FC<CompanyMaintenanceHeaderProps> =
             <span className="text-base font-semibold text-[#565E74]">
               / {t("company.maintenance.titleAr")}
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E5EEFF] px-2.5 py-0.5 text-[11px] font-bold text-[#2563EB]">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F1F5F9] px-2.5 py-0.5 text-[11px] font-bold text-[#142B4A]">
               <Wrench className="h-3 w-3" aria-hidden="true" />
               {t("company.maintenance.recordCount", { count: totalRecords })}
             </span>
@@ -71,10 +71,10 @@ export const CompanyMaintenanceHeader: React.FC<CompanyMaintenanceHeaderProps> =
             type="button"
             onClick={onRefresh}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-3.5 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#E5EEFF] disabled:opacity-60 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-3.5 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#F1F5F9] disabled:opacity-60 cursor-pointer"
           >
             <RefreshCw
-              className={`h-4 w-4 text-[#2563EB] ${loading ? "animate-spin" : ""}`}
+              className={`h-4 w-4 text-[#142B4A] ${loading ? "animate-spin" : ""}`}
               aria-hidden="true"
             />
             {t("company.maintenance.refresh")}
@@ -84,13 +84,13 @@ export const CompanyMaintenanceHeader: React.FC<CompanyMaintenanceHeaderProps> =
             onClick={onScheduleInspection}
             className="inline-flex items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-4 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#F8FAFF] cursor-pointer"
           >
-            <ClipboardPlus className="h-[18px] w-[18px] text-[#2563EB]" aria-hidden="true" />
+            <ClipboardPlus className="h-[18px] w-[18px] text-[#142B4A]" aria-hidden="true" />
             {t("company.maintenance.scheduleInspection")}
           </button>
           <button
             type="button"
             onClick={onAddRecord}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-all hover:bg-[#1D4ED8] cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-all hover:bg-[#0D2039] cursor-pointer"
           >
             <Wrench className="h-[18px] w-[18px]" aria-hidden="true" />
             {t("company.maintenance.addRecord")}

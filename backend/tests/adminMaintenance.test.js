@@ -103,7 +103,7 @@ test("maintenance schema rejects unsupported statuses and negative costs", async
     vehicleId,
     companyId,
     category: "ROUTINE_SERVICE",
-    status: "CANCELLED",
+    status: "INVALID_STATUS",
     triggerReason: "Service interval reached",
     estCost: -1,
   });

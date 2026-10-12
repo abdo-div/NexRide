@@ -37,14 +37,14 @@ const InputField: React.FC<InputFieldProps> = ({
   onChange,
 }) => {
   const { t } = useTranslation();
-  const shared = "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-[#0B1C30] placeholder:text-[#A6ACBE] focus:border-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 disabled:cursor-not-allowed disabled:bg-[#F8FAFC] disabled:text-[#A6ACBE]";
+  const shared = "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-[#0B1C30] placeholder:text-[#A6ACBE] focus:border-[#142B4A] focus:outline-none focus:ring-2 focus:ring-[#142B4A]/20 disabled:cursor-not-allowed disabled:bg-[#F8FAFC] disabled:text-[#A6ACBE]";
   return (
     <label className="block">
       <span className="mb-1.5 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-[#565E74]">
         {label}
         {required ? <span className="text-[#BA1A1A]">*</span> : null}
         {soon ? (
-          <span className="rounded-full bg-[#EFF4FF] px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-[#2563EB]">
+          <span className="rounded-full bg-[#F8FAFC] px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-[#142B4A]">
             {t("company.settings.soon")}
           </span>
         ) : null}
@@ -137,8 +137,8 @@ export const CompanySettingsProfileCard: React.FC<CompanySettingsProfileCardProp
       description={t("company.settings.profile.description")}
       icon={<Building2 className="h-5 w-5" aria-hidden="true" />}
     >
-      <div className="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-[#EFF4FF]">
-        <div className="relative h-40 w-full overflow-hidden bg-gradient-to-r from-[#0B1C30] via-[#153A6B] to-[#2563EB]">
+      <div className="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-[#F8FAFC]">
+        <div className="relative h-40 w-full overflow-hidden bg-gradient-to-r from-[#0B1C30] via-[#153A6B] to-[#142B4A]">
           {cover ? <img src={cover} alt="" className="absolute inset-0 h-full w-full object-cover" /> : <div className="absolute inset-0 grid place-items-center text-blue-100"><ImageIcon className="h-10 w-10" /></div>}
           <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C30]/55 to-transparent" />
           <div className="absolute bottom-4 start-4 text-white">
@@ -146,7 +146,7 @@ export const CompanySettingsProfileCard: React.FC<CompanySettingsProfileCardProp
             <p className="mt-0.5 text-[11px] text-white/75">{isArabic ? "تظهر أعلى صفحة شركتك العامة" : "Shown at the top of your public company page"}</p>
           </div>
           <input ref={coverInput} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => chooseCover(e.target.files)} />
-          <button type="button" disabled={busy} onClick={() => coverInput.current?.click()} className="absolute bottom-4 end-4 inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[11px] font-extrabold text-[#0B1C30] shadow-lg hover:bg-[#EFF4FF] disabled:opacity-60"><CloudUpload className="h-3.5 w-3.5" />{busy ? (isArabic ? "جارٍ الرفع..." : "Uploading...") : (isArabic ? "تغيير الغلاف" : "Change cover")}</button>
+          <button type="button" disabled={busy} onClick={() => coverInput.current?.click()} className="absolute bottom-4 end-4 inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[11px] font-extrabold text-[#0B1C30] shadow-lg hover:bg-[#F8FAFC] disabled:opacity-60"><CloudUpload className="h-3.5 w-3.5" />{busy ? (isArabic ? "جارٍ الرفع..." : "Uploading...") : (isArabic ? "تغيير الغلاف" : "Change cover")}</button>
         </div>
         {coverError && <p className="px-4 py-2 text-[11px] font-semibold text-[#BA1A1A]">{coverError}</p>}
       </div>
@@ -203,9 +203,9 @@ export const CompanySettingsProfileCard: React.FC<CompanySettingsProfileCardProp
           disabled
         />
         <div className="flex items-end">
-          <div className="flex w-full items-center justify-between gap-4 rounded-xl border border-dashed border-[#D3E4FE] bg-[#F8FAFF] px-4 py-3">
+          <div className="flex w-full items-center justify-between gap-4 rounded-xl border border-dashed border-[#E2E8F0] bg-[#F8FAFF] px-4 py-3">
             <div className="flex min-w-0 items-center gap-3">
-              {logo ? <img src={logo} alt={draft.name} className="h-12 w-12 shrink-0 rounded-xl border border-slate-200 object-cover" /> : <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#2563EB] text-sm font-extrabold text-white">{initialsFrom(draft.name)}</span>}
+              {logo ? <img src={logo} alt={draft.name} className="h-12 w-12 shrink-0 rounded-xl border border-slate-200 object-cover" /> : <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#142B4A] text-sm font-extrabold text-white">{initialsFrom(draft.name)}</span>}
               <div className="min-w-0">
                 <p className="text-xs font-bold text-[#0B1C30]">
                   {t("company.settings.profile.logo")}
@@ -216,7 +216,7 @@ export const CompanySettingsProfileCard: React.FC<CompanySettingsProfileCardProp
               </div>
             </div>
             <input ref={logoInput} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => chooseLogo(e.target.files)} />
-            <button type="button" disabled={busy} onClick={() => logoInput.current?.click()} className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg bg-[#2563EB] px-3 py-2 text-[11px] font-extrabold text-white hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-60">
+            <button type="button" disabled={busy} onClick={() => logoInput.current?.click()} className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg bg-[#142B4A] px-3 py-2 text-[11px] font-extrabold text-white hover:bg-[#0D2039] disabled:cursor-not-allowed disabled:opacity-60">
               <CloudUpload className="h-3 w-3" aria-hidden="true" />
               {busy ? t("company.settings.profile.logoUploading") : t("company.settings.profile.logoAction")}
             </button>
@@ -257,7 +257,7 @@ export const CompanySettingsProfileCard: React.FC<CompanySettingsProfileCardProp
       </div>
 
       <p className="mt-4 flex items-center gap-1.5 text-[11px] font-medium text-[#9AA4B5]">
-        <Award className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden="true" />
+        <Award className="h-3.5 w-3.5 text-[#142B4A]" aria-hidden="true" />
         {t("company.settings.profile.hintSync")}
       </p>
     </CompanySettingsSection>

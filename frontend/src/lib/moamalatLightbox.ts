@@ -114,7 +114,9 @@ export const openMoamalatLightbox = (
   api.Checkout.configure = {
     ...params,
     completeCallback: (response) => {
-      console.log("MOAMALAT COMPLETE CALLBACK:", response);
+      if (import.meta.env.DEV) {
+        console.debug("MOAMALAT COMPLETE CALLBACK:", response);
+      }
       try {
         api.Checkout.closeLightbox();
       } catch {
@@ -123,11 +125,15 @@ export const openMoamalatLightbox = (
       callbacks.onComplete(response);
     },
     errorCallback: (err) => {
-      console.error("MOAMALAT ERROR CALLBACK:", err);
+      if (import.meta.env.DEV) {
+        console.error("MOAMALAT ERROR CALLBACK:", err);
+      }
       callbacks.onError?.(err);
     },
     cancelCallback: () => {
-      console.log("MOAMALAT CANCEL CALLBACK");
+      if (import.meta.env.DEV) {
+        console.debug("MOAMALAT CANCEL CALLBACK");
+      }
       callbacks.onCancel?.();
     },
   };
