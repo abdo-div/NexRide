@@ -408,14 +408,10 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
               phase={phase}
               onConfirm={onConfirm}
               tab={tab}
+              error={submitError}
             />
           )}
         </div>
-        {submitError && (
-          <div className="mt-6 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-[13px] font-semibold">
-            {submitError}
-          </div>
-        )}
       </div>
     </div>
   );

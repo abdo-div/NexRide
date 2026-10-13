@@ -14,11 +14,20 @@ interface Props {
   phase: "idle" | "processing" | "done";
   onConfirm: () => void;
   tab?: "card" | "cash";
+  error?: string | null;
 }
 
 const totalLyd = (n: number) => `${n.toLocaleString("en-US")} LYD`;
 
-export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, onConfirm, tab = "card" }) => {
+export const BookingSummary: React.FC<Props> = ({
+  vehicle,
+  meta,
+  totals,
+  phase,
+  onConfirm,
+  tab = "card",
+  error,
+}) => {
   const { t } = useTranslation();
   const { itinerary, municipalLabel, securityDeposit, totalLabel, totalNote } = meta;
   const days = itinerary.days;
@@ -170,6 +179,14 @@ export const BookingSummary: React.FC<Props> = ({ vehicle, meta, totals, phase, 
 
         {/* CTA */}
         <div className="flex flex-col gap-3">
+          {error && (
+            <div
+              role="alert"
+              className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-start text-[13px] font-semibold text-red-700"
+            >
+              {error}
+            </div>
+          )}
           {phase === "done" ? (
             <Link
               to={`/booking-confirmed/${vehicle.id}`}
