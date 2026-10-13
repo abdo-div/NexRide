@@ -21,6 +21,7 @@ const baseRedisOptions = {
  * never block application startup or an incoming request.
  */
 const PROBE_TIMEOUT_MS = Number(process.env.REDIS_PROBE_TIMEOUT_MS) || 1500;
+export const isRedisEnabled = () => process.env.REDIS_ENABLED !== "false";
 
 const redisConnection = resolveRedisConnection();
 const createRedisClient = (options) => {
@@ -77,6 +78,7 @@ export const isRedisAvailable = async (
   client = redisClient,
   timeoutMs = PROBE_TIMEOUT_MS,
 ) => {
+  if (!isRedisEnabled()) return false;
   if (client.status === "ready") return true;
 
   return new Promise((resolve) => {

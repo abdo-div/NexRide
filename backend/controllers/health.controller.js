@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
-import { isRedisAvailable, redisClient } from "../config/redis.js";
+import {
+  isRedisAvailable,
+  isRedisEnabled,
+  redisClient,
+} from "../config/redis.js";
 
 export const getLiveness = (req, res) => {
   res.status(200).json({ status: "ok", uptime: process.uptime() });
@@ -9,12 +13,12 @@ export const getReadiness = async (req, res) => {
   const isMongoReady = mongoose.connection.readyState === 1;
   const isRedisReady = await isRedisAvailable(redisClient);
 
-  if (isMongoReady && isRedisReady) {
+  if (isMongoReady && (isRedisReady || !isRedisEnabled())) {
     return res.status(200).json({
       status: "UP",
       checks: {
         database: "CONNECTED",
-        cache: "CONNECTED",
+        cache: isRedisReady ? "CONNECTED" : "DISABLED",
       },
     });
   }
@@ -23,7 +27,11 @@ export const getReadiness = async (req, res) => {
     status: "DOWN",
     checks: {
       database: isMongoReady ? "CONNECTED" : "DISCONNECTED",
-      cache: isRedisReady ? "CONNECTED" : "DISCONNECTED",
+      cache: isRedisEnabled()
+        ? isRedisReady
+          ? "CONNECTED"
+          : "DISCONNECTED"
+        : "DISABLED",
     },
   });
 };

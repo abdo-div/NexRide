@@ -211,14 +211,13 @@ test("card checkout creation remains pending without a cash payment record", asy
   assert.equal(session.committed, true);
 });
 
-test("booking creation fails closed when Redis is unavailable", async (t) => {
+test("booking creation falls back to the MongoDB transaction when Redis is unavailable", async (t) => {
   const result = await runCreateBooking(t, undefined, { redisAvailable: false });
 
-  assert.equal(result.response.statusCode, 503);
-  assert.match(result.response.error.message, /temporarily unavailable/);
-  assert.doesNotMatch(result.response.error.message, /Redis internal/);
-  assert.equal(result.sessionStarts, 0);
-  assert.equal(result.bookingCreates, 0);
+  assert.equal(result.response.statusCode, 201);
+  assert.equal(result.sessionStarts, 1);
+  assert.equal(result.session.committed, true);
+  assert.equal(result.bookingCreates, 1);
   assert.equal(result.concurrencyCalls.holds.length, 0);
   assert.equal(result.concurrencyCalls.locks.length, 0);
 });
@@ -243,17 +242,16 @@ test("booking creation releases its hold and creates nothing when lock acquisiti
   assert.deepEqual(result.concurrencyCalls.releasedHolds, [vehicleId]);
 });
 
-test("booking creation returns unavailable if Redis drops during lock acquisition", async (t) => {
+test("booking creation falls back to MongoDB if Redis drops during lock acquisition", async (t) => {
   const result = await runCreateBooking(t, undefined, {
     lockSuccess: false,
     redisAvailableAfterFirstCheck: false,
   });
 
-  assert.equal(result.response.statusCode, 503);
-  assert.match(result.response.error.message, /temporarily unavailable/);
-  assert.doesNotMatch(result.response.error.message, /Redis internal/);
-  assert.equal(result.sessionStarts, 0);
-  assert.equal(result.bookingCreates, 0);
+  assert.equal(result.response.statusCode, 201);
+  assert.equal(result.sessionStarts, 1);
+  assert.equal(result.session.committed, true);
+  assert.equal(result.bookingCreates, 1);
   assert.deepEqual(result.concurrencyCalls.releasedHolds, [vehicleId]);
 });
 
