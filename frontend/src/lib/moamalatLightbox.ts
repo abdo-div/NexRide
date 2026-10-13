@@ -114,6 +114,21 @@ export interface LightboxCallbacks {
   onCancel?: () => void;
 }
 
+export const getMoamalatErrorMessage = (
+  error?: LightboxErrorPayload,
+): string | null => {
+  const detail = [error?.message, error?.Info, error?.error].find(
+    (value): value is string =>
+      typeof value === "string" && value.trim().length > 0,
+  );
+  if (!detail) return null;
+
+  const code = error?.errorCode;
+  return code === undefined || code === null || code === ""
+    ? detail.trim()
+    : `${detail.trim()} (code: ${String(code)})`;
+};
+
 export const openMoamalatLightbox = (
   params: MoamalatGatewayParams,
   callbacks: LightboxCallbacks,
@@ -122,9 +137,12 @@ export const openMoamalatLightbox = (
   if (!api) {
     throw new Error("The Moamalat payment window is not loaded");
   }
+  let settled = false;
   api.Checkout.configure = {
     ...params,
     completeCallback: (response) => {
+      if (settled) return;
+      settled = true;
       if (import.meta.env.DEV) {
         console.debug("MOAMALAT COMPLETE CALLBACK:", response);
       }
@@ -136,12 +154,18 @@ export const openMoamalatLightbox = (
       callbacks.onComplete(response);
     },
     errorCallback: (err) => {
+      // Some LightBox versions emit an error/cancel event while closing after
+      // a successful completion. Never let that overwrite a valid payment.
+      if (settled) return;
+      settled = true;
       if (import.meta.env.DEV) {
         console.error("MOAMALAT ERROR CALLBACK:", err);
       }
       callbacks.onError?.(err);
     },
     cancelCallback: () => {
+      if (settled) return;
+      settled = true;
       if (import.meta.env.DEV) {
         console.debug("MOAMALAT CANCEL CALLBACK");
       }
