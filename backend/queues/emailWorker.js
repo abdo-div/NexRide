@@ -107,6 +107,11 @@ const noopWorker = {
  * so an unreachable Redis can never delay or prevent the API from starting.
  */
 export const startEmailWorker = async () => {
+  if (process.env.EMAIL_QUEUE_ENABLED !== "true") {
+    logger.info("Email worker is disabled (EMAIL_QUEUE_ENABLED is not true).");
+    return noopWorker;
+  }
+
   const redisReady = await isRedisAvailable(bullmqConnection);
 
   if (!redisReady) {

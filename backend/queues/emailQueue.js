@@ -13,8 +13,11 @@ const noopQueue = {
  * wait on a Redis probe before the HTTP server could bind its port.
  */
 let queuePromise = null;
+const emailQueueEnabled = () => process.env.EMAIL_QUEUE_ENABLED === "true";
 
 const getQueue = async () => {
+  if (!emailQueueEnabled()) return noopQueue;
+
   if (!queuePromise) {
     queuePromise = (async () => {
       const redisReady = await isRedisAvailable(bullmqConnection);
@@ -67,6 +70,10 @@ export const addEmailToQueue = async (type, payload) => {
  * Redis probe. Never rejects.
  */
 export const warmEmailQueue = () => {
+  if (!emailQueueEnabled()) {
+    logger.info("Background email queue is disabled (EMAIL_QUEUE_ENABLED is not true).");
+    return;
+  }
   getQueue().catch((err) => {
     logger.warn(`Email queue warm-up failed: ${err.message}`);
   });
