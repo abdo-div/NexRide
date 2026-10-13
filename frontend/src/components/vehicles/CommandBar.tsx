@@ -26,7 +26,7 @@ export const CommandBar: React.FC<CommandBarProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div className="w-full bg-[#FFFFFF] sticky top-20 z-40 border-b border-[#E2E8F0] shadow-sm">
+    <div className="w-full bg-[#FFFFFF] border-b border-[#E2E8F0] shadow-sm">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-3.5 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
         {/* Search parameters pill strip */}
         <div className="flex flex-wrap items-center gap-2 bg-slate-100/90 border border-[#E2E8F0] p-1.5 rounded-2xl shadow-sm">

@@ -73,7 +73,7 @@ export const fetchPublicCompanyById = async (companyId) => {
     status: "APPROVED",
     deletedAt: null,
   })
-    .select("_id name slug logo coverImage description city phone")
+    .select("_id name slug logo coverImage description city address location phone")
     .lean();
 
   if (!company) {
@@ -88,6 +88,8 @@ export const fetchPublicCompanyById = async (companyId) => {
     coverImage: company.coverImage,
     description: company.description,
     city: company.city,
+    address: company.address,
+    location: company.location,
     phone: company.phone,
   };
 };
@@ -183,6 +185,7 @@ const SETTINGS_PROFILE_FIELDS = [
   "address",
   "description",
   "logo",
+  "location",
 ];
 
 /** Percentage of the public-facing profile fields that are actually filled in. */
@@ -263,6 +266,7 @@ export const fetchCompanySettings = async (companyId) => {
       phone: company.phone,
       city: company.city,
       address: company.address,
+      location: company.location ?? null,
       commercialRegisterNumber: company.commercialRegisterNumber ?? "",
       status: company.status,
       approvedAt: company.approvedAt ?? null,

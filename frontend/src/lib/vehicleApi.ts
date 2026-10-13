@@ -1,5 +1,5 @@
 import { request, API_BASE_URL } from "./apiClient";
-import type { VehicleDto } from "../types/vehicle";
+import type { VehicleDto, VehicleReviewDto } from "../types/vehicle";
 
 interface VehiclesResponse {
   status: string;
@@ -10,6 +10,15 @@ interface VehiclesResponse {
 interface VehicleResponse {
   status: string;
   data: { vehicle: VehicleDto };
+}
+
+export interface ReviewEligibility {
+  eligible: boolean;
+  completed: boolean;
+  reviewed: boolean;
+  review: VehicleReviewDto | null;
+  vehicleId: string;
+  companyId: string;
 }
 
 /**
@@ -78,5 +87,21 @@ export const vehicleApi = {
         type,
       )}&sort=-createdAt&limit=12`,
       { auth: false, signal },
+    ),
+
+  reviewEligibility: (vehicleId: string, bookingId: string, signal?: AbortSignal) =>
+    request<{ status: string; data: { eligibility: ReviewEligibility } }>(
+      `/vehicles/${encodeURIComponent(vehicleId)}/reviews/eligibility?bookingId=${encodeURIComponent(bookingId)}`,
+      { auth: true, signal },
+    ),
+
+  createReview: (vehicleId: string, rating: number, review: string) =>
+    request<{ status: string; data: { review: VehicleReviewDto } }>(
+      `/vehicles/${encodeURIComponent(vehicleId)}/reviews`,
+      {
+        method: "POST",
+        auth: true,
+        body: { rating, review },
+      },
     ),
 };

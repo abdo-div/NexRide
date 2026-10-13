@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { ChevronRight, Users, Car, Wallet, BadgeCheck, Activity } from "lucide-react";
+import { ChevronRight, Users, Car, Wallet, Activity } from "lucide-react";
 
 export const PartnerHero: React.FC = () => {
   const { t } = useTranslation();
@@ -62,10 +62,6 @@ export const PartnerHero: React.FC = () => {
               </p>
             </div>
 
-            <div className="flex items-center gap-2 text-xs font-semibold text-[#434655] bg-white px-4 py-2.5 rounded-xl shadow-sm self-start md:self-auto">
-              <BadgeCheck className="w-[18px] h-[18px] text-[#142B4A]" />
-              <span>{t("partner.hero.registry")}</span>
-            </div>
           </div>
         </div>
       </section>

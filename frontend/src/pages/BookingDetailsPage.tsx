@@ -14,6 +14,7 @@ import { GatePassCard } from "../components/bookingDetails/GatePassCard";
 import { FinancialCard } from "../components/bookingDetails/FinancialCard";
 import { ChecklistCard } from "../components/bookingDetails/ChecklistCard";
 import { ConciergeCard } from "../components/bookingDetails/ConciergeCard";
+import { BookingReviewCard } from "../components/bookingDetails/BookingReviewCard";
 
 const TOAST_MS = 3000;
 
@@ -166,6 +167,8 @@ export const BookingDetailsPage: React.FC = () => {
                 booking.bookingStatus === "EXPIRED"
               }
             />
+
+            <BookingReviewCard booking={booking} onNotice={showToast} />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
               {/* Main column */}

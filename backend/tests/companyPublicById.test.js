@@ -5,7 +5,7 @@ import { getCompanyById } from "../controllers/companyController.js";
 import * as companyService from "../services/companyService.js";
 
 const companyId = "aaaaaaaaaaaaaaaaaaaaaaaa";
-const safeFields = ["_id", "name", "slug", "logo", "coverImage", "description", "city", "phone"];
+const safeFields = ["_id", "name", "slug", "logo", "coverImage", "description", "city", "address", "location", "phone"];
 const privateCompany = {
   _id: companyId,
   name: "Approved Rentals",
@@ -20,6 +20,7 @@ const privateCompany = {
   email: "private@example.test",
   phone: "+218900000000",
   address: "Private address",
+  location: { type: "Point", coordinates: [13.1913, 32.8872] },
   customCommissionRate: 12,
   commissionAmount: 900,
   approvedAt: new Date("2025-01-01T00:00:00.000Z"),
@@ -79,6 +80,8 @@ test("approved, non-deleted company returns only the public DTO", async (t) => {
     coverImage: "approved-rentals-cover.webp",
     description: "Public company description",
     city: "Tripoli",
+    address: "Private address",
+    location: { type: "Point", coordinates: [13.1913, 32.8872] },
     phone: "+218900000000",
   });
 });
@@ -145,7 +148,8 @@ test("public company-by-ID controller responds with only the safe DTO", async (t
   assert.equal("commissionAmount" in responseBody.data.company, false);
   assert.equal("email" in responseBody.data.company, false);
   assert.equal(responseBody.data.company.phone, "+218900000000");
-  assert.equal("address" in responseBody.data.company, false);
+  assert.equal(responseBody.data.company.address, "Private address");
+  assert.deepEqual(responseBody.data.company.location.coordinates, [13.1913, 32.8872]);
   assert.equal("approvedAt" in responseBody.data.company, false);
   assert.equal("createdAt" in responseBody.data.company, false);
   assert.equal("updatedAt" in responseBody.data.company, false);

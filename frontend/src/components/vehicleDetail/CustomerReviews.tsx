@@ -53,7 +53,7 @@ export const CustomerReviews: React.FC<{ detail: VehicleDetail }> = ({ detail })
       <div className="space-y-4">
         {detail.reviews.map((r) => (
           <div
-            key={r.author}
+            key={r.id}
             className="p-4 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0]"
           >
             <div className="flex items-center justify-between mb-2">
@@ -66,6 +66,14 @@ export const CustomerReviews: React.FC<{ detail: VehicleDetail }> = ({ detail })
                 <div>
                   <h5 className="text-[13px] font-bold text-[#0F172A]">{r.author}</h5>
                   <p className="text-[11px] text-[#64748B]">{t(r.context)}</p>
+                  <div className="mt-1 flex gap-0.5 text-amber-500">
+                    {Array.from({ length: 5 }, (_, index) => (
+                      <Star
+                        key={index}
+                        className={`h-3.5 w-3.5 ${index < r.rating ? "fill-current" : "text-slate-300"}`}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
               <span className="text-[12px] text-[#94A3B8]">{t(r.timeAgo)}</span>
@@ -73,6 +81,14 @@ export const CustomerReviews: React.FC<{ detail: VehicleDetail }> = ({ detail })
             <p className="text-[13px] text-[#64748B]">
               {t(r.body, { model: detail.vehicle.title })}
             </p>
+            {r.companyResponse ? (
+              <div className="mt-3 rounded-xl border-s-4 border-[#2563EB] bg-white px-4 py-3">
+                <p className="text-[11px] font-extrabold uppercase tracking-wide text-[#2563EB]">
+                  {t("vehicleDetail.companyResponse")}
+                </p>
+                <p className="mt-1 text-[13px] leading-6 text-slate-600">{r.companyResponse}</p>
+              </div>
+            ) : null}
           </div>
         ))}
       </div>

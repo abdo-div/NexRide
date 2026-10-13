@@ -6,8 +6,9 @@ import {
   CreditCard,
   CarSimple,
 } from "@phosphor-icons/react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import type { StandardFeature } from "../../types/standard";
+import { cardHover } from "../../lib/motion";
 
 interface StandardCardProps {
   feature: StandardFeature;
@@ -16,6 +17,7 @@ interface StandardCardProps {
 
 export const StandardCard: React.FC<StandardCardProps> = ({ feature, index = 0 }) => {
   const { t } = useTranslation();
+  const reduceMotion = useReducedMotion();
   const iconClass = "h-6 w-6 transition-colors duration-300";
   const renderIcon = () => {
     switch (feature.iconType) {
@@ -38,6 +40,7 @@ export const StandardCard: React.FC<StandardCardProps> = ({ feature, index = 0 }
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
+      whileHover={reduceMotion ? undefined : cardHover}
       className="premium-card bg-slate-50/70 hover:bg-white rounded-3xl border border-slate-200/80 p-6 flex flex-col justify-between group"
     >
       <div>

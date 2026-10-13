@@ -73,6 +73,7 @@ export interface PartnerApplicationDraft {
     commercialRegisterNumber: string;
     city: string;
     address: string;
+    location: { type: "Point"; coordinates: [number, number] } | null;
   };
   fleet: {
     tier: FleetTier;
@@ -99,6 +100,7 @@ export interface CompanyApplicationPayload {
     commercialRegisterNumber: string;
     city: string;
     address: string;
+    location: { type: "Point"; coordinates: [number, number] };
   };
   fleet: {
     tier: FleetTier;
@@ -198,6 +200,7 @@ export const EMPTY_APPLICATION_DRAFT: PartnerApplicationDraft = {
     commercialRegisterNumber: "",
     city: "",
     address: "",
+    location: null,
   },
   fleet: {
     tier: "SELECTED",

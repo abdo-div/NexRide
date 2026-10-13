@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useCompanyProfile } from "../hooks/useCompanyProfile";
 import { companyLogoUrl, initialsFrom, photoUrl } from "../lib/vehicleMapper";
+import { VehicleLocationMap } from "../components/maps/VehicleLocationMap";
 import type { VehicleType } from "../types/vehicle";
 import type { CompanyProfileVehicle } from "../types/companyProfile";
 import {
@@ -292,8 +293,9 @@ export const CompanyProfilePage: React.FC = () => {
   const fleetSize = fleet.length;
   const totalCollected = starCounts.reduce((s, c) => s + c.count, 0);
   const mapQuery = encodeURIComponent(
-    [name, company?.city].filter(Boolean).join(" "),
+    [name, company?.address, company?.city].filter(Boolean).join(" "),
   );
+  const companyCoordinates = company?.location?.coordinates ?? null;
 
   const quickFacts = [
     {
@@ -970,9 +972,24 @@ export const CompanyProfilePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="lg:w-1/2 min-h-[300px] rounded-xl overflow-hidden border border-slate-200 relative flex flex-col justify-end p-6 bg-gradient-to-br from-blue-600/15 via-slate-100 to-slate-200">
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/20 to-transparent" />
-            <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-white">
+          <div className="lg:w-1/2 min-h-[320px] rounded-xl overflow-hidden border border-slate-200 relative">
+            {companyCoordinates ? (
+              <VehicleLocationMap
+                coordinates={companyCoordinates}
+                label={`${name} — ${company?.address || company?.city || ""}`}
+                className="h-full min-h-[320px] rounded-none border-0"
+              />
+            ) : (
+              <iframe
+                title={`${name} location`}
+                src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
+                className="h-full min-h-[320px] w-full border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            )}
+            <div className="pointer-events-none absolute inset-0 z-[400] bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[500] flex flex-col items-start justify-between gap-3 p-5 text-white sm:flex-row sm:items-center">
               <div>
                 <p className="text-[15px] font-bold">
                   {t("companyProfile.hubsMapTitle", {
@@ -984,10 +1001,12 @@ export const CompanyProfilePage: React.FC = () => {
                 </p>
               </div>
               <a
-                href={`https://maps.google.com/?q=${mapQuery}`}
+                href={companyCoordinates
+                  ? `https://maps.google.com/?q=${companyCoordinates[1]},${companyCoordinates[0]}`
+                  : `https://maps.google.com/?q=${mapQuery}`}
                 target="_blank"
                 rel="noreferrer"
-                className="px-3.5 py-1.5 rounded-lg bg-white/90 backdrop-blur-md text-slate-900 text-[12px] font-bold hover:bg-white transition-colors flex items-center gap-1.5 shadow"
+                className="pointer-events-auto px-3.5 py-1.5 rounded-lg bg-white/90 backdrop-blur-md text-slate-900 text-[12px] font-bold hover:bg-white transition-colors flex items-center gap-1.5 shadow"
               >
                 <Navigation className="w-4 h-4" />
                 {t("companyProfile.openMaps")}

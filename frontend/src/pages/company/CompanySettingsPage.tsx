@@ -41,6 +41,7 @@ export const CompanySettingsPage: React.FC = () => {
     updatePayoutDraft,
     saveProfile,
     savePayout,
+    saveLocation,
     saveLogo,
     saveCover,
     savePreferences,
@@ -197,6 +198,10 @@ export const CompanySettingsPage: React.FC = () => {
                   />
                   <CompanySettingsLocationsCard
                     hubs={data.hubs}
+                    companyName={data.profile.name}
+                    location={data.profile.location}
+                    busy={busy}
+                    onSaveLocation={saveLocation}
                     onComingSoon={notifyComingSoon}
                   />
                   <CompanySettingsPoliciesCard values={data.profile.settingsPreferences.policies} busy={busy} onToggle={(key, value) => void handlePreference("policies", key, value)} />

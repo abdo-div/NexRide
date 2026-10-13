@@ -24,8 +24,9 @@ const doneCountFor = (status: BookingDto["bookingStatus"]): number => {
     case "PAID":
       return 1;
     case "CONFIRMED":
-    case "ACTIVE":
       return 2;
+    case "ACTIVE":
+      return 3;
     case "COMPLETED":
       return TOTAL;
     case "CANCELLED":

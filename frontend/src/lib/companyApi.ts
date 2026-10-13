@@ -32,6 +32,8 @@ export interface CompanyPublicDto {
   coverImage?: string;
   description?: string;
   city?: string;
+  address?: string;
+  location?: { type: "Point"; coordinates: [number, number] };
   phone?: string;
 }
 

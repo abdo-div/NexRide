@@ -179,6 +179,8 @@ export const buildVehicleDetail = (
             .join("") || "?"
         : "NR";
       return {
+        id: review._id,
+        rating: review.rating,
         author: name,
         initials,
         avatarClass:
@@ -188,6 +190,7 @@ export const buildVehicleDetail = (
           ? new Date(review.createdAt).toLocaleDateString()
           : "vehicleDetail.timeJustNow",
         body: review.review,
+        companyResponse: review.companyResponse?.response ?? null,
       };
     }),
     similarHeading: "vehicleDetail.similarHeadingFleet",
