@@ -454,67 +454,72 @@ export const finalizeVerifiedPayment = async ({
   networkReference,
 }) => {
   const session = await mongoose.startSession();
-  session.startTransaction();
+  let payment;
+  let booking;
+  let alreadyPaid = false;
 
   try {
-    const payment = await Payment.findById(paymentId).session(session);
-    const booking = await Booking.findById(bookingId).session(session);
+    await session.withTransaction(async () => {
+      payment = await Payment.findById(paymentId).session(session);
+      booking = await Booking.findById(bookingId).session(session);
 
-    if (!payment) {
-      throw new AppError("No payment record found for that booking", 404);
-    }
-    if (!booking) {
-      throw new AppError("No booking found with that ID", 404);
-    }
+      if (!payment) {
+        throw new AppError("No payment record found for that booking", 404);
+      }
+      if (!booking) {
+        throw new AppError("No booking found with that ID", 404);
+      }
 
-    const paymentBookingId = payment.bookingId?._id ?? payment.bookingId;
-    if (paymentBookingId?.toString() !== booking._id.toString()) {
-      throw new AppError("Payment does not belong to the expected booking.", 409);
-    }
+      const paymentBookingId = payment.bookingId?._id ?? payment.bookingId;
+      if (paymentBookingId?.toString() !== booking._id.toString()) {
+        throw new AppError("Payment does not belong to the expected booking.", 409);
+      }
 
-    if (
-      payment.paymentGateway !== "MOAMALAT" ||
-      payment.paymentMethod !== "MOAMALAT"
-    ) {
-      throw new AppError("Payment was not initialized for Moamalat.", 409);
-    }
+      if (
+        payment.paymentGateway !== "MOAMALAT" ||
+        payment.paymentMethod !== "MOAMALAT"
+      ) {
+        throw new AppError("Payment was not initialized for Moamalat.", 409);
+      }
 
-    if (amountToUnits(Number(payment.amount)) !== amountToUnits(Number(booking.totalAmount))) {
-      throw new AppError("Payment amount does not match the booking amount.", 409);
-    }
+      if (
+        amountToUnits(Number(payment.amount)) !==
+        amountToUnits(Number(booking.totalAmount))
+      ) {
+        throw new AppError("Payment amount does not match the booking amount.", 409);
+      }
 
-    const alreadyPaid =
-      payment.status === "COMPLETED" &&
-      booking.bookingStatus === "PAID" &&
-      booking.paymentStatus === "PAID";
-    if (alreadyPaid) {
-      await session.commitTransaction();
-      session.endSession();
-      return payment;
-    }
+      alreadyPaid =
+        payment.status === "COMPLETED" &&
+        booking.bookingStatus === "PAID" &&
+        booking.paymentStatus === "PAID";
+      if (alreadyPaid) return;
 
-    if (
-      payment.status !== "PENDING" ||
-      booking.bookingStatus !== "PENDING_PAYMENT" ||
-      booking.paymentStatus !== "UNPAID"
-    ) {
-      throw new AppError("Payment or booking is not eligible for finalization.", 409);
-    }
+      if (
+        payment.status !== "PENDING" ||
+        booking.bookingStatus !== "PENDING_PAYMENT" ||
+        booking.paymentStatus !== "UNPAID"
+      ) {
+        throw new AppError("Payment or booking is not eligible for finalization.", 409);
+      }
 
-    booking.bookingStatus = "PAID";
-    booking.paymentStatus = "PAID";
-    await booking.save({ session, validateBeforeSave: false });
+      booking.bookingStatus = "PAID";
+      booking.paymentStatus = "PAID";
+      await booking.save({ session, validateBeforeSave: false });
 
-    payment.status = "COMPLETED";
-    payment.transactionId = systemReference || payment.transactionId;
-    payment.paidAt = new Date();
-    await payment.save({ session });
+      payment.status = "COMPLETED";
+      payment.transactionId = systemReference || payment.transactionId;
+      payment.paidAt = new Date();
+      await payment.save({ session });
+    });
+  } finally {
+    await session.endSession();
+  }
 
-    await session.commitTransaction();
-    session.endSession();
-
-    // Checkout concluded — free the vehicle reservation hold.
-    await releaseVehicleHold(booking.vehicleId);
+  if (!alreadyPaid) {
+    // Redis and email are post-commit conveniences. Their failure must never
+    // turn a completed card payment into a failed checkout response.
+    await releaseVehicleHold(booking.vehicleId).catch(() => {});
 
     const customer = booking.customerId;
     const vehicle = booking.vehicleId;
@@ -522,14 +527,12 @@ export const finalizeVerifiedPayment = async ({
       await addEmailToQueue("BOOKING_CONFIRMATION", {
         email: customer.email,
         bookingId: booking._id.toString(),
-        vehicleName: vehicle ? `${vehicle.make} ${vehicle.model}` : "Your vehicle",
-      });
+        vehicleName: vehicle
+          ? `${vehicle.make} ${vehicle.model}`
+          : "Your vehicle",
+      }).catch(() => {});
     }
-
-    return payment;
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    throw error;
   }
+
+  return payment;
 };
