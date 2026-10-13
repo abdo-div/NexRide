@@ -3,6 +3,7 @@ import type { MoamalatGatewayParams } from "./moamalatApi";
 
 let lightboxPromise: Promise<LightboxApi> | null = null;
 let scriptPromise: Promise<void> | null = null;
+const LIGHTBOX_LOAD_TIMEOUT_MS = 12_000;
 
 export const getLightboxApi = (): LightboxApi | null =>
   window.Lightbox ?? window.lightbox ?? null;
@@ -21,7 +22,17 @@ const injectScript = (url: string): Promise<void> => {
     }
 
     const script = existing ?? document.createElement("script");
+    const timeoutId = window.setTimeout(() => {
+      cleanup();
+      script.remove();
+      reject(
+        new Error(
+          "Moamalat did not respond. Check the gateway configuration or try again.",
+        ),
+      );
+    }, LIGHTBOX_LOAD_TIMEOUT_MS);
     const cleanup = () => {
+      window.clearTimeout(timeoutId);
       script.removeEventListener("load", onLoad);
       script.removeEventListener("error", onError);
     };
