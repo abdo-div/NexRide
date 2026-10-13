@@ -6,6 +6,10 @@ import AppError from "../utils/appError.js";
 import Email from "../utils/email.js";
 import { getJwtSecret } from "../config/jwt.js";
 import { resolveClientUrl } from "../config/clientUrl.js";
+import {
+  getGoogleOAuthClient,
+  validateGoogleAuthConfig,
+} from "../config/googleAuth.js";
 
 /**
  * Sign JWT Token
@@ -134,6 +138,71 @@ export const authenticateUser = async (identifier, password) => {
     }
   }
 
+  return user;
+};
+
+const ensureCompanyCanSignIn = async (user) => {
+  if (user.role !== "company") return;
+
+  const company = await Company.findById(user.company).select("status").lean();
+  if (company?.status !== "APPROVED") {
+    throw new AppError(
+      "Your partner application is still under review by NexRide. You will be able to sign in once it is approved.",
+      403,
+    );
+  }
+};
+
+/** Verify a Google ID token and link or create the matching NexRide account. */
+export const authenticateGoogleUser = async (idToken) => {
+  if (!idToken) throw new AppError("Google credential is required", 400);
+
+  let clientId;
+  try {
+    ({ clientId } = validateGoogleAuthConfig());
+  } catch {
+    throw new AppError("Google authentication is not configured", 503);
+  }
+
+  let payload;
+  try {
+    const ticket = await getGoogleOAuthClient().verifyIdToken({
+      idToken,
+      audience: clientId,
+    });
+    payload = ticket.getPayload();
+  } catch {
+    throw new AppError("Invalid or expired Google credential", 401);
+  }
+
+  const googleId = payload?.sub;
+  const email = payload?.email?.trim().toLowerCase();
+  const name = payload?.name?.trim();
+
+  if (!googleId || !email || !name || payload.email_verified !== true) {
+    throw new AppError("Google account must have a verified email address", 401);
+  }
+
+  let user = await User.findOne({ $or: [{ googleId }, { email }] }).select(
+    "+googleId",
+  );
+
+  if (user) {
+    if (user.googleId && user.googleId !== googleId) {
+      throw new AppError("This email is already linked to another Google account", 409);
+    }
+    if (!user.googleId) {
+      user.googleId = googleId;
+      await user.save({ validateBeforeSave: false });
+    }
+  } else {
+    user = await User.create({ name, email, googleId, role: "customer" });
+  }
+
+  if (user.status !== "ACTIVE") {
+    throw new AppError("This account is not active", 403);
+  }
+  await ensureCompanyCanSignIn(user);
   return user;
 };
 

@@ -16,14 +16,14 @@ export const ReferenceBar: React.FC<{ meta: ConfirmationMeta; onCopy: () => void
         <span className="text-[11px] uppercase tracking-wider text-[#0F172A] font-semibold">
           {t(reference.label)}
         </span>
-        <span className="text-[16px] text-[#2563EB] font-bold tracking-tight bg-white px-3 py-1 rounded-lg shadow-sm font-mono">
+        <span className="text-[16px] text-[#142B4A] font-bold tracking-tight bg-white px-3 py-1 rounded-lg shadow-sm font-mono">
           {reference.code}
         </span>
         <button
           type="button"
           onClick={onCopy}
           title={t("booking.reference.copyTitle")}
-          className="p-1.5 rounded-lg text-[#0F172A] hover:text-[#2563EB] hover:bg-white transition-all"
+          className="p-1.5 rounded-lg text-[#0F172A] hover:text-[#142B4A] hover:bg-white transition-all"
         >
           <Copy className="w-[18px] h-[18px]" />
         </button>
@@ -31,7 +31,7 @@ export const ReferenceBar: React.FC<{ meta: ConfirmationMeta; onCopy: () => void
       <div className="flex items-center gap-6 text-[11px] text-[#0F172A]">
         {reference.chips.map((chip) => (
           <div key={chip.text} className="flex items-center gap-2">
-            <ConfirmationIcon name={chip.icon} className="w-[16px] h-[16px] text-[#2563EB]" />
+            <ConfirmationIcon name={chip.icon} className="w-[16px] h-[16px] text-[#142B4A]" />
             <span>{t(chip.text)}</span>
           </div>
         ))}

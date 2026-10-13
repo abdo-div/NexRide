@@ -1,6 +1,7 @@
 import Review from "../models/review_model.js";
 import Booking from "../models/booking_model.js";
 import AppError from "../utils/appError.js";
+import mongoose from "mongoose";
 
 /**
  * Fetch all reviews (Supports global lookups or nested under a vehicle)
@@ -39,6 +40,37 @@ export const verifyBookingCompletion = async (customerId, vehicleId) => {
   }
 
   return completedBooking;
+};
+
+/**
+ * Customer-facing review state for one booking. This keeps the UI honest:
+ * only the booking owner can inspect it, only completed rentals are eligible,
+ * and an existing review is returned so duplicate submissions are prevented.
+ */
+export const fetchReviewEligibility = async (customerId, bookingId) => {
+  if (!mongoose.isValidObjectId(bookingId)) {
+    throw new AppError("Please provide a valid booking identifier.", 400);
+  }
+  const booking = await Booking.findOne({ _id: bookingId, customerId });
+  if (!booking) {
+    throw new AppError("No booking found for this customer.", 404);
+  }
+
+  const vehicleId = booking.vehicleId?._id ?? booking.vehicleId;
+  const existing = await Review.findOne({
+    $or: [
+      { bookingId },
+      { vehicleId, customerId },
+    ],
+  });
+  return {
+    eligible: booking.bookingStatus === "COMPLETED" && !existing,
+    completed: booking.bookingStatus === "COMPLETED",
+    reviewed: Boolean(existing),
+    review: existing ?? null,
+    vehicleId,
+    companyId: booking.companyId?._id ?? booking.companyId,
+  };
 };
 
 /**

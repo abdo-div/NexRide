@@ -23,7 +23,7 @@ export const PayoutStep: React.FC<Props> = ({ draft, setDraft, errors }) => {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-start gap-4">
-        <div className="w-10 h-10 rounded-xl bg-[#2563EB] text-white flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-[#142B4A] text-white flex items-center justify-center shrink-0">
           <Landmark className="w-5 h-5" />
         </div>
         <div>
@@ -61,8 +61,8 @@ export const PayoutStep: React.FC<Props> = ({ draft, setDraft, errors }) => {
         </div>
       </div>
 
-      <div className="p-3.5 rounded-xl bg-[#EFF4FF] flex items-start gap-2.5">
-        <CalendarClock className="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5" />
+      <div className="p-3.5 rounded-xl bg-[#F8FAFC] flex items-start gap-2.5">
+        <CalendarClock className="w-4 h-4 text-[#142B4A] shrink-0 mt-0.5" />
         <p className="text-xs text-[#434655] leading-relaxed">{t("partner.step5.note")}</p>
       </div>
     </div>

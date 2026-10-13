@@ -35,6 +35,10 @@ export const moamalatConfig = {
   get secureKey() {
     return process.env.MOAMALAT_SECURE_KEY ?? "";
   },
+  /** Local time used by Moamalat when validating signed transaction windows. */
+  get timeZone() {
+    return process.env.MOAMALAT_TIME_ZONE || "Africa/Tripoli";
+  },
   get lightBoxUrl() {
     return LIGHTBOX_URLS[this.env] || LIGHTBOX_URLS.test;
   },

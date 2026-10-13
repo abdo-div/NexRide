@@ -40,7 +40,7 @@ export const AdminChart: React.FC<AdminChartProps> = ({
   emptyLabel,
 }) => {
   const gradientId = useId().replace(/[^a-zA-Z0-9]/g, "");
-  const stroke = metric === "bookings" ? "#2563EB" : "#8E3C00";
+  const stroke = metric === "bookings" ? "#142B4A" : "#8E3C00";
 
   if (maxValue <= 0 || points.length === 0) {
     return (
@@ -94,7 +94,7 @@ export const AdminChart: React.FC<AdminChartProps> = ({
         const gy = TOP + k * ((BOTTOM - TOP) / 3);
         return (
           <g key={k}>
-            <line x1={LEFT} x2={RIGHT} y1={gy} y2={gy} stroke="#EFF4FF" strokeWidth="1" />
+            <line x1={LEFT} x2={RIGHT} y1={gy} y2={gy} stroke="#F8FAFC" strokeWidth="1" />
             <text
               x={Y_LABEL_X}
               y={gy + 4}
@@ -151,7 +151,7 @@ export const AdminChart: React.FC<AdminChartProps> = ({
             textAnchor="middle"
             fontSize="10"
             fontWeight={isPeak ? "bold" : "normal"}
-            fill={isPeak ? "#2563EB" : "#565E74"}
+            fill={isPeak ? "#142B4A" : "#565E74"}
           >
             {p.label}
           </text>

@@ -36,7 +36,7 @@ export const CommissionFlow: React.FC<CommissionFlowProps> = ({ summary }) => {
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-[#08131F] via-[#0B1C30] to-[#10263F] p-6 text-white shadow-[0_18px_50px_-16px_rgba(8,19,31,0.55)]">
-      <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#2563EB]/20 blur-3xl" />
+      <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#142B4A]/20 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-28 -left-20 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl" />
 
       <div className="relative flex flex-col justify-between gap-3 lg:flex-row lg:items-center">
@@ -68,7 +68,7 @@ export const CommissionFlow: React.FC<CommissionFlowProps> = ({ summary }) => {
               <Smartphone className="h-3.5 w-3.5" />
               {t("admin.commissions.flow.gmvBadge")}
             </span>
-            <span className="rounded-md bg-[#2563EB]/20 px-2 py-0.5 font-mono text-[11px] font-bold text-[#93C5FD]">
+            <span className="rounded-md bg-[#142B4A]/20 px-2 py-0.5 font-mono text-[11px] font-bold text-[#93C5FD]">
               {t("admin.commissions.flow.gmvPct")}
             </span>
           </div>
@@ -114,7 +114,7 @@ export const CommissionFlow: React.FC<CommissionFlowProps> = ({ summary }) => {
               </div>
               <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-700/70">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-[#2563EB] to-[#60A5FA]"
+                  className="h-full rounded-full bg-gradient-to-r from-[#142B4A] to-[#60A5FA]"
                   style={{ width: `${rate}%` }}
                 />
               </div>

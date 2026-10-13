@@ -6,9 +6,26 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
-    // The application shell intentionally includes the shared React, i18n and
-    // animation runtimes. Keep Vite's warning budget just above that measured
-    // bundle while route-level pages remain lazy-loaded into separate chunks.
-    chunkSizeWarningLimit: 900,
+    chunkSizeWarningLimit: 500,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return undefined;
+          const moduleId = id.replaceAll("\\\\", "/");
+          if (/\/(?:react-)?leaflet\//.test(moduleId)) return "maps";
+          if (/\/(?:lucide-react|@phosphor-icons\/react)\//.test(moduleId)) {
+            return "icons";
+          }
+          if (/\/(?:framer-motion|gsap|@studio-freight\/lenis|react-parallax-tilt)\//.test(moduleId)) {
+            return "motion";
+          }
+          if (/\/(?:react|react-dom|react-router)\//.test(moduleId)) {
+            return "react-vendor";
+          }
+          if (/\/(?:i18next|react-i18next)\//.test(moduleId)) return "i18n";
+          return "vendor";
+        },
+      },
+    },
   },
 });

@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from "react-router";
-import { Car, ShieldCheck, ChevronLeft, ChevronRight, AlertTriangle } from "lucide-react";
+import { Car, ShieldCheck, ChevronLeft, ChevronRight, AlertTriangle, SlidersHorizontal, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useVehicles } from "../hooks/useVehicles";
 import { useVehicleFilters } from "../hooks/useVehicleFilters";
 import { mapVehicles } from "../lib/vehicleMapper";
@@ -62,6 +63,7 @@ export const FleetPage: React.FC = () => {
   const { filteredVehicles, segmentCounts, locationOptions } = filters;
 
   const [sort, setSort] = useState("recommended");
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   // A single sidebar location selection is pushed back into the URL `location`
   // param so the search API applies real booking availability server-side. The
@@ -277,7 +279,7 @@ export const FleetPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Sidebar */}
-          <div className="lg:col-span-4 xl:col-span-3">
+          <div className="hidden lg:block lg:col-span-4 xl:col-span-3">
             <FilterSideBar
               maxPrice={filters.maxPrice}
               onMaxPriceChange={filters.setMaxPrice}
@@ -306,7 +308,7 @@ export const FleetPage: React.FC = () => {
                   <h2 className="text-2xl font-bold text-[#0F172A]">
                     {t("fleet.results.title")}
                   </h2>
-                  <span className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[10px] font-bold text-[#2563EB]">
+                  <span className="px-2.5 py-0.5 rounded-full bg-slate-50 border border-slate-200 text-[10px] font-bold text-[#142B4A]">
                     {t("fleet.results.availableCount", {
                       count: companyParam ? vehicles.length : filteredVehicles.length,
                     })}
@@ -316,14 +318,27 @@ export const FleetPage: React.FC = () => {
                   {t("fleet.results.telemetryNote")}
                 </p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setMobileFiltersOpen(true)}
+                  className="inline-flex lg:hidden items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-[#142B4A] shadow-sm"
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                  {t("fleet.filters.title")}
+                  {tokenRows.length > 0 && (
+                    <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[#142B4A] px-1 text-[10px] text-white">
+                      {tokenRows.length}
+                    </span>
+                  )}
+                </button>
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                   {t("fleet.results.sortBy")}
                 </span>
                 <select
                   value={sort}
                   onChange={(e) => setSort(e.target.value)}
-                  className="bg-slate-50 border border-[#E2E8F0] text-slate-800 text-xs font-semibold px-3.5 py-2 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                  className="bg-slate-50 border border-[#E2E8F0] text-slate-800 text-xs font-semibold px-3.5 py-2 rounded-xl focus:outline-none focus:ring-1 focus:ring-slate-500 cursor-pointer"
                 >
                   <option value="recommended">{t("fleet.sort.recommended")}</option>
                   <option value="price-desc">{t("fleet.sort.priceDesc")}</option>
@@ -345,7 +360,7 @@ export const FleetPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={t.onRemove}
-                      className="text-slate-400 hover:text-[#2563EB]"
+                      className="text-slate-400 hover:text-[#142B4A]"
                     >
                       ✕
                     </button>
@@ -354,7 +369,7 @@ export const FleetPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={filters.resetFilters}
-                  className="text-xs font-semibold text-[#2563EB] hover:underline px-2"
+                  className="text-xs font-semibold text-[#142B4A] hover:underline px-2"
                 >
                   {t("fleet.results.clearAll")}
                 </button>
@@ -384,7 +399,7 @@ export const FleetPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={reload}
-                  className="mt-5 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+                  className="mt-5 px-5 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
                 >
                   {t("fleet.error.retry")}
                 </button>
@@ -407,7 +422,7 @@ export const FleetPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => navigate("/fleet")}
-                    className="mt-5 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+                    className="mt-5 px-5 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
                   >
                     {t("fleet.emptySearch.action")}
                   </button>
@@ -441,7 +456,7 @@ export const FleetPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => navigate("/companies")}
-                    className="px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+                    className="px-5 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
                   >
                     {t("fleet.emptyCompany.back")}
                   </button>
@@ -471,7 +486,7 @@ export const FleetPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={filters.resetFilters}
-                  className="mt-5 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+                  className="mt-5 px-5 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
                 >
                   {t("fleet.empty.action")}
                 </button>
@@ -506,7 +521,7 @@ export const FleetPage: React.FC = () => {
                   </button>
                   <button
                     type="button"
-                    className="w-9 h-9 rounded-xl bg-[#2563EB] text-white text-xs font-bold shadow-sm"
+                    className="w-9 h-9 rounded-xl bg-[#142B4A] text-white text-xs font-bold shadow-sm"
                   >
                     1
                   </button>
@@ -522,9 +537,9 @@ export const FleetPage: React.FC = () => {
             )}
 
             {/* Trust banner */}
-            <div className="bg-blue-50/60 border border-blue-200/80 p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 mt-4">
+            <div className="bg-slate-50/60 border border-slate-200/80 p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 mt-4">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-[#2563EB] text-white flex items-center justify-center shrink-0 shadow-sm">
+                <div className="w-12 h-12 rounded-xl bg-[#142B4A] text-white flex items-center justify-center shrink-0 shadow-sm">
                   <ShieldCheck className="w-7 h-7" />
                 </div>
                 <div>
@@ -542,6 +557,64 @@ export const FleetPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {mobileFiltersOpen && (
+          <motion.div
+            className="fixed inset-0 z-[70] flex items-end bg-slate-950/45 p-0 backdrop-blur-sm lg:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setMobileFiltersOpen(false)}
+          >
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-label={t("fleet.filters.title")}
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 340, damping: 34 }}
+              onClick={(event) => event.stopPropagation()}
+              className="relative max-h-[88dvh] w-full overflow-y-auto rounded-t-[2rem] bg-white p-4 shadow-2xl"
+            >
+              <div className="sticky top-0 z-10 mb-3 flex items-center justify-between rounded-2xl border border-slate-200 bg-white/95 px-4 py-3 backdrop-blur-xl">
+                <div>
+                  <p className="text-sm font-black text-slate-900">{t("fleet.filters.title")}</p>
+                  <p className="text-[11px] text-slate-500">{t("fleet.filters.apply", { count: filteredVehicles.length })}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileFiltersOpen(false)}
+                  className="grid h-10 w-10 place-items-center rounded-full bg-slate-100 text-slate-700"
+                  aria-label="Close filters"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <FilterSideBar
+                maxPrice={filters.maxPrice}
+                onMaxPriceChange={filters.setMaxPrice}
+                locations={locationOptions}
+                selectedLocations={filters.selectedLocations}
+                onToggleLocation={handleToggleLocation}
+                selectedBodies={filters.selectedBodies}
+                onToggleBody={filters.toggleBody}
+                selectedDrives={filters.selectedDrives}
+                onToggleDrive={filters.toggleDrive}
+                selectedOperators={filters.selectedOperators}
+                onToggleOperator={filters.toggleOperator}
+                selectedPerks={filters.selectedPerks}
+                onTogglePerk={filters.togglePerk}
+                onReset={filters.resetFilters}
+                resultCount={filteredVehicles.length}
+                sticky={false}
+                onApply={() => setMobileFiltersOpen(false)}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

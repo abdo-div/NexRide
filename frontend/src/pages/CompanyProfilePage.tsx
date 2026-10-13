@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useCompanyProfile } from "../hooks/useCompanyProfile";
 import { companyLogoUrl, initialsFrom, photoUrl } from "../lib/vehicleMapper";
+import { VehicleLocationMap } from "../components/maps/VehicleLocationMap";
 import type { VehicleType } from "../types/vehicle";
 import type { CompanyProfileVehicle } from "../types/companyProfile";
 import {
@@ -210,7 +211,7 @@ export const CompanyProfilePage: React.FC = () => {
         </div>
         <div className="max-w-7xl mx-auto px-6 lg:px-12 py-8 space-y-6">
           <div className="bg-white rounded-2xl shadow-md overflow-hidden animate-pulse">
-            <div className="h-28 bg-gradient-to-r from-[#2563EB] to-[#60a5fa]" />
+            <div className="h-28 bg-gradient-to-r from-[#142B4A] to-[#0d2039]" />
             <div className="p-6 md:p-8 flex flex-col md:flex-row items-start gap-6">
               <div className="w-24 h-24 rounded-2xl bg-slate-200" />
               <div className="flex-1 space-y-3">
@@ -246,7 +247,7 @@ export const CompanyProfilePage: React.FC = () => {
             </p>
             <Link
               to="/companies"
-              className="mt-2 inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-[14px] font-bold shadow-md transition-colors"
+              className="mt-2 inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-[14px] font-bold shadow-md transition-colors"
             >
               <ChevronLeft className="w-5 h-5 rtl:rotate-180" />
               {t("companyProfile.notFoundAction")}
@@ -274,7 +275,7 @@ export const CompanyProfilePage: React.FC = () => {
             <button
               type="button"
               onClick={retry}
-              className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-[13px] font-bold transition-colors"
+              className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-[13px] font-bold transition-colors"
             >
               <RefreshCcw className="w-4 h-4" />
               {t("companyProfile.retry")}
@@ -292,13 +293,14 @@ export const CompanyProfilePage: React.FC = () => {
   const fleetSize = fleet.length;
   const totalCollected = starCounts.reduce((s, c) => s + c.count, 0);
   const mapQuery = encodeURIComponent(
-    [name, company?.city].filter(Boolean).join(" "),
+    [name, company?.address, company?.city].filter(Boolean).join(" "),
   );
+  const companyCoordinates = company?.location?.coordinates ?? null;
 
   const quickFacts = [
     {
       icon: BadgeCheck,
-      iconClass: "text-[#2563EB]",
+      iconClass: "text-[#142B4A]",
       title: t("companyProfile.quickFacts.instant"),
       desc: t("companyProfile.quickFacts.instantDesc", {
         count: fleetSize,
@@ -318,7 +320,7 @@ export const CompanyProfilePage: React.FC = () => {
     },
     {
       icon: Store,
-      iconClass: "text-[#2563EB]",
+      iconClass: "text-[#142B4A]",
       title: t("companyProfile.quickFacts.hubs"),
       desc: t("companyProfile.quickFacts.hubsDesc", {
         count: Math.max(1, pickupStations.length + (company?.city ? 1 : 0)),
@@ -346,7 +348,7 @@ export const CompanyProfilePage: React.FC = () => {
           >
             <Link
               to="/"
-              className="hover:text-[#2563EB] transition-colors flex items-center gap-1 font-semibold"
+              className="hover:text-[#142B4A] transition-colors flex items-center gap-1 font-semibold"
             >
               <Home className="w-[18px] h-[18px]" />
               {t("companies.breadcrumbHome")}
@@ -354,7 +356,7 @@ export const CompanyProfilePage: React.FC = () => {
             <span className="text-slate-300">/</span>
             <Link
               to="/companies"
-              className="hover:text-[#2563EB] transition-colors font-semibold"
+              className="hover:text-[#142B4A] transition-colors font-semibold"
             >
               {t("companies.breadcrumbCurrent")}
             </Link>
@@ -372,7 +374,7 @@ export const CompanyProfilePage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 lg:px-12 pt-6">
         <Link
           to="/companies"
-          className="inline-flex items-center gap-2 text-slate-500 hover:text-[#2563EB] transition-colors text-[14px] font-semibold"
+          className="inline-flex items-center gap-2 text-slate-500 hover:text-[#142B4A] transition-colors text-[14px] font-semibold"
         >
           <ChevronLeft className="w-5 h-5 rtl:rotate-180" />
           {t("companyProfile.backToDirectory")}
@@ -382,7 +384,7 @@ export const CompanyProfilePage: React.FC = () => {
       {/* Hero card */}
       <section className="max-w-7xl mx-auto px-6 lg:px-12 pt-4 pb-8">
         <div className="w-full bg-white rounded-2xl border border-slate-200 shadow-[0_12px_36px_-16px_rgba(15,23,42,.28)] overflow-hidden relative">
-          <div className="h-52 sm:h-64 w-full bg-gradient-to-r from-[#0B1C30] via-[#153A6B] to-[#2563EB] relative overflow-hidden flex items-start justify-between px-6 md:px-8 pt-5">
+          <div className="h-52 sm:h-64 w-full bg-gradient-to-r from-[#0B1C30] via-[#153A6B] to-[#142B4A] relative overflow-hidden flex items-start justify-between px-6 md:px-8 pt-5">
             {companyCover && <img src={companyCover} alt="" className="absolute inset-0 h-full w-full object-cover" />}
             <div className="absolute inset-0 bg-gradient-to-t from-[#0B1C30]/80 via-[#0B1C30]/20 to-[#0B1C30]/25" />
             <span className="text-[11px] tracking-widest text-blue-100 uppercase font-bold flex items-center gap-1.5 z-10">
@@ -427,7 +429,7 @@ export const CompanyProfilePage: React.FC = () => {
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px] text-slate-600">
                   {company?.city && (
                     <span className="flex items-center gap-1.5">
-                      <MapPin className="w-[18px] h-[18px] text-[#2563EB]" />
+                      <MapPin className="w-[18px] h-[18px] text-[#142B4A]" />
                       <span className="font-semibold">{company.city}</span>
                     </span>
                   )}
@@ -448,7 +450,7 @@ export const CompanyProfilePage: React.FC = () => {
                     </span>
                   )}
                   <span className="flex items-center gap-1.5">
-                    <Car className="w-[18px] h-[18px] text-[#2563EB]" />
+                    <Car className="w-[18px] h-[18px] text-[#142B4A]" />
                     <span className="font-semibold">
                       {t("companyProfile.fleetAvailable", {
                         count: fleetSize,
@@ -496,14 +498,14 @@ export const CompanyProfilePage: React.FC = () => {
                     {t("companyProfile.contactNote", { name })}
                   </p>
                   {company?.phone && (
-                    <a href={`tel:${company.phone}`} dir="ltr" className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[13px] font-bold text-[#0B1C30] ring-1 ring-slate-200 hover:text-[#2563EB]">
+                    <a href={`tel:${company.phone}`} dir="ltr" className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-[13px] font-bold text-[#0B1C30] ring-1 ring-slate-200 hover:text-[#142B4A]">
                       <Phone className="h-4 w-4" />
                       {company.phone}
                     </a>
                   )}
                   <a
                     href="#contact"
-                    className="inline-flex items-center gap-2 text-[13px] font-bold text-[#2563EB] hover:underline"
+                    className="inline-flex items-center gap-2 text-[13px] font-bold text-[#142B4A] hover:underline"
                   >
                     <MessageCircle className="w-4 h-4" />
                     {t("companyProfile.contactCta")}
@@ -556,7 +558,7 @@ export const CompanyProfilePage: React.FC = () => {
             <div>
               <h2 className="text-[20px] font-bold text-slate-900 tracking-tight flex items-center gap-2 flex-wrap">
                 {t("companyProfile.fleetTitle")}
-                <span className="text-[12px] px-2.5 py-0.5 rounded-full bg-blue-50 text-[#2563EB] font-bold">
+                <span className="text-[12px] px-2.5 py-0.5 rounded-full bg-blue-50 text-[#142B4A] font-bold">
                   {t("companyProfile.fleetCount", { count: fleetSize })}
                 </span>
               </h2>
@@ -574,7 +576,7 @@ export const CompanyProfilePage: React.FC = () => {
                   setSort(e.target.value as SortKey);
                   setPage(1);
                 }}
-                className="px-3 py-2 rounded-xl bg-slate-50 text-slate-800 text-[13px] focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                className="px-3 py-2 rounded-xl bg-slate-50 text-slate-800 text-[13px] focus:outline-none focus:ring-2 focus:ring-slate-500 cursor-pointer"
               >
                 <option value="recommended">
                   {t("companyProfile.sortRecommended")}
@@ -602,7 +604,7 @@ export const CompanyProfilePage: React.FC = () => {
                   setPage(1);
                 }}
                 placeholder={t("companyProfile.searchPlaceholder")}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 text-slate-900 placeholder:text-slate-400 text-[14px] focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/40 transition-all"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 text-slate-900 placeholder:text-slate-400 text-[14px] focus:outline-none focus:bg-white focus:ring-2 focus:ring-slate-500/40 transition-all"
               />
             </div>
             <div className="flex items-center gap-3 flex-wrap">
@@ -614,7 +616,7 @@ export const CompanyProfilePage: React.FC = () => {
                   );
                   setPage(1);
                 }}
-                className="px-3 py-2.5 rounded-xl bg-slate-50 text-slate-800 text-[14px] focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                className="px-3 py-2.5 rounded-xl bg-slate-50 text-slate-800 text-[14px] focus:outline-none focus:ring-2 focus:ring-slate-500 cursor-pointer"
               >
                 <option value="all">
                   {t("companyProfile.transmissionAll")}
@@ -632,7 +634,7 @@ export const CompanyProfilePage: React.FC = () => {
                   setPriceTier(e.target.value as PriceTier);
                   setPage(1);
                 }}
-                className="px-3 py-2.5 rounded-xl bg-slate-50 text-slate-800 text-[14px] focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                className="px-3 py-2.5 rounded-xl bg-slate-50 text-slate-800 text-[14px] focus:outline-none focus:ring-2 focus:ring-slate-500 cursor-pointer"
               >
                 <option value="all">{t("companyProfile.priceAll")}</option>
                 <option value="under-400">{t("companyProfile.priceUnder")}</option>
@@ -660,7 +662,7 @@ export const CompanyProfilePage: React.FC = () => {
               }}
               className={`px-4 py-2 rounded-xl text-[14px] font-semibold whitespace-nowrap transition-all ${
                 category === "all"
-                  ? "bg-[#2563EB] text-white shadow-sm"
+                  ? "bg-[#142B4A] text-white shadow-sm"
                   : "bg-slate-50 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
@@ -676,7 +678,7 @@ export const CompanyProfilePage: React.FC = () => {
                 }}
                 className={`px-4 py-2 rounded-xl text-[14px] font-semibold whitespace-nowrap transition-all ${
                   category === type
-                    ? "bg-[#2563EB] text-white shadow-sm"
+                    ? "bg-[#142B4A] text-white shadow-sm"
                     : "bg-slate-50 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                 }`}
               >
@@ -725,7 +727,7 @@ export const CompanyProfilePage: React.FC = () => {
             <button
               type="button"
               onClick={resetFilters}
-              className="mt-6 px-6 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-[14px] font-bold shadow-md transition-colors"
+              className="mt-6 px-6 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-[14px] font-bold shadow-md transition-colors"
             >
               {t("companyProfile.filterEmptyAction")}
             </button>
@@ -742,7 +744,7 @@ export const CompanyProfilePage: React.FC = () => {
               <button
                 type="button"
                 onClick={resetFilters}
-                className="self-center text-xs font-semibold text-[#2563EB] hover:underline px-2"
+                className="self-center text-xs font-semibold text-[#142B4A] hover:underline px-2"
               >
                 {t("companyProfile.filterEmptyAction")}
               </button>
@@ -780,7 +782,7 @@ export const CompanyProfilePage: React.FC = () => {
                       onClick={() => setPage(p)}
                       className={`w-10 h-10 rounded-xl text-[13px] font-bold transition-colors ${
                         p === safePage
-                          ? "bg-[#2563EB] text-white shadow-sm"
+                          ? "bg-[#142B4A] text-white shadow-sm"
                           : "bg-white border border-[#E2E8F0] hover:bg-slate-50 text-slate-600"
                       }`}
                     >
@@ -931,7 +933,7 @@ export const CompanyProfilePage: React.FC = () => {
             <div className="flex flex-col gap-4">
               {company?.city && (
                 <div className="p-4 rounded-xl bg-slate-50 flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 text-[#2563EB] flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 text-[#142B4A] flex items-center justify-center flex-shrink-0">
                     <Store className="w-5 h-5" />
                   </div>
                   <div className="flex flex-col">
@@ -970,9 +972,24 @@ export const CompanyProfilePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="lg:w-1/2 min-h-[300px] rounded-xl overflow-hidden border border-slate-200 relative flex flex-col justify-end p-6 bg-gradient-to-br from-blue-600/15 via-slate-100 to-slate-200">
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/20 to-transparent" />
-            <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-white">
+          <div className="lg:w-1/2 min-h-[320px] rounded-xl overflow-hidden border border-slate-200 relative">
+            {companyCoordinates ? (
+              <VehicleLocationMap
+                coordinates={companyCoordinates}
+                label={`${name} — ${company?.address || company?.city || ""}`}
+                className="h-full min-h-[320px] rounded-none border-0"
+              />
+            ) : (
+              <iframe
+                title={`${name} location`}
+                src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
+                className="h-full min-h-[320px] w-full border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            )}
+            <div className="pointer-events-none absolute inset-0 z-[400] bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[500] flex flex-col items-start justify-between gap-3 p-5 text-white sm:flex-row sm:items-center">
               <div>
                 <p className="text-[15px] font-bold">
                   {t("companyProfile.hubsMapTitle", {
@@ -984,10 +1001,12 @@ export const CompanyProfilePage: React.FC = () => {
                 </p>
               </div>
               <a
-                href={`https://maps.google.com/?q=${mapQuery}`}
+                href={companyCoordinates
+                  ? `https://maps.google.com/?q=${companyCoordinates[1]},${companyCoordinates[0]}`
+                  : `https://maps.google.com/?q=${mapQuery}`}
                 target="_blank"
                 rel="noreferrer"
-                className="px-3.5 py-1.5 rounded-lg bg-white/90 backdrop-blur-md text-slate-900 text-[12px] font-bold hover:bg-white transition-colors flex items-center gap-1.5 shadow"
+                className="pointer-events-auto px-3.5 py-1.5 rounded-lg bg-white/90 backdrop-blur-md text-slate-900 text-[12px] font-bold hover:bg-white transition-colors flex items-center gap-1.5 shadow"
               >
                 <Navigation className="w-4 h-4" />
                 {t("companyProfile.openMaps")}

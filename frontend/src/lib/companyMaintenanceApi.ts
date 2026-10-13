@@ -5,7 +5,7 @@ import type {
   MaintenanceEventDto,
   MaintenanceSummary,
 } from "../types/admin";
-import type { CompanyMaintenanceQuery } from "../types/companyMaintenance";
+import type { CompanyMaintenanceQuery, MaintenanceFleetQuery, MaintenanceFleetVehicle } from "../types/companyMaintenance";
 
 interface CompanyMaintenanceListResponse {
   status: string;
@@ -45,6 +45,21 @@ const buildQuery = (query: CompanyMaintenanceQuery): string => {
  * `companyId` query key can never pivot the ledger onto another fleet.
  */
 export const companyMaintenanceApi = {
+  vehicles: (query: MaintenanceFleetQuery, signal?: AbortSignal) => {
+    const params = new URLSearchParams({ page: String(query.page), limit: String(query.limit) });
+    if (query.search.trim()) params.set("search", query.search.trim());
+    if (query.healthStatus !== "ALL") params.set("healthStatus", query.healthStatus);
+    return request<{ status: string; results: number; pagination: PaginationMeta; data: { vehicles: MaintenanceFleetVehicle[] } }>(
+      `/companies/maintenance/vehicles?${params.toString()}`,
+      { signal },
+    );
+  },
+
+  updateOdometer: (vehicleId: string, currentOdometer: number) =>
+    request<{ status: string; data: { vehicle: MaintenanceFleetVehicle } }>(
+      "/companies/maintenance/odometer",
+      { method: "PATCH", body: { vehicleId, currentOdometer } },
+    ),
   list: (query: CompanyMaintenanceQuery, signal?: AbortSignal) =>
     request<CompanyMaintenanceListResponse>(
       `/companies/maintenance?${buildQuery(query)}`,

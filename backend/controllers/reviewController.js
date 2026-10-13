@@ -39,6 +39,18 @@ export const getAllReviews = catchAsync(async (req, res, next) => {
   });
 });
 
+export const getReviewEligibility = catchAsync(async (req, res) => {
+  const eligibility = await reviewService.fetchReviewEligibility(
+    req.user.id,
+    req.query.bookingId,
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: { eligibility },
+  });
+});
+
 export const getReviewById = catchAsync(async (req, res, next) => {
   const review = await reviewService.fetchReviewById(req.params.id);
 

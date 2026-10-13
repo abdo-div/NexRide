@@ -11,7 +11,6 @@ import {
   CaretRight as ChevronRight,
   ArrowRight,
   Check,
-  MapTrifold as Map,
 } from "@phosphor-icons/react";
 
 // ----------------------------------------------------------------------------
@@ -134,13 +133,13 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
   return (
     <div
       ref={popupRef}
-      className={`absolute top-full start-0 mt-2 z-[100] origin-top transition-all duration-150 ${
+      className={`absolute top-full start-0 mt-1 z-[200] origin-top transition-all duration-150 ${
         open
           ? "opacity-100 scale-100"
           : "pointer-events-none opacity-0 scale-95"
       }`}
     >
-      <div className="w-[min(92vw,300px)] rounded-2xl bg-white border border-slate-200 shadow-2xl shadow-slate-900/15 overflow-hidden z-50">
+      <div className="w-[min(92vw,360px)] rounded-2xl bg-white border border-slate-200 shadow-2xl shadow-slate-900/15 overflow-hidden z-50">
         {/* Header */}
         <div className="flex items-center justify-between px-3 pt-3 pb-2 border-b border-slate-100">
           <div className="flex items-center gap-1.5">
@@ -228,7 +227,7 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
                   type="button"
                   disabled={disabled}
                   onClick={() => onPick(d, time)}
-                  className={`w-8 h-8 text-[11px] font-bold rounded-lg transition-colors ${
+                  className={`aspect-square w-full text-[11px] font-bold rounded-lg transition-colors ${
                     selected
                       ? "bg-blue-600 text-white shadow-md shadow-blue-500/30"
                       : disabled
@@ -243,18 +242,19 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
           </div>
         </div>
 
-        {/* Time list (horizontal grid, no scroll) */}
+        {/* Time list */}
         <div className="px-3 pb-3">
           <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
             {chip} · {t("home.search.time")}
           </div>
-          <div className="grid grid-cols-8 gap-1">
+          <div className="grid max-h-40 grid-cols-4 gap-1.5 overflow-y-auto pe-1 sm:grid-cols-6 [scrollbar-gutter:stable]">
             {TIME_OPTIONS.map((tEl) => (
               <button
                 key={tEl}
                 type="button"
+                dir="ltr"
                 onClick={() => onPick(value ?? today, tEl)}
-                className={`py-1 rounded-md text-[10px] font-bold text-center transition-colors ${
+                className={`min-w-0 whitespace-nowrap rounded-lg px-1 py-1.5 text-center text-[11px] font-bold tabular-nums transition-colors ${
                   time === tEl
                     ? "bg-blue-600 text-white"
                     : "text-slate-600 hover:bg-slate-100"
@@ -309,7 +309,6 @@ const LocationField: React.FC<LocationFieldProps> = ({
   const { t } = useTranslation();
   const [filterKind, setFilterKind] = useState<"city" | "airport" | "all">("all");
   const [query, setQuery] = useState("");
-  const [mapMode, setMapMode] = useState(false);
 
   const q = query.trim().toLowerCase();
   const cityList = LOCATIONS.cities.filter(
@@ -325,18 +324,20 @@ const LocationField: React.FC<LocationFieldProps> = ({
   );
 
   return (
-    <div className="relative flex flex-col h-full">
+    <div className="relative flex h-full flex-col">
       <button
         type="button"
         onClick={onToggle}
-        className="w-full flex items-center gap-3 text-left px-4 py-3.5"
+        className={`group/field flex w-full items-center gap-2.5 px-4 py-3 text-left transition-colors duration-200 lg:min-h-[70px] ${open ? "bg-slate-50" : "hover:bg-slate-50/70"}`}
       >
-        <MapPin weight="duotone" className="w-5 h-5 text-blue-600 shrink-0" />
+        <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg border transition-colors ${open ? "border-[#142b4a] bg-[#142b4a] text-white" : "border-slate-200 bg-slate-50 text-[#142b4a]"}`}>
+          <MapPin weight="duotone" className="h-[18px] w-[18px]" />
+        </span>
         <div className="flex-1 min-w-0">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+          <div className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
             {label}
           </div>
-          <div className={`flex items-center gap-1.5 truncate text-sm font-bold ${value ? "text-slate-900" : "text-slate-400"}`}>
+          <div className={`flex items-center gap-1.5 truncate text-[15px] font-extrabold ${value ? "text-slate-950" : "text-slate-400"}`}>
             {value ? value.name : placeholder}
             {value?.code && (
               <span className="px-1 py-0.5 rounded bg-slate-100 text-[10px] font-bold text-slate-500">
@@ -358,9 +359,9 @@ const LocationField: React.FC<LocationFieldProps> = ({
           open ? "opacity-100 scale-100" : "pointer-events-none opacity-0 scale-95"
         }`}
       >
-        <div className="w-[min(92vw,360px)] rounded-2xl bg-white border border-slate-200 shadow-2xl shadow-slate-900/15 overflow-hidden z-50">
+        <div className="w-[min(92vw,380px)] overflow-hidden rounded-3xl border border-slate-200/80 bg-white/95 shadow-[0_28px_70px_-20px_rgba(15,23,42,0.35)] backdrop-blur-xl z-50">
           {/* Kind tabs */}
-          <div className="flex items-center gap-1 p-2">
+          <div className="flex items-center gap-1.5 border-b border-slate-100 p-3">
             {(
               [
                 ["all", t("home.search.all")],
@@ -372,7 +373,7 @@ const LocationField: React.FC<LocationFieldProps> = ({
                 key={k}
                 type="button"
                 onClick={() => setFilterKind(k)}
-                className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors ${
+                className={`px-3.5 py-2 rounded-xl text-[11px] font-bold transition-colors ${
                   filterKind === k
                     ? "bg-slate-900 text-white"
                     : "text-slate-600 hover:bg-slate-100"
@@ -384,15 +385,15 @@ const LocationField: React.FC<LocationFieldProps> = ({
           </div>
 
           {/* Search */}
-          <div className="px-2 pb-2">
-            <div className="flex items-center gap-2 bg-slate-100 rounded-lg px-3">
+          <div className="px-3 pb-2 pt-3">
+            <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-slate-400 focus-within:bg-white">
               <Search weight="bold" className="w-3.5 h-3.5 text-slate-500" />
               <input
                 autoFocus={open}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={t("home.search.searchLocation")}
-                className="w-full bg-transparent py-2 text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none"
+                className="w-full bg-transparent py-2.5 text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none"
               />
             </div>
           </div>
@@ -439,28 +440,6 @@ const LocationField: React.FC<LocationFieldProps> = ({
             )}
           </div>
 
-          {/* Map toggle */}
-          <button
-            type="button"
-            onClick={() => setMapMode((m) => !m)}
-            className="w-full flex items-center justify-between px-3 py-2.5 border-t border-slate-100 hover:bg-slate-50"
-          >
-            <span className="flex items-center gap-2 text-[11px] font-bold text-slate-700">
-              <Map className="w-3.5 h-3.5 text-slate-400" />
-              {t("home.search.mapOffers")}
-            </span>
-            <span
-              className={`w-8 h-[18px] rounded-full p-[2px] transition-colors ${
-                mapMode ? "bg-blue-600" : "bg-slate-300"
-              }`}
-            >
-              <span
-                className={`block w-[14px] h-[14px] rounded-full bg-white shadow transition-transform ${
-                  mapMode ? "translate-x-[14px]" : ""
-                }`}
-              />
-            </span>
-          </button>
         </div>
       </div>
     </div>
@@ -565,13 +544,15 @@ export const SearchConsole: React.FC = () => {
   };
 
   const fromValue = (
-    <div className="flex items-center gap-1.5">
-      <Calendar weight="duotone" className="w-5 h-5 text-blue-600 shrink-0" />
+    <div className="flex items-center gap-2.5">
+      <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg border ${openPicker === "from" ? "border-[#142b4a] bg-[#142b4a] text-white" : "border-slate-200 bg-slate-50 text-[#142b4a]"}`}>
+        <Calendar weight="duotone" className="h-[18px] w-[18px]" />
+      </span>
       <div className="flex-1 min-w-0 text-left">
-        <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+        <div className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
           {t("home.search.pickupDateTime")}
         </div>
-        <div className={`truncate text-sm font-bold ${pickupDate ? "text-slate-900" : "text-slate-400"}`}>
+        <div className={`truncate text-[15px] font-extrabold ${pickupDate ? "text-slate-950" : "text-slate-400"}`}>
           {pickupDate
             ? `${fmtDate(pickupDate, t("home.search.weekdayHeads").split(" "), t("home.search.months").split(" "))} · ${pickupTime}`
             : `${t("home.search.today")} · ${pickupTime}`}
@@ -582,13 +563,15 @@ export const SearchConsole: React.FC = () => {
   );
 
   const toValue = (
-    <div className="flex items-center gap-1.5">
-      <Calendar weight="duotone" className="w-5 h-5 text-blue-600 shrink-0" />
+    <div className="flex items-center gap-2.5">
+      <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg border ${openPicker === "to" ? "border-[#142b4a] bg-[#142b4a] text-white" : "border-slate-200 bg-slate-50 text-[#142b4a]"}`}>
+        <Calendar weight="duotone" className="h-[18px] w-[18px]" />
+      </span>
       <div className="flex-1 min-w-0 text-left">
-        <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+        <div className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
           {t("home.search.returnDateTime")}
         </div>
-        <div className={`truncate text-sm font-bold ${returnDate ? "text-slate-900" : "text-slate-400"}`}>
+        <div className={`truncate text-[15px] font-extrabold ${returnDate ? "text-slate-950" : "text-slate-400"}`}>
           {returnDate
             ? `${fmtDate(returnDate, t("home.search.weekdayHeads").split(" "), t("home.search.months").split(" "))} · ${returnTime}`
             : `${t("home.search.today")} · ${returnTime}`}
@@ -599,18 +582,18 @@ export const SearchConsole: React.FC = () => {
   );
 
   return (
-    <div id="search-engine" className="relative z-[60] mt-8 w-full overflow-visible">
+    <div id="search-engine" className="relative z-[60] mt-8 w-full overflow-visible isolate">
       {/* Card */}
-      <div className="rounded-2xl bg-slate-200 shadow-2xl shadow-slate-900/15 border border-slate-200">
+      <div className="overflow-visible rounded-[26px] border border-white/80 bg-white/95 p-1 shadow-[0_30px_80px_-28px_rgba(15,23,42,0.45),0_8px_24px_-12px_rgba(15,23,42,0.18)] ring-1 ring-slate-200/70 backdrop-blur-xl">
         {/* Main row */}
         <form
-          className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr_1fr_auto] gap-px rounded-2xl overflow-visible"
+          className={`relative grid grid-cols-1 overflow-visible rounded-[22px] bg-slate-200/80 lg:grid-cols-[1.5fr_1fr_1fr_auto] lg:gap-px ${openPicker ? "z-30" : "z-10"}`}
           onSubmit={handleSubmit}
         >
           {/* Pick-up location */}
           <div
             data-search-picker="pickup"
-            className="bg-white rounded-t-2xl lg:rounded-tr-none relative"
+            className={`relative overflow-visible rounded-t-[22px] bg-white lg:rounded-s-[22px] lg:rounded-tr-none lg:rounded-br-none ${openPicker === "pickup" ? "z-20" : ""}`}
           >
             <LocationField
               label={t("home.search.pickup")}
@@ -627,12 +610,12 @@ export const SearchConsole: React.FC = () => {
           </div>
 
           {/* Pick-up date & time */}
-          <div data-search-picker="from" className="bg-white relative">
+          <div data-search-picker="from" className={`relative bg-white transition-colors ${openPicker === "from" ? "z-20 bg-slate-50" : ""}`}>
             <button
               type="button"
               onClick={() => setOpenPicker(openPicker === "from" ? null : "from")}
               aria-expanded={openPicker === "from"}
-              className="w-full h-full flex items-center px-4 py-3.5 text-left"
+              className="flex h-full w-full items-center px-4 py-3 text-left transition-colors hover:bg-slate-50/70 lg:min-h-[70px]"
             >
               {fromValue}
             </button>
@@ -650,12 +633,12 @@ export const SearchConsole: React.FC = () => {
           </div>
 
           {/* Return date & time */}
-          <div data-search-picker="to" className="bg-white lg:rounded-tr-2xl relative">
+          <div data-search-picker="to" className={`relative bg-white transition-colors ${openPicker === "to" ? "z-20 bg-slate-50" : ""}`}>
             <button
               type="button"
               onClick={() => setOpenPicker(openPicker === "to" ? null : "to")}
               aria-expanded={openPicker === "to"}
-              className="w-full h-full flex items-center px-4 py-3.5 text-left"
+              className="flex h-full w-full items-center px-4 py-3 text-left transition-colors hover:bg-slate-50/70 lg:min-h-[70px]"
             >
               {toValue}
             </button>
@@ -676,20 +659,20 @@ export const SearchConsole: React.FC = () => {
           </div>
 
           {/* Search CTA */}
-          <div className="bg-white rounded-b-2xl lg:rounded-bl-none lg:rounded-r-2xl lg:rounded-br-2xl p-2">
+          <div className="rounded-b-[22px] bg-white p-2 lg:rounded-e-[22px] lg:rounded-bl-none">
             <button
               type="submit"
-              className="w-full h-full min-h-[56px] rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-bold text-sm flex items-center justify-center gap-2 px-6 transition-colors shadow-lg shadow-blue-600/25"
+              className="premium-button group flex h-full min-h-[54px] w-full items-center justify-center gap-2 rounded-2xl px-7 text-sm font-extrabold tracking-wide"
             >
               <Search weight="bold" className="w-4 h-4" />
               <span>{t("home.search.search")}</span>
-              <ArrowRight weight="bold" className="w-4 h-4 rtl:rotate-180" />
+              <ArrowRight weight="bold" className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1.5 rtl:rotate-180 rtl:group-hover:-translate-x-1.5" />
             </button>
           </div>
         </form>
 
         {/* Options row */}
-        <div className="bg-white rounded-b-2xl border-t border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="relative z-0 mt-px flex flex-wrap items-center justify-between gap-2 rounded-b-[22px] bg-slate-50/90 px-5 py-3">
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
               type="checkbox"
@@ -697,14 +680,14 @@ export const SearchConsole: React.FC = () => {
               onChange={(e) => setDifferentReturn(e.target.checked)}
               className="peer sr-only"
             />
-            <span className="w-4 h-4 rounded border border-slate-300 flex items-center justify-center transition-colors peer-checked:bg-blue-600 peer-checked:border-blue-600">
-              <Check weight="bold" className="w-3 h-3 text-white" />
+            <span className="flex h-5 w-5 items-center justify-center rounded-md border border-slate-300 bg-white shadow-sm transition-colors peer-checked:border-[#142b4a] peer-checked:bg-[#142b4a]">
+              <Check weight="bold" className="h-3.5 w-3.5 text-white" />
             </span>
-            <span className="text-xs font-bold text-slate-700">
+            <span className="text-xs font-extrabold text-slate-700">
               {t("home.search.differentReturn")}
             </span>
           </label>
-          <span className="text-[11px] font-medium text-slate-400">
+          <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-bold text-slate-500 shadow-sm">
             {t("home.search.freeCancellation")}
           </span>
         </div>
@@ -733,7 +716,7 @@ export const SearchConsole: React.FC = () => {
       </div>
 
       {/* Popular picks */}
-      <div className="flex flex-wrap items-center gap-2 mt-3">
+      <div className={`relative z-0 mt-3 flex flex-wrap items-center gap-2 transition-opacity ${openPicker ? "invisible opacity-0" : "opacity-100"}`}>
         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
           {t("home.search.popular")}
         </span>
@@ -751,7 +734,7 @@ export const SearchConsole: React.FC = () => {
               );
               setOpenPicker(null);
             }}
-            className="px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur border border-white/60 text-[11px] font-bold text-slate-600 hover:text-blue-600 hover:border-blue-600 shadow-sm transition-colors"
+            className="rounded-full border border-slate-200/80 bg-white/90 px-3.5 py-1.5 text-[11px] font-bold text-slate-600 shadow-sm backdrop-blur transition-colors hover:border-[#142b4a] hover:text-[#142b4a]"
           >
             {pick}
           </button>

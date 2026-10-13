@@ -9,10 +9,12 @@ import {
   type LanguageKey,
 } from "../../i18n";
 import { useAuth } from "../../context/useAuth";
+import { subscribeToNewsletter } from "../../lib/newsletterApi";
 
 export const Footer: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [email, setEmail] = useState("");
+  const [subscriptionState, setSubscriptionState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const { user } = useAuth();
   const isCompany = user?.role?.trim() === "company";
   const lang = (i18n.language in LANGUAGES ? i18n.language : "ar") as LanguageKey;
@@ -35,11 +37,16 @@ export const Footer: React.FC = () => {
     ],
   };
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      alert(`Subscribed ${email} to VIP alerts!`);
+    if (!email || subscriptionState === "loading") return;
+    setSubscriptionState("loading");
+    try {
+      await subscribeToNewsletter(email, lang);
       setEmail("");
+      setSubscriptionState("success");
+    } catch {
+      setSubscriptionState("error");
     }
   };
 
@@ -141,15 +148,33 @@ export const Footer: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t("footer.subscribePlaceholder")}
+                required
+                autoComplete="email"
+                disabled={subscriptionState === "loading"}
+                aria-describedby="newsletter-status"
                 className="w-full bg-[#0b1220] border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-600 transition-colors"
               />
               <button
                 type="submit"
-                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shrink-0 transition-colors"
+                disabled={subscriptionState === "loading"}
+                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shrink-0 transition-colors disabled:cursor-wait disabled:opacity-60"
               >
-                {t("footer.subscribe")}
+                {subscriptionState === "loading" ? t("footer.subscribing") : t("footer.subscribe")}
               </button>
             </form>
+            <p
+              id="newsletter-status"
+              aria-live="polite"
+              className={`-mt-2 mb-4 min-h-4 text-[11px] font-semibold ${
+                subscriptionState === "error" ? "text-rose-400" : "text-emerald-400"
+              }`}
+            >
+              {subscriptionState === "success"
+                ? t("footer.subscribeSuccess")
+                : subscriptionState === "error"
+                  ? t("footer.subscribeError")
+                  : ""}
+            </p>
 
             {/* Emergency Hotline Box */}
             <div className="bg-[#0b1220] border border-slate-800/80 rounded-xl p-3 flex items-center justify-between">

@@ -213,7 +213,7 @@ export const fetchVehicleById = async (
     .populate("companyId", "name logo city status")
     .populate({
       path: "reviews",
-      select: "review rating customerId createdAt",
+      select: "review rating customerId companyResponse createdAt",
     });
 
   if (!vehicle) {

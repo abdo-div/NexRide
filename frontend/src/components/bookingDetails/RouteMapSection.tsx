@@ -31,7 +31,7 @@ export const RouteMapSection: React.FC<RouteMapSectionProps> = ({ booking }) => 
         <span
           className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold ${
             variant === "pickup"
-              ? "bg-[#EFF4FF] text-[#2563EB]"
+              ? "bg-[#F8FAFC] text-[#142B4A]"
               : "bg-emerald-50 text-emerald-700"
           }`}
         >
@@ -77,7 +77,7 @@ export const RouteMapSection: React.FC<RouteMapSectionProps> = ({ booking }) => 
     <section className="bg-white rounded-2xl border border-slate-200 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)] p-6 lg:p-8 flex flex-col gap-5">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="text-[17px] font-bold text-[#0F172A] flex items-center gap-2">
-          <span className="w-8 h-8 rounded-lg bg-[#EFF4FF] text-[#2563EB] flex items-center justify-center">
+          <span className="w-8 h-8 rounded-lg bg-[#F8FAFC] text-[#142B4A] flex items-center justify-center">
             <Map className="w-4 h-4" />
           </span>
           {t("bookingDetails.route.title")}
@@ -123,7 +123,7 @@ export const RouteMapSection: React.FC<RouteMapSectionProps> = ({ booking }) => 
           <div className="absolute top-0 bottom-0 left-[42%] w-4 bg-white -rotate-6 shadow-sm" />
           {/* Pickup marker */}
           <div className="absolute top-[28%] start-[20%] flex flex-col items-center gap-1">
-            <span className="w-9 h-9 rounded-full bg-[#2563EB] text-white flex items-center justify-center shadow-lg">
+            <span className="w-9 h-9 rounded-full bg-[#142B4A] text-white flex items-center justify-center shadow-lg">
               <MapPin className="w-4 h-4" />
             </span>
             <span className="px-2 py-0.5 bg-white rounded-md text-[10px] font-bold text-[#0F172A] shadow">
@@ -142,7 +142,7 @@ export const RouteMapSection: React.FC<RouteMapSectionProps> = ({ booking }) => 
         </div>
         <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-white/95 to-transparent px-4 py-3 flex items-center justify-between flex-wrap gap-2">
           <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#0F172A]">
-            <CircleCheck className="w-3.5 h-3.5 text-[#2563EB]" />
+            <CircleCheck className="w-3.5 h-3.5 text-[#142B4A]" />
             {t("bookingDetails.route.parkingBadge")}
           </span>
           <span className="text-[11px] text-[#64748B]">

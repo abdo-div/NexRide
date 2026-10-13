@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import {
   User,
   Building2,
@@ -22,6 +22,13 @@ export const SignUpForm: React.FC = () => {
   const { t } = useTranslation();
   const { signUp } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const requestedDestination = (location.state as { from?: string } | null)?.from;
+  const redirectTo =
+    requestedDestination?.startsWith("/") && !requestedDestination.startsWith("//")
+      ? requestedDestination
+      : "/";
 
   const [accountType, setAccountType] = useState<AccountType>("client");
   const [fullName, setFullName] = useState("");
@@ -56,7 +63,7 @@ export const SignUpForm: React.FC = () => {
         passwordConfirm: confirmPassword,
         role: accountType === "corporate" ? "company" : "customer",
       });
-      navigate("/", { replace: true });
+      navigate(redirectTo, { replace: true });
     } catch (error) {
       if (error instanceof ApiError) {
         setFormError(error.message);
@@ -73,7 +80,7 @@ export const SignUpForm: React.FC = () => {
   const optionClasses = (active: boolean) =>
     `flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg cursor-pointer transition-all text-xs font-semibold ${
       active
-        ? "bg-white text-[#2563EB] shadow-sm"
+        ? "bg-white text-[#142B4A] shadow-sm"
         : "text-slate-500 hover:text-slate-800"
     }`;
 
@@ -124,7 +131,7 @@ export const SignUpForm: React.FC = () => {
               placeholder={t("auth.signup.fullNamePlaceholder")}
               autoComplete="name"
               required
-              className="w-full ps-11 pe-4 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
+              className="w-full ps-11 pe-4 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#142B4A]/30 focus:border-[#142B4A] transition-all placeholder:text-slate-400"
             />
           </div>
           {fieldErrors.name && <FieldError>{fieldErrors.name}</FieldError>}
@@ -147,7 +154,7 @@ export const SignUpForm: React.FC = () => {
               placeholder={t("auth.signup.emailPlaceholder")}
               autoComplete="email"
               required
-              className="w-full ps-11 pe-4 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
+              className="w-full ps-11 pe-4 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#142B4A]/30 focus:border-[#142B4A] transition-all placeholder:text-slate-400"
             />
           </div>
           {fieldErrors.email && <FieldError>{fieldErrors.email}</FieldError>}
@@ -170,7 +177,7 @@ export const SignUpForm: React.FC = () => {
               placeholder={t("auth.signup.mobilePlaceholder")}
               autoComplete="tel-national"
               required
-              className="w-full ps-24 pe-11 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
+              className="w-full ps-24 pe-11 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#142B4A]/30 focus:border-[#142B4A] transition-all placeholder:text-slate-400"
             />
           </div>
           {fieldErrors.phoneNumber && <FieldError>{fieldErrors.phoneNumber}</FieldError>}
@@ -194,7 +201,7 @@ export const SignUpForm: React.FC = () => {
               autoComplete="new-password"
               minLength={8}
               required
-              className="w-full ps-11 pe-11 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
+              className="w-full ps-11 pe-11 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#142B4A]/30 focus:border-[#142B4A] transition-all placeholder:text-slate-400"
             />
             <button
               type="button"
@@ -225,7 +232,7 @@ export const SignUpForm: React.FC = () => {
               placeholder={t("auth.signup.confirmPlaceholder")}
               autoComplete="new-password"
               required
-              className="w-full ps-11 pe-4 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400"
+              className="w-full ps-11 pe-4 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#142B4A]/30 focus:border-[#142B4A] transition-all placeholder:text-slate-400"
             />
           </div>
           {fieldErrors.passwordConfirm && (
@@ -241,14 +248,14 @@ export const SignUpForm: React.FC = () => {
           checked={agreeTerms}
           onChange={(e) => setAgreeTerms(e.target.checked)}
           required
-          className="mt-1 w-4 h-4 rounded text-[#2563EB] focus:ring-[#2563EB]/30"
+          className="mt-1 w-4 h-4 rounded text-[#142B4A] focus:ring-[#142B4A]/30"
         />
         <span className="text-sm text-slate-600">
           {t("auth.signup.terms")}{" "}
           <a
             href="#terms"
             onClick={(e) => e.preventDefault()}
-            className="text-[#2563EB] font-semibold hover:underline"
+            className="text-[#142B4A] font-semibold hover:underline"
           >
             {t("auth.signup.termsLink")}
           </a>
@@ -260,7 +267,7 @@ export const SignUpForm: React.FC = () => {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="mt-1 w-full py-3.5 px-6 rounded-xl bg-[#2563EB] text-white text-sm font-semibold hover:bg-blue-700 transition-all shadow-[0_4px_16px_rgba(37,99,235,0.28)] flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-[#2563EB]"
+        className="mt-1 w-full py-3.5 px-6 rounded-xl bg-[#142B4A] text-white text-sm font-semibold hover:bg-blue-700 transition-all shadow-[0_4px_16px_rgba(37,99,235,0.28)] flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-[#142B4A]"
       >
         <span>{isSubmitting ? t("auth.state.creating") : t("auth.signup.submit")}</span>
         {isSubmitting ? <SubmitSpinner /> : <UserPlus className="w-[18px] h-[18px]" />}

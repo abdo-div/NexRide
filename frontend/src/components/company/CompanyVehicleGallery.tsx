@@ -75,7 +75,7 @@ export const CompanyVehicleGallery: React.FC<CompanyVehicleGalleryProps> = ({
               type="button"
               onClick={() => setActivePhoto(photo)}
               className={`relative h-20 overflow-hidden rounded-lg transition-opacity hover:opacity-90 md:h-24 cursor-pointer ${
-                current === photo ? "ring-2 ring-[#2563EB]" : ""
+                current === photo ? "ring-2 ring-[#142B4A]" : ""
               }`}
               aria-label={`${vehicle.make} ${vehicle.model} photo ${index + 2}`}
             >

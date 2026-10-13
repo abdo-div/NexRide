@@ -228,7 +228,7 @@ export const MyBookingsPage: React.FC = () => {
             <button
               type="button"
               onClick={() => loadBookings()}
-              className="mt-4 px-5 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold rounded-lg transition-colors cursor-pointer"
+              className="mt-4 px-5 py-2.5 bg-[#142B4A] hover:bg-[#0D2039] text-white text-sm font-bold rounded-lg transition-colors cursor-pointer"
             >
               {t("myBookings.retry")}
             </button>
@@ -250,7 +250,7 @@ export const MyBookingsPage: React.FC = () => {
 
             {filtered.length === 0 ? (
               <section className="bg-white border border-slate-200 rounded-2xl p-12 flex flex-col items-center text-center">
-                <div className="w-14 h-14 rounded-2xl bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center">
+                <div className="w-14 h-14 rounded-2xl bg-[#EFF6FF] text-[#142B4A] flex items-center justify-center">
                   <CarFront className="w-7 h-7" />
                 </div>
                 <h3 className="mt-4 text-lg font-extrabold text-[#0F172A]">
@@ -261,7 +261,7 @@ export const MyBookingsPage: React.FC = () => {
                 </p>
                 <Link
                   to="/FleetPage"
-                  className="mt-5 px-5 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold rounded-lg transition-colors"
+                  className="mt-5 px-5 py-2.5 bg-[#142B4A] hover:bg-[#0D2039] text-white text-sm font-bold rounded-lg transition-colors"
                 >
                   {t("myBookings.emptyCta")}
                 </Link>

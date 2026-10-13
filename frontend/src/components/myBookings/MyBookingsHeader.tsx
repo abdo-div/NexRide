@@ -35,7 +35,7 @@ export const MyBookingsHeader: React.FC<MyBookingsHeaderProps> = ({
             <h1 className="text-[26px] lg:text-[28px] font-extrabold tracking-tight text-[#0F172A]">
               {t("myBookings.title")}
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-[#DCE9FF] text-[#004AC6] text-[11px] font-bold uppercase tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-full bg-[#F1F5F9] text-[#142B4A] text-[11px] font-bold uppercase tracking-wider">
               {t("myBookings.vipBadge")}
             </span>
           </div>
@@ -51,12 +51,12 @@ export const MyBookingsHeader: React.FC<MyBookingsHeaderProps> = ({
             disabled={exportBusy}
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#0F172A] rounded-lg text-sm font-semibold transition-colors disabled:opacity-60 cursor-pointer"
           >
-            <Download className="w-4 h-4 text-[#2563EB]" />
+            <Download className="w-4 h-4 text-[#142B4A]" />
             <span>{exportBusy ? t("myBookings.exportBusy") : t("myBookings.export")}</span>
           </button>
           <Link
             to="/FleetPage"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-lg text-sm font-bold shadow-[0_4px_12px_rgba(37,99,235,0.25)] transition-all hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#142B4A] hover:bg-[#0D2039] text-white rounded-lg text-sm font-bold shadow-[0_4px_12px_rgba(37,99,235,0.25)] transition-all hover:-translate-y-0.5"
           >
             <Plus className="w-4 h-4" />
             <span>{t("myBookings.newBooking")}</span>

@@ -113,7 +113,7 @@ export const CompanyEarningsKpiCards: React.FC<CompanyEarningsKpiCardsProps> = (
           <span className="text-[26px] font-extrabold tracking-tight text-[#0B1C30]">
             {moneyOf(summary.companyEarnings)}
           </span>
-          <span className="inline-flex items-center rounded-full bg-[#EFF4FF] px-2 py-0.5 text-[11px] font-bold text-[#2563EB]">
+          <span className="inline-flex items-center rounded-full bg-[#F8FAFC] px-2 py-0.5 text-[11px] font-bold text-[#142B4A]">
             {t("company.payoutsPage.kpis.netTag", { pct: netPct.toFixed(1) })}
           </span>
         </div>

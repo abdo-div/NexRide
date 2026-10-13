@@ -79,7 +79,11 @@ export const buildApplicationPayload = (
   documents: DocumentDraft[],
 ): CompanyApplicationPayload => ({
   applicant: draft.applicant,
-  company: draft.company,
+  company: {
+    ...draft.company,
+    // Submission is preceded by validateStep(2), which requires this map pin.
+    location: draft.company.location!,
+  },
   fleet: draft.fleet,
   hubs: {
     active: draft.hubs.active.map((hub) => HUB_LABELS[hub]),
@@ -184,6 +188,8 @@ export const validateStep = (
     if (!draft.company.city.trim()) errors.city = t("partner.step2.error.city");
     if (!draft.company.address.trim())
       errors.address = t("partner.step2.error.address");
+    if (!draft.company.location)
+      errors.location = t("partner.step2.error.location");
   }
 
   if (step === 3) {

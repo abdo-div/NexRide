@@ -32,6 +32,12 @@ const maintenanceEventSchema = new mongoose.Schema(
       },
       index: true,
     },
+    serviceType: {
+      type: String,
+      enum: ["OIL_CHANGE", "BRAKES", "TIRES", "ENGINE", "BODY_WORK", "PAPERWORK", "ROUTINE_INSPECTION", "OTHER"],
+      default: "OTHER",
+      index: true,
+    },
     priority: {
       type: String,
       enum: {
@@ -44,7 +50,7 @@ const maintenanceEventSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: {
-        values: ["SCHEDULED", "IN_PROGRESS", "COMPLETED"],
+        values: ["SCHEDULED", "IN_PROGRESS", "COMPLETED", "CANCELLED"],
         message: "invalid maintenance status",
       },
       default: "SCHEDULED",
@@ -90,6 +96,12 @@ const maintenanceEventSchema = new mongoose.Schema(
       min: [0, "estimated cost cannot be negative"],
       default: 0,
     },
+    cost: { type: Number, min: 0, default: 0 },
+    odometerAtService: { type: Number, min: 0, default: null },
+    nextServiceOdometer: { type: Number, min: 0, default: null },
+    workshopName: { type: String, trim: true, default: "" },
+    mechanicContact: { type: String, trim: true, default: "" },
+    receiptUrl: { type: String, trim: true, default: "" },
     costLines: {
       type: [
         {
@@ -130,7 +142,7 @@ maintenanceEventSchema.index({ vehicleId: 1, status: 1 });
  * is computed whenever a pending event has blown past its estimated return.
  */
 export const dispatchStatusOf = (event) => {
-  if (event.status === "COMPLETED") return "COMPLETED";
+  if (event.status === "COMPLETED" || event.status === "CANCELLED") return event.status;
   if (event.estReturnDate && new Date(event.estReturnDate).getTime() < Date.now()) {
     return "OVERDUE";
   }

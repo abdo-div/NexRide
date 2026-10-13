@@ -1,7 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import type { RegionHub } from "../../types/region";
+import { cardHover } from "../../lib/motion";
 
 interface RegionCardProps {
   hub: RegionHub;
@@ -10,13 +11,14 @@ interface RegionCardProps {
 
 export const RegionCard: React.FC<RegionCardProps> = ({ hub, index = 0 }) => {
   const { t } = useTranslation();
+  const reduceMotion = useReducedMotion();
   return (
     <motion.div
       initial={{ opacity: 0, y: 25 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
-      whileHover={{ y: -6, transition: { duration: 0.2 } }}
+      whileHover={reduceMotion ? undefined : cardHover}
       className="bg-[#0b1329]/90 border border-slate-800 hover:border-cyan-500/40 rounded-2xl p-6 flex flex-col justify-between transition-colors duration-300 group"
     >
       <div>

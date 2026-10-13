@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getAllReviews,
+  getReviewEligibility,
   getReviewById,
   createReview,
   updateReview,
@@ -45,6 +46,12 @@ router.get("/", getAllReviews);
 // PROTECTED CUSTOMER & TENANT ROUTES
 // -----------------------------------------------------------------------------
 router.use(protect);
+
+router.get(
+  "/eligibility",
+  restrictTo("customer"),
+  getReviewEligibility,
+);
 
 // IMPORTANT: Static routes must come BEFORE parameterized /:id routes
 // Tenant fleet management route

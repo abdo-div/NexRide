@@ -17,8 +17,6 @@ export const NavBarActions: React.FC<NavBarActionsProps> = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const isCustomer = user?.role?.trim() === "customer";
-  const isCompany = user?.role?.trim() === "company";
-  const isAdmin = user?.role?.trim() === "admin";
   const avatar = userPhotoUrl(user?.photo);
   const initials = (user?.name ?? "N")
     .split(/\s+/)
@@ -164,10 +162,10 @@ export const NavBarActions: React.FC<NavBarActionsProps> = () => {
       )}
 
       {/* Add your Fleet Button - linked to /partner/apply */}
-      {!isCompany && !isAdmin && (
+      {!isAuthenticated && (
         <Link
           to="/partner/apply"
-          className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/35 active:scale-95 transition-all shrink-0"
+          className="hidden xl:inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/35 active:scale-95 transition-all shrink-0"
         >
           <Zap className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
           <span>{t("nav.listFleet")}</span>

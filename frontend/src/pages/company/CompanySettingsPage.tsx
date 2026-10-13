@@ -41,6 +41,7 @@ export const CompanySettingsPage: React.FC = () => {
     updatePayoutDraft,
     saveProfile,
     savePayout,
+    saveLocation,
     saveLogo,
     saveCover,
     savePreferences,
@@ -120,7 +121,7 @@ export const CompanySettingsPage: React.FC = () => {
   const verified = data?.readiness.verified ?? false;
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
+    <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
       <div className="flex flex-col gap-6">
         <CompanySettingsHeader
           companyName={companyName}
@@ -142,7 +143,7 @@ export const CompanySettingsPage: React.FC = () => {
             <button
               type="button"
               onClick={reload}
-              className="mt-4 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+              className="mt-4 rounded-lg bg-[#142B4A] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#0D2039] cursor-pointer"
             >
               {t("company.settings.retry")}
             </button>
@@ -197,6 +198,10 @@ export const CompanySettingsPage: React.FC = () => {
                   />
                   <CompanySettingsLocationsCard
                     hubs={data.hubs}
+                    companyName={data.profile.name}
+                    location={data.profile.location}
+                    busy={busy}
+                    onSaveLocation={saveLocation}
                     onComingSoon={notifyComingSoon}
                   />
                   <CompanySettingsPoliciesCard values={data.profile.settingsPreferences.policies} busy={busy} onToggle={(key, value) => void handlePreference("policies", key, value)} />

@@ -29,7 +29,7 @@ export const CompanyVehicleEditPublish: React.FC<CompanyVehicleEditPublishProps>
   return (
     <SectionCard
       icon={Globe}
-      iconStyle="bg-[#E5EEFF] text-[#2563EB]"
+      iconStyle="bg-[#F1F5F9] text-[#142B4A]"
       title={t("company.editVehiclePage.publish.title")}
       titleAr={t("company.editVehiclePage.publish.titleAr")}
       subtitle={t("company.editVehiclePage.publish.subtitle")}
@@ -69,14 +69,14 @@ export const CompanyVehicleEditPublish: React.FC<CompanyVehicleEditPublishProps>
         </p>
       )}
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-[#EFF4FF] px-4 py-3">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-[#F8FAFC] px-4 py-3">
         <span className="text-xs font-bold text-[#0B1C30] dark:text-white">
           {t("company.editVehiclePage.publish.opsStatus")}{" "}
           <span className="font-normal text-[#9AA4B5]">
             ({t("company.editVehiclePage.publish.opsStatusAr")})
           </span>
         </span>
-        <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[#2563EB]">
+        <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[#142B4A]">
           {t(`admin.status.${previewVehicle.operationalStatus}`)}
         </span>
       </div>

@@ -24,8 +24,8 @@ export const CompanyFleetKpiCards: React.FC<CompanyFleetKpiCardsProps> = ({
       value: summary.total,
       pct: 100,
       icon: Car,
-      iconStyle: "bg-[#EFF4FF] text-[#2563EB]",
-      barStyle: "bg-[#2563EB]",
+      iconStyle: "bg-[#F8FAFC] text-[#142B4A]",
+      barStyle: "bg-[#142B4A]",
     },
     {
       key: "available",
@@ -45,8 +45,8 @@ export const CompanyFleetKpiCards: React.FC<CompanyFleetKpiCardsProps> = ({
       value: summary.rented,
       pct: pct(summary.rented),
       icon: KeyRound,
-      iconStyle: "bg-[#EFF4FF] text-[#2563EB]",
-      barStyle: "bg-[#2563EB]",
+      iconStyle: "bg-[#F8FAFC] text-[#142B4A]",
+      barStyle: "bg-[#142B4A]",
       pulse: true,
     },
     {

@@ -7,6 +7,11 @@ export interface CompanySettingsPayout {
   accountName: string;
 }
 
+export interface CompanyGeoPoint {
+  type: "Point";
+  coordinates: [number, number];
+}
+
 /** The operator's own profile document as surfaced by GET /companies/settings. */
 export interface CompanySettingsProfile {
   _id: string;
@@ -20,6 +25,7 @@ export interface CompanySettingsProfile {
   phone: string;
   city: string;
   address: string;
+  location: CompanyGeoPoint | null;
   commercialRegisterNumber: string;
   status: CompanyStatus;
   approvedAt: string | null;
@@ -66,6 +72,7 @@ export interface CompanySettingsPatch {
   phone?: string;
   city?: string;
   address?: string;
+  location?: CompanyGeoPoint;
   payout?: CompanySettingsPayout;
   settingsPreferences?: CompanySettingsPreferences;
 }

@@ -36,13 +36,13 @@ export const ConfirmationHeader: React.FC<Props> = ({
               <React.Fragment key={i}>
                 {i > 0 && <span className="text-[#CBD5E1]">/</span>}
                 {crumb.to ? (
-                  <Link to={crumb.to} className="hover:text-[#2563EB] transition-colors">
+                  <Link to={crumb.to} className="hover:text-[#142B4A] transition-colors">
                     {text}
                   </Link>
                 ) : i === vehicleCrumbIndex ? (
                   <Link
                     to={`/cars/${vehicleId}`}
-                    className="hover:text-[#2563EB] transition-colors truncate max-w-[200px]"
+                    className="hover:text-[#142B4A] transition-colors truncate max-w-[200px]"
                   >
                     {text}
                   </Link>
@@ -56,18 +56,18 @@ export const ConfirmationHeader: React.FC<Props> = ({
           })}
         </nav>
         <div className="inline-flex items-center gap-2 bg-white shadow-sm px-3.5 py-1.5 rounded-full self-start sm:self-auto">
-          <ConfirmationIcon name="verified" className="w-[16px] h-[16px] text-[#2563EB]" />
+          <ConfirmationIcon name="verified" className="w-[16px] h-[16px] text-[#142B4A]" />
           <span className="text-[11px] uppercase tracking-wider text-[#0F172A] font-bold">
             {t(stepBadge.caption)}
           </span>
-          <span className="text-[11px] text-[#2563EB] font-bold">{t(stepBadge.value)}</span>
+          <span className="text-[11px] text-[#142B4A] font-bold">{t(stepBadge.value)}</span>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm p-6 sm:p-10 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8 relative overflow-hidden">
         <div className="absolute -top-24 -right-24 w-80 h-80 bg-[#DBE1FF]/40 rounded-full blur-3xl pointer-events-none" />
         <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#F8FAFC] flex items-center justify-center shrink-0 shadow-inner">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#2563EB] flex items-center justify-center text-white shadow-md">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#142B4A] flex items-center justify-center text-white shadow-md">
             <ConfirmationIcon name="done" className="w-[26px] h-[26px] sm:w-[30px] sm:h-[30px]" />
           </div>
         </div>

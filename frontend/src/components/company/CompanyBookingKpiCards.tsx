@@ -26,7 +26,7 @@ export const CompanyBookingKpiCards: React.FC<CompanyBookingKpiCardsProps> = ({
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
             {t("company.bookingsPage.kpis.total")}
           </span>
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF4FF] text-[#565E74]">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8FAFC] text-[#565E74]">
             <ReceiptText className="h-[18px] w-[18px]" aria-hidden="true" />
           </span>
         </div>
@@ -78,13 +78,13 @@ export const CompanyBookingKpiCards: React.FC<CompanyBookingKpiCardsProps> = ({
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
             {t("company.bookingsPage.kpis.confirmed")}
           </span>
-          <span className="rounded-full bg-[#DAE2FD] px-2 py-0.5 text-[11px] font-bold text-[#004AC6]">
+          <span className="rounded-full bg-[#DAE2FD] px-2 py-0.5 text-[11px] font-bold text-[#142B4A]">
             {t("company.bookingsPage.kpis.confirmedTag")}
           </span>
         </div>
         <div className="mt-3">
           <div className="flex items-baseline gap-2">
-            <span className="text-[26px] font-extrabold tracking-tight text-[#004AC6]">
+            <span className="text-[26px] font-extrabold tracking-tight text-[#142B4A]">
               {summary.confirmed}
             </span>
             <span className="text-[11px] font-semibold text-[#565E74]">
@@ -103,8 +103,8 @@ export const CompanyBookingKpiCards: React.FC<CompanyBookingKpiCardsProps> = ({
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
             {t("company.bookingsPage.kpis.active")}
           </span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-[#EFF4FF] px-2 py-0.5 text-[11px] font-bold text-[#0B1C30]">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#2563EB]" />
+          <span className="inline-flex items-center gap-1 rounded-full bg-[#F8FAFC] px-2 py-0.5 text-[11px] font-bold text-[#0B1C30]">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#142B4A]" />
             {t("company.bookingsPage.kpis.activeTag")}
           </span>
         </div>
@@ -129,7 +129,7 @@ export const CompanyBookingKpiCards: React.FC<CompanyBookingKpiCardsProps> = ({
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
             {t("company.bookingsPage.kpis.completed")}
           </span>
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF4FF] text-[#565E74]">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8FAFC] text-[#565E74]">
             <ClipboardCheck className="h-[18px] w-[18px]" aria-hidden="true" />
           </span>
         </div>

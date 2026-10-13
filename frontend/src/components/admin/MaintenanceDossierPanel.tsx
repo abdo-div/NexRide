@@ -191,7 +191,7 @@ export const MaintenanceDossierPanel: React.FC<MaintenanceDossierPanelProps> = (
               className="h-16 w-16 shrink-0 rounded-2xl border border-slate-200 object-cover"
             />
           ) : (
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#E5EEFF] text-base font-extrabold text-[#2563EB]">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#F1F5F9] text-base font-extrabold text-[#142B4A]">
               {(vehicle?.make ?? "?").slice(0, 2).toUpperCase()}
             </div>
           )}
@@ -205,11 +205,11 @@ export const MaintenanceDossierPanel: React.FC<MaintenanceDossierPanelProps> = (
               <MaintenanceStatusChip status={event.dispatchStatus} />
             </div>
             <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[11px]">
-              <span className="inline-flex items-center gap-1.5 rounded-md bg-[#EFF4FF] px-2 py-1 font-mono font-bold text-[#2563EB]">
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-[#F8FAFC] px-2 py-1 font-mono font-bold text-[#142B4A]">
                 <Gauge className="h-3 w-3" />
                 {eventVehicleRef(event)}
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-md bg-[#EFF4FF] px-2 py-1 font-semibold text-[#565E74]">
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-[#F8FAFC] px-2 py-1 font-semibold text-[#565E74]">
                 {t("admin.maintenance.dossier.vehicleTag", {
                   city: vehicle?.city ?? company?.city ?? t("admin.maintenance.dossier.none"),
                 })}
@@ -242,8 +242,8 @@ export const MaintenanceDossierPanel: React.FC<MaintenanceDossierPanelProps> = (
       {/* Bay / DTC / Cost */}
       <div className="grid grid-cols-1 gap-4 p-6 lg:grid-cols-3">
         <InfoCard
-          tone="bg-[#EFF4FF]"
-          iconTone="bg-white text-[#2563EB]"
+          tone="bg-[#F8FAFC]"
+          iconTone="bg-white text-[#142B4A]"
           icon={<Building2 className="h-4 w-4" />}
           title={t("admin.maintenance.dossier.bayTitle")}
           rows={[
@@ -282,7 +282,7 @@ export const MaintenanceDossierPanel: React.FC<MaintenanceDossierPanelProps> = (
           <div className="mt-3 space-y-2">
             {(event.dtcCodes && event.dtcCodes.length > 0 ? event.dtcCodes : []).map(
               (dtc, index) => (
-                <div key={index} className="rounded-lg bg-[#EFF4FF] p-2.5">
+                <div key={index} className="rounded-lg bg-[#F8FAFC] p-2.5">
                   <div className="font-mono text-[12px] font-extrabold text-[#BA1A1A]">{dtc.code}</div>
                   <div className="mt-0.5 text-[11px] text-[#565E74]">{dtc.description}</div>
                 </div>
@@ -337,7 +337,7 @@ export const MaintenanceDossierPanel: React.FC<MaintenanceDossierPanelProps> = (
       {/* Lifecycle timeline */}
       <div className="border-t border-slate-100 p-6">
         <h3 className="flex items-center gap-2 text-sm font-extrabold text-[#0B1C30]">
-          <CalendarDays className="h-4 w-4 text-[#2563EB]" />
+          <CalendarDays className="h-4 w-4 text-[#142B4A]" />
           {t("admin.maintenance.dossier.timelineTitle")}
         </h3>
         <p className="mt-0.5 text-xs text-[#565E74]">
@@ -359,9 +359,9 @@ export const MaintenanceDossierPanel: React.FC<MaintenanceDossierPanelProps> = (
 
       {/* Admin clearance */}
       {locked && (
-        <div className="flex flex-col justify-between gap-3 bg-[#EFF4FF] p-6 sm:flex-row sm:items-center">
+        <div className="flex flex-col justify-between gap-3 bg-[#F8FAFC] p-6 sm:flex-row sm:items-center">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-[#2563EB]">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-[#142B4A]">
               <Wrench className="h-4 w-4" />
             </span>
             <div>
@@ -377,7 +377,7 @@ export const MaintenanceDossierPanel: React.FC<MaintenanceDossierPanelProps> = (
             type="button"
             disabled={busy}
             onClick={() => onRelease(event)}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-all enabled:hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-all enabled:hover:bg-[#0D2039] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
           >
             <Hammer className="h-4 w-4" />
             {t("admin.maintenance.dossier.release")}
@@ -394,7 +394,7 @@ interface SpecChipProps {
 }
 
 const SpecChip: React.FC<SpecChipProps> = ({ label, value }) => (
-  <div className="rounded-xl bg-[#EFF4FF] px-3 py-2">
+  <div className="rounded-xl bg-[#F8FAFC] px-3 py-2">
     <div className="text-[10px] font-bold uppercase tracking-wider text-[#565E74]">{label}</div>
     <div className="mt-0.5 truncate text-[13px] font-extrabold text-[#0B1C30]">{value}</div>
   </div>
@@ -441,7 +441,7 @@ const TimelineStep: React.FC<TimelineStepProps> = ({ title, meta, done, active, 
       overdue
         ? "border-red-200 bg-red-50/60"
         : active
-          ? "border-[#2563EB]/30 bg-[#EFF4FF]"
+          ? "border-[#142B4A]/30 bg-[#F8FAFC]"
           : done
             ? "border-emerald-200 bg-emerald-50/50"
             : "border-slate-100 bg-white opacity-60"
@@ -456,7 +456,7 @@ const TimelineStep: React.FC<TimelineStepProps> = ({ title, meta, done, active, 
         <span
           className={`h-4 w-4 shrink-0 rounded-full border-2 ${
             active
-              ? "animate-pulse border-[#2563EB] bg-[#2563EB]/20"
+              ? "animate-pulse border-[#142B4A] bg-[#142B4A]/20"
               : "border-slate-300 bg-white"
           }`}
         />

@@ -82,7 +82,7 @@ export const CompanyEarningsWaterfall: React.FC<CompanyEarningsWaterfallProps> =
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F1F5F9] px-5 py-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center rounded-full bg-[#EFF4FF] px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-[#2563EB]">
+            <span className="inline-flex items-center rounded-full bg-[#F8FAFC] px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-[#142B4A]">
               <Info className="me-1 h-3 w-3" aria-hidden="true" />
               {t("company.payoutsPage.waterfall.badge")}
             </span>
@@ -97,7 +97,7 @@ export const CompanyEarningsWaterfall: React.FC<CompanyEarningsWaterfallProps> =
         <button
           type="button"
           onClick={onPolicy}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-[#F1F5F9] px-3 py-2 text-[12px] font-bold text-[#565E74] transition-colors hover:bg-[#E5EEFF] hover:text-[#0B1C30] cursor-pointer"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-[#F1F5F9] px-3 py-2 text-[12px] font-bold text-[#565E74] transition-colors hover:bg-[#F1F5F9] hover:text-[#0B1C30] cursor-pointer"
         >
           <FileText className="h-3.5 w-3.5" aria-hidden="true" />
           {t("company.payoutsPage.waterfall.policy")}
@@ -117,13 +117,13 @@ export const CompanyEarningsWaterfall: React.FC<CompanyEarningsWaterfallProps> =
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </span>
               )}
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-[#2563EB] shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-[#142B4A] shadow-sm">
                 <Icon className="h-4.5 w-4.5 h-[18px] w-[18px]" aria-hidden="true" />
               </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-1.5">
                   <span className="text-[13px] font-bold text-[#0B1C30]">{step.title}</span>
-                  <span className="inline-flex items-center rounded-full bg-[#E5EEFF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">
+                  <span className="inline-flex items-center rounded-full bg-[#F1F5F9] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#142B4A]">
                     {step.tag}
                   </span>
                 </div>

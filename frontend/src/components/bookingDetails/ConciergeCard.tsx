@@ -31,7 +31,7 @@ export const ConciergeCard: React.FC = () => {
           href={CONCIERGE_TEL}
           className="inline-flex items-center justify-center gap-2 bg-white text-[#0F172A] rounded-xl py-2.5 text-[12px] font-bold hover:bg-slate-200 transition-colors"
         >
-          <Phone className="w-4 h-4 text-[#2563EB]" />
+          <Phone className="w-4 h-4 text-[#142B4A]" />
           {t("bookingDetails.concierge.call")}
         </a>
         <a

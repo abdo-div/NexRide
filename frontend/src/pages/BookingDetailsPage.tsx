@@ -14,6 +14,7 @@ import { GatePassCard } from "../components/bookingDetails/GatePassCard";
 import { FinancialCard } from "../components/bookingDetails/FinancialCard";
 import { ChecklistCard } from "../components/bookingDetails/ChecklistCard";
 import { ConciergeCard } from "../components/bookingDetails/ConciergeCard";
+import { BookingReviewCard } from "../components/bookingDetails/BookingReviewCard";
 
 const TOAST_MS = 3000;
 
@@ -142,7 +143,7 @@ export const BookingDetailsPage: React.FC = () => {
             <button
               type="button"
               onClick={() => loadBooking()}
-              className="mt-4 px-5 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold rounded-lg transition-colors cursor-pointer"
+              className="mt-4 px-5 py-2.5 bg-[#142B4A] hover:bg-[#0D2039] text-white text-sm font-bold rounded-lg transition-colors cursor-pointer"
             >
               {t("myBookings.retry")}
             </button>
@@ -166,6 +167,8 @@ export const BookingDetailsPage: React.FC = () => {
                 booking.bookingStatus === "EXPIRED"
               }
             />
+
+            <BookingReviewCard booking={booking} onNotice={showToast} />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
               {/* Main column */}

@@ -52,7 +52,7 @@ export const VipSupportBanner: React.FC = () => {
         <div className="flex flex-wrap lg:flex-col sm:flex-row items-stretch lg:items-end gap-3 shrink-0">
           <a
             href={VIP_PHONE_LINK}
-            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold shadow-md transition-all"
+            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#142B4A] hover:bg-[#0D2039] text-white text-sm font-bold shadow-md transition-all"
           >
             <Phone className="w-5 h-5" />
             <span className="tracking-wider" dir="ltr">

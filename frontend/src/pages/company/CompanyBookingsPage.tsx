@@ -170,7 +170,7 @@ export const CompanyBookingsPage: React.FC = () => {
   const { summary, list, pagination } = data;
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
+    <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
       <div className="flex flex-col gap-6">
         <CompanyBookingsHeader
           data={data}
@@ -207,7 +207,7 @@ export const CompanyBookingsPage: React.FC = () => {
 
             {loading ? (
               <div className="space-y-3">
-                <div className="h-3 w-2/3 animate-pulse rounded-full bg-[#E5EEFF]" />
+                <div className="h-3 w-2/3 animate-pulse rounded-full bg-[#F1F5F9]" />
                 <div className="h-72 animate-pulse rounded-2xl border border-slate-200 bg-white" />
               </div>
             ) : error ? (
@@ -219,7 +219,7 @@ export const CompanyBookingsPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={reload}
-                  className="mt-4 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+                  className="mt-4 rounded-lg bg-[#142B4A] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#0D2039] cursor-pointer"
                 >
                   {t("company.overview.retry")}
                 </button>
@@ -258,8 +258,8 @@ export const CompanyBookingsPage: React.FC = () => {
         </div>
 
         {!loading && !error && list.length === 0 && (
-          <div className="flex items-center gap-2 rounded-2xl border border-[#E5EEFF] bg-[#F8FAFF] px-4 py-3 text-xs text-[#565E74]">
-            <Inbox className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+          <div className="flex items-center gap-2 rounded-2xl border border-[#F1F5F9] bg-[#F8FAFF] px-4 py-3 text-xs text-[#565E74]">
+            <Inbox className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
             {t("company.bookingsPage.empty.hint")}
           </div>
         )}

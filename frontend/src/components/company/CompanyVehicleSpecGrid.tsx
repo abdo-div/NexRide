@@ -63,7 +63,7 @@ export const CompanyVehicleSpecGrid: React.FC<CompanyVehicleSpecGridProps> = ({
     >
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {cells.map((cell) => (
-          <div key={cell.label} className="rounded-xl bg-[#EFF4FF] p-3">
+          <div key={cell.label} className="rounded-xl bg-[#F8FAFC] p-3">
             <span className="block text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
               {cell.label}
             </span>

@@ -45,7 +45,7 @@ export const IdentificationCard: React.FC<{ meta: ConfirmationMeta }> = ({ meta 
             <span className="text-[16px] text-[#0F172A] font-bold truncate">{card.value}</span>
             <span
               className={`text-[11px] flex items-center gap-1 mt-1 ${
-                card.primary ? "text-[#2563EB]" : "text-[#64748B]"
+                card.primary ? "text-[#142B4A]" : "text-[#64748B]"
               }`}
             >
               {card.noteIcon}

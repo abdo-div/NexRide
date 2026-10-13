@@ -74,7 +74,7 @@ export const CompanyRatingTrend: React.FC<CompanyRatingTrendProps> = ({
               onClick={() => setRange(key)}
               className={`rounded-lg px-3 py-1.5 text-[12px] font-bold transition-colors cursor-pointer ${
                 range === key
-                  ? "bg-white text-[#2563EB] shadow-sm"
+                  ? "bg-white text-[#142B4A] shadow-sm"
                   : "text-[#565E74] hover:text-[#0B1C30]"
               }`}
             >
@@ -114,7 +114,7 @@ export const CompanyRatingTrend: React.FC<CompanyRatingTrendProps> = ({
                     <div className="flex w-full flex-1 items-end">
                       <div
                         className={`w-full rounded-t-lg transition-all ${
-                          datum.count > 0 ? "bg-gradient-to-t from-[#2563EB] to-[#60A5FA]" : "bg-[#E2E8F0]"
+                          datum.count > 0 ? "bg-gradient-to-t from-[#142B4A] to-[#60A5FA]" : "bg-[#E2E8F0]"
                         }`}
                         style={{ height: `${height}%` }}
                       />

@@ -66,7 +66,7 @@ export const AdminPaymentsTable: React.FC<AdminPaymentsTableProps> = ({
   if (payments.length === 0) {
     return (
       <div className="flex h-56 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#E5EEFF] text-[#2563EB]">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F1F5F9] text-[#142B4A]">
           <CreditCard className="h-7 w-7" />
         </div>
         <p className="mt-4 max-w-sm text-sm text-[#64748B]">{emptyLabel}</p>
@@ -79,7 +79,7 @@ export const AdminPaymentsTable: React.FC<AdminPaymentsTableProps> = ({
       <div className="w-full overflow-x-auto">
         <table className="w-full border-collapse text-left">
           <thead>
-            <tr className="bg-[#EFF4FF] text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
+            <tr className="bg-[#F8FAFC] text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
               <th className="rounded-s-2xl px-4 py-3">{t("admin.payments.table.transaction")}</th>
               <th className="px-4 py-3">{t("admin.payments.table.booking")}</th>
               <th className="px-4 py-3">{t("admin.payments.table.renter")}</th>
@@ -107,15 +107,15 @@ export const AdminPaymentsTable: React.FC<AdminPaymentsTableProps> = ({
                   onClick={() => onSelect(payment)}
                   className={`cursor-pointer border-b border-slate-100 transition-colors last:border-0 ${
                     selected
-                      ? "bg-[#EFF4FF]/80"
+                      ? "bg-[#F8FAFC]/80"
                       : payment.status === "FAILED"
                         ? "bg-red-50/30 hover:bg-red-50/50"
-                        : "hover:bg-[#EFF4FF]/40"
+                        : "hover:bg-[#F8FAFC]/40"
                   }`}
                 >
                   <td className="px-4 py-3.5">
                     <div className="flex min-w-[150px] flex-col">
-                      <span className="font-mono text-[12px] font-bold text-[#2563EB]">
+                      <span className="font-mono text-[12px] font-bold text-[#142B4A]">
                         {trxRefOf(payment)}
                       </span>
                       {payment.merchantReference && (
@@ -143,7 +143,7 @@ export const AdminPaymentsTable: React.FC<AdminPaymentsTableProps> = ({
                   </td>
                   <td className="px-4 py-3.5">
                     <div className="flex min-w-[170px] items-center gap-2.5">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#E5EEFF] text-xs font-bold text-[#2563EB] shadow-sm">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#F1F5F9] text-xs font-bold text-[#142B4A] shadow-sm">
                         {avatar ? (
                           <img src={avatar} alt="" className="h-full w-full object-cover" />
                         ) : (
@@ -185,11 +185,11 @@ export const AdminPaymentsTable: React.FC<AdminPaymentsTableProps> = ({
                     </span>
                   </td>
                   <td className="px-4 py-3.5">
-                    <div className="inline-flex items-center gap-1.5 rounded-lg bg-[#EFF4FF] px-2.5 py-1 text-xs font-semibold text-[#0B1C30]">
+                    <div className="inline-flex items-center gap-1.5 rounded-lg bg-[#F8FAFC] px-2.5 py-1 text-xs font-semibold text-[#0B1C30]">
                       {payment.paymentMethod === "CASH_ON_DELIVERY" ? (
                         <Wallet className="h-3.5 w-3.5 text-amber-600" />
                       ) : (
-                        <CreditCard className="h-3.5 w-3.5 text-[#2563EB]" />
+                        <CreditCard className="h-3.5 w-3.5 text-[#142B4A]" />
                       )}
                       {t(`admin.payments.methods.${payment.paymentMethod ?? ""}`, {
                         defaultValue: payment.paymentMethod ?? "—",
@@ -216,8 +216,8 @@ export const AdminPaymentsTable: React.FC<AdminPaymentsTableProps> = ({
                         onClick={() => openDossier(payment)}
                         className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
                           selected
-                            ? "bg-[#2563EB] text-white shadow-[0_2px_8px_rgba(37,99,235,0.2)]"
-                            : "bg-[#EFF4FF] text-[#2563EB] hover:bg-[#2563EB] hover:text-white"
+                            ? "bg-[#142B4A] text-white shadow-[0_2px_8px_rgba(37,99,235,0.2)]"
+                            : "bg-[#F8FAFC] text-[#142B4A] hover:bg-[#142B4A] hover:text-white"
                         }`}
                       >
                         {t("admin.payments.table.openDossier")}
@@ -226,7 +226,7 @@ export const AdminPaymentsTable: React.FC<AdminPaymentsTableProps> = ({
                         <button
                           type="button"
                           onClick={() => viewBooking(payment)}
-                          className="rounded-lg p-1 text-[#565E74] transition-colors hover:bg-[#EFF4FF] hover:text-[#2563EB] cursor-pointer"
+                          className="rounded-lg p-1 text-[#565E74] transition-colors hover:bg-[#F8FAFC] hover:text-[#142B4A] cursor-pointer"
                           aria-label={t("admin.payments.table.viewBooking")}
                         >
                           <ExternalLink className="h-4 w-4" />
@@ -235,7 +235,7 @@ export const AdminPaymentsTable: React.FC<AdminPaymentsTableProps> = ({
                       <button
                         type="button"
                         onClick={() => onSelect(payment)}
-                        className="rounded-lg p-1 text-[#565E74] transition-colors hover:bg-[#EFF4FF] hover:text-[#0B1C30] cursor-pointer"
+                        className="rounded-lg p-1 text-[#565E74] transition-colors hover:bg-[#F8FAFC] hover:text-[#0B1C30] cursor-pointer"
                         aria-label={t("admin.payments.table.actions")}
                       >
                         <MoreHorizontal className="h-5 w-5" />

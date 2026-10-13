@@ -464,7 +464,7 @@ export const BookingConfirmationPage: React.FC = () => {
           </p>
           <Link
             to="/my-bookings"
-            className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+            className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
           >
             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             {t("booking.empty.action")}
@@ -478,7 +478,7 @@ export const BookingConfirmationPage: React.FC = () => {
     return (
       <div className="bg-[#F8FAFC] min-h-screen">
         <div className="pt-20 flex flex-col items-center justify-center gap-4 min-h-[70vh]">
-          <span className="w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
+          <span className="w-8 h-8 border-2 border-[#142B4A] border-t-transparent rounded-full animate-spin" />
           <p className="text-sm text-[#64748B]">{t("booking.loading")}</p>
         </div>
       </div>
@@ -503,7 +503,7 @@ export const BookingConfirmationPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setNonce((value) => value + 1)}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
               >
                 <RefreshCw className="w-4 h-4" />
                 {t("booking.notFound.retry")}

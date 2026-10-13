@@ -85,7 +85,7 @@ export const CompanyEarningsChart: React.FC<CompanyEarningsChartProps> = ({
 
       <div className="mt-5 flex items-center gap-4 text-[11px] font-bold text-[#565E74]">
         <span className="inline-flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-[4px] bg-[#2563EB]" />
+          <span className="h-2.5 w-2.5 rounded-[4px] bg-[#142B4A]" />
           {t("company.payoutsPage.chart.legendNet")}
         </span>
         <span className="inline-flex items-center gap-1.5">
@@ -122,7 +122,7 @@ export const CompanyEarningsChart: React.FC<CompanyEarningsChartProps> = ({
                   style={{ height: feeHeight }}
                 />
                 <div
-                  className="w-full rounded-b-[4px] bg-[#2563EB] transition-opacity group-hover:opacity-80"
+                  className="w-full rounded-b-[4px] bg-[#142B4A] transition-opacity group-hover:opacity-80"
                   style={{ height: netHeight }}
                 />
               </div>
@@ -135,7 +135,7 @@ export const CompanyEarningsChart: React.FC<CompanyEarningsChartProps> = ({
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-[#F1F5F9] pt-3">
-        <TrendingUp className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden="true" />
+        <TrendingUp className="h-3.5 w-3.5 text-[#142B4A]" aria-hidden="true" />
         <p className="text-[11px] font-medium leading-snug text-[#64748B]">
           {footnotes.join(" · ")}
         </p>

@@ -47,7 +47,7 @@ interface CompanyEarningsToolbarProps {
 }
 
 const baseSelect =
-  "w-full cursor-pointer appearance-none rounded-lg border border-[#E5EEFF] bg-[#F8FAFF] py-2.5 pe-8 ps-9 text-sm font-medium text-[#0B1C30] outline-none transition-colors focus:border-[#2563EB] focus:ring-2 focus:ring-[#E5EEFF]";
+  "w-full cursor-pointer appearance-none rounded-lg border border-[#F1F5F9] bg-[#F8FAFF] py-2.5 pe-8 ps-9 text-sm font-medium text-[#0B1C30] outline-none transition-colors focus:border-[#142B4A] focus:ring-2 focus:ring-[#F1F5F9]";
 
 /**
  * Register toolbar for the payout ledger: free-text search (debounced in the
@@ -88,7 +88,7 @@ export const CompanyEarningsToolbar: React.FC<CompanyEarningsToolbarProps> = ({
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder={t("company.payoutsPage.register.searchPlaceholder")}
             aria-label={t("company.payoutsPage.register.searchPlaceholder")}
-            className="w-full rounded-lg border border-[#E5EEFF] bg-[#F8FAFF] py-2.5 ps-10 pe-4 text-sm font-medium text-[#0B1C30] outline-none transition-colors placeholder:text-[#9AA4B5] focus:border-[#2563EB] focus:ring-2 focus:ring-[#E5EEFF]"
+            className="w-full rounded-lg border border-[#F1F5F9] bg-[#F8FAFF] py-2.5 ps-10 pe-4 text-sm font-medium text-[#0B1C30] outline-none transition-colors placeholder:text-[#9AA4B5] focus:border-[#142B4A] focus:ring-2 focus:ring-[#F1F5F9]"
           />
         </div>
 
@@ -142,7 +142,7 @@ export const CompanyEarningsToolbar: React.FC<CompanyEarningsToolbarProps> = ({
         </label>
 
         {/* Count chip */}
-        <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#EFF4FF] px-3 py-2.5 text-[12px] font-bold text-[#2563EB]">
+        <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#F8FAFC] px-3 py-2.5 text-[12px] font-bold text-[#142B4A]">
           <Wallet className="h-3.5 w-3.5" aria-hidden="true" />
           {t("company.payoutsPage.register.count", { count })}
         </span>
@@ -175,7 +175,7 @@ export const CompanyEarningsToolbar: React.FC<CompanyEarningsToolbarProps> = ({
               className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer ${
                 active
                   ? "border-[#0B1C30] bg-[#0B1C30] text-white"
-                  : "border-[#E5EEFF] bg-white text-[#565E74] hover:border-[#C7D2FE]"
+                  : "border-[#F1F5F9] bg-white text-[#565E74] hover:border-[#C7D2FE]"
               }`}
             >
               <Filter className="h-3 w-3" aria-hidden="true" />

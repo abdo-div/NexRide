@@ -252,6 +252,29 @@ test("company maintenance summary is scoped to the tenant at the query layer", a
 // Service-level constructors: the tenant filter reaches every ledger query
 // ---------------------------------------------------------------------------
 
+test("calculateVehicleHealth flags overdue, due-soon and healthy telemetry", () => {
+  const now = new Date("2026-10-12T12:00:00.000Z");
+  const base = {
+    currentOdometer: 19500,
+    lastOilChangeOdometer: 10000,
+    oilChangeInterval: 10000,
+    lastBrakeServiceOdometer: 5000,
+    brakeServiceInterval: 20000,
+    licenseExpiryDate: "2027-01-01T00:00:00.000Z",
+    insuranceExpiryDate: "2027-01-01T00:00:00.000Z",
+  };
+
+  assert.equal(maintenanceService.calculateVehicleHealth(base, now).healthStatus, "DUE_SOON");
+  assert.equal(
+    maintenanceService.calculateVehicleHealth({ ...base, currentOdometer: 20100 }, now).healthStatus,
+    "CRITICAL_OVERDUE",
+  );
+  assert.equal(
+    maintenanceService.calculateVehicleHealth({ ...base, currentOdometer: 12000 }, now).healthStatus,
+    "HEALTHY",
+  );
+});
+
 test("buildMaintenanceSummary applies the tenant filter to every ledger query", async (t) => {
   const vehicleModel = mongoose.model("Vehicle");
   const maintenanceModel = mongoose.model("MaintenanceEvent");

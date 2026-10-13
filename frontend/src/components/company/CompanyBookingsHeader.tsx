@@ -35,8 +35,8 @@ export const CompanyBookingsHeader: React.FC<CompanyBookingsHeaderProps> = ({
           <span className="text-[#0B1C30]">{t("company.bookingsPage.primary")}</span>
         </div>
         {data.company && (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EFF4FF] px-3 py-1 text-[11px] font-semibold text-[#565E74]">
-            <ShieldCheck className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden="true" />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8FAFC] px-3 py-1 text-[11px] font-semibold text-[#565E74]">
+            <ShieldCheck className="h-3.5 w-3.5 text-[#142B4A]" aria-hidden="true" />
             {t("company.bookingsPage.scopedTenant", {
               company: data.company.name,
               code: data.company.code,
@@ -55,7 +55,7 @@ export const CompanyBookingsHeader: React.FC<CompanyBookingsHeaderProps> = ({
             <span className="text-base font-semibold text-[#565E74]">
               {t("company.bookingsPage.titleAr")}
             </span>
-            <span className="rounded-full bg-[#E5EEFF] px-2.5 py-0.5 text-[11px] font-bold text-[#2563EB]">
+            <span className="rounded-full bg-[#F1F5F9] px-2.5 py-0.5 text-[11px] font-bold text-[#142B4A]">
               {t("company.bookingsPage.totalBadge", {
                 count: data.summary.total,
               })}
@@ -74,7 +74,7 @@ export const CompanyBookingsHeader: React.FC<CompanyBookingsHeaderProps> = ({
             type="button"
             onClick={onExport}
             disabled={loading || data.list.length === 0}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
           >
             <Download className="h-[18px] w-[18px] text-[#565E74]" aria-hidden="true" />
             {t("company.bookingsPage.export")}
@@ -83,7 +83,7 @@ export const CompanyBookingsHeader: React.FC<CompanyBookingsHeaderProps> = ({
             type="button"
             disabled
             title={t("company.bookingsPage.soon")}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(37,99,235,0.25)] transition-all hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(37,99,235,0.25)] transition-all hover:bg-[#0D2039] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <CalendarDays className="h-[18px] w-[18px]" aria-hidden="true" />
             {t("company.bookingsPage.viewCalendar")}

@@ -78,6 +78,10 @@ export interface VehicleReviewDto {
   review: string;
   customerId: { _id: string; name?: string; photo?: string } | string | null;
   createdAt?: string;
+  companyResponse?: {
+    response: string | null;
+    respondedAt: string | null;
+  };
 }
 
 export interface VehicleDto {

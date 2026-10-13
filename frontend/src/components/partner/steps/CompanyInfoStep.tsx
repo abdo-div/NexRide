@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Building2 } from "lucide-react";
 import type { PartnerApplicationDraft } from "../../../types/companyApplication";
 import { LabeledField, TextInput } from "./inputs";
+import { VehicleLocationMap } from "../../maps/VehicleLocationMap";
 
 interface Props {
   draft: PartnerApplicationDraft;
@@ -23,7 +24,7 @@ export const CompanyInfoStep: React.FC<Props> = ({ draft, setDraft, errors }) =>
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-start gap-4">
-        <div className="w-10 h-10 rounded-xl bg-[#2563EB] text-white flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-[#142B4A] text-white flex items-center justify-center shrink-0">
           <Building2 className="w-5 h-5" />
         </div>
         <div>
@@ -69,6 +70,25 @@ export const CompanyInfoStep: React.FC<Props> = ({ draft, setDraft, errors }) =>
               value={company.address}
               onChange={(address) => patch({ address })}
               placeholder={t("partner.step2.addressPlaceholder")}
+            />
+          </LabeledField>
+        </div>
+
+        <div className="sm:col-span-2">
+          <LabeledField
+            label={t("partner.step2.mapLocation")}
+            hint={t("partner.step2.mapHint")}
+            error={errors.location}
+          >
+            <VehicleLocationMap
+              editable
+              coordinates={company.location?.coordinates ?? null}
+              label={company.name || t("partner.step2.mapLocation")}
+              onChange={(longitude, latitude) =>
+                patch({ location: { type: "Point", coordinates: [longitude, latitude] } })
+              }
+              className={`h-72 ${errors.location ? "ring-2 ring-[#BA1A1A]/60" : ""}`}
+              pickerHint={t("partner.step2.mapPickerHint")}
             />
           </LabeledField>
         </div>

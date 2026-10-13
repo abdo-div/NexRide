@@ -147,7 +147,7 @@ const PaymentPage: React.FC = () => {
     return (
       <div className="bg-[#F8FAFC] min-h-screen">
         <div className="pt-20 flex flex-col items-center justify-center gap-4 min-h-[70vh]">
-          <span className="w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
+          <span className="w-8 h-8 border-2 border-[#142B4A] border-t-transparent rounded-full animate-spin" />
           <p className="text-sm text-[#64748B]">{t("payment.title")}</p>
         </div>
       </div>
@@ -165,7 +165,7 @@ const PaymentPage: React.FC = () => {
             </p>
             <Link
               to="/fleet"
-              className="flex items-center gap-2 text-[#2563EB] font-bold text-sm"
+              className="flex items-center gap-2 text-[#142B4A] font-bold text-sm"
             >
               <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
               {t("checkout.unavailable.browse")}
@@ -188,7 +188,7 @@ const PaymentPage: React.FC = () => {
         <div className="max-w-[1360px] mx-auto px-4 lg:px-8 pt-6 pb-8">
           <Link
             to={`/vehicles/${bookingVehicleId}`}
-            className="inline-flex items-center gap-2 text-[#2563EB] font-bold text-sm"
+            className="inline-flex items-center gap-2 text-[#142B4A] font-bold text-sm"
           >
             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             {t("payment.backToVehicle", { defaultValue: "Back to vehicle" })}
@@ -201,7 +201,7 @@ const PaymentPage: React.FC = () => {
           <div className="p-6 lg:p-8 flex flex-col gap-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                <CreditCard className="w-6 h-6 text-[#2563EB]" />
+                <CreditCard className="w-6 h-6 text-[#142B4A]" />
               </div>
               <div>
                 <h1 className="text-[20px] font-bold text-[#0F172A]">
@@ -253,7 +253,7 @@ const PaymentPage: React.FC = () => {
                       {t("payment.dates")}
                     </dt>
                     <dd className="flex items-center gap-2 text-[15px] font-bold text-[#0F172A] mt-1">
-                      <CalendarDays className="w-4 h-4 text-[#2563EB]" />
+                      <CalendarDays className="w-4 h-4 text-[#142B4A]" />
                       {`${fmtDate(booking.startDate)} - ${fmtDate(booking.endDate)}`}
                     </dd>
                   </div>
@@ -262,7 +262,7 @@ const PaymentPage: React.FC = () => {
                       {t("payment.location")}
                     </dt>
                     <dd className="flex items-center gap-2 text-[15px] font-semibold text-[#0F172A] mt-1">
-                      <MapPin className="w-4 h-4 text-[#2563EB]" />
+                      <MapPin className="w-4 h-4 text-[#142B4A]" />
                       {booking.pickupLocation || t("checkout.pickupFallback")}
                     </dd>
                   </div>
@@ -327,9 +327,9 @@ const PaymentPage: React.FC = () => {
                 )}
 
                 {(status === "preparing" || status === "verifying") && (
-                  <div className="flex items-center gap-3 rounded-xl bg-blue-50 border border-blue-200 px-5 py-4">
-                    <span className="w-5 h-5 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-[13px] font-semibold text-[#2563EB]">
+                  <div className="flex items-center gap-3 rounded-xl bg-slate-50 border border-slate-200 px-5 py-4">
+                    <span className="w-5 h-5 border-2 border-[#142B4A] border-t-transparent rounded-full animate-spin" />
+                    <p className="text-[13px] font-semibold text-[#142B4A]">
                       {status === "preparing"
                         ? t("payment.preparing")
                         : t("payment.verifying")}

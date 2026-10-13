@@ -50,8 +50,8 @@ export const CompanySettingsHeader: React.FC<CompanySettingsHeaderProps> = ({
           <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
           <span className="text-[#0B1C30]">{t("company.settings.title")}</span>
         </div>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EFF4FF] px-3 py-1 text-[11px] font-semibold text-[#565E74]">
-          <Settings className="h-3.5 w-3.5 text-[#2563EB]" aria-hidden="true" />
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8FAFC] px-3 py-1 text-[11px] font-semibold text-[#565E74]">
+          <Settings className="h-3.5 w-3.5 text-[#142B4A]" aria-hidden="true" />
           {t("company.settings.scopedTenant", { company: companyName })}
         </span>
       </div>
@@ -95,10 +95,10 @@ export const CompanySettingsHeader: React.FC<CompanySettingsHeaderProps> = ({
             type="button"
             onClick={onRefresh}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-3.5 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#E5EEFF] disabled:opacity-60 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-3.5 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#F1F5F9] disabled:opacity-60 cursor-pointer"
           >
             <RefreshCw
-              className={`h-4 w-4 text-[#2563EB] ${loading ? "animate-spin" : ""}`}
+              className={`h-4 w-4 text-[#142B4A] ${loading ? "animate-spin" : ""}`}
               aria-hidden="true"
             />
             {t("company.settings.refresh")}
@@ -107,7 +107,7 @@ export const CompanySettingsHeader: React.FC<CompanySettingsHeaderProps> = ({
             type="button"
             onClick={onSave}
             disabled={!canSave || saving}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-all hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-all hover:bg-[#0D2039] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
           >
             <Save className="h-[18px] w-[18px]" aria-hidden="true" />
             {saving
@@ -141,7 +141,7 @@ export const CompanySettingsHeader: React.FC<CompanySettingsHeaderProps> = ({
           </span>
         </div>
         <div className="flex items-center gap-3 bg-[#F8FAFC] px-5 py-4">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E5EEFF] text-[#2563EB]">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F1F5F9] text-[#142B4A]">
             <UserRoundCheck className="h-5 w-5" aria-hidden="true" />
           </span>
           <span className="min-w-0 flex-1">
@@ -154,7 +154,7 @@ export const CompanySettingsHeader: React.FC<CompanySettingsHeaderProps> = ({
               </span>
               <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#E5E7EB]">
                 <span
-                  className="block h-full rounded-full bg-[#2563EB] transition-all"
+                  className="block h-full rounded-full bg-[#142B4A] transition-all"
                   style={{ width: `${readiness?.completeness ?? 0}%` }}
                 />
               </span>
@@ -162,7 +162,7 @@ export const CompanySettingsHeader: React.FC<CompanySettingsHeaderProps> = ({
           </span>
         </div>
         <div className="flex items-center gap-3 bg-[#F8FAFC] px-5 py-4">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E5EEFF] text-[#2563EB]">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F1F5F9] text-[#142B4A]">
             <MapPin className="h-5 w-5" aria-hidden="true" />
           </span>
           <span className="min-w-0">
@@ -175,7 +175,7 @@ export const CompanySettingsHeader: React.FC<CompanySettingsHeaderProps> = ({
           </span>
         </div>
         <div className="flex items-center gap-3 bg-[#F8FAFC] px-5 py-4">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E5EEFF] text-[#2563EB]">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F1F5F9] text-[#142B4A]">
             <Truck className="h-5 w-5" aria-hidden="true" />
           </span>
           <span className="min-w-0">

@@ -58,21 +58,21 @@ export const BookingDetailsHeader: React.FC<BookingDetailsHeaderProps> = ({
       {/* Breadcrumb */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <nav className="flex items-center gap-2 text-[12px] text-[#64748B]">
-          <Link to="/" className="hover:text-[#2563EB] transition-colors flex items-center gap-1">
+          <Link to="/" className="hover:text-[#142B4A] transition-colors flex items-center gap-1">
             {t("bookingDetails.breadcrumbHome")}
           </Link>
           <span className="text-[#CBD5E1]">/</span>
-          <Link to="/my-bookings" className="hover:text-[#2563EB] transition-colors">
+          <Link to="/my-bookings" className="hover:text-[#142B4A] transition-colors">
             {t("bookingDetails.breadcrumbList")}
           </Link>
           <span className="text-[#CBD5E1]">/</span>
-          <span className="text-[#0F172A] font-bold text-[#2563EB]">
+          <span className="text-[#0F172A] font-bold text-[#142B4A]">
             {t("bookingDetails.title")} #{ref}
           </span>
         </nav>
         <Link
           to="/my-bookings"
-          className="inline-flex items-center gap-1.5 text-[12px] text-[#2563EB] font-bold hover:gap-2.5 transition-all"
+          className="inline-flex items-center gap-1.5 text-[12px] text-[#142B4A] font-bold hover:gap-2.5 transition-all"
         >
           <BackArrow className="w-4 h-4" />
           {t("bookingDetails.backToList")}
@@ -85,7 +85,7 @@ export const BookingDetailsHeader: React.FC<BookingDetailsHeaderProps> = ({
           <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-[24px] lg:text-[26px] font-extrabold tracking-tight text-[#0F172A]">
               {t("bookingDetails.title")}{" "}
-              <span className="text-[#2563EB] font-mono tracking-normal">
+              <span className="text-[#142B4A] font-mono tracking-normal">
                 #{ref}
               </span>
             </h1>
@@ -115,7 +115,7 @@ export const BookingDetailsHeader: React.FC<BookingDetailsHeaderProps> = ({
               {t(`bookingDetails.statusPill.${status}`)}
             </span>
             <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-[#64748B]">
-              <ShieldCheck className="w-4 h-4 text-[#2563EB]" />
+              <ShieldCheck className="w-4 h-4 text-[#142B4A]" />
               {t("bookingDetails.registeredNote")}
             </span>
           </div>
@@ -126,7 +126,7 @@ export const BookingDetailsHeader: React.FC<BookingDetailsHeaderProps> = ({
             type="button"
             onClick={onDownloadDoc}
             disabled={downloadBusy}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl text-sm font-bold shadow-sm transition-colors disabled:opacity-60 cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#142B4A] hover:bg-[#0D2039] text-white rounded-xl text-sm font-bold shadow-sm transition-colors disabled:opacity-60 cursor-pointer"
           >
             <Download className="w-4 h-4" />
             {t("bookingDetails.docPdf")}

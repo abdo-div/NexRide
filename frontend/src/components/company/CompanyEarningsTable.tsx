@@ -43,7 +43,7 @@ const METHOD_ID: Record<PaymentMethod, string> = {
 const STATUS_STYLES: Record<string, string> = {
   refunded: "bg-[#FFF1F2] text-[#E11D48]",
   partiallyRefunded: "bg-[#FFF1F2] text-[#E11D48]",
-  disbursed: "bg-[#EFF4FF] text-[#2563EB]",
+  disbursed: "bg-[#F8FAFC] text-[#142B4A]",
   processing: "bg-[#FFF4E5] text-[#B45309]",
   completed: "bg-emerald-50 text-emerald-700",
 };
@@ -61,7 +61,7 @@ const StatusChip: React.FC<{ row: CompanyEarningsRow }> = ({ row }) => {
           variant === "refunded" || variant === "partiallyRefunded"
             ? "bg-[#E11D48]"
             : variant === "disbursed"
-              ? "bg-[#2563EB]"
+              ? "bg-[#142B4A]"
               : variant === "processing"
                 ? "bg-[#F59E0B]"
                 : "bg-emerald-500"
@@ -130,8 +130,8 @@ export const CompanyEarningsTable: React.FC<CompanyEarningsTableProps> = ({
       <div className="flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white px-6 py-14 text-center shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
         {hasActiveFilters ? (
           <>
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EFF4FF]">
-              <SearchX className="h-6 w-6 text-[#2563EB]" aria-hidden="true" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F8FAFC]">
+              <SearchX className="h-6 w-6 text-[#142B4A]" aria-hidden="true" />
             </div>
             <p className="text-[16px] font-bold text-[#0B1C30]">
               {t("company.payoutsPage.register.emptyFilter")}
@@ -139,8 +139,8 @@ export const CompanyEarningsTable: React.FC<CompanyEarningsTableProps> = ({
           </>
         ) : (
           <>
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EFF4FF]">
-              <Wallet className="h-6 w-6 text-[#2563EB]" aria-hidden="true" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F8FAFC]">
+              <Wallet className="h-6 w-6 text-[#142B4A]" aria-hidden="true" />
             </div>
             <p className="text-[16px] font-bold text-[#0B1C30]">
               {t("company.payoutsPage.states.emptyTitle")}
@@ -215,7 +215,7 @@ export const CompanyEarningsTable: React.FC<CompanyEarningsTableProps> = ({
                   <td className="px-4 py-3.5">
                     {row.vehicle ? (
                       <div className="flex min-w-0 items-center gap-2">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[#E5EEFF] text-[#2563EB]">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[#F1F5F9] text-[#142B4A]">
                           {row.vehicle.photo ? (
                             <img
                               src={row.vehicle.photo}
@@ -276,7 +276,7 @@ export const CompanyEarningsTable: React.FC<CompanyEarningsTableProps> = ({
                       type="button"
                       disabled={loading}
                       onClick={() => onOpenRow(row)}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-[#EFF4FF] px-3 py-1.5 text-[11px] font-bold text-[#2563EB] transition-colors hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-[#F8FAFC] px-3 py-1.5 text-[11px] font-bold text-[#142B4A] transition-colors hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
                     >
                       <Eye className="h-3.5 w-3.5" aria-hidden="true" />
                       {t("company.payoutsPage.rows.view")}
@@ -296,7 +296,7 @@ export const CompanyEarningsTable: React.FC<CompanyEarningsTableProps> = ({
           <select
             value={pagination.limit}
             onChange={(event) => onLimitChange(Number(event.target.value))}
-            className="cursor-pointer rounded-md border border-[#E5EEFF] bg-white px-2 py-1 text-[12px] font-semibold text-[#0B1C30] outline-none focus:border-[#2563EB]"
+            className="cursor-pointer rounded-md border border-[#F1F5F9] bg-white px-2 py-1 text-[12px] font-semibold text-[#0B1C30] outline-none focus:border-[#142B4A]"
           >
             {LIMIT_OPTIONS.map((option) => (
               <option key={option} value={option}>
@@ -311,7 +311,7 @@ export const CompanyEarningsTable: React.FC<CompanyEarningsTableProps> = ({
             type="button"
             disabled={!hasPreviousPage}
             onClick={() => onPageChange(page - 1)}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF4FF] text-[#565E74] transition-colors hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8FAFC] text-[#565E74] transition-colors hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
             aria-label={t("company.payoutsPage.table.prev")}
           >
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
@@ -336,8 +336,8 @@ export const CompanyEarningsTable: React.FC<CompanyEarningsTableProps> = ({
                   onClick={() => onPageChange(p)}
                   className={`h-8 min-w-8 rounded-lg px-2 text-[13px] font-bold transition-colors cursor-pointer ${
                     p === page
-                      ? "bg-[#2563EB] text-white"
-                      : "bg-[#EFF4FF] text-[#565E74] hover:bg-[#E5EEFF]"
+                      ? "bg-[#142B4A] text-white"
+                      : "bg-[#F8FAFC] text-[#565E74] hover:bg-[#F1F5F9]"
                   }`}
                 >
                   {p}
@@ -348,7 +348,7 @@ export const CompanyEarningsTable: React.FC<CompanyEarningsTableProps> = ({
             type="button"
             disabled={!hasNextPage}
             onClick={() => onPageChange(page + 1)}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF4FF] text-[#565E74] transition-colors hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8FAFC] text-[#565E74] transition-colors hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
             aria-label={t("company.payoutsPage.table.next")}
           >
             <ChevronRight className="h-4 w-4" aria-hidden="true" />

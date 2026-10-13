@@ -47,7 +47,7 @@ export const CompanyMaintenanceToolbar: React.FC<CompanyMaintenanceToolbarProps>
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder={t("company.maintenance.filters.searchPlaceholder")}
-          className="w-full rounded-xl bg-[#EFF4FF] py-2.5 ps-11 pe-4 text-sm text-[#0B1C30] outline-none transition-all placeholder:text-[#565E74] focus:bg-white focus:ring-2 focus:ring-[#2563EB]"
+          className="w-full rounded-xl bg-[#F8FAFC] py-2.5 ps-11 pe-4 text-sm text-[#0B1C30] outline-none transition-all placeholder:text-[#565E74] focus:bg-white focus:ring-2 focus:ring-[#142B4A]"
         />
       </div>
 
@@ -88,7 +88,7 @@ export const CompanyMaintenanceToolbar: React.FC<CompanyMaintenanceToolbarProps>
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#EFF4FF] px-3 py-2 text-sm font-semibold text-[#2563EB] transition-all hover:bg-[#E5EEFF] cursor-pointer xl:h-[42px]"
+            className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#F8FAFC] px-3 py-2 text-sm font-semibold text-[#142B4A] transition-all hover:bg-[#F1F5F9] cursor-pointer xl:h-[42px]"
           >
             <RotateCcw className="h-4 w-4" />
             {t("company.maintenance.filters.reset")}
@@ -132,7 +132,7 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
-        className={`w-full cursor-pointer appearance-none rounded-xl bg-[#EFF4FF] py-2.5 ps-10 pe-8 text-sm font-semibold text-[#0B1C30] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#2563EB] disabled:cursor-not-allowed disabled:text-[#9AA4B5] ${
+        className={`w-full cursor-pointer appearance-none rounded-xl bg-[#F8FAFC] py-2.5 ps-10 pe-8 text-sm font-semibold text-[#0B1C30] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#142B4A] disabled:cursor-not-allowed disabled:text-[#9AA4B5] ${
           disabled ? "opacity-70" : ""
         }`}
       >

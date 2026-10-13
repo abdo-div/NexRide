@@ -32,7 +32,7 @@ export const TextInput: React.FC<{
     value={value}
     onChange={(event) => onChange(event.target.value)}
     placeholder={placeholder}
-    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#EFF4FF] text-sm text-[#0B1C30] placeholder:text-[#737686] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 transition-shadow ${
+    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#F8FAFC] text-sm text-[#0B1C30] placeholder:text-[#737686] focus:outline-none focus:ring-2 focus:ring-[#142B4A]/40 transition-shadow ${
       error ? "ring-2 ring-[#BA1A1A]/60" : ""
     } ${className}`}
   />
@@ -47,7 +47,7 @@ export const SelectInput: React.FC<{
   <select
     value={String(value)}
     onChange={(event) => onChange(event.target.value)}
-    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#EFF4FF] text-sm font-semibold text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 transition-shadow appearance-none cursor-pointer ${
+    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#F8FAFC] text-sm font-semibold text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#142B4A]/40 transition-shadow appearance-none cursor-pointer ${
       error ? "ring-2 ring-[#BA1A1A]/60" : ""
     }`}
   >
@@ -83,7 +83,7 @@ export const Toggle: React.FC<{
     aria-checked={checked}
     onClick={() => onChange(!checked)}
     className={`w-12 h-6 rounded-full flex items-center px-1 transition-colors cursor-pointer ${
-      checked ? "bg-[#2563EB] justify-end" : "bg-[#D3E4FE] justify-start"
+      checked ? "bg-[#142B4A] justify-end" : "bg-[#E2E8F0] justify-start"
     }`}
   >
     <span className="w-4 h-4 rounded-full bg-white shadow-sm" />

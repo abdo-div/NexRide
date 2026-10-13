@@ -71,7 +71,7 @@ export const CompanyBookingsTable: React.FC<CompanyBookingsTableProps> = ({
       <div className="w-full overflow-x-auto">
         <table className="w-full border-collapse text-start">
           <thead>
-            <tr className="bg-[#E5EEFF] text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
+            <tr className="bg-[#F1F5F9] text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
               <th className="rounded-s-xl px-4 py-3 text-start">
                 {t("company.bookingsPage.table.booking")}
               </th>
@@ -98,7 +98,7 @@ export const CompanyBookingsTable: React.FC<CompanyBookingsTableProps> = ({
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#E5EEFF]">
+          <tbody className="divide-y divide-[#F1F5F9]">
             {rows.map((row) => {
               const selected = selectedId === row.id;
               return (
@@ -106,12 +106,12 @@ export const CompanyBookingsTable: React.FC<CompanyBookingsTableProps> = ({
                   key={row.id}
                   onClick={() => onSelect(row)}
                   className={`transition-colors cursor-pointer ${
-                    selected ? "bg-[#EFF4FF]" : "hover:bg-[#F1F5F9]"
+                    selected ? "bg-[#F8FAFC]" : "hover:bg-[#F1F5F9]"
                   }`}
                 >
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-[13px] font-bold text-[#2563EB]">
+                      <span className="font-mono text-[13px] font-bold text-[#142B4A]">
                         {row.reference}
                       </span>
                       {row.verified && (
@@ -126,7 +126,7 @@ export const CompanyBookingsTable: React.FC<CompanyBookingsTableProps> = ({
                   </td>
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-2">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#DCE9FF] text-xs font-bold text-[#2563EB]">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#F1F5F9] text-xs font-bold text-[#142B4A]">
                         {row.customer.initials}
                       </span>
                       <span className="max-w-[160px] truncate text-sm font-semibold text-[#0B1C30]">
@@ -144,7 +144,7 @@ export const CompanyBookingsTable: React.FC<CompanyBookingsTableProps> = ({
                           loading="lazy"
                         />
                       ) : (
-                        <span className="flex h-9 w-12 shrink-0 items-center justify-center rounded-md bg-[#E5EEFF] text-[10px] font-bold text-[#2563EB]">
+                        <span className="flex h-9 w-12 shrink-0 items-center justify-center rounded-md bg-[#F1F5F9] text-[10px] font-bold text-[#142B4A]">
                           NX
                         </span>
                       )}
@@ -190,12 +190,12 @@ export const CompanyBookingsTable: React.FC<CompanyBookingsTableProps> = ({
                     <span
                       className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold ${
                         row.bookingStatus === "ACTIVE"
-                          ? "bg-[#E5EEFF] text-[#0B1C30]"
-                          : "bg-[#EFF4FF] text-[#2563EB]"
+                          ? "bg-[#F1F5F9] text-[#0B1C30]"
+                          : "bg-[#F8FAFC] text-[#142B4A]"
                       }`}
                     >
                       {row.bookingStatus === "ACTIVE" && (
-                        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#2563EB]" />
+                        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#142B4A]" />
                       )}
                       {t(`company.bookingsPage.status.${row.bookingStatus}`)}
                     </span>
@@ -207,7 +207,7 @@ export const CompanyBookingsTable: React.FC<CompanyBookingsTableProps> = ({
                         event.stopPropagation();
                         onSelect(row);
                       }}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-[#EFF4FF] px-2.5 py-1.5 text-[12px] font-bold text-[#2563EB] transition-colors hover:bg-[#E5EEFF] cursor-pointer"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-[#F8FAFC] px-2.5 py-1.5 text-[12px] font-bold text-[#142B4A] transition-colors hover:bg-[#F1F5F9] cursor-pointer"
                     >
                       <Eye className="h-3.5 w-3.5" aria-hidden="true" />
                       {t("company.bookingsPage.table.view")}
@@ -229,7 +229,7 @@ export const CompanyBookingsTable: React.FC<CompanyBookingsTableProps> = ({
           <select
             value={limit}
             onChange={(event) => onLimitChange(Number(event.target.value))}
-            className="cursor-pointer rounded-md border border-[#E5EEFF] bg-white px-2 py-1 text-[12px] font-semibold text-[#0B1C30] outline-none focus:border-[#2563EB]"
+            className="cursor-pointer rounded-md border border-[#F1F5F9] bg-white px-2 py-1 text-[12px] font-semibold text-[#0B1C30] outline-none focus:border-[#142B4A]"
           >
             {LIMIT_OPTIONS.map((option) => (
               <option key={option} value={option}>
@@ -244,7 +244,7 @@ export const CompanyBookingsTable: React.FC<CompanyBookingsTableProps> = ({
             type="button"
             disabled={!canGoPrevious}
             onClick={() => onPageChange(page - 1)}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF4FF] text-[#565E74] transition-colors hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8FAFC] text-[#565E74] transition-colors hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
             aria-label={t("company.bookingsPage.table.prev")}
           >
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
@@ -274,8 +274,8 @@ export const CompanyBookingsTable: React.FC<CompanyBookingsTableProps> = ({
                   onClick={() => onPageChange(p)}
                   className={`h-8 min-w-8 rounded-lg px-2 text-[13px] font-bold transition-colors cursor-pointer ${
                     p === page
-                      ? "bg-[#2563EB] text-white"
-                      : "bg-[#EFF4FF] text-[#565E74] hover:bg-[#E5EEFF]"
+                      ? "bg-[#142B4A] text-white"
+                      : "bg-[#F8FAFC] text-[#565E74] hover:bg-[#F1F5F9]"
                   }`}
                 >
                   {p}
@@ -286,7 +286,7 @@ export const CompanyBookingsTable: React.FC<CompanyBookingsTableProps> = ({
             type="button"
             disabled={!canGoNext}
             onClick={() => onPageChange(page + 1)}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF4FF] text-[#565E74] transition-colors hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8FAFC] text-[#565E74] transition-colors hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
             aria-label={t("company.bookingsPage.table.next")}
           >
             <ChevronRight className="h-4 w-4" aria-hidden="true" />

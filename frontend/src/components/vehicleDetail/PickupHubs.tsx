@@ -8,7 +8,7 @@ const HubIcon: React.FC<{ kind: "plane" | "building"; className?: string }> = ({
   kind,
   className,
 }) => {
-  const cls = className ?? "w-[18px] h-[18px] text-[#2563EB]";
+  const cls = className ?? "w-[18px] h-[18px] text-[#142B4A]";
   return kind === "plane" ? <MapPin className={cls} /> : <Building2 className={cls} />;
 };
 
@@ -22,7 +22,7 @@ export const PickupHubs: React.FC<{ detail: VehicleDetail }> = ({ detail }) => {
           <h2 className="text-[20px] font-bold text-[#0F172A]">{t("vehicleDetail.hubsHeading")}</h2>
           <p className="text-[13px] text-[#64748B]">{t("vehicleDetail.hubsSub")}</p>
         </div>
-        <span className="px-2.5 py-1 rounded-xl bg-blue-50 text-[#2563EB] text-[11px] font-bold border border-blue-100 self-start">
+        <span className="px-2.5 py-1 rounded-xl bg-slate-50 text-[#142B4A] text-[11px] font-bold border border-slate-100 self-start">
           {t(detail.hubBadge)}
         </span>
       </div>
@@ -45,7 +45,7 @@ export const PickupHubs: React.FC<{ detail: VehicleDetail }> = ({ detail }) => {
         />
         <div className="absolute inset-x-4 bottom-4 z-[500] bg-white/95 border border-[#E2E8F0] p-3.5 rounded-2xl flex items-center justify-between shadow-md backdrop-blur-md">
           <div className="flex items-center gap-3">
-            <MapPin className="w-[26px] h-[26px] text-[#2563EB] shrink-0" />
+            <MapPin className="w-[26px] h-[26px] text-[#142B4A] shrink-0" />
             <div>
               <p className="text-[14px] font-bold text-[#0F172A]">{t(detail.conciergeTitle)}</p>
               <p className="text-[12px] text-[#64748B]">{t(detail.conciergeBody)}</p>
@@ -56,7 +56,7 @@ export const PickupHubs: React.FC<{ detail: VehicleDetail }> = ({ detail }) => {
             onClick={(e) => {
               if (!detail.mapUrl) e.preventDefault();
             }}
-            className="hidden sm:block shrink-0 text-[12px] font-bold text-[#2563EB] hover:underline underline-offset-4"
+            className="hidden sm:block shrink-0 text-[12px] font-bold text-[#142B4A] hover:underline underline-offset-4"
           >
             {t(detail.mapLinkLabel)}
           </a>

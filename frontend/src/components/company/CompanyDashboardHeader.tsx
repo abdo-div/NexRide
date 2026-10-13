@@ -39,7 +39,7 @@ export const CompanyDashboardHeader: React.FC<CompanyDashboardHeaderProps> = ({
             <h1 className="text-2xl font-extrabold tracking-tight text-[#0B1C30] md:text-[28px]">
               {t("company.header.welcome", { name: userName ?? "Partner" })}
             </h1>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#DCE9FF] px-3 py-1 text-sm font-semibold text-[#2563EB] shadow-sm">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F1F5F9] px-3 py-1 text-sm font-semibold text-[#142B4A] shadow-sm">
               <ShieldCheck className="h-4 w-4" />
               {t("company.header.certifiedBadge", {
                 city: company?.city ?? t("company.header.yourHub"),
@@ -59,7 +59,7 @@ export const CompanyDashboardHeader: React.FC<CompanyDashboardHeaderProps> = ({
             type="button"
             onClick={onExport}
             disabled={exporting}
-            className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#E5EEFF] disabled:opacity-60 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#F1F5F9] disabled:opacity-60 cursor-pointer"
           >
             <Download className="h-5 w-5 text-[#565E74]" />
             {t("company.header.exportFleet")}
@@ -67,7 +67,7 @@ export const CompanyDashboardHeader: React.FC<CompanyDashboardHeaderProps> = ({
           <button
             type="button"
             onClick={onRequestPayout}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#DCE9FF] px-4 py-2.5 text-sm font-semibold text-[#2563EB] shadow-sm transition-all hover:bg-[#D3E4FE] cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#F1F5F9] px-4 py-2.5 text-sm font-semibold text-[#142B4A] shadow-sm transition-all hover:bg-[#E2E8F0] cursor-pointer"
           >
             <Landmark className="h-5 w-5" />
             {t("company.header.requestClearance")}
@@ -75,7 +75,7 @@ export const CompanyDashboardHeader: React.FC<CompanyDashboardHeaderProps> = ({
           <button
             type="button"
             onClick={() => navigate("/company/fleet/new")}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_16px_rgba(37,99,235,0.28)] transition-all hover:bg-[#1D4ED8] cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_16px_rgba(37,99,235,0.28)] transition-all hover:bg-[#0D2039] cursor-pointer"
           >
             <Plus className="h-5 w-5" />
             {t("company.header.addVehicle")}
@@ -86,7 +86,7 @@ export const CompanyDashboardHeader: React.FC<CompanyDashboardHeaderProps> = ({
       {/* Live settlement alert banner */}
       <div className="flex w-full flex-col justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.04)] md:flex-row md:items-center">
         <div className="flex items-center gap-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E5EEFF] text-[#2563EB]">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F1F5F9] text-[#142B4A]">
             <Wallet className="h-[22px] w-[22px]" />
           </div>
           <div className="flex flex-col">
@@ -115,14 +115,14 @@ export const CompanyDashboardHeader: React.FC<CompanyDashboardHeaderProps> = ({
           </div>
         </div>
         <div className="flex items-center gap-3 self-start md:self-auto">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EFF4FF] px-3 py-1 text-sm font-semibold text-[#2563EB]">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-[#2563EB]" />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8FAFC] px-3 py-1 text-sm font-semibold text-[#142B4A]">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-[#142B4A]" />
             {t("company.header.rtgsActive")}
           </span>
           <button
             type="button"
             onClick={() => navigate("/company/payouts")}
-            className="inline-flex items-center gap-0.5 rounded-full bg-[#EFF4FF] px-3 py-1 text-sm font-semibold text-[#2563EB] transition-colors hover:bg-[#DCE9FF] cursor-pointer"
+            className="inline-flex items-center gap-0.5 rounded-full bg-[#F8FAFC] px-3 py-1 text-sm font-semibold text-[#142B4A] transition-colors hover:bg-[#F1F5F9] cursor-pointer"
           >
             {t("company.header.auditTrail")}
             <span aria-hidden="true">›</span>

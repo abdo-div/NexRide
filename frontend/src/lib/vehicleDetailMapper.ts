@@ -179,15 +179,18 @@ export const buildVehicleDetail = (
             .join("") || "?"
         : "NR";
       return {
+        id: review._id,
+        rating: review.rating,
         author: name,
         initials,
         avatarClass:
-          index % 2 === 0 ? "bg-blue-100 text-[#2563EB]" : "bg-slate-200 text-[#0F172A]",
+          index % 2 === 0 ? "bg-blue-100 text-[#142B4A]" : "bg-slate-200 text-[#0F172A]",
         context: "vehicleDetail.reviewCtxCompleted",
         timeAgo: review.createdAt
           ? new Date(review.createdAt).toLocaleDateString()
           : "vehicleDetail.timeJustNow",
         body: review.review,
+        companyResponse: review.companyResponse?.response ?? null,
       };
     }),
     similarHeading: "vehicleDetail.similarHeadingFleet",

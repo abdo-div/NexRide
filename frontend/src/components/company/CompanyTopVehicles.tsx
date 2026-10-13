@@ -72,7 +72,7 @@ export const CompanyTopVehicles: React.FC<CompanyTopVehiclesProps> = ({
               }
               className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer ${
                 selectedVehicleId === vehicle.id
-                  ? "border-[#2563EB] bg-[#EFF4FF]"
+                  ? "border-[#142B4A] bg-[#F8FAFC]"
                   : "border-slate-100 bg-[#F8FAFF] hover:border-[#C7D2FE]"
               }`}
             >
@@ -81,7 +81,7 @@ export const CompanyTopVehicles: React.FC<CompanyTopVehiclesProps> = ({
               >
                 {row.rank}
               </span>
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#E5EEFF] text-[#2563EB]">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#F1F5F9] text-[#142B4A]">
                 {photo ? (
                   <img
                     src={photo}
@@ -105,9 +105,9 @@ export const CompanyTopVehicles: React.FC<CompanyTopVehiclesProps> = ({
                   <span className="h-3 w-px bg-[#E2E8F0]" />
                   {moneyOf(row.gross)}
                 </span>
-                <span className="mt-1.5 block h-1.5 w-full overflow-hidden rounded-full bg-[#E5EEFF]">
+                <span className="mt-1.5 block h-1.5 w-full overflow-hidden rounded-full bg-[#F1F5F9]">
                   <span
-                    className="block h-full rounded-full bg-[#2563EB]"
+                    className="block h-full rounded-full bg-[#142B4A]"
                     style={{ width: `${Math.min(100, row.sharePct)}%` }}
                   />
                 </span>

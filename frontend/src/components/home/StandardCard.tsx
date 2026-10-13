@@ -6,8 +6,9 @@ import {
   CreditCard,
   CarSimple,
 } from "@phosphor-icons/react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import type { StandardFeature } from "../../types/standard";
+import { cardHover } from "../../lib/motion";
 
 interface StandardCardProps {
   feature: StandardFeature;
@@ -16,8 +17,8 @@ interface StandardCardProps {
 
 export const StandardCard: React.FC<StandardCardProps> = ({ feature, index = 0 }) => {
   const { t } = useTranslation();
-  const iconClass =
-    "h-6 w-6 text-blue-600 transition-colors duration-300 group-hover:text-white";
+  const reduceMotion = useReducedMotion();
+  const iconClass = "h-6 w-6 transition-colors duration-300";
   const renderIcon = () => {
     switch (feature.iconType) {
       case "shield":
@@ -39,12 +40,12 @@ export const StandardCard: React.FC<StandardCardProps> = ({ feature, index = 0 }
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
-      whileHover={{ y: -6, transition: { duration: 0.2 } }}
-      className="bg-slate-50/70 hover:bg-white rounded-3xl border border-slate-200/80 p-6 flex flex-col justify-between transition-colors duration-300 hover:shadow-xl hover:shadow-blue-500/5 hover:border-blue-200 group"
+      whileHover={reduceMotion ? undefined : cardHover}
+      className="premium-card bg-slate-50/70 hover:bg-white rounded-3xl border border-slate-200/80 p-6 flex flex-col justify-between group"
     >
       <div>
         {/* Icon Box */}
-        <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 shadow-sm flex items-center justify-center mb-6 group-hover:scale-105 group-hover:bg-blue-600 group-hover:border-blue-600 group-hover:text-white transition-all duration-300">
+        <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 text-[#142b4a] shadow-sm flex items-center justify-center mb-6 group-hover:scale-105 group-hover:bg-[#142b4a] group-hover:border-[#142b4a] group-hover:text-white transition-all duration-300">
           {renderIcon()}
         </div>
 

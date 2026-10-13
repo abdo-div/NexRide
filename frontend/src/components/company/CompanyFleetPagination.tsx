@@ -11,7 +11,7 @@ interface CompanyFleetPaginationProps {
 const pageButton = (active: boolean) =>
   `h-9 min-w-9 rounded-lg px-2 text-sm font-semibold transition-colors cursor-pointer ${
     active
-      ? "bg-[#2563EB] text-white shadow-sm"
+      ? "bg-[#142B4A] text-white shadow-sm"
       : "text-[#565E74] hover:bg-[#F7F9FC]"
   }`;
 

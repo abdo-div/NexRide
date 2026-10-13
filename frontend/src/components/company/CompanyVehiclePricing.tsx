@@ -25,7 +25,7 @@ export const CompanyVehiclePricing: React.FC<CompanyVehiclePricingProps> = ({
   return (
     <SectionCard
       icon={Wallet}
-      iconStyle="bg-[#EFF4FF] text-[#2563EB]"
+      iconStyle="bg-[#F8FAFC] text-[#142B4A]"
       title={t("company.vehiclePage.pricing.title")}
       titleAr={t("company.vehiclePage.pricing.titleAr")}
       action={
@@ -33,7 +33,7 @@ export const CompanyVehiclePricing: React.FC<CompanyVehiclePricingProps> = ({
           type="button"
           disabled
           title={t("company.vehiclePage.soon")}
-          className="inline-flex items-center gap-1 text-xs font-semibold text-[#2563EB] disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center gap-1 text-xs font-semibold text-[#142B4A] disabled:cursor-not-allowed disabled:opacity-60"
         >
           <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
           {t("company.vehiclePage.pricing.edit")}
@@ -41,7 +41,7 @@ export const CompanyVehiclePricing: React.FC<CompanyVehiclePricingProps> = ({
       }
     >
       <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between rounded-xl bg-[#EFF4FF] p-4">
+        <div className="flex items-center justify-between rounded-xl bg-[#F8FAFC] p-4">
           <div>
             <p className="text-sm font-bold text-[#0B1C30]">
               {t("company.vehiclePage.pricing.daily")}
@@ -49,7 +49,7 @@ export const CompanyVehiclePricing: React.FC<CompanyVehiclePricingProps> = ({
             <p className="text-[11px] text-[#5C647A]">{t("company.vehiclePage.pricing.dailyHint")}</p>
           </div>
           <div className="text-right">
-            <p className="text-xl font-extrabold text-[#004AC6]">
+            <p className="text-xl font-extrabold text-[#142B4A]">
               {lyd(vehicle.dailyPrice)}
               <span className="ml-1 text-xs font-normal text-[#0B1C30]">
                 / {t("company.fleetPage.price.day")}
@@ -60,7 +60,7 @@ export const CompanyVehiclePricing: React.FC<CompanyVehiclePricingProps> = ({
         </div>
 
         {vehicle.weeklyPrice ? (
-          <div className="flex items-center justify-between rounded-xl bg-[#2563EB] p-4 text-white shadow-sm">
+          <div className="flex items-center justify-between rounded-xl bg-[#142B4A] p-4 text-white shadow-sm">
             <div>
               <p className="text-sm font-bold">{t("company.vehiclePage.pricing.weekly")}</p>
               <p className="text-[11px] opacity-90">{t("company.vehiclePage.pricing.weeklyHint")}</p>
