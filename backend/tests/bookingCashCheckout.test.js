@@ -59,9 +59,16 @@ const runCreateBooking = async (
   const session = {
     committed: false,
     aborted: false,
-    startTransaction() {},
-    async commitTransaction() { this.committed = true; },
-    async abortTransaction() { this.aborted = true; },
+    async withTransaction(work) {
+      try {
+        const result = await work();
+        this.committed = true;
+        return result;
+      } catch (error) {
+        this.aborted = true;
+        throw error;
+      }
+    },
     endSession() {},
   };
   const bookingCreateOptions = [];
