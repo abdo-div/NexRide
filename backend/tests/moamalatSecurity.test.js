@@ -245,7 +245,12 @@ test("verified amount must match the stored booking, and repeated verification i
   };
   let vehicleUpdateCount = 0;
   let redisDeleteCount = 0;
-  const transaction = { commitTransaction: async () => {}, abortTransaction: async () => {}, endSession() {} };
+  const transaction = {
+    async withTransaction(work) {
+      return work();
+    },
+    endSession() {},
+  };
 
   const bookingQuery = () => {
     const query = Promise.resolve(booking);
@@ -256,7 +261,6 @@ test("verified amount must match the stored booking, and repeated verification i
   const paymentQuery = () => ({ session: async () => payment });
   t.mock.method(mongoose, "startSession", async () => ({
     ...transaction,
-    startTransaction() {},
   }));
   t.mock.method(Booking, "findById", bookingQuery);
   t.mock.method(Payment, "findOne", async () => payment);
