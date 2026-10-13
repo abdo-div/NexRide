@@ -87,8 +87,8 @@ const ReplyForm: React.FC<ReplyFormProps> = ({
 }) => {
   const { t } = useTranslation();
   return (
-    <div className="rounded-xl border border-[#E5EEFF] bg-[#F8FAFF] p-3">
-      <p className="mb-2 flex items-center gap-1.5 text-[12px] font-semibold text-[#2563EB]">
+    <div className="rounded-xl border border-[#F1F5F9] bg-[#F8FAFF] p-3">
+      <p className="mb-2 flex items-center gap-1.5 text-[12px] font-semibold text-[#142B4A]">
         <Reply className="h-3.5 w-3.5" aria-hidden="true" />
         {t("company.reviewsPage.rows.replyAs", { company: companyName })}
       </p>
@@ -100,7 +100,7 @@ const ReplyForm: React.FC<ReplyFormProps> = ({
         disabled={busy}
         onChange={(event) => onDraftChange(reviewId, event.target.value)}
         placeholder={t("company.reviewsPage.rows.replyPlaceholder")}
-        className="w-full resize-none rounded-lg border border-[#E5EEFF] bg-white px-3 py-2 text-sm text-[#0B1C30] outline-none transition-colors placeholder:text-[#9AA4B5] focus:border-[#2563EB] focus:ring-2 focus:ring-[#E5EEFF] disabled:opacity-60"
+        className="w-full resize-none rounded-lg border border-[#F1F5F9] bg-white px-3 py-2 text-sm text-[#0B1C30] outline-none transition-colors placeholder:text-[#9AA4B5] focus:border-[#142B4A] focus:ring-2 focus:ring-[#F1F5F9] disabled:opacity-60"
       />
       <div className="mt-2 flex items-center justify-end gap-2">
         <button
@@ -115,7 +115,7 @@ const ReplyForm: React.FC<ReplyFormProps> = ({
           type="button"
           disabled={busy || draft.trim().length === 0}
           onClick={() => void onSubmit()}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-[#2563EB] px-3.5 py-1.5 text-[12px] font-bold text-white shadow-sm transition-colors enabled:hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-[#142B4A] px-3.5 py-1.5 text-[12px] font-bold text-white shadow-sm transition-colors enabled:hover:bg-[#0D2039] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
         >
           <Send className="h-3.5 w-3.5" aria-hidden="true" />
           {t("company.reviewsPage.rows.postResponse")}
@@ -154,12 +154,12 @@ const ReviewContextLine: React.FC<{ row: CompanyReviewRow }> = ({ row }) => {
         </span>
       )}
       {row.booking?.pickupMethod === "DELIVERY" && (
-        <span className="inline-flex items-center rounded-lg bg-[#EFF4FF] px-2.5 py-1 text-[12px] font-bold text-[#2563EB]">
+        <span className="inline-flex items-center rounded-lg bg-[#F8FAFC] px-2.5 py-1 text-[12px] font-bold text-[#142B4A]">
           {t("company.reviewsPage.rows.delivery")}
         </span>
       )}
       {row.booking?.pickupMethod === "BRANCH_PICKUP" && (
-        <span className="inline-flex items-center rounded-lg bg-[#EFF4FF] px-2.5 py-1 text-[12px] font-bold text-[#2563EB]">
+        <span className="inline-flex items-center rounded-lg bg-[#F8FAFC] px-2.5 py-1 text-[12px] font-bold text-[#142B4A]">
           {t("company.reviewsPage.rows.branchPickup")}
         </span>
       )}
@@ -176,7 +176,7 @@ const PartnerResponseBubble: React.FC<{ row: CompanyReviewRow; lang: string }> =
   return (
     <div className="rounded-xl bg-[#F8FAFC] px-4 py-3">
       <div className="flex items-center justify-between gap-2">
-        <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#142B4A]">
           <Send className="h-3 w-3" aria-hidden="true" />
           {t("company.reviewsPage.rows.partnerReply")} · {row.vehicle?.make ?? t("company.reviewsPage.title")}
         </span>
@@ -204,7 +204,7 @@ interface AvatarProps {
 const Avatar: React.FC<AvatarProps> = ({ name, initials }) => (
   <span
     aria-hidden="true"
-    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#E5EEFF] text-[13px] font-extrabold text-[#2563EB]"
+    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F1F5F9] text-[13px] font-extrabold text-[#142B4A]"
   >
     {initials || name.charAt(0).toUpperCase() || "?"}
   </span>
@@ -268,8 +268,8 @@ export const CompanyReviewsTable: React.FC<CompanyReviewsTableProps> = ({
       <div className="flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white px-6 py-14 text-center shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
         {hasActiveFilters ? (
           <>
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EFF4FF]">
-              <SearchX className="h-6 w-6 text-[#2563EB]" aria-hidden="true" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F8FAFC]">
+              <SearchX className="h-6 w-6 text-[#142B4A]" aria-hidden="true" />
             </div>
             <p className="text-[16px] font-bold text-[#0B1C30]">
               {t("company.reviewsPage.register.emptyFilter")}
@@ -277,8 +277,8 @@ export const CompanyReviewsTable: React.FC<CompanyReviewsTableProps> = ({
           </>
         ) : (
           <>
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EFF4FF]">
-              <Star className="h-6 w-6 text-[#2563EB]" aria-hidden="true" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F8FAFC]">
+              <Star className="h-6 w-6 text-[#142B4A]" aria-hidden="true" />
             </div>
             <p className="text-[16px] font-bold text-[#0B1C30]">
               {t("company.reviewsPage.states.emptyTitle")}
@@ -398,7 +398,7 @@ export const CompanyReviewsTable: React.FC<CompanyReviewsTableProps> = ({
                         type="button"
                         onClick={() => setExpandedCompact(expanded ? null : row.id)}
                         disabled={busy}
-                        className="inline-flex items-center gap-1 rounded-lg bg-[#EFF4FF] px-2.5 py-1.5 text-[11px] font-bold text-[#2563EB] transition-colors hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                        className="inline-flex items-center gap-1 rounded-lg bg-[#F8FAFC] px-2.5 py-1.5 text-[11px] font-bold text-[#142B4A] transition-colors hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                       >
                         <Reply className="h-3 w-3" aria-hidden="true" />
                         {t("company.reviewsPage.rows.postResponse")}
@@ -432,7 +432,7 @@ export const CompanyReviewsTable: React.FC<CompanyReviewsTableProps> = ({
           <select
             value={pagination.limit}
             onChange={(event) => onLimitChange(Number(event.target.value))}
-            className="cursor-pointer rounded-md border border-[#E5EEFF] bg-white px-2 py-1 text-[12px] font-semibold text-[#0B1C30] outline-none focus:border-[#2563EB]"
+            className="cursor-pointer rounded-md border border-[#F1F5F9] bg-white px-2 py-1 text-[12px] font-semibold text-[#0B1C30] outline-none focus:border-[#142B4A]"
           >
             {LIMIT_OPTIONS.map((option) => (
               <option key={option} value={option}>
@@ -447,7 +447,7 @@ export const CompanyReviewsTable: React.FC<CompanyReviewsTableProps> = ({
             type="button"
             disabled={!hasPreviousPage}
             onClick={() => onPageChange(page - 1)}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF4FF] text-[#565E74] transition-colors hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8FAFC] text-[#565E74] transition-colors hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
             aria-label={t("company.reviewsPage.table.prev")}
           >
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
@@ -471,7 +471,7 @@ export const CompanyReviewsTable: React.FC<CompanyReviewsTableProps> = ({
                   type="button"
                   onClick={() => onPageChange(p)}
                   className={`h-8 min-w-8 rounded-lg px-2 text-[13px] font-bold transition-colors cursor-pointer ${
-                    p === page ? "bg-[#2563EB] text-white" : "bg-[#EFF4FF] text-[#565E74] hover:bg-[#E5EEFF]"
+                    p === page ? "bg-[#142B4A] text-white" : "bg-[#F8FAFC] text-[#565E74] hover:bg-[#F1F5F9]"
                   }`}
                 >
                   {p}
@@ -482,7 +482,7 @@ export const CompanyReviewsTable: React.FC<CompanyReviewsTableProps> = ({
             type="button"
             disabled={!hasNextPage}
             onClick={() => onPageChange(page + 1)}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF4FF] text-[#565E74] transition-colors hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8FAFC] text-[#565E74] transition-colors hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
             aria-label={t("company.reviewsPage.table.next")}
           >
             <ChevronRight className="h-4 w-4" aria-hidden="true" />

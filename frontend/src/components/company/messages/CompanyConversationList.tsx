@@ -97,8 +97,8 @@ export const CompanyConversationList: React.FC<
               onClick={() => onViewChange(pill.value)}
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold transition-colors cursor-pointer ${
                 view === pill.value
-                  ? "bg-[#2563EB] text-white"
-                  : "bg-[#EFF4FF] text-[#434655] hover:bg-[#E5EEFF]"
+                  ? "bg-[#142B4A] text-white"
+                  : "bg-[#F8FAFC] text-[#434655] hover:bg-[#F1F5F9]"
               }`}
             >
               {t(pill.labelKey)}
@@ -122,9 +122,9 @@ export const CompanyConversationList: React.FC<
           <div className="space-y-3 p-4">
             {[0, 1, 2, 3, 4].map((row) => (
               <div key={row} className="flex gap-3">
-                <div className="h-11 w-11 shrink-0 animate-pulse rounded-full bg-[#E5EEFF]" />
+                <div className="h-11 w-11 shrink-0 animate-pulse rounded-full bg-[#F1F5F9]" />
                 <div className="flex-1 space-y-2 py-1">
-                  <div className="h-3 w-1/2 animate-pulse rounded-full bg-[#E5EEFF]" />
+                  <div className="h-3 w-1/2 animate-pulse rounded-full bg-[#F1F5F9]" />
                   <div className="h-3 w-3/4 animate-pulse rounded-full bg-[#F1F5F9]" />
                 </div>
               </div>
@@ -151,7 +151,7 @@ export const CompanyConversationList: React.FC<
                     type="button"
                     onClick={() => onSelect(conversation.id)}
                     className={`flex w-full gap-3 p-4 text-left transition-colors cursor-pointer ${
-                      isActive ? "bg-[#EFF4FF]" : "hover:bg-[#F8FAFF]"
+                      isActive ? "bg-[#F8FAFC]" : "hover:bg-[#F8FAFF]"
                     }`}
                   >
                     {photo ? (
@@ -161,7 +161,7 @@ export const CompanyConversationList: React.FC<
                         className="h-11 w-11 shrink-0 rounded-full border border-slate-200 object-cover"
                       />
                     ) : (
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-sm font-bold text-white">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#142B4A] text-sm font-bold text-white">
                         {conversation.customer.initials}
                       </div>
                     )}
@@ -187,7 +187,7 @@ export const CompanyConversationList: React.FC<
                           {t(CHANNEL_LABEL_KEY[conversation.channel])}
                         </span>
                         {conversation.booking && (
-                          <span className="truncate text-[11px] font-semibold text-[#2563EB]">
+                          <span className="truncate text-[11px] font-semibold text-[#142B4A]">
                             {conversation.booking.reference}
                           </span>
                         )}

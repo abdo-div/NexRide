@@ -5,8 +5,8 @@ export type StatusKind = "booking" | "payment" | "payout" | "company" | "vehicle
 
 const BOOKING_STYLES: Record<string, string> = {
   PENDING_PAYMENT: "bg-amber-50 text-amber-800",
-  PAID: "bg-[#EFF4FF] text-[#2563EB]",
-  CONFIRMED: "bg-[#E5EEFF] text-[#1E3A8A]",
+  PAID: "bg-[#F8FAFC] text-[#142B4A]",
+  CONFIRMED: "bg-[#F1F5F9] text-[#1E3A8A]",
   ACTIVE: "bg-emerald-100/70 text-emerald-800",
   COMPLETED: "bg-slate-100 text-slate-600",
   CANCELLED: "bg-red-50 text-red-700",
@@ -26,7 +26,7 @@ const PAYMENT_STYLES: Record<string, string> = {
 
 const PAYOUT_STYLES: Record<string, string> = {
   UNSETTLED: "bg-amber-50 text-amber-800",
-  PROCESSING: "bg-[#EFF4FF] text-[#2563EB]",
+  PROCESSING: "bg-[#F8FAFC] text-[#142B4A]",
   SETTLED: "bg-emerald-50 text-emerald-700",
 };
 

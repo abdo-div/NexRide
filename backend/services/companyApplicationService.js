@@ -184,6 +184,7 @@ export const applyForCompany = async ({ data, files = [] }) => {
       phone: normalizedPhone,
       city: data.company.city,
       address: data.company.address,
+      location: data.company.location,
       commercialRegisterNumber: String(data.company.commercialRegisterNumber).trim(),
       fleetSizeTier: data.fleet.tier,
       vehicleCategories: data.fleet.categories,

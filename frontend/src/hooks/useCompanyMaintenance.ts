@@ -9,7 +9,7 @@ import type {
   MaintenanceSummary,
   MaintenanceVehicleOption,
 } from "../types/admin";
-import type { CompanyMaintenanceData } from "../types/companyMaintenance";
+import type { CompanyMaintenanceData, MaintenanceFleetVehicle, VehicleHealthStatus } from "../types/companyMaintenance";
 
 export const DEFAULT_MAINTENANCE_LIMIT = 6;
 /** Bound of the fleet registry fetch used to fill the create-event picker. */
@@ -42,6 +42,9 @@ export const useCompanyMaintenance = () => {
   const [error, setError] = useState(false);
   const [busy, setBusy] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const [vehicles, setVehicles] = useState<MaintenanceFleetVehicle[]>([]);
+  const [vehiclePagination, setVehiclePagination] = useState(EMPTY_PAGINATION);
+  const [healthStatus, setHealthStatusState] = useState<VehicleHealthStatus | "ALL">("ALL");
 
   const resetPage = () => setPage(1);
 
@@ -146,6 +149,28 @@ export const useCompanyMaintenance = () => {
     };
   }, [attempt]);
 
+  useEffect(() => {
+    const controller = new AbortController();
+    let active = true;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const response = await companyMaintenanceApi.vehicles(
+          { search, healthStatus, page, limit }, controller.signal,
+        );
+        if (!active) return;
+        setVehicles(response.data?.vehicles ?? []);
+        setVehiclePagination(response.pagination ?? EMPTY_PAGINATION);
+      } catch {
+        if (active) setError(true);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    void load();
+    return () => { active = false; controller.abort(); };
+  }, [search, healthStatus, page, limit, attempt]);
+
   const reload = useCallback(() => setAttempt((n) => n + 1), []);
 
   const resetFilters = () => {
@@ -192,6 +217,12 @@ export const useCompanyMaintenance = () => {
     [runMutation],
   );
 
+  const updateOdometer = useCallback(
+    (vehicleId: string, currentOdometer: number) =>
+      runMutation(() => companyMaintenanceApi.updateOdometer(vehicleId, currentOdometer)),
+    [runMutation],
+  );
+
   return {
     data,
     summary,
@@ -214,5 +245,13 @@ export const useCompanyMaintenance = () => {
     limit,
     setLimit,
     resetFilters,
+    vehicles,
+    vehiclePagination,
+    healthStatus,
+    setHealthStatus: (next: VehicleHealthStatus | "ALL") => {
+      setPage(1);
+      setHealthStatusState(next);
+    },
+    updateOdometer,
   };
 };

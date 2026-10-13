@@ -45,7 +45,7 @@ export const CompanyVehicleAddPage: React.FC = () => {
   const { saving, saved, saveError, saveDraft, saveChanges } = form;
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
+    <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
       <div className="flex flex-col gap-5">
 
         {/* ── Header ─────────────────────────────────────────────────── */}
@@ -57,7 +57,7 @@ export const CompanyVehicleAddPage: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate("/company/fleet")}
-              className="hover:text-[#2563EB] hover:underline cursor-pointer"
+              className="hover:text-[#142B4A] hover:underline cursor-pointer"
             >
               {t("company.fleetPage.primary")}
             </button>
@@ -70,7 +70,7 @@ export const CompanyVehicleAddPage: React.FC = () => {
             <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
               <div className="min-w-0 space-y-2">
                 <div className="flex flex-wrap items-center gap-3">
-                  <Plus className="h-6 w-6 text-[#2563EB]" aria-hidden="true" />
+                  <Plus className="h-6 w-6 text-[#142B4A]" aria-hidden="true" />
                   <h1 className="text-[26px] font-extrabold leading-tight tracking-tight text-[#0B1C30]">
                     {t("company.addVehiclePage.title", "Add New Vehicle")}
                   </h1>
@@ -112,7 +112,7 @@ export const CompanyVehicleAddPage: React.FC = () => {
                   type="button"
                   onClick={saveChanges}
                   disabled={saving}
-                  className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-all hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-all hover:bg-[#0D2039] disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
                 >
                   {saving ? (
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />

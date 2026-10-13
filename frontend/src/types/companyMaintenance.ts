@@ -24,4 +24,35 @@ export interface CompanyMaintenanceData {
   pagination: PaginationMeta;
 }
 
+export type VehicleHealthStatus = "CRITICAL_OVERDUE" | "DUE_SOON" | "HEALTHY";
+
+export interface MaintenanceFleetVehicle {
+  _id: string;
+  make: string;
+  model: string;
+  year?: number;
+  plateNumber?: string;
+  vin?: string;
+  photos?: string[];
+  operationalStatus: string;
+  currentOdometer: number;
+  licenseExpiryDate?: string | null;
+  insuranceExpiryDate?: string | null;
+  healthStatus: VehicleHealthStatus;
+  nextServiceMilestone: {
+    currentKm: number;
+    targetKm: number;
+    percentageUsed: number;
+    kmRemaining: number;
+  };
+  paperworkStatus: { licenseDays: number | null; insuranceDays: number | null };
+}
+
+export interface MaintenanceFleetQuery {
+  search: string;
+  healthStatus: VehicleHealthStatus | "ALL";
+  page: number;
+  limit: number;
+}
+
 export type { MaintenanceCategory, MaintenanceDispatchStatus, MaintenanceEventDto, MaintenanceVehicleOption };

@@ -23,6 +23,7 @@ export const VehicleCategories: React.FC<VehicleCategoriesProps> = ({
 
   return (
     <section className="w-full py-16 px-6 lg:px-12 bg-white border-b border-slate-100 overflow-hidden">
+      <div className="mx-auto max-w-7xl">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -51,7 +52,7 @@ export const VehicleCategories: React.FC<VehicleCategoriesProps> = ({
           {[0, 1, 2, 3, 4].map((i) => (
             <div
               key={i}
-              className="rounded-2xl border border-slate-200/80 h-[240px] bg-slate-100/70 animate-pulse"
+              className="rounded-2xl border border-slate-200/80 h-[185px] bg-slate-100/70 animate-pulse"
             />
           ))}
         </div>
@@ -64,6 +65,7 @@ export const VehicleCategories: React.FC<VehicleCategoriesProps> = ({
           ))}
         </div>
       )}
+      </div>
     </section>
   );
 };

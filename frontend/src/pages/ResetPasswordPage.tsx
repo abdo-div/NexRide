@@ -63,7 +63,7 @@ export const ResetPasswordPage: React.FC = () => {
           <p className="text-sm text-slate-500 mb-6">{t("auth.reset.invalidDesc")}</p>
           <Link
             to="/login"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#2563EB] text-white text-sm font-semibold hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#142B4A] text-white text-sm font-semibold hover:bg-blue-700 transition-colors"
           >
             {t("auth.reset.backToSignIn")}
           </Link>
@@ -73,12 +73,12 @@ export const ResetPasswordPage: React.FC = () => {
   }
 
   const inputClasses =
-    "w-full ps-11 pe-11 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-slate-400";
+    "w-full ps-11 pe-11 py-3 rounded-xl bg-white border border-[#E2E8F0] text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#142B4A]/30 focus:border-[#142B4A] transition-all placeholder:text-slate-400";
 
   return (
     <div className="bg-[#F8FAFC] min-h-screen flex items-center justify-center px-6 py-28">
       <div className="max-w-md w-full bg-white rounded-xl shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)] border border-[#E2E8F0] p-8 md:p-10">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-[#2563EB] text-[11px] font-bold uppercase tracking-wider mb-3">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-[#142B4A] text-[11px] font-bold uppercase tracking-wider mb-3">
           <KeyRound className="w-3.5 h-3.5" />
           <span>{t("auth.reset.badge")}</span>
         </div>
@@ -144,7 +144,7 @@ export const ResetPasswordPage: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3.5 px-6 rounded-xl bg-[#2563EB] text-white text-sm font-semibold hover:bg-blue-700 transition-all shadow-[0_4px_16px_rgba(37,99,235,0.28)] flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-[#2563EB]"
+            className="w-full py-3.5 px-6 rounded-xl bg-[#142B4A] text-white text-sm font-semibold hover:bg-blue-700 transition-all shadow-[0_4px_16px_rgba(37,99,235,0.28)] flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-[#142B4A]"
           >
             <span>{isSubmitting ? t("auth.state.updating") : t("auth.reset.submit")}</span>
             {isSubmitting ? (

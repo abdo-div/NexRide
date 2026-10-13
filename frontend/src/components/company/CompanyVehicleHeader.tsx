@@ -111,7 +111,7 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
           <button
             type="button"
             onClick={() => navigate("/company/fleet")}
-            className="hover:text-[#2563EB] hover:underline cursor-pointer"
+            className="hover:text-[#142B4A] hover:underline cursor-pointer"
           >
             {t("company.fleetPage.primary")}
           </button>
@@ -177,7 +177,7 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
                 </>
               )}
               <span className="text-[#C3C6D7]">•</span>
-              <span className="rounded-md bg-[#F1F5F9] px-2 py-0.5 font-mono text-[11px] font-bold text-[#2563EB]">
+              <span className="rounded-md bg-[#F1F5F9] px-2 py-0.5 font-mono text-[11px] font-bold text-[#142B4A]">
                 {vehicle.code}
               </span>
             </div>
@@ -196,7 +196,7 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
               title={t("company.vehiclePage.soon")}
               className="inline-flex items-center gap-2 rounded-xl bg-[#F1F5F9] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <Settings className="h-[18px] w-[18px] text-[#2563EB]" aria-hidden="true" />
+              <Settings className="h-[18px] w-[18px] text-[#142B4A]" aria-hidden="true" />
               {t("company.vehiclePage.header.manageAvailability")}
               <span className="text-[11px] font-normal text-[#9AA4B5]">
                 ({t("company.vehiclePage.header.manageAvailabilityAr")})
@@ -205,7 +205,7 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
             <button
               type="button"
               onClick={() => navigate(`/company/fleet/${vehicle.id}/edit`)}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-colors hover:bg-[#0D2039] cursor-pointer"
             >
               <Edit className="h-[18px] w-[18px]" aria-hidden="true" />
               {t("company.vehiclePage.header.editVehicle")}
@@ -218,7 +218,7 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
               <button
                 type="button"
                 onClick={() => setMenuOpen((open) => !open)}
-                className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F1F5F9] text-[#0B1C30] shadow-sm transition-colors hover:bg-[#E5EEFF] cursor-pointer"
+                className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F1F5F9] text-[#0B1C30] shadow-sm transition-colors hover:bg-[#F1F5F9] cursor-pointer"
                 aria-label={t("company.vehiclePage.header.more")}
                 aria-expanded={menuOpen}
               >
@@ -244,7 +244,7 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
                       }}
                       className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-[#0B1C30] hover:bg-[#F1F5F9] disabled:cursor-wait disabled:opacity-60"
                     >
-                      <FileText className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+                      <FileText className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
                       {t("company.vehiclePage.header.print")}
                     </button>
                     <button
@@ -257,7 +257,7 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
                       }}
                       className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-[#0B1C30] hover:bg-[#F1F5F9] disabled:cursor-wait disabled:opacity-60"
                     >
-                      <Cpu className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+                      <Cpu className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
                       {t("company.vehiclePage.header.maintenance")}
                     </button>
                     <button
@@ -270,7 +270,7 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
                       }}
                       className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-[#0B1C30] hover:bg-[#F1F5F9] disabled:cursor-wait disabled:opacity-60"
                     >
-                      <CalendarX2 className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+                      <CalendarX2 className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
                       {t(
                         `company.vehiclePage.header.${
                           vehicle.listingStatus === "PUBLISHED" ? "unpublish" : "publish"
@@ -287,7 +287,7 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
                       }}
                       className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-[#0B1C30] hover:bg-[#F1F5F9] disabled:cursor-wait disabled:opacity-60"
                     >
-                      <Archive className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+                      <Archive className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
                       {t("company.vehiclePage.header.archive")}
                     </button>
                   </div>
@@ -303,7 +303,7 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
             <button
               type="button"
               onClick={() => navigate("/company/fleet")}
-              className="font-semibold text-[#2563EB] hover:underline cursor-pointer"
+              className="font-semibold text-[#142B4A] hover:underline cursor-pointer"
             >
               {t("company.vehiclePage.backToFleet")}
             </button>

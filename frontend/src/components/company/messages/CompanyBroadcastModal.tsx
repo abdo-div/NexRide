@@ -42,8 +42,8 @@ export const CompanyBroadcastModal: React.FC<CompanyBroadcastModalProps> = ({
       <div className="relative w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#EFF4FF]">
-              <Megaphone className="h-5 w-5 text-[#2563EB]" aria-hidden="true" />
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F8FAFC]">
+              <Megaphone className="h-5 w-5 text-[#142B4A]" aria-hidden="true" />
             </div>
             <div>
               <h2 className="text-lg font-bold text-[#0B1C30]">
@@ -69,14 +69,14 @@ export const CompanyBroadcastModal: React.FC<CompanyBroadcastModalProps> = ({
           onChange={(event) => setText(event.target.value)}
           rows={5}
           placeholder={t("company.messagesPage.broadcast.placeholder")}
-          className="mt-5 w-full resize-y rounded-xl border border-slate-200 bg-[#F8FAFC] px-3 py-3 text-[13px] text-[#0B1C30] outline-none transition-colors focus:border-[#2563EB] focus:bg-white"
+          className="mt-5 w-full resize-y rounded-xl border border-slate-200 bg-[#F8FAFC] px-3 py-3 text-[13px] text-[#0B1C30] outline-none transition-colors focus:border-[#142B4A] focus:bg-white"
         />
 
         <div className="mt-5 flex justify-end gap-3">
           <button
             type="button"
             onClick={close}
-            className="rounded-xl bg-[#F1F5F9] px-4 py-2.5 text-sm font-semibold text-[#434655] transition-colors hover:bg-[#E5EEFF] cursor-pointer"
+            className="rounded-xl bg-[#F1F5F9] px-4 py-2.5 text-sm font-semibold text-[#434655] transition-colors hover:bg-[#F1F5F9] cursor-pointer"
           >
             {t("company.messagesPage.broadcast.cancel")}
           </button>
@@ -84,7 +84,7 @@ export const CompanyBroadcastModal: React.FC<CompanyBroadcastModalProps> = ({
             type="button"
             onClick={() => void submit()}
             disabled={sending || text.trim().length === 0}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.25)] transition-colors hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.25)] transition-colors hover:bg-[#0D2039] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
           >
             <Megaphone className="h-4 w-4" aria-hidden="true" />
             {sending

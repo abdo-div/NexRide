@@ -66,7 +66,7 @@ export const CompanyMaintenanceDrawer: React.FC<CompanyMaintenanceDrawerProps> =
         {/* Header */}
         <div className="flex items-start justify-between gap-3 border-b border-slate-100 bg-[#F8FAFC] px-6 py-5">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="h-12 w-16 shrink-0 overflow-hidden rounded-xl bg-[#E5EEFF]">
+            <div className="h-12 w-16 shrink-0 overflow-hidden rounded-xl bg-[#F1F5F9]">
               <VehicleImage
                 src={photoUrl(vehicle?.photos?.[0])}
                 alt={vehicle?.make ?? ""}
@@ -77,7 +77,7 @@ export const CompanyMaintenanceDrawer: React.FC<CompanyMaintenanceDrawerProps> =
               <div className="text-sm font-extrabold tracking-tight text-[#0B1C30]">
                 {vehicleTitleOf(event)}
               </div>
-              <div className="font-mono text-[11px] font-bold text-[#2563EB]">
+              <div className="font-mono text-[11px] font-bold text-[#142B4A]">
                 {eventVehicleRef(event)}
               </div>
             </div>
@@ -85,7 +85,7 @@ export const CompanyMaintenanceDrawer: React.FC<CompanyMaintenanceDrawerProps> =
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-2 text-[#565E74] transition-colors hover:bg-[#EFF4FF] hover:text-[#0B1C30] cursor-pointer"
+            className="rounded-lg p-2 text-[#565E74] transition-colors hover:bg-[#F8FAFC] hover:text-[#0B1C30] cursor-pointer"
             aria-label="close"
           >
             <CircleX className="h-5 w-5" />
@@ -235,7 +235,7 @@ export const CompanyMaintenanceDrawer: React.FC<CompanyMaintenanceDrawerProps> =
           {/* Attached docs (unmodelled) */}
           <section className="flex items-center justify-between rounded-2xl border border-dashed border-[#C3C6D7] bg-[#F8FAFC] px-4 py-3">
             <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#EFF4FF] text-[#2563EB]">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F8FAFC] text-[#142B4A]">
                 <FileText className="h-4 w-4" />
               </span>
               <div>
@@ -257,7 +257,7 @@ export const CompanyMaintenanceDrawer: React.FC<CompanyMaintenanceDrawerProps> =
             type="button"
             onClick={onClose}
             disabled={busy}
-            className="rounded-xl bg-[#EFF4FF] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] transition-colors hover:bg-[#E5EEFF] disabled:opacity-50 cursor-pointer"
+            className="rounded-xl bg-[#F8FAFC] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] transition-colors hover:bg-[#F1F5F9] disabled:opacity-50 cursor-pointer"
           >
             {t("company.maintenance.drawer.close")}
           </button>
@@ -267,7 +267,7 @@ export const CompanyMaintenanceDrawer: React.FC<CompanyMaintenanceDrawerProps> =
                 type="button"
                 disabled={busy}
                 onClick={() => onComplete(event)}
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-colors enabled:hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-colors enabled:hover:bg-[#0D2039] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
               >
                 <Hammer className="h-4 w-4" />
                 {busy ? t("company.maintenance.drawer.saving") : t("company.maintenance.drawer.completeWork")}

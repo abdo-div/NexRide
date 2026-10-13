@@ -27,7 +27,7 @@ export const DetailGallery: React.FC<Props> = ({ detail }) => {
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-black/10 pointer-events-none" />
           <div className="absolute top-4 start-4 flex flex-wrap gap-2">
             <span className="px-3 py-1.5 rounded-xl bg-white/90 backdrop-blur-md text-[#0F172A] text-[11px] font-bold flex items-center gap-1.5 shadow-sm border border-slate-200">
-              <Camera className="w-4 h-4 text-[#2563EB]" />
+              <Camera className="w-4 h-4 text-[#142B4A]" />
               {labelFor(master)}
             </span>
           </div>
@@ -41,7 +41,7 @@ export const DetailGallery: React.FC<Props> = ({ detail }) => {
               </p>
             </div>
             <span className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/90 backdrop-blur-md text-[#0F172A] text-[12px] font-semibold shadow-sm">
-              <Camera className="w-4 h-4 text-[#2563EB]" />
+              <Camera className="w-4 h-4 text-[#142B4A]" />
               {t(master.meta ?? "vehicleDetail.galleryMasterView")}
             </span>
           </div>
@@ -67,7 +67,7 @@ export const DetailGallery: React.FC<Props> = ({ detail }) => {
         ))}
         <div className="relative rounded-2xl overflow-hidden group cursor-pointer shadow-sm border border-[#E2E8F0] bg-[#F8FAFC] h-[170px] md:h-[120px] flex items-center justify-center text-center p-3 hover:border-blue-400 transition-colors">
           <div className="relative z-10 flex flex-col items-center justify-center gap-1">
-            <LayoutGrid className="w-7 h-7 text-[#2563EB] group-hover:scale-110 transition-transform" />
+            <LayoutGrid className="w-7 h-7 text-[#142B4A] group-hover:scale-110 transition-transform" />
             <span className="text-[14px] font-bold text-[#0F172A]">
               {t("vehicleDetail.moreAngles", { count: Math.max(thumbs.length - 3, 1) })}
             </span>

@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { ChevronRight, Users, Car, Wallet, BadgeCheck, Activity } from "lucide-react";
+import { ChevronRight, Users, Car, Wallet, Activity } from "lucide-react";
 
 export const PartnerHero: React.FC = () => {
   const { t } = useTranslation();
@@ -11,13 +11,13 @@ export const PartnerHero: React.FC = () => {
       title: t("partner.benefits.reach.title"),
       desc: t("partner.benefits.reach.desc"),
       icon: Users,
-      tile: "bg-[#E5EEFF] text-[#004AC6]",
+      tile: "bg-[#F1F5F9] text-[#142B4A]",
     },
     {
       title: t("partner.benefits.manage.title"),
       desc: t("partner.benefits.manage.desc"),
       icon: Car,
-      tile: "bg-[#DAE2FD] text-[#2563EB]",
+      tile: "bg-[#DAE2FD] text-[#142B4A]",
     },
     {
       title: t("partner.benefits.payouts.title"),
@@ -29,25 +29,25 @@ export const PartnerHero: React.FC = () => {
 
   return (
     <>
-      <section className="w-full rounded-3xl bg-[#EFF4FF] px-5 sm:px-8 lg:px-12 pt-8 pb-8 overflow-hidden">
+      <section className="w-full rounded-3xl bg-[#F8FAFC] px-5 sm:px-8 lg:px-12 pt-8 pb-8 overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-col gap-4">
           <nav className="flex items-center gap-1 text-xs font-semibold text-[#434655]" aria-label="Breadcrumb">
-            <Link to="/" className="hover:text-[#004AC6] transition-colors">
+            <Link to="/" className="hover:text-[#142B4A] transition-colors">
               {t("partner.breadcrumb.home")}
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-[#737686] rtl:rotate-180" />
-            <Link to="/#fleet-operators" className="hover:text-[#004AC6] transition-colors">
+            <Link to="/#fleet-operators" className="hover:text-[#142B4A] transition-colors">
               {t("partner.breadcrumb.becomePartner")}
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-[#737686] rtl:rotate-180" />
-            <span className="text-[#004AC6] font-bold">
+            <span className="text-[#142B4A] font-bold">
               {t("partner.breadcrumb.application")}
             </span>
           </nav>
 
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 pt-1">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-[#D3E4FE] text-[#004AC6] text-[11px] uppercase tracking-wider font-bold mb-1.5">
+              <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-[#E2E8F0] text-[#142B4A] text-[11px] uppercase tracking-wider font-bold mb-1.5">
                 <Activity className="w-3 h-3" />
                 {t("partner.hero.badge")}
               </div>
@@ -62,10 +62,6 @@ export const PartnerHero: React.FC = () => {
               </p>
             </div>
 
-            <div className="flex items-center gap-2 text-xs font-semibold text-[#434655] bg-white px-4 py-2.5 rounded-xl shadow-sm self-start md:self-auto">
-              <BadgeCheck className="w-[18px] h-[18px] text-[#004AC6]" />
-              <span>{t("partner.hero.registry")}</span>
-            </div>
           </div>
         </div>
       </section>

@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router";
 import { KeyRound } from "lucide-react";
 import { SignInForm } from "./SignInForm";
 import { SignUpForm } from "./SignUpForm";
 import { ForgotPasswordPanel } from "./ForgotPasswordPanel";
+import { GoogleSignIn } from "./GoogleSignIn";
 
 type AuthTab = "signin" | "signup";
 
@@ -14,23 +16,27 @@ const TAB_HEADINGS = {
 
 export const AuthFormPanel: React.FC = () => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<AuthTab>("signin");
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<AuthTab>(() =>
+    searchParams.get("mode") === "signup" ? "signup" : "signin",
+  );
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const googleAuthEnabled = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim());
 
   const heading = TAB_HEADINGS[activeTab];
 
   const tabButtonClasses = (active: boolean) =>
-    `flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all text-center ${
+    `flex-1 py-3 px-4 rounded-lg border text-sm font-bold transition-all text-center ${
       active
-        ? "bg-white text-slate-800 shadow-sm"
-        : "text-slate-500 hover:text-slate-800"
+        ? "border-blue-600 bg-blue-600 text-white shadow-sm"
+        : "border-transparent bg-white text-slate-700 hover:border-blue-300 hover:text-blue-700"
     }`;
 
   return (
     <div className="bg-white rounded-xl shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)] border border-[#E2E8F0] p-6 md:p-10">
       {/* Brand Badge and Headline */}
       <div className="mb-6">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-[#2563EB] text-[11px] font-bold uppercase tracking-wider mb-3">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-[#142B4A] text-[11px] font-bold uppercase tracking-wider mb-3">
           <KeyRound className="w-3.5 h-3.5" />
           <span>{t("auth.panel.badge")}</span>
         </div>
@@ -72,6 +78,7 @@ export const AuthFormPanel: React.FC = () => {
       ) : (
         <SignUpForm />
       )}
+      {!showForgotPassword && googleAuthEnabled && <GoogleSignIn />}
     </div>
   );
 };

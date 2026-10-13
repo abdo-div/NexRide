@@ -4,9 +4,13 @@ import mongoose from "mongoose";
 import Review from "../models/review_model.js";
 import Vehicle from "../models/vehicle_model.js";
 import Company from "../models/Company_model.js";
+import Booking from "../models/booking_model.js";
 import { getCompanyReviews, replyToCompanyReview } from "../controllers/companyReviewsController.js";
 import { buildCompanyReviews } from "../services/companyReviewsService.js";
-import { addCompanyResponseToReview } from "../services/reviewService.js";
+import {
+  addCompanyResponseToReview,
+  fetchReviewEligibility,
+} from "../services/reviewService.js";
 
 const companyA = "bbbbbbbbbbbbbbbbbbbbbbbb";
 const companyB = "dddddddddddddddddddddddd";
@@ -14,6 +18,7 @@ const customerA = "aaaaaaaaaaaaaaaaaaaaaaaa";
 const vehicleA = "cccccccccccccccccccccccc";
 const vehicleB = "eeeeeeeeeeeeeeeeeeeeeeee";
 const adminId = "999999999999999999999999";
+const bookingA = "121212121212121212121212";
 
 const companyUser = (overrides = {}) => ({
   _id: customerA,
@@ -506,4 +511,39 @@ test("deck company context is resolved from the session tenant", async (t) => {
     query: { companyId: companyB },
   });
   assert.equal(sinks.deckMatches[0].companyId.toString(), companyA);
+});
+
+test("a completed owned booking becomes eligible when it has no review", async (t) => {
+  t.mock.method(Booking, "findOne", () =>
+    thenable({
+      _id: bookingA,
+      bookingStatus: "COMPLETED",
+      vehicleId: vehicleA,
+      companyId: companyA,
+    }),
+  );
+  t.mock.method(Review, "findOne", () => thenable(null));
+
+  const result = await fetchReviewEligibility(customerA, bookingA);
+  assert.equal(result.eligible, true);
+  assert.equal(result.completed, true);
+  assert.equal(result.reviewed, false);
+});
+
+test("an existing review closes eligibility for the booking", async (t) => {
+  const existing = { _id: "343434343434343434343434", rating: 5 };
+  t.mock.method(Booking, "findOne", () =>
+    thenable({
+      _id: bookingA,
+      bookingStatus: "COMPLETED",
+      vehicleId: vehicleA,
+      companyId: companyA,
+    }),
+  );
+  t.mock.method(Review, "findOne", () => thenable(existing));
+
+  const result = await fetchReviewEligibility(customerA, bookingA);
+  assert.equal(result.eligible, false);
+  assert.equal(result.reviewed, true);
+  assert.equal(result.review, existing);
 });

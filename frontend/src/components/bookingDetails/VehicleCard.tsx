@@ -94,9 +94,9 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ booking }) => {
       {/* Header */}
       <div className="p-5 flex items-center justify-between gap-3 bg-[#F1F5F9]">
         <div className="flex items-center gap-3 min-w-0">
-          <CarFront className="w-7 h-7 text-[#2563EB] shrink-0" />
+          <CarFront className="w-7 h-7 text-[#142B4A] shrink-0" />
           <div className="min-w-0">
-            <span className="text-[11px] text-[#2563EB] font-bold uppercase tracking-wide">
+            <span className="text-[11px] text-[#142B4A] font-bold uppercase tracking-wide">
               {t("bookingDetails.vehicle.label")}
             </span>
             <h2 className="text-[18px] font-extrabold text-[#0F172A] leading-tight truncate">
@@ -145,7 +145,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ booking }) => {
               key={spec.key}
               className="p-3 bg-[#F8FAFC] rounded-xl flex flex-col gap-1"
             >
-              <div className="flex items-center gap-1.5 text-[#2563EB]">
+              <div className="flex items-center gap-1.5 text-[#142B4A]">
                 <span className="h-6 w-6">{spec.icon}</span>
               </div>
               <span className="text-[11px] text-[#64748B] font-semibold">
@@ -163,7 +163,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ booking }) => {
 
         {/* Partner profile */}
         {provider && (
-          <div className="p-4 bg-[#EFF4FF] rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="p-4 bg-[#F8FAFC] rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               {companyLogoUrl(provider.logo) ? <img src={companyLogoUrl(provider.logo) ?? ""} alt={provider.name ?? ""} className="h-12 w-12 shrink-0 rounded-xl border border-slate-200 object-cover" /> : <div className="w-12 h-12 rounded-xl bg-[#0F172A] text-white flex items-center justify-center font-bold text-[18px] shrink-0">{initialsFrom(provider.name ?? "N")}</div>}
               <div className="flex flex-col">
@@ -184,9 +184,9 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ booking }) => {
             {provider.phone && (
               <a
                 href={`tel:${provider.phone.replace(/[^+\d]/g, "")}`}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-white hover:text-[#2563EB] rounded-lg text-xs font-bold shadow-sm transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-white hover:text-[#142B4A] rounded-lg text-xs font-bold shadow-sm transition-colors"
               >
-                <Phone className="w-4 h-4 text-[#2563EB]" />
+                <Phone className="w-4 h-4 text-[#142B4A]" />
                 <span dir="ltr">{provider.phone}</span>
               </a>
             )}

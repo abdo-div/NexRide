@@ -34,13 +34,13 @@ export const CompanyPerformancePanel: React.FC<CompanyPerformancePanelProps> = (
             <span className="text-sm text-[#565E74]">({t("company.performance.titleAr")})</span>
           </div>
         </div>
-        <span className="inline-flex items-center gap-1 text-sm font-bold text-[#2563EB]">
+        <span className="inline-flex items-center gap-1 text-sm font-bold text-[#142B4A]">
           <TrendingUp className="h-4 w-4" />
           {t("company.performance.tier")}
         </span>
       </div>
 
-      <div className="flex flex-col divide-y divide-[#E5EEFF]">
+      <div className="flex flex-col divide-y divide-[#F1F5F9]">
         {/* Bookings this month */}
         <div className="flex items-center justify-between py-2.5">
           <div className="flex flex-col">
@@ -68,7 +68,7 @@ export const CompanyPerformancePanel: React.FC<CompanyPerformancePanelProps> = (
               })}
             </span>
           </div>
-          <span className="text-lg font-extrabold text-[#2563EB]">
+          <span className="text-lg font-extrabold text-[#142B4A]">
             {performance.fulfillmentRate}%
           </span>
         </div>

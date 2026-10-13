@@ -98,14 +98,14 @@ export const AdminPayoutDossier: React.FC<AdminPayoutDossierProps> = ({
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
       {/* Dossier header */}
-      <div className="rounded-t-2xl bg-gradient-to-r from-[#2563EB]/5 via-transparent to-transparent p-6">
+      <div className="rounded-t-2xl bg-gradient-to-r from-[#142B4A]/5 via-transparent to-transparent p-6">
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#2563EB] text-white shadow-[0_4px_12px_rgba(37,99,235,0.25)]">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#142B4A] text-white shadow-[0_4px_12px_rgba(37,99,235,0.25)]">
               <Landmark className="h-6 w-6" />
             </div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
+              <div className="text-xs font-bold uppercase tracking-wider text-[#142B4A]">
                 {t("admin.commissions.dossier.title", { code })}
               </div>
               <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -115,12 +115,12 @@ export const AdminPayoutDossier: React.FC<AdminPayoutDossierProps> = ({
                 <PayoutStatusChip status={row.payoutStatus} />
               </div>
               <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[11px]">
-                <span className="inline-flex items-center gap-1.5 rounded-md bg-[#EFF4FF] px-2 py-1 font-mono font-bold text-[#2563EB]">
+                <span className="inline-flex items-center gap-1.5 rounded-md bg-[#F8FAFC] px-2 py-1 font-mono font-bold text-[#142B4A]">
                   <ShieldCheck className="h-3 w-3" />
                   {t("admin.commissions.dossier.batchRef", { ref: lfbBatchRefOf(row) })}
                 </span>
                 {windowFrom.min && (
-                  <span className="inline-flex items-center gap-1.5 rounded-md bg-[#EFF4FF] px-2 py-1 font-semibold text-[#565E74]">
+                  <span className="inline-flex items-center gap-1.5 rounded-md bg-[#F8FAFC] px-2 py-1 font-semibold text-[#565E74]">
                     {t("admin.commissions.dossier.window", {
                       from: formatDate(windowFrom.min, i18n.language),
                       to: formatDate(windowFrom.max || windowFrom.min, i18n.language),
@@ -141,7 +141,7 @@ export const AdminPayoutDossier: React.FC<AdminPayoutDossierProps> = ({
               type="button"
               onClick={() => onAudit(row)}
               disabled={busy}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[#EFF4FF] px-3 py-1.5 text-xs font-bold text-[#2563EB] transition-colors enabled:hover:bg-[#2563EB] enabled:hover:text-white disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#F8FAFC] px-3 py-1.5 text-xs font-bold text-[#142B4A] transition-colors enabled:hover:bg-[#142B4A] enabled:hover:text-white disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
             >
               <Printer className="h-3.5 w-3.5" />
               {t("admin.commissions.dossier.auditPdf")}
@@ -153,8 +153,8 @@ export const AdminPayoutDossier: React.FC<AdminPayoutDossierProps> = ({
       {/* Balance breakdown */}
       <div className="grid grid-cols-1 gap-3 p-6 sm:grid-cols-2 lg:grid-cols-5">
         <BreakCard
-          tone="bg-[#EFF4FF]"
-          iconTone="bg-[#2563EB] text-white"
+          tone="bg-[#F8FAFC]"
+          iconTone="bg-[#142B4A] text-white"
           icon={<Wallet className="h-4 w-4" />}
           label={t("admin.commissions.dossier.grossDispatches", {
             count: liquidated.length,
@@ -165,12 +165,12 @@ export const AdminPayoutDossier: React.FC<AdminPayoutDossierProps> = ({
         />
         <BreakCard
           tone="bg-white"
-          iconTone="bg-[#E5EEFF] text-[#2563EB]"
+          iconTone="bg-[#F1F5F9] text-[#142B4A]"
           icon={<Percent className="h-4 w-4" />}
           label={t("admin.commissions.dossier.platformFee")}
           sub={t("admin.commissions.dossier.platformFeeSub", { rate: rate.toFixed(1) })}
           value={`- ${formatLYD(row.fee)}`}
-          valueClass="text-[#2563EB]"
+          valueClass="text-[#142B4A]"
         />
         <BreakCard
           tone="bg-amber-50/70"
@@ -205,9 +205,9 @@ export const AdminPayoutDossier: React.FC<AdminPayoutDossierProps> = ({
 
       {/* Approve + destinations */}
       <div className="px-6 pb-6">
-        <div className="flex flex-col justify-between gap-3 rounded-xl bg-[#EFF4FF] p-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col justify-between gap-3 rounded-xl bg-[#F8FAFC] p-4 sm:flex-row sm:items-center">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#E5EEFF] text-[#2563EB]">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F1F5F9] text-[#142B4A]">
               <Landmark className="h-4 w-4" />
             </span>
             <div>
@@ -223,7 +223,7 @@ export const AdminPayoutDossier: React.FC<AdminPayoutDossierProps> = ({
             type="button"
             disabled={busy || pending <= 0}
             onClick={() => onApprove(row)}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-all enabled:hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-all enabled:hover:bg-[#0D2039] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             {t("admin.commissions.dossier.approve", { amount: formatLYD(pending) })}
@@ -236,7 +236,7 @@ export const AdminPayoutDossier: React.FC<AdminPayoutDossierProps> = ({
         <div className="mb-3 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
           <div>
             <h3 className="flex items-center gap-2 text-sm font-extrabold text-[#0B1C30]">
-              <ArrowUpRight className="h-4 w-4 text-[#2563EB]" />
+              <ArrowUpRight className="h-4 w-4 text-[#142B4A]" />
               {t("admin.commissions.dossier.tripsTitle", { code })}
             </h3>
             <p className="mt-0.5 text-xs text-[#565E74]">
@@ -257,7 +257,7 @@ export const AdminPayoutDossier: React.FC<AdminPayoutDossierProps> = ({
           <div className="overflow-x-auto rounded-2xl border border-slate-100">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="bg-[#EFF4FF] text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
+                <tr className="bg-[#F8FAFC] text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
                   <th className="rounded-s-2xl px-4 py-3">{t("admin.commissions.dossier.tripId")}</th>
                   <th className="px-4 py-3">{t("admin.commissions.dossier.renter")}</th>
                   <th className="px-4 py-3">{t("admin.commissions.dossier.vehicle")}</th>
@@ -274,7 +274,7 @@ export const AdminPayoutDossier: React.FC<AdminPayoutDossierProps> = ({
                   return (
                     <tr key={payment._id} className="border-b border-slate-100 last:border-0">
                       <td className="px-4 py-3">
-                        <span className="font-mono text-[12px] font-bold text-[#2563EB]">
+                        <span className="font-mono text-[12px] font-bold text-[#142B4A]">
                           {booking ? `#${referenceCodeFrom(booking._id)}` : `#TRX-${payment._id.slice(-6).toUpperCase()}`}
                         </span>
                       </td>
@@ -297,7 +297,7 @@ export const AdminPayoutDossier: React.FC<AdminPayoutDossierProps> = ({
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right whitespace-nowrap">
-                        <span className="text-[13px] font-bold text-[#2563EB]">
+                        <span className="text-[13px] font-bold text-[#142B4A]">
                           -{formatLYD(payment.commissionAmount)}
                         </span>
                       </td>
@@ -327,7 +327,7 @@ export const AdminPayoutDossier: React.FC<AdminPayoutDossierProps> = ({
             {confirmed.length} {t("admin.commissions.table.bookings")} —{" "}
             {t("admin.commissions.statuses.ADJUSTED")}
           </span>
-          <span className="inline-flex items-center gap-1.5 font-bold text-[#2563EB]">
+          <span className="inline-flex items-center gap-1.5 font-bold text-[#142B4A]">
             <FileText className="h-3.5 w-3.5" />
             {t("admin.commissions.kpis.adjustments")}
           </span>

@@ -65,3 +65,14 @@ export const paymentVerificationLimiter = rateLimit({
     );
   },
 });
+
+export const newsletterLimiter = rateLimit({
+  max: 8,
+  windowMs: 15 * 60 * 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => isDevelopment(),
+  handler: (req, res, next) => {
+    next(new AppError("Too many subscription attempts, please try again later!", 429));
+  },
+});

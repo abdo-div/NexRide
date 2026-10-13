@@ -132,19 +132,19 @@ export const CompaniesPage: React.FC = () => {
             >
               <span>{t("companies.breadcrumbHome")}</span>
               <span className="text-slate-300">/</span>
-              <span className="text-[#2563EB] font-bold">
+              <span className="text-[#142B4A] font-bold">
                 {t("companies.breadcrumbCurrent")}
               </span>
             </nav>
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#2563EB] text-xs font-bold">
-              <span className="w-2 h-2 rounded-full bg-[#2563EB] animate-pulse" />
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#142B4A] text-xs font-bold">
+              <span className="w-2 h-2 rounded-full bg-[#142B4A] animate-pulse" />
               {t("companies.metaCount", { count: totalVerified })}
             </span>
           </div>
 
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
             <div className="flex flex-col gap-2 max-w-3xl">
-              <span className="text-[11px] font-bold text-[#2563EB] uppercase tracking-widest">
+              <span className="text-[11px] font-bold text-[#142B4A] uppercase tracking-widest">
                 {t("companies.eyebrow")}
               </span>
               <h1 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
@@ -155,7 +155,7 @@ export const CompaniesPage: React.FC = () => {
               </p>
             </div>
             <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 shrink-0">
-              <div className="w-10 h-10 rounded-xl bg-[#2563EB] text-white flex items-center justify-center shrink-0 shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-[#142B4A] text-white flex items-center justify-center shrink-0 shadow-sm">
                 <ShieldCheck className="w-6 h-6" />
               </div>
               <div className="flex flex-col">
@@ -184,7 +184,7 @@ export const CompaniesPage: React.FC = () => {
                   setPage(1);
                 }}
                 placeholder={t("companies.searchPlaceholder")}
-                className="w-full pl-10 pr-3 py-2.5 bg-slate-50 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/40 transition-all"
+                className="w-full pl-10 pr-3 py-2.5 bg-slate-50 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-slate-500/40 transition-all"
               />
             </div>
 
@@ -196,7 +196,7 @@ export const CompaniesPage: React.FC = () => {
                   setCity(e.target.value);
                   setPage(1);
                 }}
-                className="w-full appearance-none bg-slate-50 px-3.5 py-2.5 pr-9 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/40 cursor-pointer transition-all"
+                className="w-full appearance-none bg-slate-50 px-3.5 py-2.5 pr-9 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-slate-500/40 cursor-pointer transition-all"
               >
                 <option value="all">{t("companies.allCities")}</option>
                 {cities.map((c) => (
@@ -218,7 +218,7 @@ export const CompaniesPage: React.FC = () => {
                   setSort(e.target.value);
                   setPage(1);
                 }}
-                className="w-full appearance-none bg-slate-50 px-3.5 py-2.5 pr-9 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/40 cursor-pointer transition-all"
+                className="w-full appearance-none bg-slate-50 px-3.5 py-2.5 pr-9 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-slate-500/40 cursor-pointer transition-all"
               >
                 <option value="recommended">
                   {t("companies.sortLabel")} {t("companies.sortRecommended")}
@@ -243,7 +243,7 @@ export const CompaniesPage: React.FC = () => {
                 title={t("companies.gridView")}
                 className={`p-2 rounded-lg transition-all ${
                   view === "grid"
-                    ? "bg-white text-[#2563EB] shadow-sm"
+                    ? "bg-white text-[#142B4A] shadow-sm"
                     : "text-slate-500 hover:text-slate-900"
                 }`}
               >
@@ -258,7 +258,7 @@ export const CompaniesPage: React.FC = () => {
                 title={t("companies.listView")}
                 className={`p-2 rounded-lg transition-all ${
                   view === "list"
-                    ? "bg-white text-[#2563EB] shadow-sm"
+                    ? "bg-white text-[#142B4A] shadow-sm"
                     : "text-slate-500 hover:text-slate-900"
                 }`}
               >
@@ -300,7 +300,7 @@ export const CompaniesPage: React.FC = () => {
             <button
               type="button"
               onClick={reload}
-              className="mt-5 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+              className="mt-5 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
             >
               <RefreshCcw className="w-3.5 h-3.5" />
               {t("companies.retry")}
@@ -330,7 +330,7 @@ export const CompaniesPage: React.FC = () => {
           filtered.length === 0 && (
             <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm px-6 py-16 text-center">
               <div className="mx-auto w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center mb-4">
-                <SearchX className="w-6 h-6 text-[#2563EB]" />
+                <SearchX className="w-6 h-6 text-[#142B4A]" />
               </div>
               <h3 className="text-base font-bold text-slate-900">
                 {t("companies.emptyTitle")}
@@ -341,7 +341,7 @@ export const CompaniesPage: React.FC = () => {
               <button
                 type="button"
                 onClick={resetFilters}
-                className="mt-5 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
+                className="mt-5 px-5 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-xs font-bold transition-colors"
               >
                 {t("companies.resetFilters")}
               </button>
@@ -369,7 +369,7 @@ export const CompaniesPage: React.FC = () => {
               <button
                 type="button"
                 onClick={resetFilters}
-                className="self-center text-xs font-semibold text-[#2563EB] hover:underline px-2"
+                className="self-center text-xs font-semibold text-[#142B4A] hover:underline px-2"
               >
                 {t("companies.resetFilters")}
               </button>
@@ -405,7 +405,7 @@ export const CompaniesPage: React.FC = () => {
                       onClick={() => setPage(p)}
                       className={`w-9 h-9 rounded-xl text-xs font-bold transition-colors ${
                         p === safePage
-                          ? "bg-[#2563EB] text-white shadow-sm"
+                          ? "bg-[#142B4A] text-white shadow-sm"
                           : "bg-white border border-[#E2E8F0] hover:bg-slate-50 text-slate-600"
                       }`}
                     >

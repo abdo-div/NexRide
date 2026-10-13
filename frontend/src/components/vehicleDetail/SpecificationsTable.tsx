@@ -14,7 +14,7 @@ export const SpecificationsTable: React.FC<{ groups: SpecGroup[] }> = ({ groups 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {groups.map((g) => (
           <div key={g.title} className="space-y-4">
-            <div className="flex items-center gap-2 text-[#2563EB] text-[12px] font-bold uppercase tracking-wider pb-1 border-b border-[#E2E8F0]">
+            <div className="flex items-center gap-2 text-[#142B4A] text-[12px] font-bold uppercase tracking-wider pb-1 border-b border-[#E2E8F0]">
               <DetailIcon name={g.icon} className="w-[18px] h-[18px]" />
               <span>{t(g.title)}</span>
             </div>
@@ -27,7 +27,7 @@ export const SpecificationsTable: React.FC<{ groups: SpecGroup[] }> = ({ groups 
                   <span>{t(r.label)}</span>
                   <span
                     className={
-                      r.accent ? "text-[#2563EB] font-bold" : "text-[#0F172A] font-semibold"
+                      r.accent ? "text-[#142B4A] font-bold" : "text-[#0F172A] font-semibold"
                     }
                   >
                     {t(r.value)}

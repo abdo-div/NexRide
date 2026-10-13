@@ -4,6 +4,13 @@ import './index.css'
 import 'leaflet/dist/leaflet.css'
 import { translationsReady } from './i18n'
 import App from './App.tsx'
+import { GoogleOAuthProvider } from '@react-oauth/google'
+
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim()
+
+if (!googleClientId) {
+  console.warn('Google authentication is disabled: VITE_GOOGLE_CLIENT_ID is not configured.')
+}
 
 /**
  * Translations are resolved before the first paint: only the default language is
@@ -20,7 +27,13 @@ async function bootstrap() {
 
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <App />
+      {googleClientId ? (
+        <GoogleOAuthProvider clientId={googleClientId}>
+          <App />
+        </GoogleOAuthProvider>
+      ) : (
+        <App />
+      )}
     </StrictMode>,
   )
 }

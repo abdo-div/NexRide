@@ -19,7 +19,7 @@ const SummaryRow: React.FC<{ label: string; value: ReactNode }> = ({
   label,
   value,
 }) => (
-  <div className="flex items-start justify-between gap-4 py-2.5 border-b border-[#E5EEFF] last:border-0">
+  <div className="flex items-start justify-between gap-4 py-2.5 border-b border-[#F1F5F9] last:border-0">
     <span className="text-[11px] font-bold uppercase tracking-wider text-[#737686] shrink-0">
       {label}
     </span>
@@ -43,7 +43,7 @@ export const ReviewStep: React.FC<Props> = ({
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-start gap-4">
-        <div className="w-10 h-10 rounded-xl bg-[#2563EB] text-white flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-[#142B4A] text-white flex items-center justify-center shrink-0">
           <ClipboardCheck className="w-5 h-5" />
         </div>
         <div>
@@ -52,7 +52,7 @@ export const ReviewStep: React.FC<Props> = ({
         </div>
       </div>
 
-      <div className="rounded-xl bg-[#F8F9FF] border border-[#E5EEFF] px-5 py-2">
+      <div className="rounded-xl bg-[#F8F9FF] border border-[#F1F5F9] px-5 py-2">
         <SummaryRow
           label={t("partner.step6.summary.applicant")}
           value={
@@ -114,7 +114,7 @@ export const ReviewStep: React.FC<Props> = ({
           type="checkbox"
           checked={agreed}
           onChange={(event) => setAgreed(event.target.checked)}
-          className="w-4 h-4 mt-0.5 accent-[#2563EB]"
+          className="w-4 h-4 mt-0.5 accent-[#142B4A]"
         />
         <span className="text-[13px] text-[#0B1C30] leading-relaxed">
           {t("partner.step6.agreementLabel")}

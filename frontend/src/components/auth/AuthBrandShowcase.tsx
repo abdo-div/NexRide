@@ -1,10 +1,10 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Star,
   Landmark,
-  Plane,
-  Verified,
+  CarFront,
+  ListChecks,
+  ShieldCheck,
   Headset,
   MapPin,
 } from "lucide-react";
@@ -19,19 +19,19 @@ export const AuthBrandShowcase: React.FC = () => {
       description: t("auth.showcase.perks.escrow.desc"),
     },
     {
-      icon: Plane,
+      icon: CarFront,
       title: t("auth.showcase.perks.tarmac.title"),
       description: t("auth.showcase.perks.tarmac.desc"),
     },
     {
-      icon: Verified,
+      icon: ListChecks,
       title: t("auth.showcase.perks.vin.title"),
       description: t("auth.showcase.perks.vin.desc"),
     },
   ];
 
   return (
-    <div className="flex flex-col justify-between rounded-xl p-6 lg:p-10 bg-gradient-to-br from-[#0b1c30] via-[#132842] to-[#004ac6] text-white shadow-[0_12px_32px_-4px_rgba(15,23,42,0.18)] relative overflow-hidden">
+    <div className="flex flex-col justify-between rounded-xl p-6 lg:p-10 bg-gradient-to-br from-[#0b1c30] via-[#132842] to-[#142b4a] text-white shadow-[0_12px_32px_-4px_rgba(15,23,42,0.18)] relative overflow-hidden">
       {/* Inset Ambient Design Elements */}
       <div className="absolute -top-24 -end-24 w-80 h-80 rounded-full bg-blue-500/20 blur-3xl pointer-events-none"></div>
       <div className="absolute -bottom-24 -start-24 w-80 h-80 rounded-full bg-orange-500/15 blur-3xl pointer-events-none"></div>
@@ -43,9 +43,8 @@ export const AuthBrandShowcase: React.FC = () => {
             {t("auth.showcase.badge")}
           </span>
           <div className="flex items-center gap-1 bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-full text-white text-[11px]">
-            <Star className="w-3.5 h-3.5 text-amber-400" fill="currentColor" />
-            <span className="font-bold">4.98</span>
-            <span className="text-white/70">{t("auth.showcase.reviews")}</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
+            <span className="font-bold">{t("auth.showcase.trustBadge")}</span>
           </div>
         </div>
 
@@ -84,7 +83,7 @@ export const AuthBrandShowcase: React.FC = () => {
         <div className="relative h-48 w-full">
           <img
             src="/3carsUpdated.png"
-            alt="Luxury Mercedes-Benz fleet on the Tripoli Corniche"
+            alt="Vehicles available from verified NexRide rental companies"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
@@ -121,8 +120,7 @@ export const AuthBrandShowcase: React.FC = () => {
           <MapPin className="w-3.5 h-3.5" />
           <span>
             {t("auth.showcase.trustedBy")}{" "}
-            <span className="font-bold text-white">140+</span>{" "}
-            {t("auth.showcase.enterprises")}
+            <span className="font-bold text-white">{t("auth.showcase.enterprises")}</span>
           </span>
         </div>
       </div>

@@ -45,6 +45,7 @@ export const TrendingRentals: React.FC<TrendingRentalsProps> = ({
 
   return (
     <section className="w-full py-16 px-6 lg:px-12 bg-slate-50/60 border-b border-slate-200/80">
+      <div className="mx-auto max-w-7xl">
       <TrendingHeader
         categories={categories}
         activeCategory={activeCategory}
@@ -88,6 +89,7 @@ export const TrendingRentals: React.FC<TrendingRentalsProps> = ({
       )}
 
       <ExploreFleetFooter count={totalAvailable} />
+      </div>
     </section>
   );
 };

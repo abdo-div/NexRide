@@ -206,12 +206,12 @@ export const AdminCustomersPage: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
+    <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
       {/* Header */}
       <div className="mb-6 flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
         <div className="min-w-0 max-w-3xl">
           <div className="mb-1 flex items-center gap-2 text-xs">
-            <span className="font-bold uppercase tracking-wider text-[#2563EB]">
+            <span className="font-bold uppercase tracking-wider text-[#142B4A]">
               {t("admin.customers.command")}
             </span>
             <span className="text-[#C3C6D7]">•</span>
@@ -228,23 +228,23 @@ export const AdminCustomersPage: React.FC = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-full bg-[#EFF4FF] px-3 py-1 text-xs font-bold text-[#2563EB]">
+          <span className="rounded-full bg-[#F8FAFC] px-3 py-1 text-xs font-bold text-[#142B4A]">
             {t("admin.customers.count", { count: pagination.total })}
           </span>
           <button
             type="button"
             onClick={reload}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-3.5 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#E5EEFF] disabled:opacity-60 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-3.5 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#F1F5F9] disabled:opacity-60 cursor-pointer"
           >
-            <RefreshCw className={`h-4 w-4 text-[#2563EB] ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw className={`h-4 w-4 text-[#142B4A] ${loading ? "animate-spin" : ""}`} />
             {t("admin.customers.refresh")}
           </button>
           <button
             type="button"
             onClick={handleExport}
             disabled={filtered.length === 0}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.28)] transition-all hover:bg-[#1D4ED8] disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.28)] transition-all hover:bg-[#0D2039] disabled:opacity-50 cursor-pointer"
           >
             <Download className="h-4 w-4" />
             {t("admin.customers.export")}
@@ -258,7 +258,7 @@ export const AdminCustomersPage: React.FC = () => {
           <KpiCard
             label={t("admin.customers.kpis.registered")}
             icon={<Users className="h-[18px] w-[18px]" />}
-            iconTone="bg-[#E5EEFF] text-[#2563EB]"
+            iconTone="bg-[#F1F5F9] text-[#142B4A]"
             value={String(kpis.total)}
             suffix={t("admin.customers.kpis.registeredSub", { count: kpis.total })}
             sub={
@@ -281,7 +281,7 @@ export const AdminCustomersPage: React.FC = () => {
               </>
             }
             progress={pct(kpis.activeAccounts, kpis.total)}
-            barTone="bg-[#2563EB]"
+            barTone="bg-[#142B4A]"
           />
           <KpiCard
             label={t("admin.customers.kpis.activeRentals")}
@@ -340,7 +340,7 @@ export const AdminCustomersPage: React.FC = () => {
       {/* Search + status filter ribbon */}
       {!loading && !error && (
         <section className="mb-6 space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
-          <div className="relative min-w-[280px] flex-1">
+          <div className="relative min-w-0 flex-1 sm:min-w-[280px]">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#565E74]">
               <Search className="h-[18px] w-[18px]" />
             </div>
@@ -351,7 +351,7 @@ export const AdminCustomersPage: React.FC = () => {
                 resetPage();
               }}
               placeholder={t("admin.customers.searchPlaceholder")}
-              className="w-full rounded-xl bg-[#EFF4FF] py-2.5 pl-11 pr-4 text-sm text-[#0B1C30] outline-none transition-all placeholder:text-[#565E74] focus:bg-white focus:ring-2 focus:ring-[#2563EB]"
+              className="w-full rounded-xl bg-[#F8FAFC] py-2.5 pl-11 pr-4 text-sm text-[#0B1C30] outline-none transition-all placeholder:text-[#565E74] focus:bg-white focus:ring-2 focus:ring-[#142B4A]"
             />
           </div>
 
@@ -374,7 +374,7 @@ export const AdminCustomersPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleClear}
-                className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#EFF4FF] px-3 py-2 text-sm font-semibold text-[#2563EB] transition-all hover:bg-[#E5EEFF] cursor-pointer xl:h-[42px]"
+                className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#F8FAFC] px-3 py-2 text-sm font-semibold text-[#142B4A] transition-all hover:bg-[#F1F5F9] cursor-pointer xl:h-[42px]"
               >
                 <RotateCcw className="h-4 w-4" />
                 {t("admin.customers.clearFilters")}
@@ -391,12 +391,12 @@ export const AdminCustomersPage: React.FC = () => {
             <span className="text-base font-bold text-[#0B1C30]">
               {t("admin.customers.table.title")}
             </span>
-            <span className="rounded-full bg-[#E5EEFF] px-2 py-0.5 text-xs font-bold text-[#2563EB]">
+            <span className="rounded-full bg-[#F1F5F9] px-2 py-0.5 text-xs font-bold text-[#142B4A]">
               {t("admin.customers.table.records", { count: pagination.total })}
             </span>
           </div>
           <div className="flex items-center gap-1 text-xs text-[#565E74]">
-            <FileDown className="h-4 w-4 text-[#2563EB]" />
+            <FileDown className="h-4 w-4 text-[#142B4A]" />
             <span>{t("admin.customers.export")}</span>
           </div>
         </div>
@@ -419,7 +419,7 @@ export const AdminCustomersPage: React.FC = () => {
             <button
               type="button"
               onClick={reload}
-              className="mt-4 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+              className="mt-4 rounded-lg bg-[#142B4A] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#0D2039] cursor-pointer"
             >
               {t("admin.bookings.retry")}
             </button>
@@ -468,7 +468,7 @@ export const AdminCustomersPage: React.FC = () => {
       {!loading && !error && customers.length > 0 && (
         <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_2px_12px_rgba(15,23,42,0.03)] md:flex-row">
           <div className="flex items-start gap-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E5EEFF] text-[#2563EB]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F1F5F9] text-[#142B4A]">
               <ShieldCheck className="h-6 w-6" />
             </div>
             <div>
@@ -575,7 +575,7 @@ const KpiCard: React.FC<KpiCardProps> = ({
       <span className="text-xs font-bold text-[#565E74]">{suffix}</span>
     </div>
     <div className="mt-1 text-xs text-[#565E74]">{sub}</div>
-    <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#EFF4FF]">
+    <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#F8FAFC]">
       <div
         className={`h-full rounded-full ${barTone} transition-all`}
         style={{ width: `${Math.min(progress, 100)}%` }}
@@ -612,7 +612,7 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full cursor-pointer appearance-none rounded-xl bg-[#EFF4FF] py-2.5 pl-10 pr-8 text-sm font-semibold text-[#0B1C30] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#2563EB]"
+        className="w-full cursor-pointer appearance-none rounded-xl bg-[#F8FAFC] py-2.5 pl-10 pr-8 text-sm font-semibold text-[#0B1C30] outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[#142B4A]"
       >
         <option value="ALL">{allLabel}</option>
         {options.map((opt) => (

@@ -4,7 +4,7 @@ import { CheckCircle2 } from "lucide-react";
 import type { CheckoutMeta } from "../../types/checkout";
 
 const inputCls =
-  "w-full px-3.5 py-2.5 rounded-xl bg-[#F8FAFC] text-[#0F172A] text-[14px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 focus:border-[#2563EB] transition-all placeholder:text-[#94A3B8]";
+  "w-full px-3.5 py-2.5 rounded-xl bg-[#F8FAFC] text-[#0F172A] text-[14px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#142B4A]/30 focus:border-[#142B4A] transition-all placeholder:text-[#94A3B8]";
 
 export const DriverSection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => {
   const { t } = useTranslation();
@@ -14,7 +14,7 @@ export const DriverSection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => {
     <section className="bg-white rounded-2xl p-6 shadow-sm border border-[#E2E8F0] flex flex-col gap-5">
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold text-[14px]">
+          <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#142B4A] flex items-center justify-center font-bold text-[14px]">
             2
           </div>
           <h2 className="text-[18px] font-bold text-[#0F172A]">{t(meta.driverTitle)}</h2>
@@ -32,7 +32,7 @@ export const DriverSection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => {
               {field.badge && (
                 <span
                   className={`inline-flex items-center gap-1 text-[11px] font-bold ${
-                    field.badgeKind === "verified" ? "text-[#2563EB]" : "text-[#64748B]"
+                    field.badgeKind === "verified" ? "text-[#142B4A]" : "text-[#64748B]"
                   }`}
                 >
                   {field.badgeKind === "verified" && <CheckCircle2 className="w-[14px] h-[14px]" />}
@@ -41,7 +41,7 @@ export const DriverSection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => {
               )}
             </div>
             <div
-              className={`flex items-center bg-[#F8FAFC] rounded-xl focus-within:bg-white focus-within:ring-2 focus-within:ring-[#2563EB]/30 transition-all overflow-hidden ${
+              className={`flex items-center bg-[#F8FAFC] rounded-xl focus-within:bg-white focus-within:ring-2 focus-within:ring-[#142B4A]/30 transition-all overflow-hidden ${
                 field.prefix ? "px-3" : ""
               }`}
             >
@@ -71,7 +71,7 @@ export const DriverSection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => {
               type="checkbox"
               checked={confirmed}
               onChange={(e) => setConfirmed(e.target.checked)}
-              className="mt-1 w-4 h-4 rounded accent-[#2563EB]"
+              className="mt-1 w-4 h-4 rounded accent-[#142B4A]"
             />
             <span className="text-[14px] text-[#0F172A]">
               {t(meta.driverConfirm.prefix)} <strong>{t(meta.driverConfirm.strong)}</strong>{" "}

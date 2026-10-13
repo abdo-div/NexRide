@@ -24,8 +24,9 @@ const doneCountFor = (status: BookingDto["bookingStatus"]): number => {
     case "PAID":
       return 1;
     case "CONFIRMED":
-    case "ACTIVE":
       return 2;
+    case "ACTIVE":
+      return 3;
     case "COMPLETED":
       return TOTAL;
     case "CANCELLED":
@@ -92,9 +93,9 @@ export const TripTimeline: React.FC<TripTimelineProps> = ({
   };
 
   const iconTone = (state: StepState): string => {
-    if (state === "done") return "bg-[#2563EB] text-white shadow-md";
+    if (state === "done") return "bg-[#142B4A] text-white shadow-md";
     if (state === "active")
-      return "bg-[#2563EB] text-white shadow-lg ring-4 ring-[#BFDBFE]";
+      return "bg-[#142B4A] text-white shadow-lg ring-4 ring-[#BFDBFE]";
     return "bg-[#F1F5F9] text-[#64748B]";
   };
 
@@ -126,7 +127,7 @@ export const TripTimeline: React.FC<TripTimelineProps> = ({
           {/* Connector track */}
           <div className="hidden md:block absolute top-9 right-7 left-7 h-1 bg-[#E2E8F0] rounded-full">
             <div
-              className="h-full bg-[#2563EB] rounded-full transition-all duration-500"
+              className="h-full bg-[#142B4A] rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -151,7 +152,7 @@ export const TripTimeline: React.FC<TripTimelineProps> = ({
                         state === "active"
                           ? "text-[#F97316] uppercase tracking-wide"
                           : state === "done"
-                          ? "text-[#2563EB]"
+                          ? "text-[#142B4A]"
                           : "text-[#94A3B8]"
                       }`}
                     >
@@ -168,7 +169,7 @@ export const TripTimeline: React.FC<TripTimelineProps> = ({
                       </span>
                     )}
                     {step.meta && (
-                      <span className="text-[11px] text-[#2563EB] font-bold">
+                      <span className="text-[11px] text-[#142B4A] font-bold">
                         {step.meta}
                       </span>
                     )}
@@ -177,7 +178,7 @@ export const TripTimeline: React.FC<TripTimelineProps> = ({
                         state === "done"
                           ? "text-emerald-700"
                           : state === "active"
-                          ? "text-[#2563EB]"
+                          ? "text-[#142B4A]"
                           : "text-[#94A3B8]"
                       }`}
                     >

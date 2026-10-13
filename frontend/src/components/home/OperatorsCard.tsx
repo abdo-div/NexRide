@@ -2,9 +2,10 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Star, ArrowRight, ShieldCheck } from "@phosphor-icons/react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import type { FleetOperator } from "../../types/operators";
 import { companyLogoUrl } from "../../lib/vehicleMapper";
+import { buttonHover, buttonTap, cardHover } from "../../lib/motion";
 
 interface OperatorCardProps {
   operator: FleetOperator;
@@ -13,14 +14,15 @@ interface OperatorCardProps {
 
 export const OperatorCard: React.FC<OperatorCardProps> = ({ operator, index = 0 }) => {
   const { t } = useTranslation();
+  const reduceMotion = useReducedMotion();
   return (
     <motion.div
       initial={{ opacity: 0, y: 25 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
-      whileHover={{ y: -6, transition: { duration: 0.2 } }}
-      className="bg-white rounded-3xl border border-slate-200/80 p-6 flex flex-col justify-between hover:shadow-xl hover:shadow-blue-500/5 transition-shadow duration-300 group hover:border-blue-200"
+      whileHover={reduceMotion ? undefined : cardHover}
+      className="premium-card bg-white rounded-3xl border border-slate-200/80 p-6 flex flex-col justify-between group"
     >
       <div>
         {/* Header: Logo Initials & Verified Badge */}
@@ -82,14 +84,19 @@ export const OperatorCard: React.FC<OperatorCardProps> = ({ operator, index = 0 
       </div>
 
       {/* View Agency Fleet Button */}
+      <motion.div
+        whileHover={reduceMotion ? undefined : buttonHover}
+        whileTap={reduceMotion ? undefined : buttonTap}
+      >
       <Link
         to={`/companies/${operator.id}`}
         aria-label={`${t("home.operators.viewFleet")} — ${operator.name}`}
-        className="w-full mt-4 py-2.5 rounded-xl bg-slate-100/80 hover:bg-blue-600 hover:text-white text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors group/btn"
+        className="premium-button w-full mt-4 py-2.5 text-xs font-bold flex items-center justify-center gap-1.5 group/btn"
       >
         <span>{t("home.operators.viewFleet")}</span>
         <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 rtl:rotate-180 rtl:group-hover/btn:-translate-x-1 transition-transform" />
       </Link>
+      </motion.div>
     </motion.div>
   );
 };

@@ -82,12 +82,15 @@ export interface RatingBar {
 }
 
 export interface Review {
+  id: string;
+  rating: number;
   author: string;
   initials: string;
   avatarClass: string;
   context: string;
   timeAgo: string;
   body: string;
+  companyResponse?: string | null;
 }
 
 export interface SimilarCar {

@@ -1,8 +1,9 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { MagnifyingGlass as Search, Scales as Scale, LockKey as Lock, Key } from "@phosphor-icons/react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import type { HowItWorksStep } from "../../types/step";
+import { cardHover } from "../../lib/motion";
 
 interface StepCardProps {
   step: HowItWorksStep;
@@ -11,6 +12,7 @@ interface StepCardProps {
 
 export const StepCard: React.FC<StepCardProps> = ({ step, index = 0 }) => {
   const { t } = useTranslation();
+  const reduceMotion = useReducedMotion();
   const renderIcon = () => {
     switch (step.iconType) {
       case "search":
@@ -34,8 +36,8 @@ export const StepCard: React.FC<StepCardProps> = ({ step, index = 0 }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
-      whileHover={{ y: -6, transition: { duration: 0.2 } }}
-      className="bg-white rounded-3xl border border-slate-200/80 p-6 flex flex-col justify-between hover:shadow-xl hover:shadow-blue-500/5 transition-shadow duration-300 group hover:border-blue-200"
+      whileHover={reduceMotion ? undefined : cardHover}
+      className="premium-card bg-white rounded-3xl border border-slate-200/80 p-6 flex flex-col justify-between group"
     >
       <div>
         {/* Header Row: Icon Box & Step Number */}
@@ -44,7 +46,7 @@ export const StepCard: React.FC<StepCardProps> = ({ step, index = 0 }) => {
             className={`w-10 h-10 rounded-2xl flex items-center justify-center border transition-transform duration-300 group-hover:scale-110 ${
               isDriveStep
                 ? "bg-emerald-50/80 border-emerald-100"
-                : "bg-blue-50/80 border-blue-100"
+                : "bg-slate-50/80 border-slate-100"
             }`}
           >
             {renderIcon()}

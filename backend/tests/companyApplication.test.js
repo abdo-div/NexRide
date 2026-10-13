@@ -29,6 +29,7 @@ const validApplication = () => ({
     commercialRegisterNumber: "LY-TRP-2024-88412",
     city: "Tripoli",
     address: "Airport Road Km 4.5, Tripoli",
+    location: { type: "Point", coordinates: [13.1913, 32.8872] },
   },
   fleet: {
     tier: "SELECTED",

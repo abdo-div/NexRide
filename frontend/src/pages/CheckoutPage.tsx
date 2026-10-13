@@ -310,7 +310,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
     return (
       <div className="bg-[#F8FAFC] min-h-screen">
         <div className="pt-20 flex flex-col items-center justify-center gap-4 min-h-[70vh]">
-          <span className="w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
+          <span className="w-8 h-8 border-2 border-[#142B4A] border-t-transparent rounded-full animate-spin" />
           <p className="text-sm text-[#64748B]">{t("checkout.loading")}</p>
         </div>
       </div>
@@ -322,13 +322,13 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
       <div className="bg-[#F8FAFC] min-h-screen">
         <div className="pt-20 max-w-[1360px] mx-auto px-4 lg:px-8 py-8">
           <div className="bg-white rounded-2xl p-8 flex flex-col items-center gap-4 text-center">
-            <CheckoutIcon name="car" className="w-10 h-10 text-[#2563EB]" />
+            <CheckoutIcon name="car" className="w-10 h-10 text-[#142B4A]" />
             <p className="text-[#0F172A] font-bold text-[18px]">
               {t("checkout.unavailable.fallbackTitle")}
             </p>
             <Link
               to="/fleet"
-              className="flex items-center gap-2 text-[#2563EB] font-bold text-sm"
+              className="flex items-center gap-2 text-[#142B4A] font-bold text-sm"
             >
               <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
               {t("checkout.unavailable.browse")}
@@ -348,8 +348,8 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-7 flex flex-col gap-6">
             {availability === "checking" && (
-              <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-blue-50 border border-blue-200 text-[#2563EB] text-[13px] font-semibold">
-                <span className="w-4 h-4 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
+              <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-[#142B4A] text-[13px] font-semibold">
+                <span className="w-4 h-4 border-2 border-[#142B4A] border-t-transparent rounded-full animate-spin" />
                 {t("checkout.availability.checking")}
               </div>
             )}
@@ -394,7 +394,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
                 </button>
                 <Link
                   to="/fleet"
-                  className="text-center text-[#2563EB] font-bold text-[13px]"
+                  className="text-center text-[#142B4A] font-bold text-[13px]"
                 >
                   {t("checkout.unavailable.browse")}
                 </Link>

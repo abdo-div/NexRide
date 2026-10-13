@@ -31,7 +31,7 @@ export const CarCard: React.FC<CarCardProps> = ({ car }) => {
       : "data.common.gasoline";
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
+    <div className="premium-card bg-white rounded-2xl border border-slate-200 overflow-hidden group flex flex-col justify-between">
       {/* Card Header & Image */}
       <div className="relative w-full h-52 bg-slate-100 overflow-hidden">
         <img
@@ -107,7 +107,7 @@ export const CarCard: React.FC<CarCardProps> = ({ car }) => {
 
           <a
             href={`#book-${car.id}`}
-            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs hover:shadow-md transition-all active:scale-95"
+            className="premium-button px-4 py-2 text-xs font-bold"
           >
             {t("data.common.rentNow")}
           </a>

@@ -74,8 +74,8 @@ export const CompanySettingsNav: React.FC<CompanySettingsNavProps> = ({
               onClick={() => onSelect(item.id)}
               className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-all cursor-pointer ${
                 isActive
-                  ? "bg-[#2563EB] text-white shadow-[0_4px_12px_rgba(37,99,235,0.2)]"
-                  : "text-[#434655] hover:bg-[#E5EEFF] hover:text-[#0B1C30]"
+                  ? "bg-[#142B4A] text-white shadow-[0_4px_12px_rgba(37,99,235,0.2)]"
+                  : "text-[#434655] hover:bg-[#F1F5F9] hover:text-[#0B1C30]"
               }`}
             >
               <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
@@ -102,7 +102,7 @@ export const CompanySettingsNav: React.FC<CompanySettingsNavProps> = ({
           </span>
         </div>
         <div className="flex items-center gap-3 px-5 py-4">
-          {companyLogoUrl(logo) ? <img src={companyLogoUrl(logo) ?? ""} alt={companyName} className="h-11 w-11 shrink-0 rounded-xl border border-slate-200 object-cover" /> : <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2563EB] text-base font-extrabold text-white">{initialsFrom(companyName)}</span>}
+          {companyLogoUrl(logo) ? <img src={companyLogoUrl(logo) ?? ""} alt={companyName} className="h-11 w-11 shrink-0 rounded-xl border border-slate-200 object-cover" /> : <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#142B4A] text-base font-extrabold text-white">{initialsFrom(companyName)}</span>}
           <div className="min-w-0">
             <p className="truncate text-sm font-bold text-[#0B1C30]">{companyName}</p>
             <p className="truncate text-xs font-semibold text-[#565E74]">
@@ -116,7 +116,7 @@ export const CompanySettingsNav: React.FC<CompanySettingsNavProps> = ({
       {/* Partner concierge — concierge messaging is unmodelled. */}
       <div className="rounded-2xl border border-dashed border-[#C3C6D7] bg-[#F8FAFC] p-5">
         <div className="flex items-center gap-2">
-          <MessagesSquare className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+          <MessagesSquare className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
           <span className="text-sm font-extrabold text-[#0B1C30]">
             {t("company.settings.nav.concierge")}
           </span>
@@ -127,7 +127,7 @@ export const CompanySettingsNav: React.FC<CompanySettingsNavProps> = ({
         <button
           type="button"
           onClick={onComingSoon}
-          className="mt-3 w-full rounded-xl bg-[#EFF4FF] px-3 py-2 text-xs font-bold text-[#2563EB] transition-colors hover:bg-[#E5EEFF] cursor-pointer"
+          className="mt-3 w-full rounded-xl bg-[#F8FAFC] px-3 py-2 text-xs font-bold text-[#142B4A] transition-colors hover:bg-[#F1F5F9] cursor-pointer"
         >
           {t("company.settings.nav.chat")}
         </button>

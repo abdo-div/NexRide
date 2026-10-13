@@ -103,12 +103,12 @@ export const CompanyChatThread: React.FC<CompanyChatThreadProps> = ({
   if (loading && !thread) {
     return (
       <div className="flex h-full flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
-        <div className="h-6 w-1/3 animate-pulse rounded-full bg-[#E5EEFF]" />
+        <div className="h-6 w-1/3 animate-pulse rounded-full bg-[#F1F5F9]" />
         <div className="h-16 animate-pulse rounded-xl bg-[#F1F5F9]" />
         <div className="mt-2 space-y-4">
-          <div className="h-14 w-2/3 animate-pulse rounded-2xl bg-[#E5EEFF]" />
+          <div className="h-14 w-2/3 animate-pulse rounded-2xl bg-[#F1F5F9]" />
           <div className="ms-auto h-14 w-1/2 animate-pulse rounded-2xl bg-[#F1F5F9]" />
-          <div className="h-20 w-3/4 animate-pulse rounded-2xl bg-[#E5EEFF]" />
+          <div className="h-20 w-3/4 animate-pulse rounded-2xl bg-[#F1F5F9]" />
         </div>
       </div>
     );
@@ -124,7 +124,7 @@ export const CompanyChatThread: React.FC<CompanyChatThreadProps> = ({
         <button
           type="button"
           onClick={onRetry}
-          className="mt-4 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+          className="mt-4 rounded-lg bg-[#142B4A] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#0D2039] cursor-pointer"
         >
           {t("company.messagesPage.states.retry")}
         </button>
@@ -150,7 +150,7 @@ export const CompanyChatThread: React.FC<CompanyChatThreadProps> = ({
             className="h-11 w-11 shrink-0 rounded-full border border-slate-200 object-cover"
           />
         ) : (
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#2563EB] text-sm font-bold text-white">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#142B4A] text-sm font-bold text-white">
             {customer.initials}
           </div>
         )}
@@ -159,7 +159,7 @@ export const CompanyChatThread: React.FC<CompanyChatThreadProps> = ({
             <span className="truncate text-sm font-bold text-[#0B1C30]">
               {customer.name}
             </span>
-            <span className="inline-flex items-center rounded-full bg-[#EFF4FF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#2563EB]">
+            <span className="inline-flex items-center rounded-full bg-[#F8FAFC] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#142B4A]">
               {t(CHANNEL_LABEL_KEY[conversation.channel])}
             </span>
           </div>
@@ -172,7 +172,7 @@ export const CompanyChatThread: React.FC<CompanyChatThreadProps> = ({
       {/* Booking strip */}
       {booking && (
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-slate-100 bg-[#F8FAFF] px-4 py-3 text-[12px]">
-          <span className="font-bold text-[#2563EB]">{booking.reference}</span>
+          <span className="font-bold text-[#142B4A]">{booking.reference}</span>
           <span className="font-semibold text-[#434655]">
             {rangeLabel(booking.startDate, booking.endDate, lang)}
           </span>
@@ -223,12 +223,12 @@ export const CompanyChatThread: React.FC<CompanyChatThreadProps> = ({
                   <div
                     className={`rounded-2xl px-4 py-2.5 text-[13px] leading-relaxed shadow-sm ${
                       message.senderRole === "AGENT"
-                        ? "rounded-tr-sm bg-[#2563EB] text-white"
+                        ? "rounded-tr-sm bg-[#142B4A] text-white"
                         : "rounded-tl-sm border border-slate-200 bg-white text-[#0B1C30]"
                     }`}
                   >
                     {message.senderRole === "CUSTOMER" && message.senderName && (
-                      <p className="mb-1 text-[11px] font-bold text-[#2563EB]">
+                      <p className="mb-1 text-[11px] font-bold text-[#142B4A]">
                         {message.senderName}
                       </p>
                     )}
@@ -260,7 +260,7 @@ export const CompanyChatThread: React.FC<CompanyChatThreadProps> = ({
               key={key}
               type="button"
               onClick={() => onDraftChange(t(key))}
-              className="shrink-0 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[12px] font-semibold text-[#434655] transition-colors hover:border-[#2563EB] hover:text-[#2563EB] cursor-pointer"
+              className="shrink-0 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[12px] font-semibold text-[#434655] transition-colors hover:border-[#142B4A] hover:text-[#142B4A] cursor-pointer"
             >
               {t(key)}
             </button>
@@ -276,13 +276,13 @@ export const CompanyChatThread: React.FC<CompanyChatThreadProps> = ({
             onChange={(event) => onDraftChange(event.target.value)}
             rows={2}
             placeholder={t("company.messagesPage.thread.composerPlaceholder")}
-            className="max-h-32 min-h-[44px] flex-1 resize-y rounded-xl border border-slate-200 bg-[#F8FAFC] px-3 py-2.5 text-[13px] text-[#0B1C30] outline-none transition-colors focus:border-[#2563EB] focus:bg-white"
+            className="max-h-32 min-h-[44px] flex-1 resize-y rounded-xl border border-slate-200 bg-[#F8FAFC] px-3 py-2.5 text-[13px] text-[#0B1C30] outline-none transition-colors focus:border-[#142B4A] focus:bg-white"
           />
           <button
             type="button"
             onClick={onSend}
             disabled={sending || draft.trim().length === 0}
-            className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#2563EB] px-5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.25)] transition-colors hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+            className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#142B4A] px-5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(37,99,235,0.25)] transition-colors hover:bg-[#0D2039] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
           >
             <Send className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
             {t("company.messagesPage.thread.send")}

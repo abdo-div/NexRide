@@ -19,11 +19,11 @@ const KIND_CONFIG = {
   },
   booking: {
     icon: ShoppingCart,
-    className: "bg-[#DCE9FF] text-[#2563EB]",
+    className: "bg-[#F1F5F9] text-[#142B4A]",
   },
   vehicle: {
     icon: Car,
-    className: "bg-[#E5EEFF] text-[#434655]",
+    className: "bg-[#F1F5F9] text-[#434655]",
   },
 } as const;
 
@@ -63,8 +63,8 @@ export const CompanyActivityFeed: React.FC<CompanyActivityFeedProps> = ({
             <span className="text-sm text-[#565E74]">({t("company.activity.titleAr")})</span>
           </div>
         </div>
-        <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[#2563EB]">
-          <span className="h-2 w-2 animate-ping rounded-full bg-[#2563EB]" />
+        <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[#142B4A]">
+          <span className="h-2 w-2 animate-ping rounded-full bg-[#142B4A]" />
           {t("company.activity.live")}
         </span>
       </div>
@@ -74,7 +74,7 @@ export const CompanyActivityFeed: React.FC<CompanyActivityFeedProps> = ({
           <p className="text-sm font-semibold text-[#0B1C30]">{t("company.activity.empty")}</p>
         </div>
       ) : (
-        <div className="relative flex flex-col gap-4 border-s-2 border-[#E5EEFF] ps-5">
+        <div className="relative flex flex-col gap-4 border-s-2 border-[#F1F5F9] ps-5">
           {data.activity.map((item) => {
             const config = KIND_CONFIG[item.kind];
             const Icon = config.icon;
@@ -89,7 +89,7 @@ export const CompanyActivityFeed: React.FC<CompanyActivityFeedProps> = ({
                   <span className="text-sm font-semibold text-[#0B1C30]">{item.title}</span>
                   <span className="text-sm text-[#434655]">
                     {item.detail} ·{" "}
-                    <span className="font-semibold text-[#2563EB]">
+                    <span className="font-semibold text-[#142B4A]">
                       {metaLabel(item, lang)}
                     </span>
                   </span>

@@ -12,8 +12,8 @@ export const CompanyBookingsEmptyState: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="flex h-80 flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-[#E5EEFF] bg-white text-center px-6">
-      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EFF4FF] text-[#2563EB]">
+    <div className="flex h-80 flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-[#F1F5F9] bg-white text-center px-6">
+      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F8FAFC] text-[#142B4A]">
         <CalendarClock className="h-7 w-7" aria-hidden="true" />
       </span>
       <div className="space-y-1">

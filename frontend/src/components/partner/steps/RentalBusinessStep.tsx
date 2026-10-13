@@ -91,7 +91,7 @@ export const RentalBusinessStep: React.FC<Props> = ({ draft, setDraft, errors })
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-start gap-4">
-        <div className="w-10 h-10 rounded-xl bg-[#2563EB] text-white flex items-center justify-center shrink-0 font-bold text-lg">
+        <div className="w-10 h-10 rounded-xl bg-[#142B4A] text-white flex items-center justify-center shrink-0 font-bold text-lg">
           3
         </div>
         <div>
@@ -104,7 +104,7 @@ export const RentalBusinessStep: React.FC<Props> = ({ draft, setDraft, errors })
       <div className="flex flex-col gap-2.5">
         <label className="flex items-center justify-between text-sm font-bold text-[#0B1C30]">
           <span className="flex items-center gap-2">
-            <CarFront className="w-4 h-4 text-[#2563EB]" />
+            <CarFront className="w-4 h-4 text-[#142B4A]" />
             {t("partner.step3.fleetSize")}
           </span>
           <span className="text-xs text-[#434655] font-normal">
@@ -121,8 +121,8 @@ export const RentalBusinessStep: React.FC<Props> = ({ draft, setDraft, errors })
                 onClick={() => patchFleet({ tier: tier.value })}
                 className={`px-3 py-3.5 rounded-xl text-[15px] font-semibold text-center transition-all cursor-pointer ${
                   selected
-                    ? "bg-[#2563EB] text-white shadow-md shadow-[#2563EB]/20"
-                    : "bg-[#EFF4FF] text-[#0B1C30] hover:bg-[#E5EEFF]"
+                    ? "bg-[#142B4A] text-white shadow-md shadow-[#142B4A]/20"
+                    : "bg-[#F8FAFC] text-[#0B1C30] hover:bg-[#F1F5F9]"
                 }`}
               >
                 {tier.range}
@@ -152,15 +152,15 @@ export const RentalBusinessStep: React.FC<Props> = ({ draft, setDraft, errors })
                 key={category}
                 className={`flex items-center gap-2 p-3 rounded-xl text-sm cursor-pointer transition-colors ${
                   selected
-                    ? "bg-[#E5EEFF] font-bold text-[#0B1C30]"
-                    : "bg-[#EFF4FF] text-[#0B1C30] hover:bg-[#E5EEFF]"
+                    ? "bg-[#F1F5F9] font-bold text-[#0B1C30]"
+                    : "bg-[#F8FAFC] text-[#0B1C30] hover:bg-[#F1F5F9]"
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={selected}
                   onChange={() => toggleCategory(category)}
-                  className="w-4 h-4 rounded accent-[#2563EB]"
+                  className="w-4 h-4 rounded accent-[#142B4A]"
                 />
                 <span>{t(`partner.step3.categoryOptions.${category}`)}</span>
               </label>
@@ -187,8 +187,8 @@ export const RentalBusinessStep: React.FC<Props> = ({ draft, setDraft, errors })
                 onClick={() => toggleHub(hub)}
                 className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-colors cursor-pointer ${
                   selected
-                    ? "bg-[#2563EB] text-white shadow-sm"
-                    : "bg-[#E5EEFF] text-[#434655] hover:bg-[#DCE9FF]"
+                    ? "bg-[#142B4A] text-white shadow-sm"
+                    : "bg-[#F1F5F9] text-[#434655] hover:bg-[#F1F5F9]"
                 }`}
               >
                 {selected ? (
@@ -219,7 +219,7 @@ export const RentalBusinessStep: React.FC<Props> = ({ draft, setDraft, errors })
           <button
             type="button"
             onClick={addDepot}
-            className="inline-flex items-center gap-1.5 text-sm font-bold text-[#2563EB] hover:underline cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-[#142B4A] hover:underline cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             {t("partner.step3.addDepot")}
@@ -231,10 +231,10 @@ export const RentalBusinessStep: React.FC<Props> = ({ draft, setDraft, errors })
           return (
             <div
               key={index}
-              className="p-4 rounded-xl bg-[#EFF4FF] shadow-sm flex flex-col gap-3"
+              className="p-4 rounded-xl bg-[#F8FAFC] shadow-sm flex flex-col gap-3"
             >
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#DCE9FF] flex items-center justify-center shrink-0 text-[#2563EB]">
+                <div className="w-10 h-10 rounded-xl bg-[#F1F5F9] flex items-center justify-center shrink-0 text-[#142B4A]">
                   <DepotIcon className="w-[22px] h-[22px]" />
                 </div>
 
@@ -302,7 +302,7 @@ export const RentalBusinessStep: React.FC<Props> = ({ draft, setDraft, errors })
                 <button
                   type="button"
                   onClick={() => removeDepot(index)}
-                  className="p-1.5 rounded-lg text-[#737686] hover:bg-[#E5EEFF] hover:text-[#BA1A1A] transition-colors cursor-pointer"
+                  className="p-1.5 rounded-lg text-[#737686] hover:bg-[#F1F5F9] hover:text-[#BA1A1A] transition-colors cursor-pointer"
                   aria-label={t("partner.step3.delete")}
                 >
                   <Trash2 className="w-[18px] h-[18px]" />
@@ -389,14 +389,14 @@ export const RentalBusinessStep: React.FC<Props> = ({ draft, setDraft, errors })
                 dir="ltr"
                 value={String(draft.policy.depositAmountLYD)}
                 onChange={(value) => patchPolicy({ depositAmountLYD: Number(value) || 0 })}
-                className="text-[#2563EB] font-bold"
+                className="text-[#142B4A] font-bold"
               />
-              <span className="shrink-0 text-sm font-black text-[#2563EB]">LYD</span>
+              <span className="shrink-0 text-sm font-black text-[#142B4A]">LYD</span>
             </div>
             <span className="text-[11px] text-[#737686]">{t("partner.step3.depositHint")}</span>
           </LabeledField>
 
-          <div className="p-4 rounded-xl bg-[#EFF4FF] flex items-center justify-between">
+          <div className="p-4 rounded-xl bg-[#F8FAFC] flex items-center justify-between">
             <div>
               <span className="text-sm font-bold text-[#0B1C30] block">
                 {t("partner.step3.additionalDriver")}
@@ -411,7 +411,7 @@ export const RentalBusinessStep: React.FC<Props> = ({ draft, setDraft, errors })
             />
           </div>
 
-          <div className="p-4 rounded-xl bg-[#EFF4FF] flex items-center justify-between">
+          <div className="p-4 rounded-xl bg-[#F8FAFC] flex items-center justify-between">
             <div>
               <span className="text-sm font-bold text-[#0B1C30] block">
                 {t("partner.step3.smoking")}

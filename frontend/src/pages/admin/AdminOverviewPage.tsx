@@ -103,12 +103,12 @@ export const AdminOverviewPage: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
+    <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
       {/* Header */}
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <div className="mb-1 flex items-center gap-2 text-xs">
-            <span className="font-bold uppercase tracking-wider text-[#2563EB]">
+            <span className="font-bold uppercase tracking-wider text-[#142B4A]">
               {t("admin.overview.command")}
             </span>
             <span className="text-[#C3C6D7]">•</span>
@@ -125,7 +125,7 @@ export const AdminOverviewPage: React.FC = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className="inline-flex rounded-xl bg-[#EFF4FF] p-1 shadow-sm">
+          <div className="inline-flex rounded-xl bg-[#F8FAFC] p-1 shadow-sm">
             {PERIODS.map((p) => (
               <button
                 key={p}
@@ -133,7 +133,7 @@ export const AdminOverviewPage: React.FC = () => {
                 onClick={() => setPeriod(p)}
                 className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-all cursor-pointer ${
                   period === p
-                    ? "bg-white text-[#2563EB] shadow-sm"
+                    ? "bg-white text-[#142B4A] shadow-sm"
                     : "text-[#565E74] hover:text-[#0B1C30]"
                 }`}
               >
@@ -145,7 +145,7 @@ export const AdminOverviewPage: React.FC = () => {
               onClick={() => setPeriod("custom")}
               className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-all cursor-pointer ${
                 period === "custom"
-                  ? "bg-white text-[#2563EB] shadow-sm"
+                  ? "bg-white text-[#142B4A] shadow-sm"
                   : "text-[#565E74] hover:text-[#0B1C30]"
               }`}
             >
@@ -154,7 +154,7 @@ export const AdminOverviewPage: React.FC = () => {
           </div>
 
           {period === "custom" && (
-            <div className="inline-flex items-center gap-1 rounded-xl bg-[#EFF4FF] p-1.5 text-sm">
+            <div className="inline-flex items-center gap-1 rounded-xl bg-[#F8FAFC] p-1.5 text-sm">
               <input
                 type="date"
                 value={custom.from}
@@ -179,16 +179,16 @@ export const AdminOverviewPage: React.FC = () => {
             type="button"
             onClick={reload}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-3.5 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#E5EEFF] disabled:opacity-60 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-3.5 py-2 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#F1F5F9] disabled:opacity-60 cursor-pointer"
           >
-            <RefreshCw className={`h-4 w-4 text-[#2563EB] ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw className={`h-4 w-4 text-[#142B4A] ${loading ? "animate-spin" : ""}`} />
             {t("admin.overview.refresh")}
           </button>
           <button
             type="button"
             onClick={handleExport}
             disabled={filtered.bookings.length === 0}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.28)] transition-all hover:bg-[#1D4ED8] disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.28)] transition-all hover:bg-[#0D2039] disabled:opacity-50 cursor-pointer"
           >
             <Download className="h-4 w-4" />
             {t("admin.overview.export")}
@@ -216,7 +216,7 @@ export const AdminOverviewPage: React.FC = () => {
           <button
             type="button"
             onClick={reload}
-            className="mt-4 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+            className="mt-4 rounded-lg bg-[#142B4A] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#0D2039] cursor-pointer"
           >
             {t("admin.overview.retry")}
           </button>
@@ -288,13 +288,13 @@ export const AdminOverviewPage: React.FC = () => {
                       {t("admin.chart.subtitle")}
                     </p>
                   </div>
-                  <div className="inline-flex items-center bg-[#EFF4FF] p-1 rounded-xl self-start sm:self-auto">
+                  <div className="inline-flex items-center bg-[#F8FAFC] p-1 rounded-xl self-start sm:self-auto">
                     <button
                       type="button"
                       onClick={() => setMetric("bookings")}
                       className={`rounded-lg px-3 py-1 text-xs font-bold transition-all cursor-pointer ${
                         metric === "bookings"
-                          ? "bg-white text-[#2563EB] shadow-sm"
+                          ? "bg-white text-[#142B4A] shadow-sm"
                           : "text-[#565E74] hover:text-[#0B1C30]"
                       }`}
                     >
@@ -305,7 +305,7 @@ export const AdminOverviewPage: React.FC = () => {
                       onClick={() => setMetric("revenue")}
                       className={`rounded-lg px-3 py-1 text-xs font-bold transition-all cursor-pointer ${
                         metric === "revenue"
-                          ? "bg-white text-[#2563EB] shadow-sm"
+                          ? "bg-white text-[#142B4A] shadow-sm"
                           : "text-[#565E74] hover:text-[#0B1C30]"
                       }`}
                     >
@@ -315,7 +315,7 @@ export const AdminOverviewPage: React.FC = () => {
                 </div>
 
                 <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
-                  <span className="rounded-md bg-[#EFF4FF] px-2.5 py-1 font-semibold text-[#2563EB]">
+                  <span className="rounded-md bg-[#F8FAFC] px-2.5 py-1 font-semibold text-[#142B4A]">
                     {t("admin.chart.totalBookings", { count: metrics.periodBookings })}
                   </span>
                   <span className="rounded-md bg-amber-50 px-2.5 py-1 font-semibold text-amber-800">
@@ -334,9 +334,9 @@ export const AdminOverviewPage: React.FC = () => {
                 />
               </div>
 
-              <div className="mt-4 flex flex-col items-center justify-between gap-3 rounded-xl bg-[#EFF4FF] p-3 text-xs sm:flex-row">
+              <div className="mt-4 flex flex-col items-center justify-between gap-3 rounded-xl bg-[#F8FAFC] p-3 text-xs sm:flex-row">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-[#2563EB] shadow-sm">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-[#142B4A] shadow-sm">
                     <Activity className="h-5 w-5" />
                   </div>
                   <div>
@@ -372,7 +372,7 @@ export const AdminOverviewPage: React.FC = () => {
                 </h2>
                 <p className="mt-0.5 text-sm text-[#565E74]">{t("admin.table.recentSubtitle")}</p>
               </div>
-              <span className="self-start rounded-full bg-[#EFF4FF] px-2 py-0.5 text-[11px] font-bold text-[#2563EB] lg:self-auto">
+              <span className="self-start rounded-full bg-[#F8FAFC] px-2 py-0.5 text-[11px] font-bold text-[#142B4A] lg:self-auto">
                 {t("admin.table.unitBadge", { count: recent.length })}
               </span>
             </div>

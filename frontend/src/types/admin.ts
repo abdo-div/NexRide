@@ -252,6 +252,10 @@ export interface MaintenanceSummary {
   inProgress: number;
   completed14d: number;
   monthLabel: string;
+  quarantinedCount?: number;
+  criticalAlertsCount?: number;
+  upcomingServicesCount?: number;
+  mtdExpenditureLYD?: number;
 }
 
 /** Minimal vehicle descriptor consumed by maintenance create pickers. */

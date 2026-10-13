@@ -37,14 +37,14 @@ export const CompanyVehicleLocation: React.FC<CompanyVehicleLocationProps> = ({
     >
       {assigned ? (
         <div className="flex flex-col gap-3">
-          <div className="rounded-xl bg-[#EFF4FF] p-4">
+          <div className="rounded-xl bg-[#F8FAFC] p-4">
             <p className="text-sm font-bold text-[#0B1C30]">{assigned}</p>
             <p className="mt-0.5 text-xs text-[#565E74]">{vehicle.city ?? vehicle.pickupLocation}</p>
           </div>
           {vehicle.coordinates ? (
             <div className="flex items-center justify-between rounded-xl bg-[#F1F5F9] px-4 py-3">
               <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0B1C30]">
-                <Navigation className="h-4 w-4 text-[#2563EB]" aria-hidden="true" />
+                <Navigation className="h-4 w-4 text-[#142B4A]" aria-hidden="true" />
                 {vehicle.gpsActive
                   ? t("company.vehiclePage.live")
                   : t("company.vehiclePage.offline")}

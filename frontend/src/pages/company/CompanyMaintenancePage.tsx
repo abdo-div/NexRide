@@ -127,7 +127,7 @@ export const CompanyMaintenancePage: React.FC = () => {
   const showEmpty = !loading && !error && data.events.length === 0;
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
+    <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
       <div className="flex flex-col gap-6">
         <CompanyMaintenanceHeader
           loading={loading}
@@ -152,12 +152,12 @@ export const CompanyMaintenancePage: React.FC = () => {
               <span className="text-base font-bold text-[#0B1C30]">
                 {t("company.maintenance.table.title")}
               </span>
-              <span className="rounded-full bg-[#E5EEFF] px-2.5 py-0.5 text-xs font-bold text-[#2563EB]">
+              <span className="rounded-full bg-[#F1F5F9] px-2.5 py-0.5 text-xs font-bold text-[#142B4A]">
                 {t("company.maintenance.recordCount", { count: data.pagination.total })}
               </span>
             </div>
             <div className="inline-flex items-center gap-1.5 text-xs text-[#9AA4B5]">
-              <ClipboardCheck className="h-4 w-4 text-[#2563EB]" />
+              <ClipboardCheck className="h-4 w-4 text-[#142B4A]" />
               {t("company.maintenance.table.serialized")}
             </div>
           </div>
@@ -181,7 +181,7 @@ export const CompanyMaintenancePage: React.FC = () => {
                 <button
                   type="button"
                   onClick={reload}
-                  className="mt-4 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+                  className="mt-4 rounded-lg bg-[#142B4A] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#0D2039] cursor-pointer"
                 >
                   {t("company.maintenance.retry")}
                 </button>
@@ -234,7 +234,7 @@ export const CompanyMaintenancePage: React.FC = () => {
                 <h3 className="text-base font-extrabold tracking-tight text-[#0B1C30]">
                   {t("company.maintenance.upcoming.title")}
                 </h3>
-                <CalendarCheck2 className="h-5 w-5 text-[#2563EB]" />
+                <CalendarCheck2 className="h-5 w-5 text-[#142B4A]" />
               </div>
               {pendingSorted.length === 0 ? (
                 <div className="mt-3 flex h-36 flex-col items-center justify-center rounded-xl bg-[#F8FAFC] text-center">
@@ -255,7 +255,7 @@ export const CompanyMaintenancePage: React.FC = () => {
                           <div className="truncate text-sm font-bold text-[#0B1C30]">
                             {vehicleShortTitle(event)}
                           </div>
-                          <div className="flex items-center gap-1.5 font-mono text-[10px] font-bold text-[#2563EB]">
+                          <div className="flex items-center gap-1.5 font-mono text-[10px] font-bold text-[#142B4A]">
                             {eventVehicleRef(event)}
                             <span className="text-[#C3C6D7]">•</span>
                             <span className="font-sans font-semibold text-[#565E74]">
@@ -286,19 +286,19 @@ export const CompanyMaintenancePage: React.FC = () => {
                     {t("company.maintenance.mot.title")}
                   </h3>
                 </div>
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#EFF4FF] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#2563EB]">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#F8FAFC] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#142B4A]">
                   <Sparkles className="h-3 w-3" />
                   {t("company.maintenance.soon")}
                 </span>
               </div>
-              <div className="mt-3 flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-[#D3E4FE] bg-white/60 text-center">
+              <div className="mt-3 flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-[#E2E8F0] bg-white/60 text-center">
                 <p className="max-w-[280px] text-xs font-semibold leading-relaxed text-[#64748B]">
                   {t("company.maintenance.mot.subtitle")}
                 </p>
                 <button
                   type="button"
                   disabled
-                  className="mt-4 rounded-xl bg-[#EFF4FF] px-4 py-2 text-xs font-bold text-[#2563EB] opacity-70"
+                  className="mt-4 rounded-xl bg-[#F8FAFC] px-4 py-2 text-xs font-bold text-[#142B4A] opacity-70"
                 >
                   {t("company.maintenance.mot.download")}
                 </button>
@@ -308,8 +308,8 @@ export const CompanyMaintenancePage: React.FC = () => {
         )}
 
         {/* Record code legend */}
-        <div className="flex items-center gap-2 rounded-2xl border border-[#E5EEFF] bg-[#F8FAFF] px-4 py-3 text-xs text-[#565E74]">
-          <Wrench className="h-4 w-4 shrink-0 text-[#2563EB]" aria-hidden="true" />
+        <div className="flex items-center gap-2 rounded-2xl border border-[#F1F5F9] bg-[#F8FAFF] px-4 py-3 text-xs text-[#565E74]">
+          <Wrench className="h-4 w-4 shrink-0 text-[#142B4A]" aria-hidden="true" />
           <span>
             {t("company.maintenance.disclaimer", {
               count: data.pagination.total,

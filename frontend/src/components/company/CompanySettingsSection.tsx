@@ -9,7 +9,7 @@ import { Sparkles } from "lucide-react";
 export const ComingSoonBadge: React.FC = () => {
   const { t } = useTranslation();
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-[#EFF4FF] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#2563EB]">
+    <span className="inline-flex items-center gap-1 rounded-full bg-[#F8FAFC] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#142B4A]">
       <Sparkles className="h-3 w-3" aria-hidden="true" />
       {t("company.settings.soon")}
     </span>
@@ -45,7 +45,7 @@ export const CompanySettingsSection: React.FC<CompanySettingsSectionProps> = ({
     >
       <header className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 px-6 py-4">
         <div className="flex min-w-0 items-start gap-3">
-          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EFF4FF] text-[#2563EB]">
+          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F8FAFC] text-[#142B4A]">
             {icon}
           </div>
           <div className="min-w-0">
@@ -99,7 +99,7 @@ export const SettingRow: React.FC<SettingRowProps> = ({
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm font-semibold text-[#0B1C30]">{label}</span>
           {soon ? (
-            <span className="rounded-full bg-[#EFF4FF] px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-[#2563EB]">
+            <span className="rounded-full bg-[#F8FAFC] px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-[#142B4A]">
               {t("company.settings.soon")}
             </span>
           ) : null}
@@ -137,8 +137,8 @@ export const SettingToggle: React.FC<SettingToggleProps> = ({ enabled = false, d
       aria-label={label}
       disabled={disabled}
       onClick={() => onChange?.(!enabled)}
-      className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full p-1 shadow-inner transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
-        enabled ? "bg-[#2563EB]" : "bg-[#CBD5E1]"
+      className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full p-1 shadow-inner transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#142B4A] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
+        enabled ? "bg-[#142B4A]" : "bg-[#CBD5E1]"
       }`}
     >
       <span

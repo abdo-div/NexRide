@@ -51,7 +51,7 @@ export const CompanyVehicleCalendar: React.FC<CompanyVehicleCalendarProps> = ({
   return (
     <SectionCard
       icon={CalendarDays}
-      iconStyle="bg-[#E5EEFF] text-[#2563EB]"
+      iconStyle="bg-[#F1F5F9] text-[#142B4A]"
       title={t("company.vehiclePage.cal.title")}
       titleAr={t("company.vehiclePage.cal.titleAr")}
       action={
@@ -66,8 +66,8 @@ export const CompanyVehicleCalendar: React.FC<CompanyVehicleCalendarProps> = ({
       }
     >
       {nextDispatch ? (
-        <div className="mb-4 flex items-start gap-3 rounded-xl bg-[#EFF4FF] p-4">
-          <CalendarDays className="mt-0.5 h-5 w-5 shrink-0 text-[#2563EB]" aria-hidden="true" />
+        <div className="mb-4 flex items-start gap-3 rounded-xl bg-[#F8FAFC] p-4">
+          <CalendarDays className="mt-0.5 h-5 w-5 shrink-0 text-[#142B4A]" aria-hidden="true" />
           <div className="space-y-0.5">
             <p className="text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
               {t("company.vehiclePage.cal.next")}
@@ -117,8 +117,8 @@ export const CompanyVehicleCalendar: React.FC<CompanyVehicleCalendarProps> = ({
           const kind = kinds.get(key);
           const classes = kind
             ? kind === "booked"
-              ? "bg-[#2563EB] text-white font-bold shadow-sm"
-              : "bg-[#E5EEFF] text-[#2563EB] font-bold"
+              ? "bg-[#142B4A] text-white font-bold shadow-sm"
+              : "bg-[#F1F5F9] text-[#142B4A] font-bold"
             : "bg-[#ECFDF5] text-[#0E6B34] font-bold";
           return (
             <span
@@ -138,11 +138,11 @@ export const CompanyVehicleCalendar: React.FC<CompanyVehicleCalendarProps> = ({
           {t("company.vehiclePage.cal.legend.available")}
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded bg-[#2563EB]" />
+          <span className="h-3 w-3 rounded bg-[#142B4A]" />
           {t("company.vehiclePage.cal.legend.booked")}
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded bg-[#E5EEFF]" />
+          <span className="h-3 w-3 rounded bg-[#F1F5F9]" />
           {t("company.vehiclePage.cal.legend.pending")}
         </span>
       </div>

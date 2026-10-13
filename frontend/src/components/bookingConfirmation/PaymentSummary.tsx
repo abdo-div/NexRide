@@ -26,7 +26,7 @@ export const PaymentSummary: React.FC<Props> = ({
     <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col gap-4">
       <div className="flex items-center justify-between pb-2">
         <h3 className="text-[18px] text-[#0F172A] font-bold">{t(payment.title)}</h3>
-        <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${isPaid ? "bg-[#F8FAFC] text-[#2563EB]" : "bg-amber-50 text-amber-800"}`}>
+        <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${isPaid ? "bg-[#F8FAFC] text-[#142B4A]" : "bg-amber-50 text-amber-800"}`}>
           {t(isPaid ? payment.paidBadge : "booking.payment.pendingBadge")}
         </span>
       </div>
@@ -48,7 +48,7 @@ export const PaymentSummary: React.FC<Props> = ({
         </div>}
       </div>
 
-      <div className="mt-2 pt-4 bg-[#E5EEFF]/60 p-4 rounded-xl flex items-center justify-between">
+      <div className="mt-2 pt-4 bg-[#F1F5F9]/60 p-4 rounded-xl flex items-center justify-between">
         <div className="flex flex-col">
             <span className="text-[11px] uppercase tracking-wide text-[#64748B] font-bold">
             {t(isPaid ? payment.totalLabel : "booking.payment.totalDue")}
@@ -58,7 +58,7 @@ export const PaymentSummary: React.FC<Props> = ({
           </span>
         </div>
         <div className="text-end">
-          <span className="text-[32px] font-bold text-[#2563EB] font-mono leading-none">
+          <span className="text-[32px] font-bold text-[#142B4A] font-mono leading-none">
             {total}
           </span>
         </div>
@@ -66,7 +66,7 @@ export const PaymentSummary: React.FC<Props> = ({
 
       {isPaid && authRef ? (
         <div className="flex items-center gap-3 pt-2 text-[#64748B] text-[11px]">
-          <CreditCard className="w-[18px] h-[18px] text-[#2563EB]" />
+          <CreditCard className="w-[18px] h-[18px] text-[#142B4A]" />
           <span>
             {t(payment.viaNote)} <strong className="text-[#0F172A">{cardEnding}</strong> (
             {t("booking.payment.authLabel")} <strong className="text-[#0F172A">{authRef}</strong>)

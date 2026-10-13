@@ -21,19 +21,19 @@ export const CompanyRoute: React.FC<CompanyRouteProps> = ({ children }) => {
   if (isInitialising) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <LoaderCircle className="h-8 w-8 animate-spin text-[#2563EB]" />
+        <LoaderCircle className="h-8 w-8 animate-spin text-[#142B4A]" />
         <span className="sr-only">{t("auth.state.restoring")}</span>
       </div>
     );
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    return <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}${location.hash}` }} />;
   }
 
   // Roles may arrive with surrounding whitespace from legacy seed data.
   if (user?.role?.trim() !== "company") {
-    return <Navigate to="/" replace />;
+    return <Navigate to={user?.role?.trim() === "admin" ? "/admin" : "/"} replace />;
   }
 
   return <>{children}</>;

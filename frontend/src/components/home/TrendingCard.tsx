@@ -2,9 +2,10 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Heart, Star, ArrowRight } from "@phosphor-icons/react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import type { TrendingCar } from "../../types/trendingCar";
 import { companyLogoUrl, initialsFrom } from "../../lib/vehicleMapper";
+import { buttonHover, buttonTap, cardHover, hoverSpring } from "../../lib/motion";
 
 interface TrendingCardProps {
   car: TrendingCar;
@@ -33,21 +34,24 @@ const BADGE_KEYS: Record<string, string> = {
 
 export const TrendingCard: React.FC<TrendingCardProps> = ({ car, index = 0 }) => {
   const { t } = useTranslation();
+  const reduceMotion = useReducedMotion();
   return (
     <motion.div
       initial={{ opacity: 0, y: 25 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
-      whileHover={{ y: -6, transition: { duration: 0.2 } }}
-      className="bg-white rounded-3xl border border-slate-200/80 overflow-hidden hover:shadow-xl hover:shadow-blue-500/5 transition-shadow duration-300 group flex flex-col justify-between"
+      whileHover={reduceMotion ? undefined : cardHover}
+      className="premium-card bg-white rounded-3xl border border-slate-200/80 overflow-hidden group flex flex-col justify-between"
     >
       {/* Top Image Box */}
       <div className="relative w-full h-56 bg-slate-900 overflow-hidden">
-        <img
+        <motion.img
           src={car.image}
           alt={car.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+          className="w-full h-full object-cover opacity-90"
+          whileHover={reduceMotion ? undefined : { scale: 1.055 }}
+          transition={hoverSpring}
         />
 
         {/* Badges Overlay */}
@@ -67,13 +71,16 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car, index = 0 }) =>
         </div>
 
         {/* Saved Heart Button */}
-        <button
+        <motion.button
           type="button"
           aria-label={t("data.common.saveCar")}
           className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-slate-700 hover:text-rose-500 hover:bg-white shadow-xs transition-colors cursor-pointer"
+          whileHover={reduceMotion ? undefined : { scale: 1.12, rotate: -7 }}
+          whileTap={reduceMotion ? undefined : { scale: 0.9 }}
+          transition={hoverSpring}
         >
           <Heart className="w-4 h-4" />
-        </button>
+        </motion.button>
       </div>
 
       {/* Card Content */}
@@ -92,7 +99,7 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car, index = 0 }) =>
                   className="h-7 w-7 shrink-0 rounded-full border border-blue-100 object-cover"
                 />
               ) : (
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-blue-100 bg-blue-50 text-[9px] font-black text-blue-600">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-slate-100 bg-slate-50 text-[9px] font-black text-blue-600">
                   {initialsFrom(car.companyName)}
                 </span>
               )}
@@ -145,13 +152,18 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car, index = 0 }) =>
             </div>
           </div>
 
+          <motion.div
+            whileHover={reduceMotion ? undefined : buttonHover}
+            whileTap={reduceMotion ? undefined : buttonTap}
+          >
           <Link
             to={car.href ?? `/cars/${car.id}`}
-            className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 flex items-center gap-1.5 transition-all active:scale-95"
+            className="premium-button px-4 py-2.5 text-xs font-bold flex items-center gap-1.5"
           >
             <span>{t("home.trending.reserveRide")}</span>
             <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
           </Link>
+          </motion.div>
         </div>
       </div>
     </motion.div>

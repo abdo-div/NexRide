@@ -1,4 +1,4 @@
-import React, { type ReactNode } from "react";
+import React, { useEffect, useRef, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Check, CheckCircle2, LoaderCircle } from "lucide-react";
 import type { DocumentDraft, PartnerApplicationDraft } from "../../types/companyApplication";
@@ -55,6 +55,14 @@ export const PartnerWizard: React.FC<WizardProps> = ({
 }) => {
   const { t } = useTranslation();
   const currentErrors = errors[activeStep] ?? {};
+  const activeStepRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    activeStepRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, [activeStep]);
 
   const summaryFor = (step: number): string => {
     switch (step) {
@@ -117,7 +125,7 @@ export const PartnerWizard: React.FC<WizardProps> = ({
   return (
     <div className="min-w-0 flex flex-col gap-6">
       {/* Tab bar */}
-      <div className="flex items-center overflow-x-auto gap-2 p-2 rounded-2xl bg-[#EFF4FF] shadow-sm">
+      <div className="flex items-center overflow-x-auto gap-2 p-2 rounded-2xl bg-[#F8FAFC] shadow-sm">
         {Array.from({ length: STEP_COUNT }, (_, index) => index + 1).map((step) => {
           const isActive = step === activeStep;
           const isCompleted = step < activeStep;
@@ -128,14 +136,14 @@ export const PartnerWizard: React.FC<WizardProps> = ({
               onClick={() => onGoTo(step)}
               className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer ${
                 isActive
-                  ? "bg-white text-[#2563EB] shadow-sm"
+                  ? "bg-white text-[#142B4A] shadow-sm"
                   : "text-[#434655] hover:text-[#0B1C30]"
               }`}
             >
               {isCompleted ? (
                 <Check className="w-3.5 h-3.5 text-emerald-600" />
               ) : (
-                <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-[#2563EB]" : "bg-[#C3C6D7]"}`} />
+                <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-[#142B4A]" : "bg-[#C3C6D7]"}`} />
               )}
               {t("partner.steps.label", { n: step, title: stepTitles(t, step) })}
             </button>
@@ -149,11 +157,12 @@ export const PartnerWizard: React.FC<WizardProps> = ({
           return (
             <div
               key={step}
-              className="bg-white rounded-xl shadow-lg p-6 md:p-8 flex flex-col gap-6"
+              ref={activeStepRef}
+              className="scroll-mt-24 bg-white rounded-xl shadow-lg p-6 md:p-8 flex flex-col gap-6"
             >
               <div className="flex items-center justify-between pb-1 gap-3">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#DBE1FF] text-[#00174B] text-[10px] font-bold uppercase tracking-wider">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#142B4A]" />
                   {t("partner.steps.active")}
                 </span>
                 <span className="text-[10px] text-[#737686] uppercase font-bold tracking-wider">
@@ -161,6 +170,42 @@ export const PartnerWizard: React.FC<WizardProps> = ({
                 </span>
               </div>
               {renderActiveStep()}
+
+              {/* Keep navigation with the fields it advances. */}
+              <div className="mt-2 flex flex-col items-center justify-between gap-4 border-t border-slate-100 pt-5 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={onBack}
+                  disabled={activeStep === 1}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#F8FAFC] text-[#0B1C30] text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#F1F5F9] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <span className="rtl:rotate-180">←</span>
+                  {activeStep === 1
+                    ? t("partner.toolbar.backStart")
+                    : t("partner.toolbar.back", { n: activeStep - 1 })}
+                </button>
+
+                <div className="flex items-center gap-1.5 text-xs text-[#434655]">
+                  {submitting ? (
+                    <LoaderCircle className="w-4 h-4 animate-spin text-[#142B4A]" />
+                  ) : (
+                    <CheckCircle2 className="w-4 h-4 text-[#737686]" />
+                  )}
+                  <span>{t("partner.toolbar.autoSaved", { time: "just now" })}</span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={onContinue}
+                  disabled={submitting}
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#142B4A] text-white text-sm font-bold flex items-center justify-center gap-2 shadow-md shadow-[#142B4A]/25 transition-all hover:bg-[#142B4A] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {activeStep === STEP_COUNT
+                    ? t("partner.step6.submit")
+                    : t("partner.toolbar.continueTo", { n: activeStep + 1 })}
+                  <span className="rtl:rotate-180">→</span>
+                </button>
+              </div>
             </div>
           );
         }
@@ -171,13 +216,13 @@ export const PartnerWizard: React.FC<WizardProps> = ({
             key={step}
             className="bg-white rounded-xl shadow-sm overflow-hidden"
           >
-            <div className="flex items-center justify-between gap-3 px-6 py-4 bg-[#EFF4FF]/60">
+            <div className="flex items-center justify-between gap-3 px-6 py-4 bg-[#F8FAFC]/60">
               <div className="flex items-center gap-4 min-w-0">
                 <div
                   className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
                     isCompleted
-                      ? "bg-[#D3E4FE] text-[#2563EB]"
-                      : "bg-[#E5EEFF] text-[#434655] font-bold text-[13px]"
+                      ? "bg-[#E2E8F0] text-[#142B4A]"
+                      : "bg-[#F1F5F9] text-[#434655] font-bold text-[13px]"
                   }`}
                 >
                   {isCompleted ? (
@@ -213,7 +258,7 @@ export const PartnerWizard: React.FC<WizardProps> = ({
                 <button
                   type="button"
                   onClick={() => onGoTo(step)}
-                  className="text-sm font-bold text-[#2563EB] flex items-center gap-1 hover:underline shrink-0 cursor-pointer"
+                  className="text-sm font-bold text-[#142B4A] flex items-center gap-1 hover:underline shrink-0 cursor-pointer"
                 >
                   {t("partner.steps.edit")}
                 </button>
@@ -225,41 +270,6 @@ export const PartnerWizard: React.FC<WizardProps> = ({
         );
       })}
 
-      {/* Bottom action toolbar */}
-      <div className="p-5 bg-white rounded-xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={activeStep === 1}
-          className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#EFF4FF] text-[#0B1C30] text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#E5EEFF] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-        >
-          <span className="rtl:rotate-180">←</span>
-          {activeStep === 1
-            ? t("partner.toolbar.backStart")
-            : t("partner.toolbar.back", { n: activeStep - 1 })}
-        </button>
-
-        <div className="flex items-center gap-1.5 text-xs text-[#434655]">
-          {submitting ? (
-            <LoaderCircle className="w-4 h-4 animate-spin text-[#2563EB]" />
-          ) : (
-            <CheckCircle2 className="w-4 h-4 text-[#737686]" />
-          )}
-          <span>{t("partner.toolbar.autoSaved", { time: "just now" })}</span>
-        </div>
-
-        <button
-          type="button"
-          onClick={onContinue}
-          disabled={submitting}
-          className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#2563EB] text-white text-sm font-bold flex items-center justify-center gap-2 shadow-md shadow-[#2563EB]/25 transition-all hover:bg-[#004AC6] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-        >
-          {activeStep === STEP_COUNT
-            ? t("partner.step6.submit")
-            : t("partner.toolbar.continueTo", { n: activeStep + 1 })}
-          <span className="rtl:rotate-180">→</span>
-        </button>
-      </div>
     </div>
   );
 };

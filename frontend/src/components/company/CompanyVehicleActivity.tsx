@@ -32,7 +32,7 @@ export const CompanyVehicleActivity: React.FC<CompanyVehicleActivityProps> = ({
   return (
     <SectionCard
       icon={History}
-      iconStyle="bg-[#E5EEFF] text-[#2563EB]"
+      iconStyle="bg-[#F1F5F9] text-[#142B4A]"
       title={t("company.vehiclePage.act.title")}
       titleAr={t("company.vehiclePage.act.titleAr")}
     >
@@ -40,7 +40,7 @@ export const CompanyVehicleActivity: React.FC<CompanyVehicleActivityProps> = ({
         <p className="text-sm text-[#9AA4B5]">{t("company.vehiclePage.act.empty")}</p>
       ) : (
         <div className="relative flex flex-col gap-4 pl-5">
-          <div className="absolute bottom-2 left-2 top-2 w-0.5 bg-[#E5EEFF]" />
+          <div className="absolute bottom-2 left-2 top-2 w-0.5 bg-[#F1F5F9]" />
           {events.map((trip) => {
             const completed = trip.bookingStatus === "COMPLETED";
             const dateIso = completed ? trip.endDate : trip.startDate;
@@ -48,7 +48,7 @@ export const CompanyVehicleActivity: React.FC<CompanyVehicleActivityProps> = ({
               ? "bg-[#0BA05F]"
               : trip.bookingStatus === "PENDING_PAYMENT"
                 ? "bg-[#EA8A00]"
-                : "bg-[#2563EB]";
+                : "bg-[#142B4A]";
             return (
               <div key={trip.id} className="relative flex flex-col">
                 <span

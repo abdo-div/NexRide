@@ -47,7 +47,7 @@ export const CompanySettingsPayoutCard: React.FC<CompanySettingsPayoutCardProps>
       <div className="rounded-xl bg-[#F8FAFC] p-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#2563EB] shadow-sm">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#142B4A] shadow-sm">
               <Wallet className="h-5 w-5" aria-hidden="true" />
             </span>
             <div className="min-w-0">
@@ -63,7 +63,7 @@ export const CompanySettingsPayoutCard: React.FC<CompanySettingsPayoutCardProps>
               </p>
             </div>
           </div>
-          <span className="shrink-0 rounded-full bg-[#E5EEFF] px-3 py-1 text-sm font-extrabold text-[#2563EB]">
+          <span className="shrink-0 rounded-full bg-[#F1F5F9] px-3 py-1 text-sm font-extrabold text-[#142B4A]">
             {commissionRate !== null && commissionRate !== undefined
               ? `${commissionRate}%`
               : "—"}
@@ -83,7 +83,7 @@ export const CompanySettingsPayoutCard: React.FC<CompanySettingsPayoutCardProps>
               onChange={(e) => onChange(field.key, e.target.value)}
               placeholder={t(`company.settings.payout.${field.key}Placeholder`)}
               disabled={busy}
-              className="w-full rounded-xl border border-[#E5EEFF] bg-white px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none transition-colors placeholder:text-[#9AA4B5] focus:border-[#2563EB] focus:ring-2 focus:ring-[#E5EEFF] disabled:opacity-60"
+              className="w-full rounded-xl border border-[#F1F5F9] bg-white px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none transition-colors placeholder:text-[#9AA4B5] focus:border-[#142B4A] focus:ring-2 focus:ring-[#F1F5F9] disabled:opacity-60"
             />
             {field.hintKey && (
               <span className="mt-1 block text-[11px] text-[#9AA4B5]">
@@ -107,7 +107,7 @@ export const CompanySettingsPayoutCard: React.FC<CompanySettingsPayoutCardProps>
         type="button"
         onClick={onSave}
         disabled={!dirty || busy}
-        className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#EFF4FF] px-4 py-2 text-sm font-semibold text-[#2563EB] transition-colors hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+        className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-4 py-2 text-sm font-semibold text-[#142B4A] transition-colors hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
       >
         <RefreshCcw className="h-4 w-4" aria-hidden="true" />
         {busy

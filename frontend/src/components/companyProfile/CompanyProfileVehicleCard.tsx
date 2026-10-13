@@ -40,7 +40,7 @@ export const CompanyProfileVehicleCard: React.FC<
             {t("companyProfile.instantConfirmation")}
           </span>
           {vehicle.pickupLocation && (
-            <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#2563EB] text-white shadow-sm max-w-[220px] truncate">
+            <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#142B4A] text-white shadow-sm max-w-[220px] truncate">
               {vehicle.pickupLocation}
             </span>
           )}
@@ -81,7 +81,7 @@ export const CompanyProfileVehicleCard: React.FC<
 
         <div className="pt-3 flex items-center justify-between gap-3 border-t border-slate-100">
           <div className="flex items-baseline gap-1">
-            <span className="text-[24px] font-extrabold text-[#2563EB] tabular-nums">
+            <span className="text-[24px] font-extrabold text-[#142B4A] tabular-nums">
               {vehicle.dailyPrice}
             </span>
             <span className="text-[12px] font-bold text-slate-700">
@@ -93,7 +93,7 @@ export const CompanyProfileVehicleCard: React.FC<
           </div>
           <Link
             to={vehicle.href}
-            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-[13px] font-bold shadow-sm transition-colors flex-shrink-0"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#142B4A] hover:bg-blue-700 text-white text-[13px] font-bold shadow-sm transition-colors flex-shrink-0"
           >
             {t("companyProfile.viewDetails")}
             <ArrowRight className="w-4 h-4 rtl:rotate-180" />

@@ -28,7 +28,7 @@ export const VehicleDescription: React.FC<{ detail: VehicleDetail }> = ({ detail
             key={f}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-[13px] font-semibold"
           >
-            <BadgeCheck className="w-[18px] h-[18px] text-[#2563EB]" />
+            <BadgeCheck className="w-[18px] h-[18px] text-[#142B4A]" />
             {t(f)}
           </span>
         ))}

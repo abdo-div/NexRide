@@ -24,12 +24,12 @@ export const VehicleConfirmationCard: React.FC<{ data: ConfirmationData }> = ({ 
           <span className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-[#0F172A] shadow-sm">
             {t(vehicleCard.badgePrimary)}
           </span>
-          <span className="bg-[#2563EB] px-3 py-1 rounded-full text-[11px] font-bold text-white shadow-sm">
+          <span className="bg-[#142B4A] px-3 py-1 rounded-full text-[11px] font-bold text-white shadow-sm">
             {t(vehicleCard.badgeSecondary)}
           </span>
         </div>
         <div className="absolute bottom-4 end-4 bg-[#0F172A]/85 backdrop-blur-md px-3 py-1 rounded-lg text-white text-[11px] flex items-center gap-1.5">
-          <ConfirmationIcon name="gps" className="w-[16px] h-[16px] text-[#B4C5FF]" />
+          <ConfirmationIcon name="gps" className="w-[16px] h-[16px] text-[#CBD5E1]" />
           {t(vehicleCard.gpsLabel)}
         </div>
       </div>
@@ -37,7 +37,7 @@ export const VehicleConfirmationCard: React.FC<{ data: ConfirmationData }> = ({ 
       <div className="p-6 sm:p-8 flex flex-col gap-4">
         <div>
           <div className="flex items-center justify-between gap-4">
-            <span className="text-[11px] uppercase tracking-wider text-[#2563EB] font-bold">
+            <span className="text-[11px] uppercase tracking-wider text-[#142B4A] font-bold">
               {t(vehicleCard.category)}
             </span>
             {vehicleCard.vin && (
@@ -61,12 +61,12 @@ export const VehicleConfirmationCard: React.FC<{ data: ConfirmationData }> = ({ 
 
         <div className="bg-[#F8FAFC] rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-1">
           <div className="flex items-center gap-3">
-            {companyLogoUrl(vehicle.operator.logo) ? <img src={companyLogoUrl(vehicle.operator.logo) ?? ""} alt={vehicle.operator.name} className="h-12 w-12 rounded-xl border border-slate-200 object-cover shadow-sm" /> : <div className="w-12 h-12 rounded-xl bg-white text-[18px] font-bold text-[#2563EB] flex items-center justify-center shadow-sm">{vehicle.operator.initials}</div>}
+            {companyLogoUrl(vehicle.operator.logo) ? <img src={companyLogoUrl(vehicle.operator.logo) ?? ""} alt={vehicle.operator.name} className="h-12 w-12 rounded-xl border border-slate-200 object-cover shadow-sm" /> : <div className="w-12 h-12 rounded-xl bg-white text-[18px] font-bold text-[#142B4A] flex items-center justify-center shadow-sm">{vehicle.operator.initials}</div>}
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
                 <span className="text-[16px] text-[#0F172A] font-bold">{vehicle.operator.name}</span>
                 {vehicle.operator.isVerified && (
-                  <BadgeCheck className="w-[18px] h-[18px] text-[#2563EB]" />
+                  <BadgeCheck className="w-[18px] h-[18px] text-[#142B4A]" />
                 )}
               </div>
               <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
@@ -82,7 +82,7 @@ export const VehicleConfirmationCard: React.FC<{ data: ConfirmationData }> = ({ 
           <a
             href={operator.phoneHref}
             title={t(operator.phoneLabel)}
-            className="p-2.5 rounded-lg bg-white text-[#0F172A] hover:text-[#2563EB] shadow-sm transition-all flex items-center gap-1 text-[12px] shrink-0"
+            className="p-2.5 rounded-lg bg-white text-[#0F172A] hover:text-[#142B4A] shadow-sm transition-all flex items-center gap-1 text-[12px] shrink-0"
           >
             <Phone className="w-[18px] h-[18px]" />
             <span className="font-bold">{operator.phone}</span>

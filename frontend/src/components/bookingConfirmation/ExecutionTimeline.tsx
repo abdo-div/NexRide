@@ -8,8 +8,8 @@ export const ExecutionTimeline: React.FC<{ meta: ConfirmationMeta }> = ({ meta }
   const { milestones } = meta;
 
   const stateCls = (state: string) => {
-    if (state === "done") return "bg-[#DBE1FF] text-[#2563EB]";
-    if (state === "next") return "bg-[#2563EB] text-white animate-pulse";
+    if (state === "done") return "bg-[#DBE1FF] text-[#142B4A]";
+    if (state === "next") return "bg-[#142B4A] text-white animate-pulse";
     return "bg-[#F1F5F9] text-[#64748B]";
   };
 
@@ -32,7 +32,7 @@ export const ExecutionTimeline: React.FC<{ meta: ConfirmationMeta }> = ({ meta }
             <div className="flex flex-col">
               <span
                 className={`text-[11px] uppercase tracking-wide font-bold ${
-                  m.state === "pending" ? "text-[#64748B]" : "text-[#2563EB]"
+                  m.state === "pending" ? "text-[#64748B]" : "text-[#142B4A]"
                 }`}
               >
                 {t(m.step)} • {t(m.status)}

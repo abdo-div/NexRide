@@ -88,7 +88,7 @@ export const AdminPagination: React.FC<AdminPaginationProps> = ({
           type="button"
           disabled={!canGoBack}
           onClick={() => onPageChange(page - 1)}
-          className="flex items-center gap-1 rounded-lg bg-[#EFF4FF] px-3 py-1.5 font-semibold text-[#565E74] transition-colors enabled:hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+          className="flex items-center gap-1 rounded-lg bg-[#F8FAFC] px-3 py-1.5 font-semibold text-[#565E74] transition-colors enabled:hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
         >
           <ChevronRight className="h-4 w-4 rtl:hidden" />
           <ChevronLeft className="hidden h-4 w-4 rtl:block" />
@@ -113,8 +113,8 @@ export const AdminPagination: React.FC<AdminPaginationProps> = ({
               aria-current={entry === page ? "page" : undefined}
               className={`rounded-lg px-3 py-1.5 font-semibold transition-colors cursor-pointer ${
                 entry === page
-                  ? "bg-[#2563EB] text-white shadow-sm"
-                  : "bg-[#EFF4FF] text-[#565E74] hover:bg-[#E5EEFF]"
+                  ? "bg-[#142B4A] text-white shadow-sm"
+                  : "bg-[#F8FAFC] text-[#565E74] hover:bg-[#F1F5F9]"
               }`}
             >
               {entry}
@@ -126,7 +126,7 @@ export const AdminPagination: React.FC<AdminPaginationProps> = ({
           type="button"
           disabled={!canGoForward}
           onClick={() => onPageChange(page + 1)}
-          className="flex items-center gap-1 rounded-lg bg-[#EFF4FF] px-3 py-1.5 font-semibold text-[#565E74] transition-colors enabled:hover:bg-[#E5EEFF] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+          className="flex items-center gap-1 rounded-lg bg-[#F8FAFC] px-3 py-1.5 font-semibold text-[#565E74] transition-colors enabled:hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
         >
           {t("admin.pagination.next")}
           <ChevronLeft className="h-4 w-4 rtl:hidden" />

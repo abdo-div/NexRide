@@ -2,6 +2,7 @@ import { request } from "./apiClient";
 import type {
   AuthUser,
   ForgotPasswordInput,
+  GoogleSignInInput,
   ResetPasswordInput,
   SignInInput,
   SignUpInput,
@@ -31,6 +32,13 @@ export const authApi = {
       method: "POST",
       auth: false,
       body: input,
+    }),
+
+  googleSignIn: ({ idToken }: GoogleSignInInput) =>
+    request<SessionResponse>("/auth/google", {
+      method: "POST",
+      auth: false,
+      body: { idToken },
     }),
 
   signOut: () =>

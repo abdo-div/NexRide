@@ -81,7 +81,7 @@ export const CompanyMessagesPage: React.FC = () => {
   );
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-8 py-8">
+    <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
       <div className="flex flex-col gap-6">
         <CompanyMessagesHeader
           company={data.company ?? null}
@@ -103,7 +103,7 @@ export const CompanyMessagesPage: React.FC = () => {
             <button
               type="button"
               onClick={reload}
-              className="mt-4 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1D4ED8] cursor-pointer"
+              className="mt-4 rounded-lg bg-[#142B4A] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#0D2039] cursor-pointer"
             >
               {t("company.messagesPage.states.retry")}
             </button>
