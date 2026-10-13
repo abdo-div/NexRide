@@ -15,6 +15,7 @@ import { moamalatApi } from "../lib/moamalatApi";
 import {
   loadMoamalatLightbox,
   openMoamalatLightbox,
+  getMoamalatErrorMessage,
 } from "../lib/moamalatLightbox";
 
 type PaymentStatus =
@@ -130,7 +131,13 @@ const PaymentPage: React.FC = () => {
         onComplete: (response) => {
           handleVerified(init.data.payment.merchantReference, response);
         },
-        onError: () => setStatus("gatewayError"),
+        onError: (gatewayError) => {
+          setStatus("gatewayError");
+          setError(
+            getMoamalatErrorMessage(gatewayError) ||
+              t("payment.gatewayError"),
+          );
+        },
         onCancel: () => setStatus("cancelled"),
       });
     } catch (err) {

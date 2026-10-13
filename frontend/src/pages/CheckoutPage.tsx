@@ -19,7 +19,7 @@ import { moamalatApi } from "../lib/moamalatApi";
 import {
   loadMoamalatLightbox,
   openMoamalatLightbox,
-  closeMoamalatLightbox,
+  getMoamalatErrorMessage,
 } from "../lib/moamalatLightbox";
 
 
@@ -243,7 +243,6 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
 
       openMoamalatLightbox(params, {
         onComplete: async (response) => {
-          closeMoamalatLightbox();
           setPhase("processing");
           try {
             const verifyRes = await moamalatApi.verify({
@@ -273,17 +272,17 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
             );
           }
         },
-        onError: () => {
-          closeMoamalatLightbox();
+        onError: (gatewayError) => {
           setPhase("idle");
           setSubmitError(
-            t("payment.gatewayError", {
-              defaultValue: "Moamalat payment gateway error. Please try again.",
-            }),
+            getMoamalatErrorMessage(gatewayError) ||
+              t("payment.gatewayError", {
+                defaultValue:
+                  "Moamalat payment gateway error. Please try again.",
+              }),
           );
         },
         onCancel: () => {
-          closeMoamalatLightbox();
           setPhase("idle");
           setSubmitError(
             t("payment.cancelledDesc", {
