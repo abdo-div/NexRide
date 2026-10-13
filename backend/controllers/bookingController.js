@@ -79,20 +79,6 @@ const safelyRelease = async (fn) => {
   }
 };
 
-const safelyAbortTransaction = async (session) => {
-  // commitTransaction can complete on MongoDB and still surface a late network
-  // error to the driver. Never replace that original error by attempting to
-  // abort a transaction whose state is already committed/aborted.
-  if (typeof session.inTransaction === "function" && !session.inTransaction()) {
-    return;
-  }
-  try {
-    await session.abortTransaction();
-  } catch {
-    // Cleanup must never hide the original booking/commit error.
-  }
-};
-
 /**
  * Pre-booking concurrency check
  */
@@ -198,9 +184,16 @@ export const createBooking = catchAsync(async (req, res, next) => {
   }
 
   const session = await mongoose.startSession();
-  session.startTransaction();
+  let booking;
+  let payment;
+  let claimed;
+  let transactionError;
 
   try {
+    // The driver owns commit, retry, and abort state transitions. Manually
+    // aborting after a successful commit caused checkout to report a failure
+    // even though MongoDB had already stored the fully paid booking.
+    await session.withTransaction(async () => {
     // Distinguish a missing/unpublished listing (404) from a vehicle that is
     // simply not rentable right now (409), so a vehicle in MAINTENANCE
     // surfaces a clear conflict instead of a misleading "not found".
@@ -222,7 +215,7 @@ export const createBooking = catchAsync(async (req, res, next) => {
     // row with a conditional findOneAndUpdate makes the vehicle document the
     // mutex. Touching updatedAt creates write contention without using the
     // physical operationalStatus as a temporary reservation flag.
-    const claimed = await Vehicle.findOneAndUpdate(
+    claimed = await Vehicle.findOneAndUpdate(
       {
         _id: vehicleId,
         listingStatus: "PUBLISHED",
@@ -261,7 +254,7 @@ export const createBooking = catchAsync(async (req, res, next) => {
     const commissionAmount = totalAmount * (commissionRate / 100);
     const companyShare = totalAmount - commissionAmount;
 
-    const [booking] = await Booking.create(
+    [booking] = await Booking.create(
       [
         {
           customerId: req.user.id,
@@ -288,7 +281,6 @@ export const createBooking = catchAsync(async (req, res, next) => {
       { session },
     );
 
-    let payment;
     if (paymentMethod === "CASH_ON_DELIVERY") {
       [payment] = await Payment.create(
         [
@@ -306,52 +298,32 @@ export const createBooking = catchAsync(async (req, res, next) => {
       );
     }
 
-    await session.commitTransaction();
-    session.endSession();
-
-    // Release lock AND the checkout hold upon successful creation. The hold is
-    // only a checkout-session reservation, not a booking: leaving it in place
-    // for its full 10-minute TTL would prevent any other user (or the same
-    // user's next booking) from checking out the same vehicle immediately.
-    if (lock) await safelyRelease(() => lock.release());
-    if (hold) {
-      await safelyRelease(() =>
-        bookingConcurrency.releaseVehicleHold(vehicleId),
-      );
-    }
-
-    // Open the operator inbox thread for this booking. Best-effort: a messaging
-    // failure must never fail a committed booking, so it is caught and ignored.
-    await ensureBookingConversation(booking, { vehicle: claimed }).catch(
-      () => {},
-    );
-
-    const data = { booking };
-    if (payment) data.payment = payment;
-
-    res.status(201).json({
-      status: "success",
-      data,
     });
   } catch (error) {
-    await safelyAbortTransaction(session);
-    session.endSession();
+    transactionError = error;
+  } finally {
+    await session.endSession();
 
-    // Always release lock and checkout hold on failure
+    // The optional Redis lock/hold protects only the active checkout attempt.
+    // Always release both after the managed transaction settles.
     if (lock) await safelyRelease(() => lock.release());
     if (hold) {
       await safelyRelease(() =>
         bookingConcurrency.releaseVehicleHold(vehicleId),
       );
     }
+  }
 
+  if (transactionError) {
     // Two transactions that contended for the same vehicle row abort one of
     // them with MongoDB's WriteConflict before any writes are visible. Surface
     // that as the same "already being booked" 409 the collision check would
     // have produced, never as a 500.
     if (
-      error?.code === 112 ||
-      /WriteConflict|TransientTransactionError/i.test(error?.message ?? "")
+      transactionError?.code === 112 ||
+      /WriteConflict|TransientTransactionError/i.test(
+        transactionError?.message ?? "",
+      )
     ) {
       return next(
         new AppError(
@@ -361,8 +333,22 @@ export const createBooking = catchAsync(async (req, res, next) => {
       );
     }
 
-    next(error);
+    return next(transactionError);
   }
+
+  // Open the operator inbox thread for this booking. Best-effort: a messaging
+  // failure must never fail a committed booking, so it is caught and ignored.
+  await ensureBookingConversation(booking, { vehicle: claimed }).catch(
+    () => {},
+  );
+
+  const data = { booking };
+  if (payment) data.payment = payment;
+
+  res.status(201).json({
+    status: "success",
+    data,
+  });
 });
 
 /**
