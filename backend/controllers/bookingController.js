@@ -79,6 +79,20 @@ const safelyRelease = async (fn) => {
   }
 };
 
+const safelyAbortTransaction = async (session) => {
+  // commitTransaction can complete on MongoDB and still surface a late network
+  // error to the driver. Never replace that original error by attempting to
+  // abort a transaction whose state is already committed/aborted.
+  if (typeof session.inTransaction === "function" && !session.inTransaction()) {
+    return;
+  }
+  try {
+    await session.abortTransaction();
+  } catch {
+    // Cleanup must never hide the original booking/commit error.
+  }
+};
+
 /**
  * Pre-booking concurrency check
  */
@@ -320,7 +334,7 @@ export const createBooking = catchAsync(async (req, res, next) => {
       data,
     });
   } catch (error) {
-    await session.abortTransaction();
+    await safelyAbortTransaction(session);
     session.endSession();
 
     // Always release lock and checkout hold on failure
