@@ -38,6 +38,11 @@ export const login = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, req, res);
 });
 
+export const googleLogin = catchAsync(async (req, res) => {
+  const user = await authService.authenticateGoogleUser(req.body.idToken);
+  createSendToken(user, 200, req, res);
+});
+
 export const logout = (req, res) => {
   res.cookie("jwt", "loggedout", {
     expires: new Date(Date.now() + 10 * 1000),

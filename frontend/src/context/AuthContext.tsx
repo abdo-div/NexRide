@@ -8,7 +8,7 @@ import {
 import { isUnauthorized } from "../lib/apiClient";
 import { authApi } from "../lib/authApi";
 import { clearToken, getToken, setToken } from "../lib/tokenStorage";
-import type { AuthUser, SignInInput, SignUpInput } from "../types/auth";
+import type { AuthUser, GoogleSignInInput, SignInInput, SignUpInput } from "../types/auth";
 import { AuthContext, type AuthContextValue } from "./auth-context";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -56,6 +56,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(data.user);
   }, []);
 
+  const googleSignIn = useCallback(async (input: GoogleSignInInput) => {
+    const { token, data } = await authApi.googleSignIn(input);
+    setToken(token);
+    setUser(data.user);
+    return data.user;
+  }, []);
+
   const signOut = useCallback(async () => {
     try {
       await authApi.signOut();
@@ -82,12 +89,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isInitialising,
       isAuthenticated: Boolean(user),
       signIn,
+      googleSignIn,
       signUp,
       signOut,
       adoptSession,
       updateUser,
     }),
-    [user, isInitialising, signIn, signUp, signOut, adoptSession, updateUser],
+    [user, isInitialising, signIn, googleSignIn, signUp, signOut, adoptSession, updateUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

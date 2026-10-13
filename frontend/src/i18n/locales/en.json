@@ -559,6 +559,11 @@
           "desc": "Review real photos, features, availability and pickup information so you know what you are booking."
         }
       },
+      "google": {
+        "divider": "Or continue with",
+        "missingCredential": "Google did not return a credential. Please try again.",
+        "popupFailed": "Google sign-in was cancelled or could not be completed."
+      },
       "terminal": "The NexRide marketplace",
       "terminalSub": "Verified companies • Live vehicle availability",
       "liveEscort": "Ready to book",

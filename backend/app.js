@@ -11,6 +11,7 @@ import swaggerUi from "swagger-ui-express";
 // ============================================
 
 import userRouter from "./routes/userRoutes.js";
+import authRouter from "./routes/authRoutes.js";
 import reviewRouter from "./routes/reviewRoutes.js";
 import bookingRouter from "./routes/bookingRoutes.js";
 import companyRouter from "./routes/companyRoutes.js";
@@ -206,6 +207,7 @@ app.use(
   [
     "/api/v1/users/signup",
     "/api/v1/users/login",
+    "/api/v1/auth/google",
     "/api/v1/users/forgot-password",
     "/api/v1/users/reset-password",
     "/api/v1/companies/apply",
@@ -238,6 +240,7 @@ if (!hasFrontendBuild) {
 
 app.use("/api/v1/cars", vehicleRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/bookings", bookingRouter);
 app.use("/api/v1/companies", companyRouter);
