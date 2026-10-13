@@ -5,6 +5,7 @@ import { KeyRound } from "lucide-react";
 import { SignInForm } from "./SignInForm";
 import { SignUpForm } from "./SignUpForm";
 import { ForgotPasswordPanel } from "./ForgotPasswordPanel";
+import { GoogleSignIn } from "./GoogleSignIn";
 
 type AuthTab = "signin" | "signup";
 
@@ -20,6 +21,7 @@ export const AuthFormPanel: React.FC = () => {
     searchParams.get("mode") === "signup" ? "signup" : "signin",
   );
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const googleAuthEnabled = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim());
 
   const heading = TAB_HEADINGS[activeTab];
 
@@ -76,6 +78,7 @@ export const AuthFormPanel: React.FC = () => {
       ) : (
         <SignUpForm />
       )}
+      {!showForgotPassword && googleAuthEnabled && <GoogleSignIn />}
     </div>
   );
 };

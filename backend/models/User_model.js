@@ -24,8 +24,17 @@ const userSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: String,
-      required: [true, "A phone number is required for rental confirmations"],
+      required: function () {
+        return !this.googleId;
+      },
       trim: true,
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+      immutable: true,
+      select: false,
     },
     photo: {
       type: String,
@@ -56,13 +65,17 @@ const userSchema = new mongoose.Schema(
     // -------------------------------------------------------------------------
     password: {
       type: String,
-      required: [true, "Please provide a password"],
+      required: function () {
+        return !this.googleId;
+      },
       minlength: [8, "Password must be at least 8 characters long"],
       select: false,
     },
     passwordConfirm: {
       type: String,
-      required: [true, "Please confirm your password"],
+      required: function () {
+        return !this.googleId && this.isNew;
+      },
       validate: {
         validator: function (el) {
           return el === this.password;

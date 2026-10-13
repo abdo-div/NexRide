@@ -31,6 +31,10 @@ export interface SignInInput {
   password: string;
 }
 
+export interface GoogleSignInInput {
+  idToken: string;
+}
+
 export interface ForgotPasswordInput {
   identifier: string;
 }
