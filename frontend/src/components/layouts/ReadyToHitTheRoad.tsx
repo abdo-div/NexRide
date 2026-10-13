@@ -2,10 +2,12 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { ArrowRight, Phone } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import { buttonHover, buttonTap } from "../../lib/motion";
 
 export const ReadyToHitTheRoad: React.FC = () => {
   const { t } = useTranslation();
+  const reduceMotion = useReducedMotion();
 
   return (
     <section className="py-20 px-6 lg:px-12 text-center border-b border-slate-900 bg-gradient-to-b from-[#020617] via-[#080e21] to-[#020617] relative overflow-hidden">
@@ -32,7 +34,10 @@ export const ReadyToHitTheRoad: React.FC = () => {
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4">
-          <div>
+          <motion.div
+            whileHover={reduceMotion ? undefined : buttonHover}
+            whileTap={reduceMotion ? undefined : buttonTap}
+          >
             <Link
               to="/fleet"
               className="px-6 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-lg shadow-blue-600/25 flex items-center gap-2 transition-all"
@@ -40,9 +45,12 @@ export const ReadyToHitTheRoad: React.FC = () => {
               <span>{t("cta.exploreVehicles")}</span>
               <ArrowRight className="w-4 h-4 rtl:rotate-180" />
             </Link>
-          </div>
+          </motion.div>
 
-          <div>
+          <motion.div
+            whileHover={reduceMotion ? undefined : buttonHover}
+            whileTap={reduceMotion ? undefined : buttonTap}
+          >
             <Link
               to="/#contact"
               className="px-6 py-3.5 rounded-2xl bg-[#0b1220] border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white font-extrabold text-xs flex items-center gap-2 transition-all"
@@ -50,7 +58,7 @@ export const ReadyToHitTheRoad: React.FC = () => {
               <span>{t("cta.contactConcierge")}</span>
               <Phone className="w-3.5 h-3.5 text-slate-400" />
             </Link>
-          </div>
+          </motion.div>
         </div>
       </motion.div>
     </section>

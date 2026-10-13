@@ -156,7 +156,7 @@ export const CompanyLayout: React.FC = () => {
 
           <div className="border-t border-slate-200 bg-[#F8FAFC] p-4">
             <Link
-              to="/"
+              to="/?preview=website"
               className="mb-3 flex items-center gap-3 rounded-xl border border-[#C9D8F8] bg-white px-4 py-2.5 text-sm font-semibold text-[#142B4A] shadow-[0_1px_8px_rgba(0,0,0,0.04)] transition-colors hover:border-[#142B4A] hover:bg-[#F1F5F9]"
             >
               <Globe2 className="h-5 w-5" />

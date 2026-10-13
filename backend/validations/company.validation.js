@@ -47,10 +47,19 @@ const settingsPreferencesBody = z.object({
   notifications: booleanSettings(["newBooking", "dispatches", "maintenance", "payout", "sms", "weeklyEmail"]).optional(),
 });
 
+const companyLocationBody = z.object({
+  type: z.literal("Point"),
+  coordinates: z.tuple([
+    z.number().min(-180, "Longitude must be between -180 and 180").max(180, "Longitude must be between -180 and 180"),
+    z.number().min(-90, "Latitude must be between -90 and 90").max(90, "Latitude must be between -90 and 90"),
+  ]),
+});
+
 export const updateCompanySchema = z.object({
   body: companyBody.partial().extend({
     logo: z.string().trim().max(255).optional(),
     coverImage: z.string().trim().max(255).optional(),
+    location: companyLocationBody.optional(),
     payout: companyPayoutBody.partial().optional(),
     settingsPreferences: settingsPreferencesBody.partial().optional(),
   }),

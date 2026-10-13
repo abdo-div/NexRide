@@ -388,6 +388,27 @@
       "body": "Available at the VIP lounge to ensure a smooth trip and handle official & logistics formalities.",
       "call": "Direct call",
       "whatsapp": "WhatsApp"
+    },
+    "review": {
+      "title": "Rate your rental experience",
+      "subtitle": "Your verified review helps other drivers choose the right car and rental company.",
+      "lockedTitle": "Review available after the rental is completed",
+      "lockedBody": "This booking is still in progress. Once the company marks the vehicle as returned and the booking as completed, the star rating and review form will unlock here automatically.",
+      "ratingLabel": "How was the vehicle and service?",
+      "starLabel": "{{count}} out of 5 stars",
+      "ratingValue": "{{count}}/5",
+      "commentLabel": "Tell future renters about your experience",
+      "placeholder": "How was the car, handover, cleanliness and service from the rental company?",
+      "verifiedNote": "Published as a verified review from a completed NexRide booking.",
+      "submit": "Publish verified review",
+      "saving": "Publishing…",
+      "success": "Thank you—your verified review is now live.",
+      "submitted": "Review published",
+      "visible": "This review now appears on the vehicle and company pages.",
+      "validation": "Choose a star rating and write at least 10 characters.",
+      "error": "The review could not be published. Please try again.",
+      "loadError": "The review status could not be loaded.",
+      "unavailable": "This booking is not currently eligible for a review."
     }
   },
   "footer": {
@@ -417,6 +438,9 @@
     "vipDesc": "Stay updated on VIP arrivals, luxury catalog drops, and airport fleet allocations.",
     "subscribePlaceholder": "Enter your business email",
     "subscribe": "Subscribe",
+    "subscribing": "Subscribing…",
+    "subscribeSuccess": "You're on the VIP list. Watch your inbox.",
+    "subscribeError": "Subscription failed. Please try again shortly.",
     "emergencyLine": "24/7 Libyan Emergency Line",
     "active": "Active",
     "rights": "© 2026 NexRide Libya Mobility Technologies",
@@ -515,31 +539,32 @@
       "passwordMismatch": "Passwords do not match"
     },
     "showcase": {
-      "badge": "Executive Mobility Experience",
+      "badge": "NexRide Car Rental Marketplace",
+      "trustBadge": "Verified rental companies",
       "rating": "rating",
       "reviews": "(1.4k+ reviews)",
-      "heading": "Bespoke travel, engineered for Tripoli's elite.",
-      "subtitle": "Command an immaculate fleet of armored luxury sedans, VIP Mercedes-Maybach shuttles, and premier Range Rovers with white-glove security personnel.",
+      "heading": "Your next car, booked with confidence.",
+      "subtitle": "Compare vehicles from verified local rental companies, choose the right price and pickup point, and manage your booking in one simple place.",
       "perks": {
         "escrow": {
-          "title": "Instant Escrow Security",
-          "desc": "Zero deposit lockups. Transparent settlement via Central Bank of Libya certified gateways and Moamalat rails."
+          "title": "Secure, transparent booking",
+          "desc": "See the full rental price and booking terms before you confirm, with payments handled safely through NexRide."
         },
         "tarmac": {
-          "title": "VIP Mitiga & Benina Tarmac Meet",
-          "desc": "Direct gate greeting, luggage management, and diplomatic route escorts straight to Tripoli Corniche or your embassy enclave."
+          "title": "Verified companies, more choice",
+          "desc": "Explore available cars from trusted rental partners across Libya and pick the location that works for you."
         },
         "vin": {
-          "title": "Guaranteed Exact VIN Model",
-          "desc": "Never a generic substitution. The Mercedes S-580, G63, or Range Rover Autobiography you select is precisely what arrives."
+          "title": "Clear vehicle details",
+          "desc": "Review real photos, features, availability and pickup information so you know what you are booking."
         }
       },
-      "terminal": "Tripoli Corniche Terminal",
-      "terminalSub": "That El Emad Tower Station • Active Ready Dispatch",
-      "liveEscort": "Live Escort",
-      "concierge": "24/7 Executive Concierge",
-      "trustedBy": "Trusted by",
-      "enterprises": "140+ Libyan enterprises & diplomatic delegations."
+      "terminal": "The NexRide marketplace",
+      "terminalSub": "Verified companies • Live vehicle availability",
+      "liveEscort": "Ready to book",
+      "concierge": "NexRide customer support",
+      "trustedBy": "Built for",
+      "enterprises": "drivers and rental companies across Libya"
     },
     "badges": {
       "identity": "Verified Identity",
@@ -1058,6 +1083,7 @@
     "agencyWhatsapp": "Agency WhatsApp",
     "directCall": "Direct Call",
     "renterFeedback": "Verified Renter Feedback",
+    "companyResponse": "Response from the rental company",
     "viewSpecs": "View Specs",
     "showcaseView": "Showcase View",
     "galleryObsidian": "Obsidian Edition · Tripoli Fleet Hub 01",
@@ -1602,8 +1628,7 @@
       "badge": "B2B Fleet Program",
       "title": "Grow Your Fleet With NexRide",
       "titleAr": "انضم لعائلة نيكس رايد",
-      "subtitle": "Publish your rental fleet on the NexRide network, receive reservations across Libya, and get settled weekly to your partner bank account.",
-      "registry": "Verified by DRT & Ministry of Economy"
+      "subtitle": "Publish your rental fleet on the NexRide network, receive reservations across Libya, and get settled weekly to your partner bank account."
     },
     "benefits": {
       "reach": {
@@ -1670,11 +1695,15 @@
       "cityPlaceholder": "e.g. Tripoli",
       "address": "Registered HQ Address",
       "addressPlaceholder": "Airport Road Km 4.5, Industrial District, Tripoli",
+      "mapLocation": "Headquarters Map Location",
+      "mapHint": "Required: click the exact headquarters position so customers can find you.",
+      "mapPickerHint": "Click the map to place your headquarters pin",
       "error": {
         "companyName": "Please enter the company legal name",
         "crNumber": "Please enter the commercial register number",
         "city": "Please enter the headquarters city",
-        "address": "Please enter the registered address"
+        "address": "Please enter the registered address",
+        "location": "Please select the headquarters location on the map"
       }
     },
     "step3": {
@@ -2718,6 +2747,18 @@
         "title": "Locations & Pickup Hubs",
         "titleAr": "الفروع ونقاط الاستلام",
         "description": "Live pickup hubs derived from your active fleet pickup locations.",
+        "mapTitle": "Company headquarters on the customer map",
+        "mapDescription": "Click the map to place or move your main office pin. Customers will see this location on your public company page.",
+        "mapLive": "Published",
+        "noMap": "Your company was registered before map locations were introduced. Choose your headquarters below and save it now.",
+        "pickerHint": "Click anywhere to place your company pin",
+        "selectPin": "Select a point on the map to enable saving.",
+        "coordinates": "Selected: {{latitude}}, {{longitude}}",
+        "savePin": "Save headquarters",
+        "savingPin": "Saving location…",
+        "savedPin": "Headquarters saved and published to your company page.",
+        "saveError": "We could not save this location. Please try again.",
+        "openMaps": "Open in Google Maps",
         "liveHubs": "Active Hubs",
         "primary": "Primary",
         "assignedVehicles": "{{count}} vehicles",

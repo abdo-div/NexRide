@@ -18,6 +18,7 @@ export const NavBar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const isHomePage = location.pathname === "/";
+  const isFleetPage = location.pathname === "/fleet";
 
   useEffect(() => {
     const updateNav = () => setIsScrolled(window.scrollY > 24);
@@ -60,7 +61,11 @@ export const NavBar: React.FC = () => {
 
           <Link
             to="/fleet"
-            className="px-3.5 py-1.5 rounded-full text-slate-600 hover:text-blue-600 hover:bg-white/60 transition-all"
+            className={`px-3.5 py-1.5 rounded-full transition-all ${
+              isFleetPage
+                ? "bg-white text-blue-600 font-bold shadow-xs"
+                : "text-slate-600 hover:text-blue-600 hover:bg-white/60"
+            }`}
           >
             {t("nav.browseCars")}
           </Link>

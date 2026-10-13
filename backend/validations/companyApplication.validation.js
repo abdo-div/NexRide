@@ -42,6 +42,13 @@ export const companyApplicationSchema = z.object({
       .min(1, "Please provide the commercial registry number"),
     city: z.string().trim().min(1, "Main company city is required"),
     address: z.string().trim().min(1, "Physical business address is required"),
+    location: z.object({
+      type: z.literal("Point"),
+      coordinates: z.tuple([
+        z.number().min(-180).max(180),
+        z.number().min(-90).max(90),
+      ]),
+    }),
   }),
   fleet: z.object({
     tier: z.enum(["BOUTIQUE", "MIDTIER", "SELECTED", "MAJOR", "ENTERPRISE"]),

@@ -25,6 +25,8 @@ export interface FilterSelection {
   onTogglePerk: (id: string) => void;
   onReset: () => void;
   resultCount: number;
+  sticky?: boolean;
+  onApply?: () => void;
 }
 
 const HISTOGRAM = [2, 4, 7, 9, 10, 8, 6, 4, 3, 2];
@@ -65,11 +67,13 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
   onTogglePerk,
   onReset,
   resultCount,
+  sticky = true,
+  onApply,
 }) => {
   const { t } = useTranslation();
 
   return (
-    <aside className="bg-[#FFFFFF] rounded-2xl p-6 border border-[#E2E8F0] shadow-sm flex flex-col gap-6 lg:sticky lg:top-40">
+    <aside className={`bg-[#FFFFFF] rounded-2xl p-6 border border-[#E2E8F0] shadow-sm flex flex-col gap-6 ${sticky ? "lg:sticky lg:top-28" : ""}`}>
       {/* Header */}
       <div className="flex items-center justify-between pb-2 border-b border-[#E2E8F0]">
         <div className="flex items-center gap-2">
@@ -237,6 +241,7 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
       {/* Apply CTA */}
       <button
         type="button"
+        onClick={onApply}
         className="w-full py-3 rounded-xl bg-[#142B4A] text-white text-sm font-bold shadow-sm hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
       >
         {t("fleet.filters.apply", { count: resultCount })}

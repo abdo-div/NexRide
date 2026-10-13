@@ -3,6 +3,7 @@ import { test } from "node:test";
 import Company from "../models/Company_model.js";
 import Vehicle from "../models/vehicle_model.js";
 import { getCompanySettings } from "../controllers/companyController.js";
+import { updateCompanySchema } from "../validations/company.validation.js";
 
 const companyA = "bbbbbbbbbbbbbbbbbbbbbbbb";
 const companyB = "dddddddddddddddddddddddd";
@@ -20,6 +21,7 @@ const companyDoc = {
   phone: "+218 91 000 0000",
   city: "Tripoli",
   address: "Souk Al-Jumaa, Tripoli",
+  location: { type: "Point", coordinates: [13.1913, 32.8872] },
   commercialRegisterNumber: "CR-2021-4471",
   status: "APPROVED",
   approvedAt: new Date("2025-01-01T00:00:00.000Z"),
@@ -74,6 +76,18 @@ const invoke = (handler, req) =>
     });
   });
 
+test("settings validation accepts a valid headquarters point and rejects invalid coordinates", () => {
+  const valid = updateCompanySchema.safeParse({
+    body: { location: { type: "Point", coordinates: [13.1913, 32.8872] } },
+  });
+  const invalid = updateCompanySchema.safeParse({
+    body: { location: { type: "Point", coordinates: [181, 32.8872] } },
+  });
+
+  assert.equal(valid.success, true);
+  assert.equal(invalid.success, false);
+});
+
 // -----------------------------------------------------------------------------
 // Tenant scoping: a company session must stay pinned to its own tenant
 // -----------------------------------------------------------------------------
@@ -96,6 +110,7 @@ test("settings for a company session stay pinned to the session tenant", async (
   const settings = outcome.body.data.settings;
   assert.equal(settings.profile._id, companyA);
   assert.equal(settings.profile.commercialRegisterNumber, "CR-2021-4471");
+  assert.deepEqual(settings.profile.location, companyDoc.location);
   assert.equal(settings.readiness.verified, true);
   assert.equal(settings.readiness.completeness, 100);
   assert.equal(settings.readiness.fleet, 3);
@@ -172,7 +187,7 @@ test("readiness reflects a partial profile and an empty fleet", async (t) => {
   assert.equal(outcome.statusCode, 200);
   const settings = outcome.body.data.settings;
   assert.equal(settings.readiness.verified, false);
-  assert.equal(settings.readiness.completeness, 71); // 5 / 7 core fields filled
+  assert.equal(settings.readiness.completeness, 75); // 6 / 8 core fields filled
   assert.equal(settings.readiness.fleet, 0);
   assert.equal(settings.readiness.hubs, 0);
   assert.deepEqual(settings.hubs, []);

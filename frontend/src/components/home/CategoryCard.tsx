@@ -8,9 +8,10 @@ import {
   Mountains,
   Sparkle,
 } from "@phosphor-icons/react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router";
 import type { VehicleCategory } from "../../types/category";
+import { cardHover, hoverSpring } from "../../lib/motion";
 
 interface CategoryCardProps {
   category: VehicleCategory;
@@ -19,6 +20,7 @@ interface CategoryCardProps {
 
 export const CategoryCard: React.FC<CategoryCardProps> = ({ category, index = 0 }) => {
   const { t } = useTranslation();
+  const reduceMotion = useReducedMotion();
   const iconClass = "h-6 w-6 transition-colors duration-300 group-hover:text-white";
   const renderIcon = () => {
     if (category.id === "executive-suv") {
@@ -45,6 +47,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, index = 0 
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
+      whileHover={reduceMotion ? undefined : cardHover}
       className="premium-card bg-white/90 rounded-2xl border border-slate-200/80 group"
     >
       <Link
@@ -92,12 +95,14 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, index = 0 
           </div>
         </div>
 
-        <span
+        <motion.span
           aria-hidden="true"
           className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-[#142b4a] group-hover:border-[#142b4a] transition-all duration-200"
+          whileHover={reduceMotion ? undefined : { scale: 1.1 }}
+          transition={hoverSpring}
         >
           <ArrowRight weight="bold" className="w-4 h-4 group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5 transition-transform" />
-        </span>
+        </motion.span>
       </div>
       </Link>
     </motion.div>

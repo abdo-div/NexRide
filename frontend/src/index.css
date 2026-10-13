@@ -18,6 +18,25 @@ body {
   font-family: var(--app-font);
   min-width: 0;
   overflow-x: clip;
+  color: #0f172a;
+  background: #f8fafc;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  color: white;
+  background: var(--premium-navy);
+}
+
+:focus-visible {
+  outline: 3px solid rgb(37 99 235 / 28%);
+  outline-offset: 3px;
+}
+
+* {
+  scrollbar-color: rgb(148 163 184 / 70%) transparent;
+  scrollbar-width: thin;
 }
 
 button,
@@ -56,6 +75,17 @@ svg {
   transform: translateY(-4px);
   border-color: rgb(148 163 184 / 55%);
   box-shadow: 0 24px 65px -18px rgb(15 23 42 / 24%), 0 8px 22px rgb(37 99 235 / 8%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .premium-button {

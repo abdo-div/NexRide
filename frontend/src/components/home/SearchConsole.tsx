@@ -139,7 +139,7 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
           : "pointer-events-none opacity-0 scale-95"
       }`}
     >
-      <div className="w-[min(92vw,300px)] rounded-2xl bg-white border border-slate-200 shadow-2xl shadow-slate-900/15 overflow-hidden z-50">
+      <div className="w-[min(92vw,360px)] rounded-2xl bg-white border border-slate-200 shadow-2xl shadow-slate-900/15 overflow-hidden z-50">
         {/* Header */}
         <div className="flex items-center justify-between px-3 pt-3 pb-2 border-b border-slate-100">
           <div className="flex items-center gap-1.5">
@@ -227,7 +227,7 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
                   type="button"
                   disabled={disabled}
                   onClick={() => onPick(d, time)}
-                  className={`w-8 h-8 text-[11px] font-bold rounded-lg transition-colors ${
+                  className={`aspect-square w-full text-[11px] font-bold rounded-lg transition-colors ${
                     selected
                       ? "bg-blue-600 text-white shadow-md shadow-blue-500/30"
                       : disabled
@@ -242,18 +242,19 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
           </div>
         </div>
 
-        {/* Time list (horizontal grid, no scroll) */}
+        {/* Time list */}
         <div className="px-3 pb-3">
           <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
             {chip} · {t("home.search.time")}
           </div>
-          <div className="grid grid-cols-8 gap-1">
+          <div className="grid max-h-40 grid-cols-4 gap-1.5 overflow-y-auto pe-1 sm:grid-cols-6 [scrollbar-gutter:stable]">
             {TIME_OPTIONS.map((tEl) => (
               <button
                 key={tEl}
                 type="button"
+                dir="ltr"
                 onClick={() => onPick(value ?? today, tEl)}
-                className={`py-1 rounded-md text-[10px] font-bold text-center transition-colors ${
+                className={`min-w-0 whitespace-nowrap rounded-lg px-1 py-1.5 text-center text-[11px] font-bold tabular-nums transition-colors ${
                   time === tEl
                     ? "bg-blue-600 text-white"
                     : "text-slate-600 hover:bg-slate-100"

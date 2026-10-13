@@ -3,6 +3,7 @@ import { ApiError } from "../lib/apiClient";
 import { companySettingsApi } from "../lib/companySettingsApi";
 import type {
   CompanySettingsData,
+  CompanyGeoPoint,
   CompanySettingsPasswordInput,
   CompanySettingsPatch,
   CompanySettingsPayout,
@@ -22,6 +23,7 @@ const EMPTY_PROFILE: CompanySettingsProfile = {
   phone: "",
   city: "",
   address: "",
+  location: null,
   commercialRegisterNumber: "",
   status: "PENDING",
   approvedAt: null,
@@ -169,6 +171,23 @@ export const useCompanySettings = () => {
     }
   }, [payoutDraft]);
 
+  const saveLocation = useCallback(async (location: CompanyGeoPoint): Promise<SettingsMutationResult> => {
+    setBusy(true);
+    try {
+      await companySettingsApi.updateProfile({ location });
+      setData((current) => current
+        ? { ...current, profile: { ...current.profile, location } }
+        : current);
+      setDraft((current) => ({ ...current, location }));
+      window.dispatchEvent(new CustomEvent("nexride:company-profile-updated"));
+      return { ok: true, message: "" };
+    } catch (error) {
+      return { ok: false, message: errorMessage(error) };
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
   const savePreferences = useCallback(async (preferences: CompanySettingsPreferences): Promise<SettingsMutationResult> => {
     setBusy(true);
     try {
@@ -241,6 +260,7 @@ export const useCompanySettings = () => {
     updatePayoutDraft,
     saveProfile,
     savePayout,
+    saveLocation,
     savePreferences,
     saveLogo,
     saveCover,

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Building2 } from "lucide-react";
 import type { PartnerApplicationDraft } from "../../../types/companyApplication";
 import { LabeledField, TextInput } from "./inputs";
+import { VehicleLocationMap } from "../../maps/VehicleLocationMap";
 
 interface Props {
   draft: PartnerApplicationDraft;
@@ -69,6 +70,25 @@ export const CompanyInfoStep: React.FC<Props> = ({ draft, setDraft, errors }) =>
               value={company.address}
               onChange={(address) => patch({ address })}
               placeholder={t("partner.step2.addressPlaceholder")}
+            />
+          </LabeledField>
+        </div>
+
+        <div className="sm:col-span-2">
+          <LabeledField
+            label={t("partner.step2.mapLocation")}
+            hint={t("partner.step2.mapHint")}
+            error={errors.location}
+          >
+            <VehicleLocationMap
+              editable
+              coordinates={company.location?.coordinates ?? null}
+              label={company.name || t("partner.step2.mapLocation")}
+              onChange={(longitude, latitude) =>
+                patch({ location: { type: "Point", coordinates: [longitude, latitude] } })
+              }
+              className={`h-72 ${errors.location ? "ring-2 ring-[#BA1A1A]/60" : ""}`}
+              pickerHint={t("partner.step2.mapPickerHint")}
             />
           </LabeledField>
         </div>

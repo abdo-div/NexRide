@@ -2,9 +2,10 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Star, ArrowRight, ShieldCheck } from "@phosphor-icons/react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import type { FleetOperator } from "../../types/operators";
 import { companyLogoUrl } from "../../lib/vehicleMapper";
+import { buttonHover, buttonTap, cardHover } from "../../lib/motion";
 
 interface OperatorCardProps {
   operator: FleetOperator;
@@ -13,13 +14,14 @@ interface OperatorCardProps {
 
 export const OperatorCard: React.FC<OperatorCardProps> = ({ operator, index = 0 }) => {
   const { t } = useTranslation();
+  const reduceMotion = useReducedMotion();
   return (
     <motion.div
       initial={{ opacity: 0, y: 25 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
-      whileHover={{ y: -6, transition: { duration: 0.2 } }}
+      whileHover={reduceMotion ? undefined : cardHover}
       className="premium-card bg-white rounded-3xl border border-slate-200/80 p-6 flex flex-col justify-between group"
     >
       <div>
@@ -82,6 +84,10 @@ export const OperatorCard: React.FC<OperatorCardProps> = ({ operator, index = 0 
       </div>
 
       {/* View Agency Fleet Button */}
+      <motion.div
+        whileHover={reduceMotion ? undefined : buttonHover}
+        whileTap={reduceMotion ? undefined : buttonTap}
+      >
       <Link
         to={`/companies/${operator.id}`}
         aria-label={`${t("home.operators.viewFleet")} — ${operator.name}`}
@@ -90,6 +96,7 @@ export const OperatorCard: React.FC<OperatorCardProps> = ({ operator, index = 0 
         <span>{t("home.operators.viewFleet")}</span>
         <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 rtl:rotate-180 rtl:group-hover/btn:-translate-x-1 transition-transform" />
       </Link>
+      </motion.div>
     </motion.div>
   );
 };
