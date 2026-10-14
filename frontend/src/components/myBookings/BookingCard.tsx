@@ -244,10 +244,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
                   {t("myBookings.provider", { name: provider.name })}
                 </span>
               </span>
-              <span className="flex items-center gap-1 text-[#F97316] font-bold shrink-0">
-                <Star className="w-3 h-3" />
-                4.98
-              </span>
+
             </div>
           )}
         </div>

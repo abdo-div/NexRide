@@ -48,6 +48,17 @@ const bookingSchema = new mongoose.Schema(
         message: "Return date ({VALUE}) must be after the pickup date",
       },
     },
+    primaryDriver: {
+      type: new mongoose.Schema({
+        firstName: { type: String, trim: true, required: true, maxlength: 100 },
+        lastName: { type: String, trim: true, required: true, maxlength: 100 },
+        email: { type: String, trim: true, required: true, maxlength: 254 },
+        phone: { type: String, required: true },
+        eligibilityConfirmed: { type: Boolean, required: true },
+      }, { _id: false }),
+      // Optional on legacy records; required by the customer checkout schema.
+      default: undefined,
+    },
     pickupMethod: {
       type: String,
       enum: ["BRANCH_PICKUP", "DELIVERY"],

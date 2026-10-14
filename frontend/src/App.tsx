@@ -1,3 +1,4 @@
+import { RouteErrorBoundary } from "./components/RouteErrorBoundary";
 import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import {
   BrowserRouter,
@@ -176,7 +177,8 @@ function RouteLoadingFallback() {
  * loading treatment instead of flashing a blank screen.
  */
 function LazyRoute({ children }: { children: ReactNode }) {
-  return <Suspense fallback={<RouteLoadingFallback />}>{children}</Suspense>;
+  const location = useLocation();
+  return <RouteErrorBoundary key={location.pathname}><Suspense fallback={<RouteLoadingFallback />}>{children}</Suspense></RouteErrorBoundary>;
 }
 
 /**

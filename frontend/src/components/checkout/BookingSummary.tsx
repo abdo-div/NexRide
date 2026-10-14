@@ -158,7 +158,7 @@ export const BookingSummary: React.FC<Props> = ({
               </div>
             </div>
             <span className="text-[12px] font-bold text-[#0F172A]">
-              {totalLyd(securityDeposit.amount)}
+              {t("checkout.summary.depositOperator") }
             </span>
           </div>
 

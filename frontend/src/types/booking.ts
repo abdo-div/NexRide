@@ -40,7 +40,16 @@ export type BookingStatus =
 
 export type PaymentStatus = "UNPAID" | "PAID" | "REFUNDED";
 
+export interface PrimaryDriver {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  eligibilityConfirmed: boolean;
+}
+
 export interface BookingDto {
+  primaryDriver?: PrimaryDriver;
   _id: string;
   customerId: string | BookingCustomerRef;
   companyId: string | BookingCompanyRef;

@@ -1,6 +1,6 @@
 import { request, API_BASE_URL, ApiError } from "./apiClient";
 import { getToken } from "./tokenStorage";
-import type { BookingDto } from "../types/booking";
+import type { BookingDto, PrimaryDriver } from "../types/booking";
 
 export interface AvailabilityResult {
   isAvailable: boolean;
@@ -34,6 +34,7 @@ export interface CreateBookingPayload {
   vehicleId: string;
   startDate: string;
   endDate: string;
+  primaryDriver: PrimaryDriver;
   pickupLocation?: string;
   pickupMethod?: "BRANCH_PICKUP" | "DELIVERY";
   paymentMethod?: "CASH_ON_DELIVERY";
@@ -64,12 +65,12 @@ export const bookingApi = {
     });
   },
 
-  create: (payload: CreateBookingPayload): Promise<BookingResponse> =>
+  create: (payload: CreateBookingPayload, idempotencyKey: string = crypto.randomUUID()): Promise<BookingResponse> =>
     request<BookingResponse>("/bookings", {
       method: "POST",
       auth: true,
       body: payload,
-      headers: { "Idempotency-Key": crypto.randomUUID() },
+      headers: { "Idempotency-Key": idempotencyKey },
     }),
 
   get: (id: string, signal?: AbortSignal): Promise<BookingResponse> =>

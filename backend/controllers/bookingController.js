@@ -120,6 +120,7 @@ export const createBooking = catchAsync(async (req, res, next) => {
     pickupLocation,
     paymentMethod,
     addonIds = [],
+    primaryDriver,
   } = req.body;
   const start = new Date(startDate);
   const end = new Date(endDate);
@@ -260,6 +261,7 @@ export const createBooking = catchAsync(async (req, res, next) => {
           customerId: req.user.id,
           companyId: vehicle.companyId,
           vehicleId,
+          primaryDriver,
           startDate: start,
           endDate: end,
           pickupLocation: pickupLocation || vehicle.pickupLocation,

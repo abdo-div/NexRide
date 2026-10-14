@@ -50,7 +50,9 @@ export const formatDate = (
   withTime = false,
 ): string => {
   const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "—";
   return new Intl.DateTimeFormat(lang, {
+    timeZone: "Africa/Tripoli",
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -61,7 +63,7 @@ export const formatDate = (
 export const rentalDays = (startIso: string, endIso: string): number =>
   Math.max(
     1,
-    Math.round(
+    Math.ceil(
       (new Date(endIso).getTime() - new Date(startIso).getTime()) / 86400000,
     ),
   );

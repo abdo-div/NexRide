@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2 } from "lucide-react";
+import type { PrimaryDriver } from "../../types/booking";
 import type { CheckoutMeta } from "../../types/checkout";
 
 const inputCls =
   "w-full px-3.5 py-2.5 rounded-xl bg-[#F8FAFC] text-[#0F172A] text-[14px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#142B4A]/30 focus:border-[#142B4A] transition-all placeholder:text-[#94A3B8]";
 
-export const DriverSection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => {
+export const DriverSection: React.FC<{ meta: CheckoutMeta; driver: PrimaryDriver; onChange: (driver: PrimaryDriver) => void }> = ({ meta, driver, onChange }) => {
   const { t } = useTranslation();
-  const [confirmed, setConfirmed] = useState(true);
+  const confirmed = driver.eligibilityConfirmed;
 
   return (
     <section className="bg-white rounded-2xl p-6 shadow-sm border border-[#E2E8F0] flex flex-col gap-5">
@@ -22,7 +23,7 @@ export const DriverSection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => {
         <p className="text-[14px] text-[#64748B] ms-10">{t(meta.driverIntro)}</p>
       </div>
 
-      <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {meta.driverFields.map((field) => (
           <div key={field.id} className={`flex flex-col gap-1.5 ${field.span2 ? "md:col-span-2" : ""}`}>
             <div className="flex items-center justify-between">
@@ -55,7 +56,9 @@ export const DriverSection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => {
                 id={`driver-${field.id}`}
                 type={field.type ?? "text"}
                 placeholder={t(field.placeholder)}
-                defaultValue={field.value}
+                required
+                value={driver[field.id as keyof Omit<PrimaryDriver, "eligibilityConfirmed">] ?? ""}
+                onChange={(e) => onChange({ ...driver, [field.id]: e.target.value })}
                 className={`${inputCls} ${field.prefix ? "bg-transparent focus:bg-transparent focus:ring-0" : ""} ${
                   field.uppercase ? "uppercase" : ""
                 }`}
@@ -70,7 +73,7 @@ export const DriverSection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => {
             <input
               type="checkbox"
               checked={confirmed}
-              onChange={(e) => setConfirmed(e.target.checked)}
+              onChange={(e) => onChange({ ...driver, eligibilityConfirmed: e.target.checked })}
               className="mt-1 w-4 h-4 rounded accent-[#142B4A]"
             />
             <span className="text-[14px] text-[#0F172A]">
@@ -79,7 +82,7 @@ export const DriverSection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => {
             </span>
           </label>
         </div>
-      </form>
+      </div>
     </section>
   );
 };
