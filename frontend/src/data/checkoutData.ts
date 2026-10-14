@@ -167,7 +167,6 @@ const CHECKOUT_META: CheckoutMeta = {
     cashNote: "checkout.payment.cashNote",
     trustBadges: [
       { icon: "shield", text: "checkout.payment.trustBadges.centralBank" },
-      { icon: "sms", text: "checkout.payment.trustBadges.instantSms" },
       { icon: "policy", text: "checkout.payment.trustBadges.zeroFees" },
     ],
   },

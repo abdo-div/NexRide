@@ -107,7 +107,7 @@ router.get(
  *     summary: Create a reservation
  *     description: >-
  *       Runs the atomic overlap check and computes the price server-side. The
- *       route is idempotency-key protected for 24 hours.
+ *       Idempotency-Key retries recover the customer's saved reservation.
  *     requestBody:
  *       required: true
  *       content:

@@ -4,6 +4,8 @@ import { calculateBookingExtras } from "../utils/bookingPricing.js";
 
 const bookingSchema = new mongoose.Schema(
   {
+    checkoutKey: { type: String, maxlength: 200, select: false },
+    checkoutFingerprint: { type: String, select: false },
     // -------------------------------------------------------------------------
     // Core Relationships
     // -------------------------------------------------------------------------
@@ -209,6 +211,10 @@ bookingSchema.index({
 });
 bookingSchema.index({ companyId: 1, bookingStatus: 1 });
 bookingSchema.index({ customerId: 1, createdAt: -1 });
+bookingSchema.index({ customerId: 1, checkoutKey: 1 }, {
+  unique: true,
+  partialFilterExpression: { checkoutKey: { $type: "string" } },
+});
 bookingSchema.index({ vehicleId: 1, startDate: 1, bookingStatus: 1 });
 
 // -----------------------------------------------------------------------------
