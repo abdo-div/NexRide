@@ -211,7 +211,7 @@ export const buildVehicleDetail = (
           { label: `fleet.transmissions.${entry.transmission}`, value: "" },
         ],
       })),
-    minDays: 2,
+    minDays: 1,
     booking: {
       pickupDefault: new Date().toISOString().slice(0, 10),
       returnDefault: new Date(Date.now() + 5 * 86400000).toISOString().slice(0, 10),

@@ -1,43 +1,49 @@
+import { getCheckoutMeta } from "../../data/checkoutData";
+import { reservationSchedule } from "../../lib/reservationSchedule";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { Bolt, CheckCircle2, ShieldCheck, Lock, Info, Headphones, ArrowRight } from "lucide-react";
 import { DetailIcon } from "./iconMap";
 import { bookingApi } from "../../lib/bookingApi";
 import type { VehicleDetail } from "../../types/vehicleDetail";
 
-const daysBetween = (a: string, b: string) =>
-  Math.max(1, Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86400000));
+
 
 export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [pickupDate, setPickupDate] = React.useState(detail.booking.pickupDefault);
-  const [returnDate, setReturnDate] = React.useState(detail.booking.returnDefault);
-  const [pickupTime, setPickupTime] = React.useState(detail.booking.pickupTimes[2] ?? "");
-  const [returnTime, setReturnTime] = React.useState(detail.booking.returnTimes[1] ?? "");
+  const [searchParams] = useSearchParams();
+  const [pickupDate, setPickupDate] = React.useState(searchParams.get("startDate") ?? detail.booking.pickupDefault);
+  const [returnDate, setReturnDate] = React.useState(searchParams.get("endDate") ?? detail.booking.returnDefault);
+  const [pickupTime, setPickupTime] = React.useState(searchParams.get("startTime") ?? detail.booking.pickupTimes[2] ?? "");
+  const [returnTime, setReturnTime] = React.useState(searchParams.get("endTime") ?? detail.booking.returnTimes[1] ?? "");
   const [delivery, setDelivery] = React.useState(detail.booking.deliveryPoints[0] ?? "");
   const [protection, setProtection] = React.useState(detail.protectionPlans[0]?.id ?? "standard");
   const [check, setCheck] = React.useState<"idle" | "checking" | "available" | "unavailable">("idle");
   const [checkError, setCheckError] = React.useState<string | null>(null);
 
   const plan = detail.protectionPlans.find((p) => p.id === protection) ?? detail.protectionPlans[0];
-  const days = Math.max(daysBetween(pickupDate, returnDate), detail.minDays);
+  const schedule = React.useMemo(() => {
+    try { return reservationSchedule(pickupDate, returnDate, pickupTime, returnTime); } catch { return null; }
+  }, [pickupDate, returnDate, pickupTime, returnTime]);
+  const days = schedule?.days ?? 1;
   const rate = detail.vehicle.pricePerDay + (plan?.pricePerDay ?? 0);
   const gross = days * rate;
+  const fee = getCheckoutMeta().municipalFee;
 
   const submitDates = React.useCallback(() => setCheck("idle"), []);
 
   const runCheck = async () => {
     setCheckError(null);
-    if (!pickupDate || !returnDate || returnDate <= pickupDate) {
+    if (!schedule || Date.parse(schedule.start) < Date.now()) {
       setCheckError(t("vehicleDetail.invalidDates"));
       setCheck("unavailable");
       return;
     }
     setCheck("checking");
     try {
-      const result = await bookingApi.checkAvailability(detail.id, pickupDate, returnDate);
+      const result = await bookingApi.checkAvailability(detail.id, schedule.start, schedule.end);
       setCheck(result.data.isAvailable ? "available" : "unavailable");
     } catch (err) {
       setCheckError(err instanceof Error ? err.message : "");
@@ -203,6 +209,10 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
             <span>{t("vehicleDetail.durationRate", { days, rate: rate.toLocaleString() })}</span>
             <span className="font-semibold text-[#0F172A] tabular-nums">{gross.toLocaleString()} LYD</span>
           </div>
+          <div className="flex justify-between">
+            <span>{t("checkout.summary.municipalLabel")}</span>
+            <span>{fee.toLocaleString()} LYD</span>
+          </div>
           {detail.freeIncluded.map((line) => (
             <div key={line} className="flex justify-between">
               <span>{t(line)}</span>
@@ -225,7 +235,7 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
             </div>
             <div className="text-end">
               <span className="text-[#142B4A] text-[28px] font-extrabold leading-none tabular-nums">
-                {gross.toLocaleString()}
+                {(gross + fee).toLocaleString()}
               </span>
               <span className="ms-1 text-[#0F172A] text-[13px]">LYD</span>
             </div>

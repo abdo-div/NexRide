@@ -1,3 +1,4 @@
+import { formatReservationDate } from "../lib/reservationSchedule";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
@@ -72,12 +73,7 @@ const PaymentPage: React.FC = () => {
     void loadMoamalatLightbox().catch(() => undefined);
   }, [booking]);
 
-  const fmtDate = (iso: string) =>
-    new Intl.DateTimeFormat(i18n.language, {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }).format(new Date(`${iso}T00:00:00`));
+  const fmtDate = (iso: string) => formatReservationDate(iso, i18n.language);
 
   const fmtAmount = (value: number) =>
     `${new Intl.NumberFormat(i18n.language, {

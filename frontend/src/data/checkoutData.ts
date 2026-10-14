@@ -61,7 +61,7 @@ const CHECKOUT_META: CheckoutMeta = {
       value: "tarek.mansouri@gmail.com",
       type: "email",
       badge: "checkout.driver.fields.email.badge",
-      badgeKind: "verified",
+      badgeKind: "muted",
     },
     {
       id: "phone",
@@ -89,7 +89,7 @@ const CHECKOUT_META: CheckoutMeta = {
       price: 45,
       unit: "day",
       recommended: true,
-      defaultOn: true,
+      defaultOn: false,
     },
     {
       id: "driver",
@@ -97,7 +97,7 @@ const CHECKOUT_META: CheckoutMeta = {
       description: "checkout.options.addons.driver.description",
       price: 25,
       unit: "day",
-      defaultOn: true,
+      defaultOn: false,
     },
     {
       id: "childseat",
@@ -167,7 +167,6 @@ const CHECKOUT_META: CheckoutMeta = {
     cashNote: "checkout.payment.cashNote",
     trustBadges: [
       { icon: "shield", text: "checkout.payment.trustBadges.centralBank" },
-      { icon: "sms", text: "checkout.payment.trustBadges.instantSms" },
       { icon: "policy", text: "checkout.payment.trustBadges.zeroFees" },
     ],
   },

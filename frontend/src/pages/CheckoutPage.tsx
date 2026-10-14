@@ -1,10 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft } from "lucide-react";
 import { getCheckoutMeta, computeCheckoutTotals } from "../data/checkoutData";
 import { useVehicleDetail } from "../hooks/useVehicleDetail";
 import { mapVehicle } from "../lib/vehicleMapper";
+import { reservationSchedule, formatReservationDate } from "../lib/reservationSchedule";
+import { createCheckoutAttempt, normalizeDriver, validDriver } from "../lib/checkoutAttempt";
+import type { PrimaryDriver } from "../types/booking";
 import { bookingApi } from "../lib/bookingApi";
 import { ApiError } from "../lib/apiClient";
 import { CheckoutIcon } from "../components/checkout/CheckoutIcon";
@@ -43,7 +46,8 @@ const toISODate = (date: Date): string => {
 export const CheckoutPage: React.FC = () => {
   const { vehicleId } = useParams<{ vehicleId: string }>();
 
-  return <RealCheckout vehicleId={vehicleId ?? ""} />;
+  const [searchParams] = useSearchParams();
+  return <RealCheckout key={(vehicleId ?? "") + "?" + searchParams.toString()} vehicleId={vehicleId ?? ""} />;
 };
 
 const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
@@ -61,10 +65,15 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   const endTime = searchParams.get("endTime") ?? "10:00";
   const locationParam = searchParams.get("location");
 
-  const days = useMemo(() => {
-    const ms = new Date(endDate).getTime() - new Date(startDate).getTime();
-    return Math.max(1, Math.ceil(ms / 86400000));
-  }, [startDate, endDate]);
+  const schedule = useMemo(() => {
+    try { return reservationSchedule(startDate, endDate, startTime, endTime); } catch { return null; }
+  }, [startDate, endDate, startTime, endTime]);
+  const days = schedule?.days ?? 1;
+  const createOnce = useMemo(() => createCheckoutAttempt(bookingApi.create), []);
+  const [submissionStarted, setSubmissionStarted] = useState(false);
+  const [pendingBookingId, setPendingBookingId] = useState<string | null>(null);
+  const submitting = useRef(false);
+  const [driver, setDriver] = useState<PrimaryDriver>({ firstName: "", lastName: "", email: "", phone: "", eligibilityConfirmed: false });
 
   const vehicle = useMemo(
     () => (dto ? mapVehicle(dto, (key, fallback) => t(key, fallback)) : null),
@@ -72,12 +81,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   );
 
   const fmtDate = useCallback(
-    (iso: string) =>
-      new Intl.DateTimeFormat(i18n.language, {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }).format(new Date(`${iso}T00:00:00`)),
+    (iso: string) => formatReservationDate(iso, i18n.language),
     [i18n.language],
   );
 
@@ -90,13 +94,13 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
     error: string | null;
   } | null>(null);
 
-  const availabilityKey = `${vehicleId}|${startDate}|${endDate}`;
+  const availabilityKey = `${vehicleId}|${schedule?.start}|${schedule?.end}`;
 
   useEffect(() => {
-    if (status !== "ready" || !vehicleId) return;
+    if (status !== "ready" || !vehicleId || !schedule || pendingBookingId) return;
     let active = true;
     bookingApi
-      .checkAvailability(vehicleId, startDate, endDate)
+      .checkAvailability(vehicleId, schedule.start, schedule.end)
       .then((result) => {
         if (active) {
           setAvailabilityResult({
@@ -120,7 +124,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
     return () => {
       active = false;
     };
-  }, [status, vehicleId, startDate, endDate, availabilityKey]);
+  }, [status, vehicleId, schedule, pendingBookingId, availabilityKey]);
 
   const currentAvailability =
     availabilityResult?.key === availabilityKey ? availabilityResult : null;
@@ -190,16 +194,27 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
     });
 
   const onConfirm = async () => {
-    if (!vehicle || !totals || phase !== "idle") return;
+    if (!vehicle || !totals || phase !== "idle" || submitting.current) return;
+    if (!schedule || Date.parse(schedule.start) <= Date.now()) {
+      setSubmitError(t("checkout.invalidSchedule"));
+      return;
+    }
+    if (!validDriver(driver)) {
+      setSubmitError(t("checkout.invalidDriver"));
+      return;
+    }
+    submitting.current = true;
     setSubmitError(null);
     setPhase("processing");
 
     if (tab === "cash") {
       try {
-        const result = await bookingApi.create({
+        setSubmissionStarted(true);
+        const result = await createOnce({
           vehicleId,
-          startDate,
-          endDate,
+          startDate: schedule.start,
+          endDate: schedule.end,
+          primaryDriver: normalizeDriver(driver),
           pickupLocation: locationParam || undefined,
           paymentMethod: "CASH_ON_DELIVERY",
           addonIds: Array.from(selected) as Array<"insurance" | "driver" | "childseat" | "delivery">,
@@ -216,6 +231,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
         );
       } catch (err) {
         setPhase("idle");
+        submitting.current = false;
         setSubmitError(
           err instanceof ApiError && err.status === 409
             ? t("checkout.submitError.conflict")
@@ -229,15 +245,18 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
 
     try {
       await loadMoamalatLightbox();
-      const result = await bookingApi.create({
+      setSubmissionStarted(true);
+      const result = await createOnce({
         vehicleId,
-        startDate,
-        endDate,
+        startDate: schedule.start,
+        endDate: schedule.end,
+        primaryDriver: normalizeDriver(driver),
         pickupLocation: locationParam || undefined,
         addonIds: Array.from(selected) as Array<"insurance" | "driver" | "childseat" | "delivery">,
       });
 
       const booking = result.data.booking;
+      setPendingBookingId(booking._id);
       const init = await moamalatApi.initiate(booking._id);
       const params = init.data.gateway.params;
 
@@ -258,6 +277,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
               );
             } else {
               setPhase("idle");
+              submitting.current = false;
               setSubmitError(
                 verifyRes.data?.reason ||
                   t("payment.gatewayNotApproved", {
@@ -267,6 +287,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
             }
           } catch (err) {
             setPhase("idle");
+            submitting.current = false;
             setSubmitError(
               err instanceof Error ? err.message : "Verification request failed.",
             );
@@ -274,6 +295,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
         },
         onError: (gatewayError) => {
           setPhase("idle");
+          submitting.current = false;
           setSubmitError(
             getMoamalatErrorMessage(gatewayError) ||
               t("payment.gatewayError", {
@@ -284,6 +306,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
         },
         onCancel: () => {
           setPhase("idle");
+          submitting.current = false;
           setSubmitError(
             t("payment.cancelledDesc", {
               defaultValue: "Payment was cancelled in Moamalat LightBox.",
@@ -293,6 +316,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
       });
     } catch (err) {
       setPhase("idle");
+      submitting.current = false;
       setSubmitError(
         err instanceof ApiError && err.status === 409
           ? t("checkout.submitError.conflict")
@@ -303,9 +327,9 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
     }
   };
 
-  const unavailable = availability === "unavailable";
+  const unavailable = !pendingBookingId && availability === "unavailable";
 
-  if (status === "loading" || !vehicle || !totals) {
+  if (status === "loading") {
     return (
       <div className="bg-[#F8FAFC] min-h-screen">
         <div className="pt-20 flex flex-col items-center justify-center gap-4 min-h-[70vh]">
@@ -316,7 +340,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
     );
   }
 
-  if (status === "error" || status === "notfound") {
+  if (status === "error" || status === "notfound" || !vehicle || !totals) {
     return (
       <div className="bg-[#F8FAFC] min-h-screen">
         <div className="pt-20 max-w-[1360px] mx-auto px-4 lg:px-8 py-8">
@@ -362,8 +386,9 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
                 {availabilityError}
               </div>
             )}
-            <ItinerarySection meta={meta} />
-            <DriverSection meta={meta} />
+            <ItinerarySection meta={meta} disabled={!!pendingBookingId} onChangeDates={() => navigate("/vehicles/" + vehicleId + "?" + searchParams.toString())} />
+            <fieldset disabled={submissionStarted || phase !== "idle"} className="contents">
+            <DriverSection meta={meta} driver={driver} onChange={setDriver} />
             <OptionsSection meta={meta} selected={selected} onToggle={toggle} />
             <PaymentSection
               meta={meta}
@@ -371,6 +396,8 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
               onTab={setTab}
               vehicleTitle={vehicle.title}
             />
+            </fieldset>
+            {pendingBookingId && <Link className="text-[#142B4A] underline" to={"/payment/" + pendingBookingId}>{t("checkout.resumeExisting")}</Link>}
           </div>
           {unavailable ? (
             <div className="lg:col-span-5 self-start lg:sticky lg:top-24 w-full">

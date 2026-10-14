@@ -151,6 +151,7 @@ const runCreateBooking = async (
     user: { id: userId },
     body: {
       vehicleId,
+      primaryDriver: { firstName: "QA", lastName: "Driver", email: "qa@example.com", phone: "+218910000001", eligibilityConfirmed: true },
       startDate: "2026-11-01T10:00:00.000Z",
       endDate: "2026-11-04T10:00:00.000Z",
       ...(paymentMethod ? { paymentMethod } : {}),
@@ -180,6 +181,9 @@ test("cash checkout creates a pending cash ledger entry atomically with an unpai
   const payment = response.body.data.payment;
 
   assert.equal(response.statusCode, 201);
+  assert.equal(booking.primaryDriver.firstName, "QA");
+  assert.equal(booking.primaryDriver.eligibilityConfirmed, true);
+  assert.equal(booking.startDate.toISOString(), "2026-11-01T10:00:00.000Z");
   assert.equal(booking.bookingStatus, "PENDING_PAYMENT");
   assert.equal(booking.paymentStatus, "UNPAID");
   assert.equal(payment.bookingId, booking._id);

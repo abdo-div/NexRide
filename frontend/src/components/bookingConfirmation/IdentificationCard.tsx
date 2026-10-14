@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { CheckCircle2, MessageSquare, Mail } from "lucide-react";
 import type { ConfirmationMeta } from "../../types/bookingConfirmation";
 
 export const IdentificationCard: React.FC<{ meta: ConfirmationMeta }> = ({ meta }) => {
@@ -11,24 +10,18 @@ export const IdentificationCard: React.FC<{ meta: ConfirmationMeta }> = ({ meta 
       key: "driver",
       label: "booking.identification.primaryDriver",
       value: identification.driverName,
-      note: "booking.identification.noteVerified",
-      noteIcon: <CheckCircle2 className="w-[14px] h-[14px]" />,
       primary: true,
     },
     {
       key: "hotline",
       label: "booking.identification.dispatchHotline",
       value: identification.hotline,
-      note: "booking.identification.noteSms",
-      noteIcon: <MessageSquare className="w-[14px] h-[14px]" />,
       primary: false,
     },
     {
       key: "email",
       label: "booking.identification.emailDelivery",
       value: identification.email,
-      note: "booking.identification.noteToken",
-      noteIcon: <Mail className="w-[14px] h-[14px]" />,
       primary: true,
     },
   ];
@@ -43,14 +36,6 @@ export const IdentificationCard: React.FC<{ meta: ConfirmationMeta }> = ({ meta 
               {t(card.label)}
             </span>
             <span className="text-[16px] text-[#0F172A] font-bold truncate">{card.value}</span>
-            <span
-              className={`text-[11px] flex items-center gap-1 mt-1 ${
-                card.primary ? "text-[#142B4A]" : "text-[#64748B]"
-              }`}
-            >
-              {card.noteIcon}
-              {t(card.note)}
-            </span>
           </div>
         ))}
       </div>

@@ -155,7 +155,7 @@
     "totalTrips": "verified trips",
     "activeLabel": "Active & Upcoming",
     "activeLive": "Live",
-    "activeConfirmed": "confirmed reservation",
+    "activeConfirmed": "upcoming reservation",
     "paidLabel": "Total Payments Settled",
     "paidSuffix": "LYD",
     "paidNote": "via Moamalat & partner banks",
@@ -1354,12 +1354,12 @@
         "email": {
           "label": "Email Address",
           "placeholder": "Email for digital keys & vouchers",
-          "badge": "Verified"
+          "badge": "Contact email"
         },
         "phone": {
           "label": "Libyan Mobile Phone",
           "placeholder": "091 / 092 / 094",
-          "badge": "SMS Dispatch",
+          "badge": "Contact phone",
           "hint": "Used for driver VIP pickup coordinator contact at Mitiga."
         }
       },
@@ -1439,7 +1439,7 @@
       "baseNote": "{{rate}} LYD × {{days}} days",
       "municipalLabel": "Municipal & Platform Service Fee",
       "depositLabel": "Refundable Security Deposit",
-      "depositNote": "Pre-authorization hold • Released on return",
+      "depositNote": "No security deposit is collected at checkout",
       "totalLabel": "Total Due Today",
       "totalNote": "All applicable Libyan taxes included",
       "ctaIdle": "Pay {{total}} & Confirm Booking",
@@ -1462,8 +1462,14 @@
           "title": "24/7 Libyan",
           "sub": "VIP Hotline"
         }
-      }
-    }
+      },
+      "depositOperator": "Confirmed by the operator at pickup"
+    },
+    "invalidSchedule": "Choose a valid future pickup and a later return time.",
+    "invalidDriver": "Enter the driver's name, valid email and Libyan mobile number, then confirm driver eligibility.",
+    "resumeExisting": "Resume payment for this reservation",
+    "pageError": "This page could not be displayed. Your saved reservations are still available.",
+    "returnToBookings": "Return to My Bookings"
   },
   "booking": {
     "crumbs": {
@@ -1472,19 +1478,21 @@
     },
     "stepBadge": {
       "caption": "Step 3 of 3:",
-      "value": "Secured & Verified"
+      "value": "Reservation details"
     },
     "success": {
       "badge": "Confirmed",
-      "validation": "Libya National Transport Authority Validated",
-      "title": "Booking Confirmed",
-      "desc": "Your {{vehicle}} reservation is secured. Confirmation SMS and downloadable digital travel credentials have been dispatched to your verified contacts.",
+      "validation": "Reservation recorded by NexRide",
+      "title": "Payment received",
+      "desc": "Payment for your {{vehicle}} reservation has been recorded. Review your booking details below.",
       "printLabel": "Print Voucher",
       "downloadLabel": "Generate Invoice",
       "downloadBusyLabel": "Generating...",
       "toastPrint": "Voucher opened for print",
       "toastDownload": "Invoice PDF generated and downloaded",
-      "toastDownloadError": "Could not generate the invoice. Please try again."
+      "toastDownloadError": "Could not generate the invoice. Please try again.",
+      "pendingTitle": "Reservation awaiting payment",
+      "pendingDesc": "Your {{vehicle}} reservation is recorded. Payment has not been collected."
     },
     "reference": {
       "label": "Booking Reference:",
@@ -1518,7 +1526,7 @@
     "vehicle": {
       "badgeTier": "Executive Tier",
       "badgeSpec": "2024 Specification",
-      "gpsLabel": "GPS & Telematics Active",
+      "gpsLabel": "Pickup arranged with the operator",
       "category": "Full-Size Luxury Sedan"
     },
     "operator": {
@@ -1562,11 +1570,12 @@
       "addonDays": "{{name}} ({{price}} LYD × {{days}} days)",
       "addonFlat": "{{name}} ({{price}} LYD flat)",
       "municipalFee": "Municipal Fleet Fee & Platform Tax",
-      "discount": "Discount Applied"
+      "discount": "Discount Applied",
+      "addon": "{{name}}"
     },
     "protocol": {
       "title": "Arrival & Handover Protocol",
-      "subtitle": "Review the essential checklist for seamless key exchange at Mitiga Airport VIP Terminal.",
+      "subtitle": "Bring the documents below and confirm the handover location with your rental company.",
       "documents": {
         "title": "Mandatory Documents",
         "body": "Bring your physical Driver's License, Original Passport or Libyan National Identity Card, and the digital token on this screen."
@@ -3369,8 +3378,8 @@
       "saveDraft": "Save as Draft",
       "saving": "Saving…",
       "publish": "Publish Vehicle",
-      "successMsg": "Vehicle created successfully! Redirecting…"
-      ,"requiredHint": "Fields marked with * are required. Optional details can be completed later."
+      "successMsg": "Vehicle created successfully! Redirecting…",
+      "requiredHint": "Fields marked with * are required. Optional details can be completed later."
     },
     "editVehiclePage": {
       "title": "Edit Vehicle",
@@ -3391,14 +3400,38 @@
         "MAINTENANCE": "Maintenance Hold"
       },
       "anchors": {
-        "info": { "label": "Vehicle Info", "ar": "بيانات المركبة" },
-        "specs": { "label": "Technical Specs", "ar": "المواصفات" },
-        "features": { "label": "Features", "ar": "الميزات" },
-        "media": { "label": "Media & Gallery", "ar": "الصور" },
-        "pricing": { "label": "Pricing", "ar": "الأسعار" },
-        "location": { "label": "Location & Depot", "ar": "التسليم" },
-        "policies": { "label": "Rental Policies", "ar": "الشروط" },
-        "publish": { "label": "Publishing", "ar": "الاعتماد" }
+        "info": {
+          "label": "Vehicle Info",
+          "ar": "بيانات المركبة"
+        },
+        "specs": {
+          "label": "Technical Specs",
+          "ar": "المواصفات"
+        },
+        "features": {
+          "label": "Features",
+          "ar": "الميزات"
+        },
+        "media": {
+          "label": "Media & Gallery",
+          "ar": "الصور"
+        },
+        "pricing": {
+          "label": "Pricing",
+          "ar": "الأسعار"
+        },
+        "location": {
+          "label": "Location & Depot",
+          "ar": "التسليم"
+        },
+        "policies": {
+          "label": "Rental Policies",
+          "ar": "الشروط"
+        },
+        "publish": {
+          "label": "Publishing",
+          "ar": "الاعتماد"
+        }
       },
       "info": {
         "title": "Vehicle Information",
@@ -3422,12 +3455,12 @@
         "locked": "Read-only registry field",
         "description": "Vehicle Description",
         "descriptionAr": "وصف المركبة وميزاتها التنافسية",
-        "charCount": "{{count}} / 500 characters"
-        ,"makePlaceholder": "For example: Toyota"
-        ,"modelPlaceholder": "For example: Corolla"
-        ,"platePlaceholder": "For example: 12-345678"
-        ,"vinPlaceholder": "17-character chassis number"
-        ,"descriptionPlaceholder": "Describe the vehicle, its condition, and its key advantages"
+        "charCount": "{{count}} / 500 characters",
+        "makePlaceholder": "For example: Toyota",
+        "modelPlaceholder": "For example: Corolla",
+        "platePlaceholder": "For example: 12-345678",
+        "vinPlaceholder": "17-character chassis number",
+        "descriptionPlaceholder": "Describe the vehicle, its condition, and its key advantages"
       },
       "specs": {
         "title": "Vehicle Specifications",
@@ -3466,8 +3499,8 @@
         "empty": "Feature & amenity data isn't part of the vehicle record yet. It will appear here once modelled.",
         "count": "{{count}} selected",
         "placeholder": "For example: Air conditioning, Bluetooth, GPS, child seat",
-        "hint": "Separate amenities with commas."
-        ,"fieldLabel": "Vehicle features and amenities"
+        "hint": "Separate amenities with commas.",
+        "fieldLabel": "Vehicle features and amenities"
       },
       "media": {
         "title": "Vehicle Photos & Media",
@@ -3643,7 +3676,6 @@
       "AVAILABLE": "Available",
       "MAINTENANCE": "In maintenance",
       "UNAVAILABLE": "Unavailable",
-      "SUSPENDED": "Suspended",
       "FAILED": "Failed"
     },
     "kpis": {

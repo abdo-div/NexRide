@@ -25,15 +25,15 @@ export const moamalatConfig = {
   },
   /** Merchant identifier assigned by Moamalat (MOAMALAT_MID). */
   get merchantId() {
-    return process.env.MOAMALAT_MID ?? "";
+    return (process.env.MOAMALAT_MID ?? "").trim();
   },
   /** Terminal identifier assigned by Moamalat (MOAMALAT_TID). */
   get terminalId() {
-    return process.env.MOAMALAT_TID ?? "";
+    return (process.env.MOAMALAT_TID ?? "").trim();
   },
   /** Hex-encoded signing key used for HMAC-SHA256 (MOAMALAT_SECURE_KEY). */
   get secureKey() {
-    return process.env.MOAMALAT_SECURE_KEY ?? "";
+    return (process.env.MOAMALAT_SECURE_KEY ?? "").trim();
   },
   /** Local time used by Moamalat when validating signed transaction windows. */
   get timeZone() {
@@ -51,5 +51,5 @@ export const isMoamalatConfigured = () =>
   Boolean(
     moamalatConfig.merchantId &&
       moamalatConfig.terminalId &&
-      moamalatConfig.secureKey,
+      /^(?:[0-9a-f]{2})+$/i.test(moamalatConfig.secureKey),
   );

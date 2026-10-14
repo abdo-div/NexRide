@@ -18,7 +18,7 @@ export const PaymentSummary: React.FC<Props> = ({
   const { t } = useTranslation();
   const { meta, fareLines, total, cardEnding, authRef } = data;
   const { payment } = meta;
-  const isPaid = paymentStatus === undefined || paymentStatus === "PAID";
+  const isPaid = paymentStatus === "PAID";
   const isUnpaidCash =
     paymentStatus === "UNPAID" && paymentMethod === "CASH_ON_DELIVERY";
 
@@ -33,7 +33,7 @@ export const PaymentSummary: React.FC<Props> = ({
 
       <div className="flex flex-col gap-2.5 text-[14px]">
         {fareLines.map((line) => (
-          <div key={line.label} className="flex items-center justify-between text-[#64748B]">
+          <div key={line.nameKey ?? line.label} className="flex items-center justify-between text-[#64748B]">
             <span>
               {t(line.label, line.nameKey ? { ...line.values, name: t(line.nameKey) } : line.values)}
             </span>

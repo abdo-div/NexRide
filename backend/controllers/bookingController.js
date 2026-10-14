@@ -7,6 +7,7 @@ import { streamInvoiceForPayment } from "../services/invoiceService.js";
 import catchAsync from "../utils/catchAsync.js";
 import * as factory from "./handlerFactory.js";
 import AppError from "../utils/appError.js";
+import { checkoutFingerprint } from "../utils/checkoutIdentity.js";
 import { isRedisAvailable } from "../config/redis.js";
 import { acquireVehicleLock } from "../utils/redisLock.js";
 import {
@@ -113,6 +114,11 @@ export const bookingConcurrency = {
  * Customer booking creation
  */
 export const createBooking = catchAsync(async (req, res, next) => {
+  const checkoutKey = req.headers?.["idempotency-key"];
+  if (checkoutKey !== undefined && (typeof checkoutKey !== "string" || !checkoutKey.trim() || checkoutKey.length > 200)) {
+    return next(new AppError("Idempotency-Key must contain 1 to 200 characters", 400));
+  }
+  const fingerprint = checkoutKey ? checkoutFingerprint(req.body) : undefined;
   const {
     vehicleId,
     startDate,
@@ -120,6 +126,7 @@ export const createBooking = catchAsync(async (req, res, next) => {
     pickupLocation,
     paymentMethod,
     addonIds = [],
+    primaryDriver,
   } = req.body;
   const start = new Date(startDate);
   const end = new Date(endDate);
@@ -194,6 +201,20 @@ export const createBooking = catchAsync(async (req, res, next) => {
     // aborting after a successful commit caused checkout to report a failure
     // even though MongoDB had already stored the fully paid booking.
     await session.withTransaction(async () => {
+    // Re-read on transaction retry, including after contention on the vehicle.
+    const recoverCheckout = async () => {
+      if (!checkoutKey) return false;
+      const existing = await Booking.findOne({ customerId: req.user.id, checkoutKey })
+        .select("+checkoutFingerprint").session(session);
+      if (!existing) return false;
+      if (existing.checkoutFingerprint !== fingerprint) {
+        throw new AppError("This checkout key belongs to a different reservation. Start a new checkout.", 409);
+      }
+      booking = existing;
+      payment = await Payment.findOne({ bookingId: existing._id, paymentMethod: "CASH_ON_DELIVERY" }).session(session);
+      return true;
+    };
+    if (await recoverCheckout()) return;
     // Distinguish a missing/unpublished listing (404) from a vehicle that is
     // simply not rentable right now (409), so a vehicle in MAINTENANCE
     // surfaces a clear conflict instead of a misleading "not found".
@@ -232,6 +253,8 @@ export const createBooking = catchAsync(async (req, res, next) => {
       );
     }
 
+    if (await recoverCheckout()) return;
+
     // 3. Double-booking collision check within the database transaction
     // session. Serialized on the vehicle row above, so a losing concurrent
     // writer can no longer slip past this check.
@@ -258,8 +281,11 @@ export const createBooking = catchAsync(async (req, res, next) => {
       [
         {
           customerId: req.user.id,
+          checkoutKey,
+          checkoutFingerprint: fingerprint,
           companyId: vehicle.companyId,
           vehicleId,
+          primaryDriver,
           startDate: start,
           endDate: end,
           pickupLocation: pickupLocation || vehicle.pickupLocation,
@@ -321,6 +347,7 @@ export const createBooking = catchAsync(async (req, res, next) => {
     // have produced, never as a 500.
     if (
       transactionError?.code === 112 ||
+      transactionError?.code === 11000 ||
       /WriteConflict|TransientTransactionError/i.test(
         transactionError?.message ?? "",
       )
@@ -342,7 +369,10 @@ export const createBooking = catchAsync(async (req, res, next) => {
     () => {},
   );
 
-  const data = { booking };
+  const publicBooking = booking.toObject ? booking.toObject() : { ...booking };
+  delete publicBooking.checkoutKey;
+  delete publicBooking.checkoutFingerprint;
+  const data = { booking: publicBooking };
   if (payment) data.payment = payment;
 
   res.status(201).json({

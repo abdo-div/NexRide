@@ -1,3 +1,4 @@
+import { buildConfirmation } from "../lib/bookingConfirmation";
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
@@ -25,19 +26,13 @@ import { ActionDock } from "../components/bookingConfirmation/ActionDock";
 import type { BookingDto } from "../types/booking";
 import type {
   ConfirmationData,
-  ConfirmationMeta,
-  FareLine,
-  Milestone,
 } from "../types/bookingConfirmation";
 import type { Vehicle } from "../types/vehicle";
 
 const TOAST_MS = 2500;
 
-const fmt2 = (n: number) =>
-  n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const lyd2 = (n: number) => `${fmt2(n)} LYD`;
 
-const referenceCodeFrom = (id: string) => `NX-${id.slice(-6).toUpperCase()}`;
+
 
 /**
  * Projects the booking's embedded vehicle reference into the shape the cards
@@ -91,213 +86,6 @@ const vehicleFromBooking = (booking: BookingDto): Vehicle | null => {
  * data. The translation values are structural labels; every displayed value
  * (reference, totals, dates, driver, company, route) comes from the booking.
  */
-const buildConfirmation = (
-  booking: BookingDto,
-  vehicle: Vehicle,
-  isCashPending: boolean,
-  lang: string,
-): ConfirmationData => {
-  const customer = typeof booking.customerId === "object" ? booking.customerId : null;
-  const company = typeof booking.companyId === "object" ? booking.companyId : null;
-  const start = new Date(booking.startDate);
-  const end = new Date(booking.endDate);
-  const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / 86400000));
-  const isPaid = booking.paymentStatus === "PAID";
-
-  const fmtDateTime = (date: Date) => {
-    const datePart = new Intl.DateTimeFormat(lang, {
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }).format(date);
-    const timePart = new Intl.DateTimeFormat(lang, {
-      hour: "numeric",
-      minute: "2-digit",
-    }).format(date);
-    return `${datePart} · ${timePart}`;
-  };
-
-  const pickupLocation =
-    booking.pickupLocation || vehicle.perks[0] || vehicle.title;
-
-  const milestones: Milestone[] = [
-    {
-      step: "booking.milestones.step1",
-      status: isPaid
-        ? "booking.milestones.statusDone"
-        : "booking.milestones.statusNext",
-      title: "booking.milestones.title1",
-      detail: isPaid
-        ? "booking.milestones.detail1"
-        : isCashPending
-          ? "booking.milestones.detailCashPending"
-          : "booking.milestones.detailPaymentPending",
-      values: { amount: lyd2(booking.totalAmount) },
-      icon: "check",
-      state: isPaid ? "done" : "next",
-    },
-    {
-      step: "booking.milestones.step2",
-      status: isPaid
-        ? "booking.milestones.statusNext"
-        : "booking.milestones.statusScheduled",
-      title: "booking.milestones.title2",
-      detail: "booking.milestones.detail2",
-      icon: "car",
-      state: isPaid ? "next" : "pending",
-    },
-    {
-      step: "booking.milestones.step3",
-      status: "booking.milestones.statusScheduled",
-      title: "booking.milestones.title3",
-      detail: "booking.milestones.detail3",
-      icon: "key",
-      state: "pending",
-    },
-  ];
-
-  const fareLines: FareLine[] = [
-    {
-      label: "booking.fare.baseRental",
-      amount: lyd2(booking.rentalPrice),
-      values: { price: booking.dailyRate, days: booking.totalDays },
-    },
-  ];
-  if (booking.discountAmount > 0) {
-    fareLines.push({
-      label: "booking.fare.discount",
-      amount: `-${lyd2(booking.discountAmount)}`,
-    });
-  }
-
-  const meta: ConfirmationMeta = {
-    crumbs: [
-      { label: "nav.home", to: "/" },
-      { label: "booking.crumbs.checkout" },
-      { label: vehicle.title },
-      { label: "booking.crumbs.current" },
-    ],
-    stepBadge: {
-      caption: "booking.stepBadge.caption",
-      value: "booking.stepBadge.value",
-    },
-    success: {
-      badge: "booking.success.badge",
-      validation: "booking.success.validation",
-      title: "booking.success.title",
-      desc: "booking.success.desc",
-      printLabel: "booking.success.printLabel",
-      downloadLabel: "booking.success.downloadLabel",
-      downloadBusyLabel: "booking.success.downloadBusyLabel",
-      toastPrint: "booking.success.toastPrint",
-      toastDownload: "booking.success.toastDownload",
-    },
-    reference: {
-      label: "booking.reference.label",
-      code: referenceCodeFrom(booking._id),
-      copyToast: "booking.reference.copyToast",
-      chips: [
-        { icon: "encrypted", text: "booking.reference.chips.escrow" },
-        { icon: "clock", text: "booking.reference.chips.instantDispatch" },
-      ],
-    },
-    milestones,
-    vehicleCard: {
-      badgePrimary: "booking.vehicle.badgeTier",
-      badgeSecondary: vehicle.specs.fuel,
-      gpsLabel: "booking.vehicle.gpsLabel",
-      category: vehicle.category,
-      vin: "",
-    },
-    operator: {
-      locationLabel: company?.city || vehicle.operator.name,
-      ratingNote: "booking.operator.ratingNote",
-      phoneLabel: "booking.operator.phoneLabel",
-      phone: company?.phone || "—",
-      phoneHref: company?.phone ? `tel:${company.phone}` : "",
-    },
-    identification: {
-      title: "booking.identification.title",
-      driverName: customer?.name || "—",
-      hotline: company?.phone || "—",
-      email: customer?.email || "—",
-    },
-    route: {
-      title: "booking.route.title",
-      days,
-      daysBadge: "booking.route.daysBadge",
-      pickup: {
-        label: "booking.route.pickupLabel",
-        location: pickupLocation,
-        datetime: fmtDateTime(start),
-        note: "booking.route.pickupNote",
-        icon: "land",
-        primary: true,
-      },
-      dropoff: {
-        label: "booking.route.dropoffLabel",
-        location: pickupLocation,
-        datetime: fmtDateTime(end),
-        icon: "takeoff",
-        primary: false,
-      },
-    },
-    payment: {
-      title: "booking.payment.title",
-      paidBadge: "booking.payment.paidBadge",
-      depositLabel: "booking.payment.depositLabel",
-      depositAmount: "",
-      totalLabel: "booking.payment.totalLabel",
-      totalNote: "booking.payment.totalNote",
-      viaNote: "booking.payment.viaNote",
-    },
-    protocol: {
-      title: "booking.protocol.title",
-      subtitle: "booking.protocol.subtitle",
-      cards: [
-        {
-          icon: "badge",
-          title: "booking.protocol.documents.title",
-          body: "booking.protocol.documents.body",
-        },
-        {
-          icon: "location",
-          title: "booking.protocol.depot.title",
-          body: "booking.protocol.depot.body",
-        },
-        {
-          icon: "restart",
-          title: "booking.protocol.cancellation.title",
-          body: "booking.protocol.cancellation.body",
-        },
-      ],
-    },
-    dock: {
-      back: { icon: "arrowLeft", label: "booking.dock.back", to: "/" },
-      actions: [
-        { label: "booking.dock.browseMore", to: "/fleet" },
-        {
-          icon: "arrowRight",
-          label: "booking.dock.manage",
-          to: "/my-bookings",
-          primary: true,
-        },
-      ],
-    },
-  };
-
-  return {
-    vehicle,
-    meta,
-    fareLines,
-    total: lyd2(booking.totalAmount),
-    // The booking document does not carry card/auth details; the paid summary
-    // hides this line when it is empty rather than inventing one.
-    cardEnding: "",
-    authRef: "",
-  };
-};
 
 export const BookingConfirmationPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -547,19 +335,19 @@ export const BookingConfirmationPage: React.FC = () => {
               </div>
               <div className="flex flex-col">
                 <h3 className="text-[16px] font-bold text-emerald-950 flex items-center gap-2">
-                  Payment Verified by Moamalat
+                  {t("booking.success.title")}
                   <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-800">
                     APPROVED
                   </span>
                 </h3>
                 <p className="text-[13px] text-emerald-800 font-medium">
-                  Your reservation is fully paid and confirmed. The vehicle has been secured for you.
+                  {t("booking.success.desc", { vehicle: resolved.vehicle.title })}
                 </p>
               </div>
             </div>
             <div className="inline-flex items-center gap-1.5 self-start sm:self-center px-3.5 py-1.5 rounded-xl bg-emerald-100/80 text-emerald-800 text-[12px] font-bold">
               <ShieldCheck className="w-4 h-4 text-emerald-700" />
-              <span>Moamalat Secured</span>
+              <span>{t("booking.payment.paidBadge")}</span>
             </div>
           </div>
         )}

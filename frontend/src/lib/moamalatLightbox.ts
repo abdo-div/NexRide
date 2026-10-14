@@ -161,6 +161,7 @@ export const openMoamalatLightbox = (
       if (import.meta.env.DEV) {
         console.error("MOAMALAT ERROR CALLBACK:", err);
       }
+      closeMoamalatLightbox();
       callbacks.onError?.(err);
     },
     cancelCallback: () => {
@@ -169,6 +170,7 @@ export const openMoamalatLightbox = (
       if (import.meta.env.DEV) {
         console.debug("MOAMALAT CANCEL CALLBACK");
       }
+      closeMoamalatLightbox();
       callbacks.onCancel?.();
     },
   };

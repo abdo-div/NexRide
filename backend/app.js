@@ -59,7 +59,6 @@ import { resolveTenant } from "./middlewares/tenantMiddleware.js";
 // IDEMPOTENCY
 // ============================================
 
-import { idempotency } from "./middlewares/idempotence.middleware.js";
 
 // ============================================
 // LOGGING
@@ -219,7 +218,8 @@ app.use(
 // 11. IDEMPOTENCY
 // ============================================
 
-app.use("/api/v1/bookings", idempotency(86400));
+// Checkout deduplication runs inside the authenticated booking transaction.
+// A cache mounted here would replay private responses before authentication.
 
 // ============================================
 // 12. API DOCUMENTATION

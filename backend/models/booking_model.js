@@ -4,6 +4,8 @@ import { calculateBookingExtras } from "../utils/bookingPricing.js";
 
 const bookingSchema = new mongoose.Schema(
   {
+    checkoutKey: { type: String, maxlength: 200, select: false },
+    checkoutFingerprint: { type: String, select: false },
     // -------------------------------------------------------------------------
     // Core Relationships
     // -------------------------------------------------------------------------
@@ -47,6 +49,17 @@ const bookingSchema = new mongoose.Schema(
         },
         message: "Return date ({VALUE}) must be after the pickup date",
       },
+    },
+    primaryDriver: {
+      type: new mongoose.Schema({
+        firstName: { type: String, trim: true, required: true, maxlength: 100 },
+        lastName: { type: String, trim: true, required: true, maxlength: 100 },
+        email: { type: String, trim: true, required: true, maxlength: 254 },
+        phone: { type: String, required: true },
+        eligibilityConfirmed: { type: Boolean, required: true },
+      }, { _id: false }),
+      // Optional on legacy records; required by the customer checkout schema.
+      default: undefined,
     },
     pickupMethod: {
       type: String,
@@ -198,6 +211,10 @@ bookingSchema.index({
 });
 bookingSchema.index({ companyId: 1, bookingStatus: 1 });
 bookingSchema.index({ customerId: 1, createdAt: -1 });
+bookingSchema.index({ customerId: 1, checkoutKey: 1 }, {
+  unique: true,
+  partialFilterExpression: { checkoutKey: { $type: "string" } },
+});
 bookingSchema.index({ vehicleId: 1, startDate: 1, bookingStatus: 1 });
 
 // -----------------------------------------------------------------------------
