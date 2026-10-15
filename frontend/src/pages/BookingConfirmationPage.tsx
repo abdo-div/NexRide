@@ -306,7 +306,7 @@ export const BookingConfirmationPage: React.FC = () => {
   const paymentMethod = searchParams.get("paymentMethod") ?? undefined;
 
   const [toast, setToast] = useState<string | null>(null);
-  const [downloadingInvoice, setDownloadingInvoice] = useState(false);
+  const [printingInvoice, setPrintingInvoice] = useState(false);
 
   // Booking fetch state is keyed by (bookingId, nonce) so "loading" is derived
   // instead of being flipped synchronously inside the effect. A request whose
@@ -424,28 +424,40 @@ export const BookingConfirmationPage: React.FC = () => {
     if (resolved) showToast(t(resolved.meta.reference.copyToast));
   };
 
-  const saveBlobAsFile = (blob: Blob, filename: string) => {
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = filename;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    URL.revokeObjectURL(url);
-  };
+  const handlePrintInvoice = async () => {
+    if (!booking || printingInvoice) return;
 
-  const handleDownloadInvoice = async () => {
-    if (!booking || downloadingInvoice) return;
-    setDownloadingInvoice(true);
+    const invoiceWindow = window.open("", "_blank");
+    if (!invoiceWindow) {
+      showToast(t("booking.success.toastPrintError"));
+      return;
+    }
+
+    invoiceWindow.opener = null;
+    invoiceWindow.document.title = t("booking.success.printLabel");
+    invoiceWindow.document.body.innerHTML =
+      '<div style="font:16px system-ui;padding:32px;color:#142B4A">Preparing invoice…</div>';
+    setPrintingInvoice(true);
+
     try {
       const blob = await bookingApi.downloadInvoice(booking._id);
-      saveBlobAsFile(blob, `invoice-${booking._id}.pdf`);
-      if (resolved) showToast(t(resolved.meta.success.toastDownload));
+      const url = URL.createObjectURL(blob);
+      invoiceWindow.addEventListener(
+        "load",
+        () => {
+          invoiceWindow.focus();
+          invoiceWindow.print();
+          window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+        },
+        { once: true },
+      );
+      invoiceWindow.location.replace(url);
+      showToast(t(resolved?.meta.success.toastPrint ?? "booking.success.toastPrint"));
     } catch {
-      showToast(t("booking.success.toastDownloadError"));
+      invoiceWindow.close();
+      showToast(t("booking.success.toastPrintError"));
     } finally {
-      setDownloadingInvoice(false);
+      setPrintingInvoice(false);
     }
   };
 
@@ -531,12 +543,8 @@ export const BookingConfirmationPage: React.FC = () => {
           vehicleTitle={resolved.vehicle.title}
           vehicleId={resolved.vehicle.id}
           meta={resolved.meta}
-          onPrint={() => {
-            showToast(t(resolved.meta.success.toastPrint));
-            window.print();
-          }}
-          onDownload={handleDownloadInvoice}
-          downloadBusy={downloadingInvoice}
+          onPrint={handlePrintInvoice}
+          printBusy={printingInvoice}
         />
 
         {showPaidConfirmation && (

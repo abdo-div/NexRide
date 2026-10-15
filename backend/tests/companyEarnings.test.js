@@ -169,6 +169,19 @@ const stubWorkspace = (t, { facet = deckFacet(), ledgerDocs = [ledgerDoc()] } = 
   };
 
   t.mock.method(Payment, "aggregate", (pipeline) => {
+    assert.ok(
+      pipeline.every((stage) => !Array.isArray(stage)),
+      "aggregation stages must be flattened before reaching MongoDB",
+    );
+    const facetStage = pipeline.find((stage) => stage.$facet);
+    if (facetStage) {
+      Object.values(facetStage.$facet).forEach((subPipeline) => {
+        assert.ok(
+          subPipeline.every((stage) => !Array.isArray(stage)),
+          "$facet sub-pipelines must contain operator documents, not nested arrays",
+        );
+      });
+    }
     if (pipeline.some((stage) => stage.$facet)) {
       sinks.deckMatches.push(pipeline[0].$match);
       return thenable([facet]);

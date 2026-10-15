@@ -6,6 +6,7 @@ import {
   formatDate,
   rentalDays,
 } from "../../lib/bookingView";
+import { photoUrl } from "../../lib/vehicleMapper";
 import type {
   CompanyBookingRow,
   CompanyPaymentState,
@@ -138,10 +139,13 @@ export const CompanyBookingsTable: React.FC<CompanyBookingsTableProps> = ({
                     <div className="flex items-center gap-2.5">
                       {row.vehicle.photo ? (
                         <img
-                          src={row.vehicle.photo}
+                          src={photoUrl(row.vehicle.photo ?? undefined)}
                           alt={vehicleName(row)}
                           className="h-9 w-12 shrink-0 rounded-md object-cover"
                           loading="lazy"
+                          onError={(event) => {
+                            event.currentTarget.src = photoUrl(undefined);
+                          }}
                         />
                       ) : (
                         <span className="flex h-9 w-12 shrink-0 items-center justify-center rounded-md bg-[#F1F5F9] text-[10px] font-bold text-[#142B4A]">

@@ -172,6 +172,21 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   const [tab, setTab] = useState<"card" | "cash">("card");
   const [phase, setPhase] = useState<"idle" | "processing" | "done">("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [driverValues, setDriverValues] = useState<Record<string, string>>({});
+  const [driverConfirmed, setDriverConfirmed] = useState(false);
+
+  const driverComplete = useMemo(() => {
+    const allFieldsFilled = meta.driverFields.every(
+      (field) => (driverValues[field.id] ?? "").trim().length > 0,
+    );
+    const email = (driverValues.email ?? "").trim();
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    return allFieldsFilled && emailValid && driverConfirmed;
+  }, [driverConfirmed, driverValues, meta.driverFields]);
+
+  const updateDriverField = (id: string, value: string) => {
+    setDriverValues((current) => ({ ...current, [id]: value }));
+  };
 
   const totals = useMemo(
     () => (vehicle ? computeCheckoutTotals(vehicle, meta, selected) : null),
@@ -190,7 +205,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
     });
 
   const onConfirm = async () => {
-    if (!vehicle || !totals || phase !== "idle") return;
+    if (!vehicle || !totals || phase !== "idle" || !driverComplete) return;
     setSubmitError(null);
     setPhase("processing");
 
@@ -283,12 +298,12 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
           );
         },
         onCancel: () => {
-          setPhase("idle");
-          setSubmitError(
-            t("payment.cancelledDesc", {
-              defaultValue: "Payment was cancelled in Moamalat LightBox.",
-            }),
-          );
+          setSubmitError(null);
+          setPhase("processing");
+          void bookingApi
+            .cancel(booking._id)
+            .catch(() => undefined)
+            .finally(() => setPhase("idle"));
         },
       });
     } catch (err) {
@@ -363,7 +378,13 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
               </div>
             )}
             <ItinerarySection meta={meta} />
-            <DriverSection meta={meta} />
+            <DriverSection
+              meta={meta}
+              values={driverValues}
+              confirmed={driverConfirmed}
+              onFieldChange={updateDriverField}
+              onConfirmedChange={setDriverConfirmed}
+            />
             <OptionsSection meta={meta} selected={selected} onToggle={toggle} />
             <PaymentSection
               meta={meta}
@@ -408,6 +429,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
               onConfirm={onConfirm}
               tab={tab}
               error={submitError}
+              driverComplete={driverComplete}
             />
           )}
         </div>

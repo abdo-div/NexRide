@@ -21,6 +21,12 @@ import {
   createBookingSchema,
   checkAvailabilitySchema,
 } from "../validations/booking.validation.js";
+import { sendMessageSchema } from "../validations/message.validation.js";
+import {
+  getMyConversations,
+  getMyConversationThread,
+  postMyConversationMessage,
+} from "../controllers/customerMessagesController.js";
 
 const router = express.Router();
 
@@ -75,6 +81,19 @@ router.get(
 // -----------------------------------------------------------------------------
 // All other booking interactions require valid JWT authentication
 router.use(protect);
+
+router.get("/conversations", restrictTo("customer"), getMyConversations);
+router.get(
+  "/conversations/:id",
+  restrictTo("customer"),
+  getMyConversationThread,
+);
+router.post(
+  "/conversations/:id/messages",
+  restrictTo("customer"),
+  validate(sendMessageSchema),
+  postMyConversationMessage,
+);
 
 // -----------------------------------------------------------------------------
 // CUSTOMER & SEARCH ROUTES

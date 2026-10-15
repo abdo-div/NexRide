@@ -491,13 +491,13 @@ export const buildCompanyEarnings = async ({
   const currentWindowMatch = rangeCondition(window);
   const facets = {
     current: currentWindowMatch
-      ? [{ $match: currentWindowMatch }, keptFields(), totalsGroup()]
-      : [keptFields(), totalsGroup()],
+      ? [{ $match: currentWindowMatch }, ...keptFields(), totalsGroup()]
+      : [...keptFields(), totalsGroup()],
   };
   if (window?.prevFrom) {
     facets.previous = [
       { $match: rangeCondition({ from: window.prevFrom, to: window.prevTo }) },
-      keptFields(),
+      ...keptFields(),
       totalsGroup(),
     ];
   }
@@ -525,7 +525,7 @@ export const buildCompanyEarnings = async ({
   const windowMatch = rangeCondition(window);
   if (windowMatch) yieldPipeline.push({ $match: windowMatch });
   yieldPipeline.push(
-    keptFields(),
+    ...keptFields(),
     {
       $lookup: {
         from: "bookings",

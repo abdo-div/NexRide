@@ -13,6 +13,7 @@ import {
   Wallet,
 } from "lucide-react";
 import type { PaginationMeta } from "../../types/admin";
+import { photoUrl } from "../../lib/vehicleMapper";
 import {
   formatDateTime,
   moneyOf,
@@ -218,7 +219,7 @@ export const CompanyEarningsTable: React.FC<CompanyEarningsTableProps> = ({
                         <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[#F1F5F9] text-[#142B4A]">
                           {row.vehicle.photo ? (
                             <img
-                              src={row.vehicle.photo}
+                              src={photoUrl(row.vehicle.photo)}
                               alt={row.vehicle.make}
                               className="h-full w-full object-cover"
                               loading="lazy"

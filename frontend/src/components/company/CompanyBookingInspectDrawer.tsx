@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { formatLYD } from "../../lib/bookingView";
+import { photoUrl } from "../../lib/vehicleMapper";
 import type { CompanyBookingRow } from "../../types/companyBookings";
 
 interface CompanyBookingInspectDrawerProps {
@@ -168,10 +169,13 @@ export const CompanyBookingInspectDrawer: React.FC<
           <div className="flex items-center gap-3 rounded-xl border border-[#F1F5F9] bg-[#F8FAFF] p-3">
             {detail.photo ? (
               <img
-                src={detail.photo}
+                src={photoUrl(detail.photo ?? undefined)}
                 alt={vehicleTitle}
                 className="h-14 w-20 shrink-0 rounded-lg object-cover"
                 loading="lazy"
+                onError={(event) => {
+                  event.currentTarget.src = photoUrl(undefined);
+                }}
               />
             ) : (
               <span className="flex h-14 w-20 shrink-0 items-center justify-center rounded-lg bg-[#F1F5F9] text-[#142B4A]">

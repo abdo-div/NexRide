@@ -15,6 +15,7 @@ interface Props {
   onConfirm: () => void;
   tab?: "card" | "cash";
   error?: string | null;
+  driverComplete: boolean;
 }
 
 const totalLyd = (n: number) => `${n.toLocaleString("en-US")} LYD`;
@@ -27,6 +28,7 @@ export const BookingSummary: React.FC<Props> = ({
   onConfirm,
   tab = "card",
   error,
+  driverComplete,
 }) => {
   const { t } = useTranslation();
   const { itinerary, municipalLabel, securityDeposit, totalLabel, totalNote } = meta;
@@ -200,10 +202,11 @@ export const BookingSummary: React.FC<Props> = ({
             <button
               type="button"
               onClick={onConfirm}
-              disabled={phase === "processing"}
+              disabled={phase === "processing" || !driverComplete}
+              aria-describedby={!driverComplete ? "driver-completion-hint" : undefined}
               className={`w-full py-4 px-6 rounded-xl text-white text-[16px] font-bold shadow-lg flex items-center justify-center gap-2 transition-all transform active:scale-[0.98] ${
-                phase === "processing"
-                  ? "bg-[#142B4A] opacity-80 cursor-not-allowed"
+                phase === "processing" || !driverComplete
+                  ? "bg-slate-400 opacity-80 cursor-not-allowed shadow-none"
                   : "bg-[#142B4A] hover:bg-blue-700 shadow-[0_4px_12px_rgba(37,99,235,0.25)]"
               }`}
             >
@@ -225,6 +228,11 @@ export const BookingSummary: React.FC<Props> = ({
                 </>
               )}
             </button>
+          )}
+          {!driverComplete && phase !== "done" && (
+            <p id="driver-completion-hint" className="text-center text-[12px] font-semibold text-amber-700">
+              {t("checkout.driver.completionHint")}
+            </p>
           )}
           <div className="flex flex-col gap-2 text-center">
             <p className="text-[11px] text-[#64748B] flex items-center justify-center gap-1.5">
