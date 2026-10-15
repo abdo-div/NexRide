@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CheckCircle2, LockKeyhole, MessageSquareText, Send, Star } from "lucide-react";
+import { Building2, CheckCircle2, LockKeyhole, MessageSquareText, Send, Star } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { vehicleApi, type ReviewEligibility } from "../../lib/vehicleApi";
 import type { BookingDto } from "../../types/booking";
@@ -11,7 +11,7 @@ export const BookingReviewCard: React.FC<{
   booking: BookingDto;
   onNotice: (message: string) => void;
 }> = ({ booking, onNotice }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const vehicleId = idOf(booking.vehicleId);
   const [state, setState] = useState<ReviewEligibility | null>(null);
   const [rating, setRating] = useState(0);
@@ -108,6 +108,32 @@ export const BookingReviewCard: React.FC<{
             <p className="mt-3 text-xs font-semibold text-emerald-700">
               {t("bookingDetails.review.visible")}
             </p>
+            {state.review?.companyResponse?.response ? (
+              <div className="mt-5 rounded-2xl border border-blue-200 bg-white p-4 shadow-sm">
+                <div className="flex items-center gap-2 text-sm font-extrabold text-[#142B4A]">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+                    <Building2 className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                  {t("bookingDetails.review.companyReply")}
+                </div>
+                <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">
+                  {state.review.companyResponse.response}
+                </p>
+                {state.review.companyResponse.respondedAt ? (
+                  <p className="mt-2 text-xs font-medium text-slate-400">
+                    {new Intl.DateTimeFormat(i18n.language === "ar" ? "ar-LY" : "en-GB", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    }).format(new Date(state.review.companyResponse.respondedAt))}
+                  </p>
+                ) : null}
+              </div>
+            ) : (
+              <p className="mt-4 rounded-xl bg-white/70 px-4 py-3 text-xs font-semibold text-slate-500">
+                {t("bookingDetails.review.awaitingCompanyReply")}
+              </p>
+            )}
           </div>
         ) : state?.eligible ? (
           <>

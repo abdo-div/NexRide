@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2 } from "lucide-react";
 import type { CheckoutMeta } from "../../types/checkout";
@@ -6,9 +6,22 @@ import type { CheckoutMeta } from "../../types/checkout";
 const inputCls =
   "w-full px-3.5 py-2.5 rounded-xl bg-[#F8FAFC] text-[#0F172A] text-[14px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#142B4A]/30 focus:border-[#142B4A] transition-all placeholder:text-[#94A3B8]";
 
-export const DriverSection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => {
+interface Props {
+  meta: CheckoutMeta;
+  values: Record<string, string>;
+  confirmed: boolean;
+  onFieldChange: (id: string, value: string) => void;
+  onConfirmedChange: (confirmed: boolean) => void;
+}
+
+export const DriverSection: React.FC<Props> = ({
+  meta,
+  values,
+  confirmed,
+  onFieldChange,
+  onConfirmedChange,
+}) => {
   const { t } = useTranslation();
-  const [confirmed, setConfirmed] = useState(true);
 
   return (
     <section className="bg-white rounded-2xl p-6 shadow-sm border border-[#E2E8F0] flex flex-col gap-5">
@@ -27,7 +40,7 @@ export const DriverSection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => {
           <div key={field.id} className={`flex flex-col gap-1.5 ${field.span2 ? "md:col-span-2" : ""}`}>
             <div className="flex items-center justify-between">
               <label htmlFor={`driver-${field.id}`} className="text-[12px] font-bold text-[#0F172A]">
-                {t(field.label)}
+                {t(field.label)} <span className="text-red-500" aria-hidden>*</span>
               </label>
               {field.badge && (
                 <span
@@ -55,7 +68,9 @@ export const DriverSection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => {
                 id={`driver-${field.id}`}
                 type={field.type ?? "text"}
                 placeholder={t(field.placeholder)}
-                defaultValue={field.value}
+                value={values[field.id] ?? ""}
+                onChange={(event) => onFieldChange(field.id, event.target.value)}
+                required
                 className={`${inputCls} ${field.prefix ? "bg-transparent focus:bg-transparent focus:ring-0" : ""} ${
                   field.uppercase ? "uppercase" : ""
                 }`}
@@ -70,7 +85,8 @@ export const DriverSection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => {
             <input
               type="checkbox"
               checked={confirmed}
-              onChange={(e) => setConfirmed(e.target.checked)}
+              onChange={(e) => onConfirmedChange(e.target.checked)}
+              required
               className="mt-1 w-4 h-4 rounded accent-[#142B4A]"
             />
             <span className="text-[14px] text-[#0F172A]">

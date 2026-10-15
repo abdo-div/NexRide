@@ -10,6 +10,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { bookingApi } from "../lib/bookingApi";
+import { ApiError } from "../lib/apiClient";
 import type { BookingDto } from "../types/booking";
 import { moamalatApi } from "../lib/moamalatApi";
 import {
@@ -24,7 +25,6 @@ type PaymentStatus =
   | "ready"
   | "preparing"
   | "verifying"
-  | "cancelled"
   | "failed"
   | "gatewayError";
 
@@ -36,6 +36,15 @@ const vehicleTitleOf = (booking: BookingDto): string => {
     return `${booking.vehicleId.make} ${booking.vehicleId.model ?? ""}`.trim();
   }
   return "";
+};
+
+const freshCheckoutUrl = (booking: BookingDto): string => {
+  const params = new URLSearchParams({
+    startDate: booking.startDate.slice(0, 10),
+    endDate: booking.endDate.slice(0, 10),
+    location: booking.pickupLocation,
+  });
+  return `/checkout/${vehicleIdOf(booking)}?${params.toString()}`;
 };
 
 const PaymentPage: React.FC = () => {
@@ -55,7 +64,16 @@ const PaymentPage: React.FC = () => {
       .get(bookingId)
       .then((result) => {
         if (!active) return;
-        setBooking(result.data.booking);
+        const loadedBooking = result.data.booking;
+        if (
+          loadedBooking.paymentStatus !== "PAID" &&
+          (loadedBooking.bookingStatus !== "PENDING_PAYMENT" ||
+            loadedBooking.paymentStatus !== "UNPAID")
+        ) {
+          navigate(freshCheckoutUrl(loadedBooking), { replace: true });
+          return;
+        }
+        setBooking(loadedBooking);
         setStatus("ready");
       })
       .catch(() => {
@@ -65,19 +83,23 @@ const PaymentPage: React.FC = () => {
     return () => {
       active = false;
     };
-  }, [bookingId]);
+  }, [bookingId, navigate]);
 
   useEffect(() => {
     if (!booking || booking.paymentStatus === "PAID") return;
     void loadMoamalatLightbox().catch(() => undefined);
   }, [booking]);
 
-  const fmtDate = (iso: string) =>
-    new Intl.DateTimeFormat(i18n.language, {
+  const fmtDate = (iso: string) => {
+    const parsed = new Date(iso.includes("T") ? iso : `${iso}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) return iso;
+
+    return new Intl.DateTimeFormat(i18n.language, {
       day: "numeric",
       month: "short",
       year: "numeric",
-    }).format(new Date(`${iso}T00:00:00`));
+    }).format(parsed);
+  };
 
   const fmtAmount = (value: number) =>
     `${new Intl.NumberFormat(i18n.language, {
@@ -138,9 +160,21 @@ const PaymentPage: React.FC = () => {
               t("payment.gatewayError"),
           );
         },
-        onCancel: () => setStatus("cancelled"),
+        onCancel: () => {
+          setStatus("preparing");
+          void bookingApi
+            .cancel(booking._id)
+            .catch(() => undefined)
+            .finally(() => {
+              navigate(`/cars/${vehicleIdOf(booking)}`, { replace: true });
+            });
+        },
       });
     } catch (err) {
+      if (err instanceof ApiError && err.status === 409) {
+        navigate(freshCheckoutUrl(booking), { replace: true });
+        return;
+      }
       setStatus("gatewayError");
       setError(err instanceof Error ? err.message : t("payment.gatewayError"));
     }
@@ -283,37 +317,13 @@ const PaymentPage: React.FC = () => {
                   </div>
                 </dl>
 
-                {(status === "cancelled" ||
-                  status === "failed" ||
-                  status === "gatewayError") && (
-                  <div
-                    className={`flex flex-col gap-3 rounded-xl p-5 ${
-                      status === "cancelled"
-                        ? "bg-amber-50 border border-amber-200"
-                        : "bg-red-50 border border-red-200"
-                    }`}
-                  >
-                    <p
-                      className={`text-[15px] font-bold ${
-                        status === "cancelled"
-                          ? "text-amber-800"
-                          : "text-red-700"
-                      }`}
-                    >
-                      {status === "cancelled"
-                        ? t("payment.cancelledTitle")
-                        : t("payment.gatewayTitle")}
+                {(status === "failed" || status === "gatewayError") && (
+                  <div className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-5">
+                    <p className="text-[15px] font-bold text-red-700">
+                      {t("payment.gatewayTitle")}
                     </p>
-                    <p
-                      className={`text-[13px] leading-relaxed ${
-                        status === "cancelled"
-                          ? "text-amber-700"
-                          : "text-red-600"
-                      }`}
-                    >
-                      {status === "cancelled"
-                        ? t("payment.cancelledDesc")
-                        : error || t("payment.gatewayDesc")}
+                    <p className="text-[13px] leading-relaxed text-red-600">
+                      {error || t("payment.gatewayDesc")}
                     </p>
                     <div className="flex flex-wrap gap-3">
                       <button

@@ -14,8 +14,11 @@ export const streamInvoiceForPayment = async (res, payment) => {
 
   const booking = await Booking.findById(payment.bookingId)
     .populate("customerId", "name email phoneNumber")
-    .populate("vehicleId", "make model year")
-    .populate("companyId", "name");
+    .populate(
+      "vehicleId",
+      "make model year type transmission fuelType plateNumber",
+    )
+    .populate("companyId", "name email phone city address");
   if (!booking) {
     throw new AppError(
       "No booking reservation associated with this payment",

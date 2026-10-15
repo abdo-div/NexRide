@@ -21,6 +21,7 @@ import {
   vehicleLineOf,
   viewStatusOf,
 } from "../../lib/companyEarningsView";
+import { photoUrl } from "../../lib/vehicleMapper";
 import type {
   CompanyEarningsRow,
   CompanyEarningsSettings,
@@ -201,7 +202,7 @@ export const CompanyTransactionDrawer: React.FC<CompanyTransactionDrawerProps> =
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#F1F5F9] text-[#142B4A]">
                   {row.vehicle.photo ? (
                     <img
-                      src={row.vehicle.photo}
+                      src={photoUrl(row.vehicle.photo)}
                       alt={row.vehicle.make}
                       className="h-full w-full object-cover"
                       loading="lazy"

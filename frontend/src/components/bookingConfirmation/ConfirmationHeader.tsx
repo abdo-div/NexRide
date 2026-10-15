@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Printer, Download } from "lucide-react";
+import { Printer } from "lucide-react";
 import { ConfirmationIcon } from "./ConfirmationIcon";
 import type { ConfirmationMeta } from "../../types/bookingConfirmation";
 
@@ -10,8 +10,7 @@ interface Props {
   vehicleId: string;
   meta: ConfirmationMeta;
   onPrint: () => void;
-  onDownload: () => void;
-  downloadBusy?: boolean;
+  printBusy?: boolean;
 }
 
 export const ConfirmationHeader: React.FC<Props> = ({
@@ -19,8 +18,7 @@ export const ConfirmationHeader: React.FC<Props> = ({
   vehicleId,
   meta,
   onPrint,
-  onDownload,
-  downloadBusy = false,
+  printBusy = false,
 }) => {
   const { t } = useTranslation();
   const { crumbs, stepBadge, success } = meta;
@@ -86,23 +84,15 @@ export const ConfirmationHeader: React.FC<Props> = ({
             {t(success.desc, { vehicle: vehicleTitle })}
           </p>
         </div>
-        <div className="md:ms-auto shrink-0 flex flex-col sm:flex-row md:flex-col gap-2 w-full md:w-auto z-10">
+        <div className="md:ms-auto shrink-0 w-full md:w-auto z-10">
           <button
             type="button"
             onClick={onPrint}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#F8FAFC] hover:bg-[#F1F5F9] text-[#0F172A] text-[12px] font-semibold transition-all shadow-sm"
+            disabled={printBusy}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#F8FAFC] hover:bg-[#F1F5F9] text-[#0F172A] text-[12px] font-semibold transition-all shadow-sm disabled:cursor-wait disabled:opacity-60"
           >
-            <Printer className="w-[18px] h-[18px]" />
+            <Printer className={`w-[18px] h-[18px] ${printBusy ? "animate-pulse" : ""}`} />
             {t(success.printLabel)}
-          </button>
-          <button
-            type="button"
-            onClick={onDownload}
-            disabled={downloadBusy}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#F8FAFC] hover:bg-[#F1F5F9] text-[#0F172A] text-[12px] font-semibold transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            <Download className="w-[18px] h-[18px]" />
-            {downloadBusy ? t(success.downloadBusyLabel) : t(success.downloadLabel)}
           </button>
         </div>
       </div>

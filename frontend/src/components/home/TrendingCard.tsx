@@ -42,10 +42,16 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car, index = 0 }) =>
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
       whileHover={reduceMotion ? undefined : cardHover}
-      className="premium-card bg-white rounded-3xl border border-slate-200/80 overflow-hidden group flex flex-col justify-between"
+      className="premium-card relative bg-white rounded-3xl border border-slate-200/80 overflow-hidden group flex flex-col justify-between"
     >
+      <Link
+        to={car.href ?? `/cars/${car.id}`}
+        aria-label={`${t("home.trending.reserveRide")}: ${car.title} (${car.year})`}
+        className="absolute inset-0 z-10 rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-600"
+      />
+
       {/* Top Image Box */}
-      <div className="relative w-full h-56 bg-slate-900 overflow-hidden">
+      <div className="relative w-full h-56 bg-slate-900 overflow-hidden pointer-events-none">
         <motion.img
           src={car.image}
           alt={car.title}
@@ -74,7 +80,7 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car, index = 0 }) =>
         <motion.button
           type="button"
           aria-label={t("data.common.saveCar")}
-          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-slate-700 hover:text-rose-500 hover:bg-white shadow-xs transition-colors cursor-pointer"
+          className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-slate-700 hover:text-rose-500 hover:bg-white shadow-xs transition-colors cursor-pointer pointer-events-auto"
           whileHover={reduceMotion ? undefined : { scale: 1.12, rotate: -7 }}
           whileTap={reduceMotion ? undefined : { scale: 0.9 }}
           transition={hoverSpring}
@@ -84,13 +90,13 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car, index = 0 }) =>
       </div>
 
       {/* Card Content */}
-      <div className="p-5 flex-1 flex flex-col justify-between">
+      <div className="p-5 flex-1 flex flex-col justify-between pointer-events-none">
         <div>
           {/* Partner Company & Rating */}
           <div className="flex items-center justify-between gap-3 text-xs mb-2">
             <Link
               to={car.companyId ? `/companies/${car.companyId}` : "#"}
-              className="flex min-w-0 items-center gap-2 font-semibold text-blue-600 hover:text-blue-700"
+              className="relative z-20 flex min-w-0 items-center gap-2 font-semibold text-blue-600 hover:text-blue-700 pointer-events-auto"
             >
               {companyLogoUrl(car.companyLogo) ? (
                 <img
@@ -155,14 +161,10 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car, index = 0 }) =>
           <motion.div
             whileHover={reduceMotion ? undefined : buttonHover}
             whileTap={reduceMotion ? undefined : buttonTap}
-          >
-          <Link
-            to={car.href ?? `/cars/${car.id}`}
             className="premium-button px-4 py-2.5 text-xs font-bold flex items-center gap-1.5"
           >
             <span>{t("home.trending.reserveRide")}</span>
             <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
-          </Link>
           </motion.div>
         </div>
       </div>

@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Car, Crown, Gauge } from "lucide-react";
 import { moneyOf } from "../../lib/companyEarningsView";
+import { photoUrl } from "../../lib/vehicleMapper";
 import type {
   CompanyEarningsMixRow,
   CompanyTopVehicleRow,
@@ -59,7 +60,7 @@ export const CompanyTopVehicles: React.FC<CompanyTopVehiclesProps> = ({
             row.rank === 1
               ? "bg-[#0B1C30] text-white"
               : "bg-[#F1F5F9] text-[#64748B]";
-          const photo = vehicle.photo;
+          const photo = vehicle.photo ? photoUrl(vehicle.photo) : null;
           return (
             <button
               key={vehicle.id}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Menu, X, Zap } from "lucide-react";
+import { Menu, MessageCircle, X, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { NavBarLogo } from "./NavBarLogo";
 import { NavBarActions } from "./NavBarActions";
@@ -99,12 +99,21 @@ export const NavBar: React.FC = () => {
           </Link>
 
           {isCustomer && (
-            <Link
-              to="/my-bookings"
-              className="px-3.5 py-1.5 rounded-full text-slate-600 hover:text-blue-600 hover:bg-white/60 transition-all"
-            >
-              {t("nav.myBookings")}
-            </Link>
+            <>
+              <Link
+                to="/my-bookings"
+                className="px-3.5 py-1.5 rounded-full text-slate-600 hover:text-blue-600 hover:bg-white/60 transition-all"
+              >
+                {t("nav.myBookings")}
+              </Link>
+              <Link
+                to="/messages"
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all ${location.pathname === "/messages" ? "bg-white text-blue-600 font-bold shadow-xs" : "text-slate-600 hover:text-blue-600 hover:bg-white/60"}`}
+              >
+                <MessageCircle className="h-3.5 w-3.5" />
+                {i18n.language === "ar" ? "الرسائل" : "Messages"}
+              </Link>
+            </>
           )}
         </nav>
 
@@ -193,6 +202,10 @@ export const NavBar: React.FC = () => {
                   </Link>
                   <Link to="/my-bookings" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all">
                     {t("nav.myBookings")}
+                  </Link>
+                  <Link to="/messages" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all">
+                    <MessageCircle className="h-4 w-4" />
+                    {i18n.language === "ar" ? "الرسائل" : "Messages"}
                   </Link>
                 </>
               )}
