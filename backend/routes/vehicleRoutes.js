@@ -210,6 +210,7 @@ router.post(
 router.patch(
   "/:id",
   restrictTo("company", "admin"),
+  validate(vehicleIdParamSchema),
   verifyTenantAccess("Vehicle"),
   uploadVehicleImages,
   resizeVehicleImages,
@@ -254,6 +255,7 @@ router.patch(
 router.patch(
   "/:id/status",
   restrictTo("company", "admin"),
+  validate(vehicleIdParamSchema),
   verifyTenantAccess("Vehicle"),
   validate(updateVehicleStatusSchema),
   updateVehicleStatus,
@@ -262,8 +264,8 @@ router.patch(
 router.delete(
   "/:id",
   restrictTo("company", "admin"),
-  verifyTenantAccess("Vehicle"),
   validate(vehicleIdParamSchema),
+  verifyTenantAccess("Vehicle"),
   deleteVehicle,
 );
 

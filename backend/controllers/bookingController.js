@@ -18,7 +18,6 @@ import {
   buildDateOverlapFilter,
 } from "../utils/bookingStatus.js";
 import { getPlatformPolicy } from "../services/platformPolicyService.js";
-import { ensureBookingConversation } from "../services/companyMessagesService.js";
 import {
   calculateBookingExtras,
   MUNICIPAL_FEE_LYD,
@@ -335,12 +334,6 @@ export const createBooking = catchAsync(async (req, res, next) => {
 
     return next(transactionError);
   }
-
-  // Open the operator inbox thread for this booking. Best-effort: a messaging
-  // failure must never fail a committed booking, so it is caught and ignored.
-  await ensureBookingConversation(booking, { vehicle: claimed }).catch(
-    () => {},
-  );
 
   const data = { booking };
   if (payment) data.payment = payment;

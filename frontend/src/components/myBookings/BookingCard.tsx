@@ -11,7 +11,6 @@ import {
   Gauge,
   Map,
   MapPin,
-  MessageCircle,
   PencilLine,
   RotateCcw,
   ShieldCheck,
@@ -395,16 +394,6 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           </div>
 
           <div className="flex flex-col gap-2 mt-4">
-            {!isTerminated && (
-              <button
-                type="button"
-                onClick={() => navigate(`/messages?booking=${booking._id}`)}
-                className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-bold rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer"
-              >
-                <MessageCircle className="w-4 h-4" />
-                {i18n.language === "ar" ? "مراسلة الشركة" : "Message company"}
-              </button>
-            )}
             {!isActive && (
               <button
                 type="button"

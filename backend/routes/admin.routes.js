@@ -24,6 +24,13 @@ import {
   releaseMaintenanceVehicle,
 } from "../controllers/maintenanceController.js";
 import { updateCompanyStatusSchema } from "../validations/company.validation.js";
+import { idParamSchema } from "../validations/common.validation.js";
+import {
+  payoutDispatchSchema,
+  payoutSettleSchema,
+  createMaintenanceSchema,
+  platformSettingsSchema,
+} from "../validations/admin.validation.js";
 import { getAnalyticsSummary } from "../controllers/analyticsController.js";
 import {
   getPlatformSettings,
@@ -165,7 +172,7 @@ router.get("/payouts/ledger", safePagination(20, 100), getPayoutLedger);
  *       403:
  *         description: Admin role required
  */
-router.post("/payouts/dispatch", generatePayoutBatch);
+router.post("/payouts/dispatch", validate(payoutDispatchSchema), generatePayoutBatch);
 
 /**
  * @openapi
@@ -187,7 +194,7 @@ router.post("/payouts/dispatch", generatePayoutBatch);
  *       403:
  *         description: Admin role required
  */
-router.post("/payouts/settle", approvePayoutDispatch);
+router.post("/payouts/settle", validate(payoutSettleSchema), approvePayoutDispatch);
 
 // Fleet Maintenance & Quarantine: health summary, event ledger and the
 // lifecycle actions. Events mirror the Vehicle operationalStatus transitions.
@@ -228,7 +235,7 @@ router.get("/maintenance/summary", getMaintenanceSummary);
  *         description: Admin role required
  */
 router.get("/maintenance", safePagination(20, 100), getMaintenanceEvents);
-router.post("/maintenance", createMaintenance);
+router.post("/maintenance", validate(createMaintenanceSchema), createMaintenance);
 
 /**
  * @openapi
@@ -248,7 +255,11 @@ router.post("/maintenance", createMaintenance);
  *       403:
  *         description: Admin role required
  */
-router.patch("/maintenance/:id/complete", completeMaintenance);
+router.patch(
+  "/maintenance/:id/complete",
+  validate(idParamSchema()),
+  completeMaintenance,
+);
 
 /**
  * @openapi
@@ -269,7 +280,11 @@ router.patch("/maintenance/:id/complete", completeMaintenance);
  *       403:
  *         description: Admin role required
  */
-router.post("/maintenance/:vehicleId/release", releaseMaintenanceVehicle);
+router.post(
+  "/maintenance/:vehicleId/release",
+  validate(idParamSchema("vehicleId")),
+  releaseMaintenanceVehicle,
+);
 
 // Reports & Analytics: live executive summary aggregated across the fleet,
 // booking funnel, payment ledger and renter cohorts.
@@ -345,7 +360,7 @@ router.get("/reports/summary", getAnalyticsSummary);
  *         description: Admin role required
  */
 router.get("/settings", getPlatformSettings);
-router.patch("/settings", updatePlatformSettingsEntry);
+router.patch("/settings", validate(platformSettingsSchema), updatePlatformSettingsEntry);
 
 // Company onboarding approval (PENDING -> APPROVED / SUSPENDED / REJECTED)
 
@@ -387,6 +402,6 @@ router.patch(
 );
 
 /** Soft-delete any company, including an approved partner. */
-router.delete("/companies/:id", deleteCompany);
+router.delete("/companies/:id", validate(idParamSchema()), deleteCompany);
 
 export default router;

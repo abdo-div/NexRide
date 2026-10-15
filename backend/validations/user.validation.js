@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ciEnum } from "./common.validation.js";
+import { ciEnum, objectId } from "./common.validation.js";
 
 export const updateMeSchema = z.object({
   body: z.object({
@@ -10,6 +10,7 @@ export const updateMeSchema = z.object({
 });
 
 export const adminUpdateUserSchema = z.object({
+  params: z.object({ id: objectId }),
   body: z.object({
     name: z.string().trim().min(1).max(100).optional(),
     email: z.string().email("Please provide a valid email address").optional(),
@@ -19,6 +20,7 @@ export const adminUpdateUserSchema = z.object({
 });
 
 export const updateUserStatusSchema = z.object({
+  params: z.object({ id: objectId }),
   body: z.object({
     status: ciEnum(
       ["ACTIVE", "SUSPENDED", "BANNED"],

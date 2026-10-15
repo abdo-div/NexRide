@@ -66,6 +66,7 @@ export const updateCompanySchema = z.object({
 });
 
 export const updateCommissionSchema = z.object({
+  params: z.object({ id: objectId }),
   body: z.object({
     commissionRate: z.coerce
       .number()
@@ -75,6 +76,7 @@ export const updateCommissionSchema = z.object({
 });
 
 export const toggleVerificationSchema = z.object({
+  params: z.object({ id: objectId }),
   body: z.object({
     isVerified: z
       .union([
@@ -83,6 +85,16 @@ export const toggleVerificationSchema = z.object({
       ])
       .optional(),
   }),
+});
+
+export const registerCompanySchema = z.object({
+  body: z.object({
+    companyName: z.string().trim().min(2).max(120),
+    businessLicense: z.string().trim().min(2).max(100),
+    phone: z.string().trim().min(7).max(30),
+    city: z.string().trim().min(1).max(100),
+    address: z.string().trim().min(1).max(300).optional(),
+  }).strict(),
 });
 
 export const updateCompanyStatusSchema = z.object({

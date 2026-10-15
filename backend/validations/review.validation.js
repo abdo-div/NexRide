@@ -2,6 +2,7 @@ import { z } from "zod";
 import { objectId } from "./common.validation.js";
 
 export const createReviewSchema = z.object({
+  params: z.object({ vehicleId: objectId }),
   body: z.object({
     rating: z.coerce
       .number()
@@ -19,6 +20,7 @@ export const createReviewSchema = z.object({
 });
 
 export const updateReviewSchema = z.object({
+  params: z.object({ id: objectId }),
   body: z.object({
     rating: z.coerce.number().int().min(1).max(5).optional(),
     review: z.string().trim().min(1).max(1000).optional(),
@@ -26,6 +28,7 @@ export const updateReviewSchema = z.object({
 });
 
 export const companyResponseSchema = z.object({
+  params: z.object({ id: objectId }),
   body: z.object({
     response: z
       .string()
@@ -33,4 +36,12 @@ export const companyResponseSchema = z.object({
       .min(1, "Please provide a response text")
       .max(1000, "Response cannot exceed 1000 characters"),
   }),
+});
+
+export const reviewIdSchema = z.object({
+  params: z.object({ vehicleId: objectId, id: objectId }),
+});
+
+export const reviewVehicleSchema = z.object({
+  params: z.object({ vehicleId: objectId }),
 });

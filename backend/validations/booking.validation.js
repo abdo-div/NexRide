@@ -35,3 +35,17 @@ export const checkAvailabilitySchema = z.object({
     })
     .refine(dateRangeIsValid, dateRangeError),
   });
+
+export const cancelBookingSchema = z.object({
+  params: z.object({ id: objectId }),
+  body: z.object({
+    reason: z.string().trim().min(1).max(500).nullable().optional(),
+  }).strict(),
+});
+
+export const updateBookingStatusSchema = z.object({
+  params: z.object({ id: objectId }),
+  body: z.object({
+    status: ciEnum(["PAID", "CONFIRMED", "ACTIVE", "COMPLETED", "CANCELLED"]),
+  }).strict(),
+});
