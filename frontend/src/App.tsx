@@ -1,11 +1,4 @@
-import {
-  Component,
-  lazy,
-  Suspense,
-  useEffect,
-  type ErrorInfo,
-  type ReactNode,
-} from "react";
+import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -21,7 +14,6 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { StaffLandingRoute } from "./components/auth/StaffLandingRoute";
 import { AuthProvider } from "./context/AuthContext";
 import HomePage from "./pages/HomePage";
-import CustomerMessagesPage from "./pages/CustomerMessagesPage";
 import { AdminRoute } from "./components/admin/AdminRoute";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import { CompanyRoute } from "./components/company/CompanyRoute";
@@ -153,12 +145,6 @@ const CompanyReviewsPage = lazy(() =>
   })),
 );
 
-const CompanyMessagesPage = lazy(() =>
-  import("./pages/company/CompanyMessagesPage").then((module) => ({
-    default: module.CompanyMessagesPage,
-  })),
-);
-
 const CompanyEarningsPage = lazy(() =>
   import("./pages/company/CompanyEarningsPage").then((module) => ({
     default: module.CompanyEarningsPage,
@@ -184,44 +170,6 @@ function RouteLoadingFallback() {
  */
 function LazyRoute({ children }: { children: ReactNode }) {
   return <Suspense fallback={<RouteLoadingFallback />}>{children}</Suspense>;
-}
-
-class MessagesRouteBoundary extends Component<
-  { children: ReactNode },
-  { failed: boolean }
-> {
-  state = { failed: false };
-
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-
-  componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error("Customer messages route failed", error, info);
-  }
-
-  render() {
-    if (this.state.failed) {
-      return (
-        <section className="min-h-screen bg-slate-50 px-4 pb-16 pt-28" dir="auto">
-          <div className="mx-auto max-w-2xl rounded-3xl border border-red-200 bg-white p-8 text-center shadow-sm">
-            <h1 className="text-2xl font-black text-slate-950">تعذر فتح الرسائل</h1>
-            <p className="mt-3 text-slate-600">
-              حدث خطأ أثناء فتح المحادثات. أعد تحميل الصفحة للمحاولة مرة أخرى.
-            </p>
-            <button
-              type="button"
-              onClick={() => window.location.reload()}
-              className="mt-6 rounded-xl bg-[#142B4A] px-6 py-3 font-bold text-white"
-            >
-              إعادة تحميل الصفحة
-            </button>
-          </div>
-        </section>
-      );
-    }
-    return this.props.children;
-  }
 }
 
 /**
@@ -413,16 +361,6 @@ function App() {
               }
             />
             <Route
-              path="/messages"
-              element={
-                <ProtectedRoute>
-                  <MessagesRouteBoundary>
-                    <CustomerMessagesPage />
-                  </MessagesRouteBoundary>
-                </ProtectedRoute>
-              }
-            />
-            <Route
               path="/my-bookings/:bookingId"
               element={
                 <ProtectedRoute>
@@ -476,7 +414,6 @@ function App() {
             <Route path="fleet/:vehicleId/edit" element={<CompanyVehicleEditPage />} />
             <Route path="maintenance" element={<CompanyMaintenancePage />} />
             <Route path="reviews" element={<CompanyReviewsPage />} />
-            <Route path="messages" element={<CompanyMessagesPage />} />
             <Route path="payouts" element={<CompanyEarningsPage />} />
             <Route path="settings" element={<CompanySettingsPage />} />
           </Route>

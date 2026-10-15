@@ -22,14 +22,6 @@ import {
 import { getCompanyDashboard } from "../controllers/companyDashboardController.js";
 import { getCompanyBookings } from "../controllers/companyBookingsController.js";
 import { getCompanyReviews, replyToCompanyReview } from "../controllers/companyReviewsController.js";
-import {
-  getCompanyConversations,
-  getCompanyConversationThread,
-  postCompanyConversationMessage,
-  patchCompanyConversationRead,
-  patchCompanyConversationsReadAll,
-  postCompanyBroadcast,
-} from "../controllers/companyMessagesController.js";
 import { getCompanyFleet } from "../controllers/companyFleetController.js";
 import { getCompanyVehicleDetail } from "../controllers/companyVehicleController.js";
 import { protect, restrictTo, protectAllowPendingCompany } from "../middlewares/authMiddleware.js";
@@ -49,12 +41,14 @@ import {
   updateCompanySchema,
   updateCommissionSchema,
   toggleVerificationSchema,
+  registerCompanySchema,
 } from "../validations/company.validation.js";
 import { companyResponseSchema } from "../validations/review.validation.js";
+import { idParamSchema } from "../validations/common.validation.js";
 import {
-  sendMessageSchema,
-  broadcastNoticeSchema,
-} from "../validations/message.validation.js";
+  createMaintenanceSchema,
+  updateOdometerSchema,
+} from "../validations/admin.validation.js";
 
 const router = express.Router();
 
@@ -452,6 +446,7 @@ router.patch(
   "/maintenance/odometer",
   protect,
   restrictTo("company", "admin"),
+  validate(updateOdometerSchema),
   updateCompanyVehicleOdometer,
 );
 
@@ -459,6 +454,7 @@ router.post(
   "/maintenance/log",
   protect,
   restrictTo("company", "admin"),
+  validate(createMaintenanceSchema),
   createCompanyMaintenance,
 );
 
@@ -466,6 +462,7 @@ router.patch(
   "/maintenance/events/:id/complete",
   protect,
   restrictTo("company", "admin"),
+  validate(idParamSchema()),
   completeCompanyMaintenance,
 );
 
@@ -487,6 +484,7 @@ router.post(
   "/maintenance",
   protect,
   restrictTo("company", "admin"),
+  validate(createMaintenanceSchema),
   createCompanyMaintenance,
 );
 
@@ -506,6 +504,7 @@ router.patch(
   "/maintenance/:id/complete",
   protect,
   restrictTo("company", "admin"),
+  validate(idParamSchema()),
   completeCompanyMaintenance,
 );
 
@@ -525,6 +524,7 @@ router.post(
   "/maintenance/:vehicleId/release",
   protect,
   restrictTo("company", "admin"),
+  validate(idParamSchema("vehicleId")),
   releaseCompanyMaintenanceVehicle,
 );
 
@@ -728,12 +728,6 @@ router.post(
  *       403:
  *         description: Company or admin role required
  */
-router.get(
-  "/conversations",
-  protect,
-  restrictTo("company", "admin"),
-  getCompanyConversations,
-);
 
 /**
  * @openapi
@@ -749,13 +743,6 @@ router.get(
  *       403:
  *         description: Company or admin role required
  */
-router.post(
-  "/conversations/broadcast",
-  protect,
-  restrictTo("company", "admin"),
-  validate(broadcastNoticeSchema),
-  postCompanyBroadcast,
-);
 
 /**
  * @openapi
@@ -771,12 +758,6 @@ router.post(
  *       403:
  *         description: Company or admin role required
  */
-router.patch(
-  "/conversations/read-all",
-  protect,
-  restrictTo("company", "admin"),
-  patchCompanyConversationsReadAll,
-);
 
 /**
  * @openapi
@@ -798,12 +779,6 @@ router.patch(
  *       404:
  *         description: Conversation not found in this tenant
  */
-router.get(
-  "/conversations/:id",
-  protect,
-  restrictTo("company", "admin"),
-  getCompanyConversationThread,
-);
 
 /**
  * @openapi
@@ -835,13 +810,6 @@ router.get(
  *       404:
  *         description: Conversation not found in this tenant
  */
-router.post(
-  "/conversations/:id/messages",
-  protect,
-  restrictTo("company", "admin"),
-  validate(sendMessageSchema),
-  postCompanyConversationMessage,
-);
 
 /**
  * @openapi
@@ -863,12 +831,6 @@ router.post(
  *       404:
  *         description: Conversation not found in this tenant
  */
-router.patch(
-  "/conversations/:id/read",
-  protect,
-  restrictTo("company", "admin"),
-  patchCompanyConversationRead,
-);
 
 /**
  * @openapi
@@ -891,7 +853,7 @@ router.patch(
  *       404:
  *         description: Company not found
  */
-router.get("/:id", getCompanyById);
+router.get("/:id", validate(idParamSchema()), getCompanyById);
 
 // -----------------------------------------------------------------------------
 // PROTECTED TENANT & ADMIN ROUTES
@@ -913,7 +875,7 @@ router.use(protect);
  *       400:
  *         description: Validation error
  */
-router.post("/register", registerCompanyOwner);
+router.post("/register", validate(registerCompanySchema), registerCompanyOwner);
 
 /**
  * @openapi
@@ -1038,6 +1000,6 @@ router.patch(
  *       403:
  *         description: Admin role required
  */
-router.delete("/:id", restrictTo("admin"), deleteCompany);
+router.delete("/:id", restrictTo("admin"), validate(idParamSchema()), deleteCompany);
 
 export default router;

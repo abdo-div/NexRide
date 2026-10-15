@@ -17,6 +17,8 @@ import {
   createReviewSchema,
   updateReviewSchema,
   companyResponseSchema,
+  reviewIdSchema,
+  reviewVehicleSchema,
 } from "../validations/review.validation.js";
 
 const router = express.Router({ mergeParams: true });
@@ -40,7 +42,7 @@ const router = express.Router({ mergeParams: true });
  *       200:
  *         description: Review list
  */
-router.get("/", getAllReviews);
+router.get("/", validate(reviewVehicleSchema), getAllReviews);
 
 // -----------------------------------------------------------------------------
 // PROTECTED CUSTOMER & TENANT ROUTES
@@ -183,14 +185,19 @@ router.post(
  *       200:
  *         description: Review deleted
  */
-router.get("/:id", getReviewById);
+router.get("/:id", validate(reviewIdSchema), getReviewById);
 router.patch(
   "/:id",
   restrictTo("customer"),
   validate(updateReviewSchema),
   updateReview,
 );
-router.delete("/:id", restrictTo("customer", "admin"), deleteReview);
+router.delete(
+  "/:id",
+  restrictTo("customer", "admin"),
+  validate(reviewIdSchema),
+  deleteReview,
+);
 
 /**
  * @openapi
