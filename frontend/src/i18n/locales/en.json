@@ -447,7 +447,13 @@
     "active": "Active",
     "rights": "© 2026 NexRide Libya Mobility Technologies",
     "systemsOperational": "All Systems Operational",
-    "currency": "LYD (د.ل)"
+    "currency": "LYD (د.ل)",
+    "legal": {
+      "label": "Legal documents",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "cancellation": "Cancellation & refunds"
+    }
   },
   "cta": {
     "badge": "UNLOCK LIBYA'S PREMIER ROADS",
@@ -1451,7 +1457,10 @@
       "ctaDone": "Booking Confirmed! SMS Voucher Dispatched",
       "viewConfirmation": "View Booking Confirmation",
       "secureNote": "Bank-grade encrypted transaction via Libyan Payment Network",
-      "agreementNote": "By clicking confirm, you agree to NexRide's Master Rental Agreement, Libyan Road Authority guidelines, and {{operator}} Terms.",
+      "agreementNote": "By clicking confirm, you agree to NexRide's Terms and the disclosed conditions of {{operator}}.",
+      "legalTerms": "Terms",
+      "legalPrivacy": "Privacy",
+      "legalCancellation": "Cancellation & refunds",
       "valueProps": {
         "freeCancel": {
           "title": "Free Cancel",

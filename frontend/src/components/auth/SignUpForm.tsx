@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import {
   User,
   Building2,
@@ -252,13 +252,13 @@ export const SignUpForm: React.FC = () => {
         />
         <span className="text-sm text-slate-600">
           {t("auth.signup.terms")}{" "}
-          <a
-            href="#terms"
-            onClick={(e) => e.preventDefault()}
+          <Link
+            to="/terms"
+            onClick={(event) => event.stopPropagation()}
             className="text-[#142B4A] font-semibold hover:underline"
           >
             {t("auth.signup.termsLink")}
-          </a>
+          </Link>
           {t("auth.signup.termsRest")}
         </span>
       </label>

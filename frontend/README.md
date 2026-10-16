@@ -55,6 +55,7 @@ Routes are defined in `src/App.tsx`:
 - `/cars/:vehicleId` and `/vehicles/:vehicleId` — vehicle details
 - `/checkout/:vehicleId`, `/payment/:bookingId`, and `/booking-confirmed/:vehicleId` — protected booking checkout, payment, and confirmation
 - `/login` and `/auth` — sign-in/sign-up; `/reset-password/:token` — password reset
+- `/terms`, `/privacy`, and `/cancellation-policy` — bilingual public legal policies
 - `/my-bookings` and `/my-bookings/:bookingId` — protected customer booking list and details
 - `/admin` — administrator-only overview; the dashboard includes bookings and booking details, companies, vehicles, customers, payments, commissions, maintenance, reports, and settings
 
