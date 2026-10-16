@@ -211,6 +211,21 @@ export const Footer: React.FC = () => {
             </span>
           </div>
 
+          <nav
+            aria-label={t("footer.legal.label")}
+            className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[11px] font-semibold text-slate-400"
+          >
+            <Link to="/terms" className="transition-colors hover:text-white">
+              {t("footer.legal.terms")}
+            </Link>
+            <Link to="/privacy" className="transition-colors hover:text-white">
+              {t("footer.legal.privacy")}
+            </Link>
+            <Link to="/cancellation-policy" className="transition-colors hover:text-white">
+              {t("footer.legal.cancellation")}
+            </Link>
+          </nav>
+
           <div className="flex items-center gap-3 text-slate-400 font-semibold text-[11px]">
             {(["en", "ar"] as const).map((code, idx) => (
               <React.Fragment key={code}>

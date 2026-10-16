@@ -39,6 +39,7 @@ const CompanyApplicationStatusPage = lazy(
   () => import("./pages/company/CompanyApplicationStatusPage"),
 );
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+const LegalPage = lazy(() => import("./pages/LegalPage"));
 const MyBookingsPage = lazy(() => import("./pages/MyBookingsPage"));
 const MyProfilePage = lazy(() => import("./pages/MyProfilePage"));
 const BookingDetailsPage = lazy(() => import("./pages/BookingDetailsPage"));
@@ -339,6 +340,18 @@ function App() {
                   <ResetPasswordPage />
                 </LazyRoute>
               }
+            />
+            <Route
+              path="/terms"
+              element={<LazyRoute><LegalPage documentKey="terms" /></LazyRoute>}
+            />
+            <Route
+              path="/privacy"
+              element={<LazyRoute><LegalPage documentKey="privacy" /></LazyRoute>}
+            />
+            <Route
+              path="/cancellation-policy"
+              element={<LazyRoute><LegalPage documentKey="cancellation" /></LazyRoute>}
             />
             <Route
               path="/my-bookings"

@@ -242,6 +242,11 @@ export const BookingSummary: React.FC<Props> = ({
             <p className="text-[10px] text-[#94A3B8] leading-tight">
               {t(meta.agreementNote, { operator: vehicle.operator.name })}
             </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[10px] font-bold text-blue-700">
+              <Link to="/terms" className="hover:underline">{t("checkout.summary.legalTerms")}</Link>
+              <Link to="/privacy" className="hover:underline">{t("checkout.summary.legalPrivacy")}</Link>
+              <Link to="/cancellation-policy" className="hover:underline">{t("checkout.summary.legalCancellation")}</Link>
+            </div>
           </div>
         </div>
 
