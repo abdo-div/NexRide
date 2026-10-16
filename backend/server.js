@@ -47,10 +47,11 @@ const { redisClient, bullmqConnection } = await import("./config/redis.js");
 connectDB();
 
 const PORT = process.env.PORT || 3000;
+const BIND_HOST = process.env.BIND_HOST || "0.0.0.0";
 
 let listening = false;
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, BIND_HOST, () => {
   // On Windows a second process can bind a port that is already in use
   // (SO_REUSEADDR), which fires this callback even though the process does not
   // own the socket. Only announce success when the socket was really acquired.
@@ -58,9 +59,12 @@ const server = app.listen(PORT, () => {
   listening = true;
 
   chalkLogger.success(
-    `NexRide API running in ${getNodeEnv()} mode on port ${PORT} 🚀`,
+    `NexRide API running in ${getNodeEnv()} mode at ${BIND_HOST}:${PORT} 🚀`,
   );
-  logger.info({ port: PORT, env: getNodeEnv() }, "NexRide API started");
+  logger.info(
+    { host: BIND_HOST, port: PORT, env: getNodeEnv() },
+    "NexRide API started",
+  );
 });
 
 // Without this handler a port conflict crashes the process with a raw stack

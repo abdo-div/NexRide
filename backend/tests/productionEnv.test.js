@@ -7,6 +7,7 @@ import { validateProductionEnv } from "../config/productionEnv.js";
 const validEnvironment = (overrides = {}) => ({
   NODE_ENV: "production",
   PORT: "3000",
+  BIND_HOST: "127.0.0.1",
   JWT_SECRET: "a-production-only-jwt-secret-with-more-than-32-bytes",
   JWT_EXPIRES_IN: "30d",
   JWT_COOKIE_EXPIRES_IN: "30",
@@ -40,6 +41,7 @@ test("preflight reports all missing production values in one error", () => {
     () => validateProductionEnv({ NODE_ENV: "production" }),
     (error) => {
       assert.match(error.message, /PORT must be/);
+      assert.match(error.message, /BIND_HOST must be 127\.0\.0\.1/);
       assert.match(error.message, /MONGODB_URI is required/);
       assert.match(error.message, /SMTP_HOST is required/);
       assert.match(error.message, /MOAMALAT_MID is required/);
@@ -66,6 +68,13 @@ test("production frontend origins must be exact HTTPS origins", () => {
         validEnvironment({ FRONTEND_DOMAIN: "https://admin.nexride.ly" }),
       ),
     /must include the exact FRONTEND_URL origin/,
+  );
+});
+
+test("production Node listener is restricted to the loopback interface", () => {
+  assert.throws(
+    () => validateProductionEnv(validEnvironment({ BIND_HOST: "0.0.0.0" })),
+    /BIND_HOST must be 127\.0\.0\.1/,
   );
 });
 

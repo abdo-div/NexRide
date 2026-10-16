@@ -39,6 +39,8 @@ npm run validate:production-env
 
 Production startup runs the same validation automatically and reports all
 configuration problems together without printing secret values.
+On the VPS, validate the protected systemd environment file explicitly with
+`PRODUCTION_ENV_FILE=/etc/nexride/backend.env npm run validate:production-env`.
 
 The supported runtime is pinned to Node.js 24 in `package.json`. Production is
 run as one systemd-managed process because the API process also owns the email
@@ -55,7 +57,7 @@ The full list of supported names and secret placeholders is in [`.env.example`](
 | `JWT_SECRET` | Required private secret used to sign and verify session tokens. It must be at least 32 bytes; startup fails if it is missing or too short. |
 | `MONGODB_URI` | MongoDB connection URI. Alternatives supported by the code are `MONGO_URI`, `DATABASE_URI`, `DATABASE_URL`, and `DATABASE`. If none is set, the local replica-set URI above is used. |
 | `REDIS_URL` | Redis connection URI. Without it, configure `REDIS_HOST`, `REDIS_PORT`, and `REDIS_PASSWORD`; defaults are `127.0.0.1:6379`. Other URL aliases are read by the code, but use `REDIS_URL` for URI-based deployments. |
-| `PORT`, `NODE_ENV` | HTTP port and runtime mode. `PORT` defaults to `3000`; set `NODE_ENV` to `development` or `production` as appropriate. |
+| `PORT`, `BIND_HOST`, `NODE_ENV` | HTTP port, listener address, and runtime mode. Production requires `BIND_HOST=127.0.0.1` so Node is reachable only through the local Nginx proxy. |
 | `DNS_SERVERS` | Optional comma-separated IP addresses used to override Node DNS resolution when the host resolver cannot resolve MongoDB Atlas/SRV records. For example, `DNS_SERVERS=8.8.8.8,1.1.1.1`. Omit it to use the host/system resolver. |
 | `FRONTEND_DOMAIN` | Optional comma-separated exact origins allowed by CORS. Development defaults include `http://localhost:5173` and `http://localhost:5174`; configure deployment origins explicitly, for example `FRONTEND_DOMAIN=https://app.example.com,https://admin.example.com`. |
 | `FRONTEND_URL` | Public HTTPS frontend origin used for authentication and booking email links. |

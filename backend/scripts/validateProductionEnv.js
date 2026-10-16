@@ -4,13 +4,28 @@ import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 
 const backendRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const envFile = [
-  path.join(backendRoot, "config.env"),
-  path.join(backendRoot, ".env"),
-  path.join(backendRoot, "..", ".env"),
-].find((candidate) => fs.existsSync(candidate));
+const explicitEnvFile = process.env.PRODUCTION_ENV_FILE?.trim();
+const envFile = explicitEnvFile
+  ? path.resolve(explicitEnvFile)
+  : [
+      path.join(backendRoot, "config.env"),
+      path.join(backendRoot, ".env"),
+      path.join(backendRoot, "..", ".env"),
+    ].find((candidate) => fs.existsSync(candidate));
 
-if (envFile) dotenv.config({ path: envFile, quiet: true });
+if (explicitEnvFile && !fs.existsSync(envFile)) {
+  throw new Error(`Production environment file does not exist: ${envFile}`);
+}
+
+if (envFile) {
+  dotenv.config({
+    path: envFile,
+    quiet: true,
+    // An explicitly selected deployment file is the release source of truth,
+    // not whatever values happen to exist in the operator's login shell.
+    override: Boolean(explicitEnvFile),
+  });
+}
 
 const { validateNodeEnv } = await import("../config/env.js");
 const { validateJwtSecret } = await import("../config/jwt.js");

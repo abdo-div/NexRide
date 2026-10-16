@@ -21,6 +21,9 @@ This checklist is the release gate. A launch is approved only when every require
 - [ ] `JWT_SECRET` is unique, random, and at least 32 bytes.
 - [ ] `FRONTEND_URL` and `FRONTEND_DOMAIN` exactly match the public HTTPS origin.
 - [ ] DNS and TLS certificate are valid; HTTP redirects to HTTPS.
+- [ ] Nginx proxies to `127.0.0.1:3000`; Node, MongoDB, and Redis are not publicly reachable.
+- [ ] UFW and any provider firewall expose only the confirmed SSH port plus TCP 80/443.
+- [ ] `certbot renew --dry-run` succeeds and automatic renewal is enabled.
 - [ ] Production indexes have been synchronized with `SYNC_INDEXES=true npm run sync-indexes`, then the flag removed.
 - [ ] `/health/liveness` returns 200.
 - [ ] `/health/readiness` returns 200 with database and cache connected.
