@@ -394,7 +394,12 @@ test("application status controller returns the owner application DTO", async (t
     rentalPolicy: { depositAmountLYD: 1000 },
     payout: { bankName: "Libyan Foreign Bank", iban: "LY93 0000 0000 0000 0000 8210" },
     applicationDocuments: [
-      { name: "cr_cert.pdf", kind: "COMMERCIAL_REGISTRY", size: 2516582, url: "/company-documents/d/cr_cert.pdf" },
+      {
+        name: "cr_cert.pdf",
+        kind: "COMMERCIAL_REGISTRY",
+        size: 2516582,
+        url: "/company-documents/d/1791375720668-406137689-cr_cert.pdf",
+      },
     ],
     rejectionReason: null,
     createdAt: new Date("2026-10-06T09:30:00.000Z"),
@@ -432,7 +437,10 @@ test("application status controller returns the owner application DTO", async (t
   assert.equal(company.applicationRef, "NX-APP-8842");
   assert.equal(company.status, "PENDING");
   assert.equal(company.commercialRegisterNumber, "LY-TRP-2024-88412");
-  assert.equal(company.applicationDocuments[0].url, "/company-documents/d/cr_cert.pdf");
+  assert.equal(
+    company.applicationDocuments[0].url,
+    "/api/v1/companies/application-documents/dddddddddddddddddddddddd/1791375720668-406137689-cr_cert.pdf",
+  );
   assert.equal(company.rejectionReason, null);
 });
 

@@ -18,6 +18,7 @@ import {
   uploadApplicationDocuments,
   applyCompany,
   getMyApplicationStatus,
+  downloadApplicationDocument,
 } from "../controllers/companyApplicationController.js";
 import { getCompanyDashboard } from "../controllers/companyDashboardController.js";
 import { getCompanyBookings } from "../controllers/companyBookingsController.js";
@@ -42,6 +43,7 @@ import {
   updateCommissionSchema,
   toggleVerificationSchema,
   registerCompanySchema,
+  applicationDocumentParamsSchema,
 } from "../validations/company.validation.js";
 import { companyResponseSchema } from "../validations/review.validation.js";
 import { idParamSchema } from "../validations/common.validation.js";
@@ -150,6 +152,42 @@ router.get(
   "/me/application",
   protectAllowPendingCompany,
   getMyApplicationStatus,
+);
+
+/**
+ * @openapi
+ * /companies/application-documents/{companyId}/{storedName}:
+ *   get:
+ *     tags: [Companies]
+ *     summary: Read a private partner-verification document
+ *     description: Available only to the owning company account and platform admins.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: companyId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: storedName
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Private PDF or image document
+ *       403:
+ *         description: Tenant access denied
+ *       404:
+ *         description: Document not found
+ */
+router.get(
+  "/application-documents/:companyId/:storedName",
+  protectAllowPendingCompany,
+  restrictTo("company", "admin"),
+  validate(applicationDocumentParamsSchema),
+  downloadApplicationDocument,
 );
 
 /**

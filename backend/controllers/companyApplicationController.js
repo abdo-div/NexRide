@@ -1,10 +1,16 @@
 import multer from "multer";
 import { ZodError } from "zod";
+import fs from "node:fs/promises";
+import path from "node:path";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
 import Company from "../models/Company_model.js";
 import { applyForCompany } from "../services/companyApplicationService.js";
 import { companyApplicationSchema } from "../validations/companyApplication.validation.js";
+import {
+  companyDocumentApiPath,
+  companyDocumentsDirectory,
+} from "../config/privateStorage.js";
 
 // -----------------------------------------------------------------------------
 // Multipart upload: the wizard's structured fields arrive in the `data` part
@@ -118,12 +124,17 @@ export const getMyApplicationStatus = catchAsync(async (req, res, next) => {
         rentalPolicy: company.rentalPolicy,
         payout: company.payout,
         applicationDocuments: (company.applicationDocuments || []).map(
-          (doc) => ({
-            name: doc.name,
-            kind: doc.kind,
-            size: doc.size,
-            url: doc.url,
-          }),
+          (doc) => {
+            const storedName = storedNameFromUrl(doc.url);
+            return {
+              name: doc.name,
+              kind: doc.kind,
+              size: doc.size,
+              url: storedName
+                ? companyDocumentApiPath(company._id, storedName)
+                : "",
+            };
+          },
         ),
         rejectionReason: company.rejectionReason || null,
         createdAt: company.createdAt,
@@ -132,3 +143,83 @@ export const getMyApplicationStatus = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+const allowedDocumentMimeTypes = new Set([
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+]);
+
+const storedNameFromUrl = (url) => {
+  const segment = String(url ?? "").split("/").pop();
+  if (!segment) return null;
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Streams one private partner-verification document to its owning company or
+ * a platform admin. Database metadata is checked before disk access so knowing
+ * a company id and filename is never enough to retrieve a file.
+ */
+export const downloadApplicationDocument = catchAsync(
+  async (req, res, next) => {
+    const { companyId, storedName } = req.params;
+    const role = req.user?.role;
+
+    if (
+      role !== "admin" &&
+      (role !== "company" || String(req.tenantId ?? "") !== companyId)
+    ) {
+      return next(
+        new AppError("You do not have permission to access this document.", 403),
+      );
+    }
+
+    const company = await Company.findById(companyId).select(
+      "applicationDocuments",
+    );
+    if (!company) {
+      return next(new AppError("Application document not found.", 404));
+    }
+
+    const document = (company.applicationDocuments ?? []).find(
+      (candidate) => storedNameFromUrl(candidate.url) === storedName,
+    );
+    if (!document) {
+      return next(new AppError("Application document not found.", 404));
+    }
+
+    const companyDirectory = path.resolve(companyDocumentsDirectory, companyId);
+    const filePath = path.resolve(companyDirectory, storedName);
+    if (path.dirname(filePath) !== companyDirectory) {
+      return next(new AppError("Invalid document path.", 400));
+    }
+
+    let contents;
+    try {
+      contents = await fs.readFile(filePath);
+    } catch (error) {
+      if (error?.code === "ENOENT") {
+        return next(new AppError("Application document not found.", 404));
+      }
+      throw error;
+    }
+
+    const mimeType = allowedDocumentMimeTypes.has(document.mimeType)
+      ? document.mimeType
+      : "application/octet-stream";
+
+    res.set({
+      "Cache-Control": "private, no-store, max-age=0",
+      "Content-Disposition": "inline",
+      "Content-Type": mimeType,
+      "X-Content-Type-Options": "nosniff",
+    });
+    res.status(200).send(contents);
+  },
+);
