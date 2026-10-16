@@ -6,8 +6,8 @@
  * index, then reconciles every model's indexes with its schema.
  *
  * Usage:
- *   npm run sync-indexes                 # apply
- *   npm run sync-indexes -- --dry-run    # report only, change nothing
+ *   npm run sync-indexes                 # report only, change nothing
+ *   npm run sync-indexes -- --apply      # reconcile after reviewing the plan
  *
  * Run once per deploy, before the new application version starts serving. It
  * is safe to run when indexes are already correct.
@@ -18,13 +18,26 @@ import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const envFile = [
-  path.join(__dirname, "..", "config.env"),
-  path.join(__dirname, "..", ".env"),
-  path.join(__dirname, "..", "..", ".env"),
-].find((candidate) => fs.existsSync(candidate));
+const explicitEnvFile = process.env.PRODUCTION_ENV_FILE?.trim();
+const envFile = explicitEnvFile
+  ? path.resolve(explicitEnvFile)
+  : [
+      path.join(__dirname, "..", "config.env"),
+      path.join(__dirname, "..", ".env"),
+      path.join(__dirname, "..", "..", ".env"),
+    ].find((candidate) => fs.existsSync(candidate));
 
-if (envFile) dotenv.config({ path: envFile });
+if (explicitEnvFile && !fs.existsSync(envFile)) {
+  throw new Error(`Production environment file does not exist: ${envFile}`);
+}
+
+if (envFile) {
+  dotenv.config({
+    path: envFile,
+    quiet: true,
+    override: Boolean(explicitEnvFile),
+  });
+}
 
 const { default: mongoose } = await import("mongoose");
 const { default: logger } = await import("../utils/logger.js");
@@ -46,7 +59,8 @@ const MODEL_MODULES = [
   "../models/PlatformSettings_model.js",
 ];
 
-const dryRun = process.argv.includes("--dry-run");
+const apply = process.argv.includes("--apply");
+const dryRun = !apply;
 
 const getMongoUri = () =>
   process.env.MONGODB_URI ||
@@ -95,7 +109,13 @@ try {
       console.error(`  [FAIL] ${entry.model}: ${entry.error}`);
       exitCode = 1;
     } else if (dryRun) {
-      console.log(`  [DRY]  ${entry.model}: ${entry.indexNames.length} indexes`);
+      console.log(
+        `  [PLAN] ${entry.model}: create ${entry.toCreate.length}, drop ${entry.toDrop.length}`,
+      );
+      for (const index of entry.toCreate) {
+        console.log(`         + ${JSON.stringify(index)}`);
+      }
+      for (const index of entry.toDrop) console.log(`         - ${index}`);
     } else {
       console.log(`  [OK]   ${entry.model}: ${entry.indexNames.length} indexes`);
     }

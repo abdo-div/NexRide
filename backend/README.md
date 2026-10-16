@@ -18,6 +18,11 @@ The NexRide backend is an Express API for the vehicle-rental marketplace and its
 
 The server can start when MongoDB or Redis is unavailable, but it runs in a degraded state; readiness reports `503` until both are available. Local defaults target MongoDB at `mongodb://127.0.0.1:27017/nexride?replicaSet=rs0` and Redis at `127.0.0.1:6379`.
 
+Production MongoDB setup, access control, plan-first index reconciliation,
+nightly backups, and isolated restore drills are documented in
+[`docs/VPS_MONGODB.md`](../docs/VPS_MONGODB.md). Database indexes are never
+reconciled automatically during API startup.
+
 ## Install and configure
 
 From the repository root:

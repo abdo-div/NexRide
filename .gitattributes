@@ -1,0 +1,5 @@
+# Deployment artifacts execute on Linux even when contributors work on Windows.
+deploy/**/*.sh text eol=lf
+deploy/**/*.service text eol=lf
+deploy/**/*.timer text eol=lf
+deploy/**/*.conf text eol=lf

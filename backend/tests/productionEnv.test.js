@@ -96,6 +96,20 @@ test("MongoDB production configuration requires one transaction-capable URI", ()
       ),
     /Configure only one MongoDB URI variable/,
   );
+
+  assert.throws(
+    () =>
+      validateProductionEnv(
+        validEnvironment({
+          MONGODB_URI: "mongodb://127.0.0.1:27017/?replicaSet=rs0",
+        }),
+      ),
+    (error) => {
+      assert.match(error.message, /dedicated application credentials/);
+      assert.match(error.message, /must name the application database/);
+      return true;
+    },
+  );
 });
 
 test("Redis and its dependent email queue must be configured consistently", () => {
