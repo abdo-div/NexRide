@@ -17,6 +17,9 @@ const validEnvironment = (overrides = {}) => ({
     "mongodb://nexride:strong-password@127.0.0.1:27017/nexride?replicaSet=rs0",
   REDIS_ENABLED: "true",
   REDIS_HOST: "127.0.0.1",
+  REDIS_PORT: "6379",
+  REDIS_USERNAME: "nexride",
+  REDIS_PASSWORD: "a-strong-production-redis-password",
   EMAIL_QUEUE_ENABLED: "false",
   PRIVATE_STORAGE_DIR: path.resolve("production-private-test"),
   SMTP_HOST: "smtp.mail-provider.ly",
@@ -131,6 +134,45 @@ test("Redis and its dependent email queue must be configured consistently", () =
         }),
       ),
     /EMAIL_QUEUE_ENABLED cannot be true/,
+  );
+
+  assert.throws(
+    () =>
+      validateProductionEnv(
+        validEnvironment({ REDIS_USERNAME: "", REDIS_PASSWORD: "" }),
+      ),
+    (error) => {
+      assert.match(error.message, /REDIS_USERNAME is required/);
+      assert.match(error.message, /REDIS_PASSWORD is required/);
+      return true;
+    },
+  );
+
+  assert.throws(
+    () =>
+      validateProductionEnv(
+        validEnvironment({
+          REDIS_HOST: "",
+          REDIS_PORT: "",
+          REDIS_USERNAME: "",
+          REDIS_PASSWORD: "",
+          REDIS_URL: "redis://nexride:strong-password@redis.internal:6379",
+        }),
+      ),
+    /must use rediss:\/\//,
+  );
+
+  assert.equal(
+    validateProductionEnv(
+      validEnvironment({
+        REDIS_HOST: "",
+        REDIS_PORT: "",
+        REDIS_USERNAME: "",
+        REDIS_PASSWORD: "",
+        REDIS_URL: "rediss://nexride:strong-password@redis.internal:6379",
+      }),
+    ),
+    true,
   );
 });
 

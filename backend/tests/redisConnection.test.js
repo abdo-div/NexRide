@@ -21,12 +21,14 @@ test("host and port configuration remains non-TLS", () => {
   const config = resolveRedisConnection({
     REDIS_HOST: "redis.internal",
     REDIS_PORT: "6380",
+    REDIS_USERNAME: "nexride",
     REDIS_PASSWORD: "test-only-password",
   });
 
   assert.deepEqual(config.connection, {
     host: "redis.internal",
     port: 6380,
+    username: "nexride",
     password: "test-only-password",
   });
   assert.equal(Object.hasOwn(config.options, "tls"), false);
