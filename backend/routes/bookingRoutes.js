@@ -283,9 +283,9 @@ router.patch(
  *         application/json:
  *           schema:
  *             type: object
- *             required: [bookingStatus]
+ *             required: [status]
  *             properties:
- *               bookingStatus:
+ *               status:
  *                 type: string
  *                 enum: [PAID, CONFIRMED, ACTIVE, COMPLETED, CANCELLED]
  *     responses:
