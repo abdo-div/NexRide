@@ -57,7 +57,7 @@ export interface VerifyResponse {
  */
 export const moamalatApi = {
   getConfig: (): Promise<GatewayConfigResponse> =>
-    request("/payments/moamalat/config", { auth: false }),
+    request("/payments/moamalat/config"),
 
   create: (payload: {
     amount: number;
@@ -66,14 +66,12 @@ export const moamalatApi = {
   }): Promise<InitiateResponse> =>
     request("/payments/moamalat/create", {
       method: "POST",
-      auth: true,
       body: payload,
     }),
 
   initiate: (bookingId: string): Promise<InitiateResponse> =>
     request("/payments/moamalat/init", {
       method: "POST",
-      auth: true,
       body: { bookingId },
       headers: { "Idempotency-Key": crypto.randomUUID() },
     }),
@@ -84,7 +82,6 @@ export const moamalatApi = {
   }): Promise<VerifyResponse> =>
     request("/payments/moamalat/verify", {
       method: "POST",
-      auth: false,
       body: payload,
     }),
 };

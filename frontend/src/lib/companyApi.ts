@@ -56,13 +56,12 @@ export const companyApi = {
       `/companies?fields=${encodeURIComponent(
         options.fields ?? DEFAULT_FIELDS,
       )}`,
-      { auth: false, signal: options.signal },
+      { signal: options.signal },
     ),
 
   /** Single approved company for the public profile page. 404 when unknown. */
   getById: (id: string, signal?: AbortSignal) =>
     request<CompanyResponse>(`/companies/${encodeURIComponent(id)}`, {
-      auth: false,
       signal,
     }),
 };

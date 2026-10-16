@@ -7,19 +7,23 @@ import {
 } from "react";
 import { isUnauthorized } from "../lib/apiClient";
 import { authApi } from "../lib/authApi";
-import { clearToken, getToken, setToken } from "../lib/tokenStorage";
 import type { AuthUser, GoogleSignInInput, SignInInput, SignUpInput } from "../types/auth";
 import { AuthContext, type AuthContextValue } from "./auth-context";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  // Seeded from storage so a visitor with no token never triggers a render pass.
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [isInitialising, setIsInitialising] = useState(() => Boolean(getToken()));
+  const [isInitialising, setIsInitialising] = useState(true);
 
-  // Restore the session on boot: a stored token is only trusted once /users/me
-  // confirms it is still valid (the API invalidates it after a password change).
+  // The JWT is intentionally inaccessible to JavaScript. Restore the session
+  // by asking the API to validate the browser's HTTP-only cookie.
   useEffect(() => {
-    if (!getToken()) return;
+    // One-time migration cleanup for sessions created by older frontend builds.
+    // New builds never write authentication material to Web Storage.
+    try {
+      localStorage.removeItem("nexride.jwt");
+    } catch {
+      // Storage can be unavailable in hardened/private browser contexts.
+    }
 
     let cancelled = false;
 
@@ -30,8 +34,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       })
       .catch((error: unknown) => {
         if (cancelled) return;
-        if (isUnauthorized(error) || (error as { status?: number })?.status === 0) {
-          clearToken();
+        if (!isUnauthorized(error) && (error as { status?: number })?.status !== 0) {
+          console.error("Unable to restore the authenticated session", error);
         }
       })
       .finally(() => {
@@ -44,38 +48,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signIn = useCallback(async ({ identifier, password }: SignInInput) => {
-    const { token, data } = await authApi.signIn({ identifier, password });
-    setToken(token);
+    const { data } = await authApi.signIn({ identifier, password });
     setUser(data.user);
     return data.user;
   }, []);
 
   const signUp = useCallback(async (input: SignUpInput) => {
-    const { token, data } = await authApi.signUp(input);
-    setToken(token);
+    const { data } = await authApi.signUp(input);
     setUser(data.user);
   }, []);
 
   const googleSignIn = useCallback(async (input: GoogleSignInInput) => {
-    const { token, data } = await authApi.googleSignIn(input);
-    setToken(token);
+    const { data } = await authApi.googleSignIn(input);
     setUser(data.user);
     return data.user;
   }, []);
 
   const signOut = useCallback(async () => {
-    try {
-      await authApi.signOut();
-    } catch {
-      // The local session is cleared regardless of the network outcome.
-    } finally {
-      clearToken();
-      setUser(null);
-    }
+    await authApi.signOut();
+    setUser(null);
   }, []);
 
-  const adoptSession = useCallback((token: string, nextUser: AuthUser) => {
-    setToken(token);
+  const adoptSession = useCallback((nextUser: AuthUser) => {
     setUser(nextUser);
   }, []);
 

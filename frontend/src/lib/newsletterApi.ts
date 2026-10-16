@@ -9,6 +9,5 @@ interface NewsletterResponse {
 export const subscribeToNewsletter = (email: string, locale: "ar" | "en") =>
   request<NewsletterResponse>("/newsletter/subscribe", {
     method: "POST",
-    auth: false,
     body: { email, locale },
   });

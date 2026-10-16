@@ -12,11 +12,6 @@ export interface AuthUser {
   updatedAt: string;
 }
 
-export interface AuthSession {
-  token: string;
-  user: AuthUser;
-}
-
 export interface SignUpInput {
   name: string;
   email: string;
