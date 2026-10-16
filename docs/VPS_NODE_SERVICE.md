@@ -17,6 +17,7 @@ Run these commands as a sudo-capable deployment operator:
 ```bash
 sudo useradd --system --home /srv/nexride --shell /usr/sbin/nologin nexride
 sudo install -d -o nexride -g nexride -m 0750 /srv/nexride
+sudo install -d -o nexride -g nexride -m 0750 /var/lib/nexride/public
 sudo install -d -o nexride -g nexride -m 0750 /var/lib/nexride/private
 sudo install -d -o root -g nexride -m 0750 /etc/nexride
 sudo install -o root -g nexride -m 0640 backend/.env.production.example /etc/nexride/backend.env
@@ -36,8 +37,10 @@ sudo systemctl enable --now nexride
 
 If deployment checkout ownership differs, the `nexride` user needs read access
 to `/srv/nexride` and its built frontend, but source code should remain
-read-only. `/var/lib/nexride/private` is the only persistent application write
-path in the supplied unit.
+read-only. `/var/lib/nexride/public` and `/var/lib/nexride/private` are the only
+persistent application write paths in the supplied unit. Follow
+[`VPS_STORAGE.md`](./VPS_STORAGE.md) to migrate existing uploads and configure
+backups before the first release-directory deployment.
 
 ## Operate and verify
 

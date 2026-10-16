@@ -31,6 +31,16 @@ const parseUrl = (value, protocols) => {
 const isLoopbackHost = (hostname) =>
   ["localhost", "127.0.0.1", "::1"].includes(hostname.toLowerCase());
 
+const pathsOverlap = (left, right) => {
+  const isInside = (relative) =>
+    relative === "" ||
+    (!relative.startsWith("..") && !path.isAbsolute(relative));
+  return (
+    isInside(path.relative(left, right)) ||
+    isInside(path.relative(right, left))
+  );
+};
+
 const validatePublicOrigin = (env, problems) => {
   const value = valueOf(env, "FRONTEND_URL");
   if (PLACEHOLDER_PATTERN.test(value)) {
@@ -255,13 +265,26 @@ export const validateProductionEnv = (env = process.env) => {
   validateMongo(env, problems);
   validateRedis(env, problems);
 
-  const privateStorage = valueOf(env, "PRIVATE_STORAGE_DIR");
+  const storagePaths = {};
+  for (const name of ["PUBLIC_STORAGE_DIR", "PRIVATE_STORAGE_DIR"]) {
+    const value = valueOf(env, name);
+    if (!value || PLACEHOLDER_PATTERN.test(value) || !path.isAbsolute(value)) {
+      problems.push(`${name} must be an absolute persistent path in production.`);
+    } else {
+      storagePaths[name] = path.resolve(value);
+    }
+  }
   if (
-    !privateStorage ||
-    PLACEHOLDER_PATTERN.test(privateStorage) ||
-    !path.isAbsolute(privateStorage)
+    storagePaths.PUBLIC_STORAGE_DIR &&
+    storagePaths.PRIVATE_STORAGE_DIR &&
+    pathsOverlap(
+      storagePaths.PUBLIC_STORAGE_DIR,
+      storagePaths.PRIVATE_STORAGE_DIR,
+    )
   ) {
-    problems.push("PRIVATE_STORAGE_DIR must be an absolute persistent path in production.");
+    problems.push(
+      "PUBLIC_STORAGE_DIR and PRIVATE_STORAGE_DIR must be separate, non-overlapping directories.",
+    );
   }
 
   const googleValues = [

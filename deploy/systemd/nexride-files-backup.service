@@ -1,0 +1,19 @@
+[Unit]
+Description=NexRide persistent upload backup
+Documentation=file:///srv/nexride/docs/VPS_STORAGE.md
+After=local-fs.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/usr/bin/flock -n /run/lock/nexride-files-backup.lock /usr/local/sbin/nexride-files-backup
+UMask=0077
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadOnlyPaths=/var/lib/nexride
+ReadWritePaths=/var/backups/nexride/files /run/lock
+

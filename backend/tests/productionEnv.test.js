@@ -21,6 +21,7 @@ const validEnvironment = (overrides = {}) => ({
   REDIS_USERNAME: "nexride",
   REDIS_PASSWORD: "a-strong-production-redis-password",
   EMAIL_QUEUE_ENABLED: "false",
+  PUBLIC_STORAGE_DIR: path.resolve("production-public-test"),
   PRIVATE_STORAGE_DIR: path.resolve("production-private-test"),
   SMTP_HOST: "smtp.mail-provider.ly",
   SMTP_PORT: "587",
@@ -214,5 +215,27 @@ test("Google OAuth credentials must be configured as a pair", () => {
         validEnvironment({ GOOGLE_CLIENT_ID: "client-id", GOOGLE_CLIENT_SECRET: "" }),
       ),
     /must either both be configured or both be omitted/,
+  );
+});
+
+test("public and private uploads require separate persistent paths", () => {
+  assert.throws(
+    () =>
+      validateProductionEnv(
+        validEnvironment({ PUBLIC_STORAGE_DIR: "relative/public" }),
+      ),
+    /PUBLIC_STORAGE_DIR must be an absolute persistent path/,
+  );
+
+  const sharedRoot = path.resolve("production-storage-test");
+  assert.throws(
+    () =>
+      validateProductionEnv(
+        validEnvironment({
+          PUBLIC_STORAGE_DIR: sharedRoot,
+          PRIVATE_STORAGE_DIR: path.join(sharedRoot, "private"),
+        }),
+      ),
+    /must be separate, non-overlapping directories/,
   );
 });

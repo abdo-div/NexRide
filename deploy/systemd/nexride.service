@@ -32,14 +32,14 @@ SyslogIdentifier=nexride
 LimitNOFILE=65535
 UMask=0027
 
-# The service only needs write access to private uploaded documents and its
-# isolated temporary directory. Application source and the rest of the host
-# remain read-only from this process.
+# The service only needs write access to persistent generated media, private
+# uploaded documents, and its isolated temporary directory. Application source
+# and the rest of the host remain read-only from this process.
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectHome=true
 ProtectSystem=strict
-ReadWritePaths=/var/lib/nexride/private
+ReadWritePaths=/var/lib/nexride/public /var/lib/nexride/private
 
 [Install]
 WantedBy=multi-user.target

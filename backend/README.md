@@ -27,6 +27,10 @@ Production Redis ACLs, persistence, memory policy, and VPS verification are
 documented in [`docs/VPS_REDIS.md`](../docs/VPS_REDIS.md). The bundled local
 configuration binds Redis to loopback; remote services must use `rediss://`.
 
+Generated public media and protected partner documents use separate persistent
+roots in production. Migration, backup, and restore verification are documented
+in [`docs/VPS_STORAGE.md`](../docs/VPS_STORAGE.md).
+
 ## Install and configure
 
 From the repository root:
@@ -75,6 +79,7 @@ The full list of supported names and secret placeholders is in [`.env.example`](
 | `MOAMALAT_ENV`, `MOAMALAT_MID`, `MOAMALAT_TID`, `MOAMALAT_SECURE_KEY` | Optional Moamalat environment and merchant credentials. Payment initiation requires the merchant ID, terminal ID, and signing key. |
 | `JWT_EXPIRES_IN`, `JWT_COOKIE_EXPIRES_IN` | Token and cookie expiration configuration. |
 | `REDIS_PROBE_TIMEOUT_MS`, `LOG_LEVEL` | Optional Redis probe timeout and logging level. |
+| `PUBLIC_STORAGE_DIR`, `PRIVATE_STORAGE_DIR` | Separate absolute persistent roots for generated public media and protected partner documents. Both are required in production and must not overlap. |
 
 Payment and mail credentials can be omitted in development when those features are not used. They are required by the production preflight because checkout and account recovery are launch-critical. Never place real credentials in an example file.
 
