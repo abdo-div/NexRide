@@ -40,6 +40,12 @@ npm run validate:production-env
 Production startup runs the same validation automatically and reports all
 configuration problems together without printing secret values.
 
+The supported runtime is pinned to Node.js 24 in `package.json`. Production is
+run as one systemd-managed process because the API process also owns the email
+worker and booking-expiry scheduler; starting multiple instances would run
+those jobs more than once. Install and operate the supplied unit by following
+[`docs/VPS_NODE_SERVICE.md`](../docs/VPS_NODE_SERVICE.md).
+
 ### Environment variables
 
 The full list of supported names and secret placeholders is in [`.env.example`](./.env.example). Key configuration:

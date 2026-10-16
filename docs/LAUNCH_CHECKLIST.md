@@ -14,6 +14,8 @@ This checklist is the release gate. A launch is approved only when every require
 ## 2. Infrastructure
 
 - [ ] `NODE_ENV=production`.
+- [ ] The supplied `nexride.service` is installed, enabled, and running as the dedicated `nexride` user on Node.js 24.
+- [ ] `systemctl restart nexride` completes cleanly and `journalctl -u nexride` shows no forced-shutdown or restart loop.
 - [ ] MongoDB is reachable, access-restricted, backed up, and a restore has been tested.
 - [ ] Redis is reachable over TLS where supported and configured for persistence/availability.
 - [ ] `JWT_SECRET` is unique, random, and at least 32 bytes.

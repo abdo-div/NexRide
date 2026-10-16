@@ -116,9 +116,22 @@ startBookingExpiryReaper();
 // Graceful Shutdown (SIGTERM / SIGINT)
 // -----------------------------------------------------------------------------
 let forceExitTimer = null;
+let shuttingDown = false;
 
 const shutdown = async (signal, exitCode = 0) => {
+  // systemd may send another signal while an earlier shutdown is draining
+  // requests. Starting cleanup twice can close shared clients out from under
+  // the first pass, so subsequent signals only leave an audit trail.
+  if (shuttingDown) {
+    logger.warn({ signal }, "Shutdown already in progress");
+    return;
+  }
+  shuttingDown = true;
+
   chalkLogger.info(`Received ${signal}. Gracefully shutting down...`);
+
+  // Do not start any more scheduled work while existing HTTP requests drain.
+  stopBookingExpiryReaper();
 
   forceExitTimer = setTimeout(() => {
     logger.warn("Graceful shutdown timed out; forcing exit.");
@@ -142,9 +155,6 @@ const shutdown = async (signal, exitCode = 0) => {
 };
 
 const cleanupResources = async (exitCode = 0) => {
-  // Stop the booking expiry reaper so no sweep outlives the database
-  stopBookingExpiryReaper();
-
   // Stop the BullMQ email worker and finish in-flight jobs
   try {
     await emailWorker.close();
@@ -177,6 +187,12 @@ process.on("SIGTERM", () => shutdown("SIGTERM"));
 process.on("SIGINT", () => shutdown("SIGINT"));
 
 process.on("unhandledRejection", (err) => {
-  logger.error(`UNHANDLED REJECTION! 💥 Shutting down... ${err.message}`);
+  const message = err instanceof Error ? err.message : String(err);
+  logger.error({ err: message }, "Unhandled rejection; shutting down");
   shutdown("unhandledRejection", 1);
+});
+
+process.on("uncaughtException", (err) => {
+  logger.fatal({ err: err.message }, "Uncaught exception; shutting down");
+  shutdown("uncaughtException", 1);
 });
