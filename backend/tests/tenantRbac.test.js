@@ -208,20 +208,27 @@ test("booking status update runs the tenant gate for an eligible company", async
   const handlers = routeHandlers(bookingRouter, "/:id/status", "patch");
   const bookingModel = mongoose.model("Booking");
   const originalFindById = bookingModel.findById;
-  bookingModel.findById = () => ({
-    then: (resolve) =>
-      resolve({ _id: bookingId, companyId: companyB, customerId: customerB }),
-  });
+  let lookupCount = 0;
+  bookingModel.findById = (id) => {
+    lookupCount += 1;
+    assert.equal(id, bookingId);
+    return {
+      then: (resolve) =>
+        resolve({ _id: bookingId, companyId: companyB, customerId: customerB }),
+    };
+  };
 
   try {
     const outcome = await runChain(handlers, {
       params: { id: bookingId },
+      body: { status: "CONFIRMED" },
       user: { _id: customerA, id: customerA, role: "company", company: companyA },
       tenantId: companyA,
     });
 
     assert.ok(outcome.error, "a foreign booking must be refused");
     assert.equal(outcome.error.statusCode, 403);
+    assert.equal(lookupCount, 1, "the tenant gate must inspect the booking");
   } finally {
     bookingModel.findById = originalFindById;
   }
