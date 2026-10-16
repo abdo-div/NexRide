@@ -6,6 +6,7 @@ import { configureDnsServers } from "./config/dnsConfig.js";
 import { validateJwtSecret } from "./config/jwt.js";
 import { validateNodeEnv, getNodeEnv } from "./config/env.js";
 import { getClientUrl } from "./config/clientUrl.js";
+import { validateProductionEnv } from "./config/productionEnv.js";
 
 // Load the environment file wherever it actually lives, regardless of the
 // working directory the server is started from. Candidates are checked in
@@ -31,6 +32,7 @@ validateJwtSecret();
 // would have to fall back to the request host, which a forged Host header
 // controls.
 getClientUrl({ allowLocalFallback: false });
+if (getNodeEnv() === "production") validateProductionEnv();
 configureDnsServers(process.env.DNS_SERVERS);
 
 const { default: mongoose } = await import("mongoose");

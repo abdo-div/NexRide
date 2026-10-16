@@ -30,6 +30,16 @@ Copy-Item .env.example .env
 
 Edit `backend/.env` for your local services and integrations. Do not commit `.env` or put credentials in source control. The server loads environment files in this order: `backend/config.env` (legacy), `backend/.env`, then the repository-root `.env`; it uses the first file that exists. Variables already supplied by the shell are retained.
 
+For a VPS deployment, copy `.env.production.example` into the host's secret
+configuration, replace every placeholder, and validate it before starting:
+
+```powershell
+npm run validate:production-env
+```
+
+Production startup runs the same validation automatically and reports all
+configuration problems together without printing secret values.
+
 ### Environment variables
 
 The full list of supported names and secret placeholders is in [`.env.example`](./.env.example). Key configuration:
@@ -42,14 +52,14 @@ The full list of supported names and secret placeholders is in [`.env.example`](
 | `PORT`, `NODE_ENV` | HTTP port and runtime mode. `PORT` defaults to `3000`; set `NODE_ENV` to `development` or `production` as appropriate. |
 | `DNS_SERVERS` | Optional comma-separated IP addresses used to override Node DNS resolution when the host resolver cannot resolve MongoDB Atlas/SRV records. For example, `DNS_SERVERS=8.8.8.8,1.1.1.1`. Omit it to use the host/system resolver. |
 | `FRONTEND_DOMAIN` | Optional comma-separated exact origins allowed by CORS. Development defaults include `http://localhost:5173` and `http://localhost:5174`; configure deployment origins explicitly, for example `FRONTEND_DOMAIN=https://app.example.com,https://admin.example.com`. |
-| `FRONTEND_URL`, `CLIENT_URL` | Frontend URL used in auth links and client URL used in booking emails, respectively. |
+| `FRONTEND_URL` | Public HTTPS frontend origin used for authentication and booking email links. |
 | `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USERNAME`, `EMAIL_PASSWORD`, `EMAIL_FROM`, `EMAIL_FROM_NAME` | Local/development SMTP and sender configuration. Development defaults to a local SMTP server at `127.0.0.1:1025`. |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USERNAME`, `SMTP_PASSWORD` | Production SMTP configuration. |
 | `MOAMALAT_ENV`, `MOAMALAT_MID`, `MOAMALAT_TID`, `MOAMALAT_SECURE_KEY` | Optional Moamalat environment and merchant credentials. Payment initiation requires the merchant ID, terminal ID, and signing key. |
 | `JWT_EXPIRES_IN`, `JWT_COOKIE_EXPIRES_IN` | Token and cookie expiration configuration. |
 | `REDIS_PROBE_TIMEOUT_MS`, `LOG_LEVEL` | Optional Redis probe timeout and logging level. |
 
-All payment and mail credentials are optional for features that do not use those integrations. Never place real credentials in the example file.
+Payment and mail credentials can be omitted in development when those features are not used. They are required by the production preflight because checkout and account recovery are launch-critical. Never place real credentials in an example file.
 
 ### Observability
 
