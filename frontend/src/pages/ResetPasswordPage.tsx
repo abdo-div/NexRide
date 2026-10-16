@@ -33,12 +33,12 @@ export const ResetPasswordPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const { token: jwt, data } = await authApi.resetPassword({
+      const { data } = await authApi.resetPassword({
         token,
         password,
         passwordConfirm,
       });
-      adoptSession(jwt, data.user);
+      adoptSession(data.user);
       navigate("/", { replace: true });
     } catch (error) {
       if (error instanceof ApiError) {

@@ -1,6 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { resolveApiBaseUrl } from "./apiClient";
+import { request, resolveApiBaseUrl } from "./apiClient";
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("resolveApiBaseUrl", () => {
   it("uses the same-origin API path when no URL is configured", () => {
@@ -16,5 +20,23 @@ describe("resolveApiBaseUrl", () => {
 
   it("supports a relative override", () => {
     expect(resolveApiBaseUrl("/nexride/api/v1/")).toBe("/nexride/api/v1");
+  });
+});
+
+describe("request authentication", () => {
+  it("uses the HTTP-only cookie without exposing an authorization header", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ status: "success" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+
+    await request("/users/me");
+
+    expect(fetchMock).toHaveBeenCalledOnce();
+    const [, options] = fetchMock.mock.calls[0];
+    expect(options?.credentials).toBe("include");
+    expect(options?.headers).not.toHaveProperty("Authorization");
   });
 });

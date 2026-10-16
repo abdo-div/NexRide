@@ -1,5 +1,3 @@
-import { getToken } from "./tokenStorage";
-
 export const resolveApiBaseUrl = (configuredUrl?: string): string =>
   (configuredUrl?.trim() || "/api/v1").replace(/\/+$/, "");
 
@@ -41,8 +39,6 @@ export const isUnauthorized = (error: unknown): boolean =>
 interface RequestOptions {
   method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   body?: unknown;
-  /** Set to false for the sign-in/sign-up calls, which must not send a stale token. */
-  auth?: boolean;
   signal?: AbortSignal;
   /** Extra headers merged over the defaults (e.g. Idempotency-Key). */
   headers?: Record<string, string>;
@@ -60,7 +56,7 @@ const parsePayload = async (response: Response): Promise<Record<string, unknown>
 
 export async function request<T>(
   path: string,
-  { method = "GET", body, auth = true, signal, headers: extraHeaders }: RequestOptions = {},
+  { method = "GET", body, signal, headers: extraHeaders }: RequestOptions = {},
 ): Promise<T> {
   const isFormData =
     typeof FormData !== "undefined" && body instanceof FormData;
@@ -69,11 +65,6 @@ export async function request<T>(
     ...extraHeaders,
   };
   if (body !== undefined && !isFormData) headers["Content-Type"] = "application/json";
-
-  if (auth) {
-    const token = getToken();
-    if (token) headers.Authorization = `Bearer ${token}`;
-  }
 
   let response: Response;
   try {

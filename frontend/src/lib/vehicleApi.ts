@@ -62,11 +62,11 @@ export const API_ORIGIN = API_BASE_URL.replace(/\/api\/v1$/, "");
 
 export const vehicleApi = {
   listAvailable: (signal?: AbortSignal) =>
-    request<VehiclesResponse>(AVAILABLE_QUERY, { auth: false, signal }),
+    request<VehiclesResponse>(AVAILABLE_QUERY, { signal }),
 
   /** Search available vehicles by location, type, price and date availability. */
   search: (args: VehicleSearchArgs = {}, signal?: AbortSignal) =>
-    request<VehiclesResponse>(buildSearchQuery(args), { auth: false, signal }),
+    request<VehiclesResponse>(buildSearchQuery(args), { signal }),
 
   /**
    * Single vehicle for the detail page. Public (no auth) and populated with the
@@ -76,7 +76,6 @@ export const vehicleApi = {
    */
   getById: (id: string, signal?: AbortSignal) =>
     request<VehicleResponse>(`/vehicles/${encodeURIComponent(id)}`, {
-      auth: false,
       signal,
     }),
 
@@ -86,13 +85,13 @@ export const vehicleApi = {
       `/vehicles?operationalStatus=AVAILABLE&listingStatus=PUBLISHED&type=${encodeURIComponent(
         type,
       )}&sort=-createdAt&limit=12`,
-      { auth: false, signal },
+      { signal },
     ),
 
   reviewEligibility: (vehicleId: string, bookingId: string, signal?: AbortSignal) =>
     request<{ status: string; data: { eligibility: ReviewEligibility } }>(
       `/vehicles/${encodeURIComponent(vehicleId)}/reviews/eligibility?bookingId=${encodeURIComponent(bookingId)}`,
-      { auth: true, signal },
+      { signal },
     ),
 
   createReview: (vehicleId: string, rating: number, review: string) =>
@@ -100,7 +99,6 @@ export const vehicleApi = {
       `/vehicles/${encodeURIComponent(vehicleId)}/reviews`,
       {
         method: "POST",
-        auth: true,
         body: { rating, review },
       },
     ),

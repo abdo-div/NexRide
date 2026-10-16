@@ -62,7 +62,7 @@ Admin pages are loaded on navigation rather than included up front in the main r
 
 ## Authentication and API communication
 
-The auth provider restores a saved token by checking the current user with the backend. Sign-in and sign-up save the returned token in browser storage; API requests send it as a Bearer token and include credentials for the HTTP-only cookie. Protected customer routes require an authenticated session, while `/admin` additionally requires the `admin` role.
+The auth provider restores the session by asking the backend to validate its HTTP-only cookie. Sign-in, sign-up, password reset and password changes establish that cookie without exposing the JWT to browser JavaScript or storage. API requests include credentials automatically. Protected customer routes require an authenticated session, while `/admin` additionally requires the `admin` role.
 
 The frontend communicates with the Express API through the shared API client. Production builds use same-origin `/api/v1` by default, which matches the Express server's frontend hosting. Set `VITE_API_BASE_URL` only for a split deployment where the API uses a different origin.
 

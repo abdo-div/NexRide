@@ -35,14 +35,13 @@ const loginAndCheck = async (label, identifier, password, protectedPath) => {
     },
   );
   if (!response?.ok) return;
-  const payload = await response.json();
-  const token = payload.token;
-  if (!token) {
-    checks.push({ name: `${label} token`, ok: false, status: "MISSING", ms: 0 });
+  const sessionCookie = response.headers.get("set-cookie")?.split(";", 1)[0];
+  if (!sessionCookie?.startsWith("jwt=")) {
+    checks.push({ name: `${label} session cookie`, ok: false, status: "MISSING", ms: 0 });
     return;
   }
   await check(`${label} protected API`, protectedPath, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Cookie: sessionCookie },
   });
 };
 

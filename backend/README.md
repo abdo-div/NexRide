@@ -78,7 +78,7 @@ The API is mounted primarily under `/api/v1` (users, vehicles/cars, companies, b
 
 ## Authentication and access
 
-Signup and login return a JWT and set an HTTP-only cookie. API clients can also send the token as a Bearer token. User status is checked on authenticated requests, and role-based middleware restricts administrative operations to admins. Company users must belong to an approved company; tenant-scoped payment and company operations are restricted to that company.
+Signup and login establish an HTTP-only, SameSite session cookie; the JWT is never exposed in the browser response body. Browser requests include that cookie through `credentials: "include"`. User status is checked on authenticated requests, and role-based middleware restricts administrative operations to admins. Company users must belong to an approved company; tenant-scoped payment and company operations are restricted to that company.
 
 ## Tests
 

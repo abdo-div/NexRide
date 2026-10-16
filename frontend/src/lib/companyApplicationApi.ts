@@ -24,7 +24,6 @@ export const companyApplicationApi = {
 
     return request<ApplicationResponse>("/companies/apply", {
       method: "POST",
-      auth: false,
       body: formData,
     });
   },
