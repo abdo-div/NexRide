@@ -1,0 +1,32 @@
+[Unit]
+Description=NexRide production health and backup monitor
+Documentation=file:///srv/nexride/docs/VPS_MONITORING.md
+Wants=network-online.target
+After=network-online.target nexride.service nginx.service mongod.service redis-server.service
+
+[Service]
+Type=oneshot
+User=nexride-monitor
+Group=nexride-monitor
+EnvironmentFile=/etc/nexride/monitor.env
+Environment=STATE_DIR=/var/lib/nexride-monitor
+ExecStart=/usr/local/sbin/nexride-monitor
+StateDirectory=nexride-monitor
+StateDirectoryMode=0700
+UMask=0077
+
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+SystemCallArchitectures=native
+ReadWritePaths=/var/lib/nexride-monitor
+

@@ -119,7 +119,7 @@ export const startEmailWorker = async () => {
     return noopWorker;
   }
 
-  return new Worker(
+  const worker = new Worker(
     "email-queue",
     async (job) => {
       logger.info(
@@ -160,4 +160,44 @@ export const startEmailWorker = async () => {
     },
     { connection: bullmqConnection, prefix: "nexride" },
   );
+
+  worker.on("completed", (job) => {
+    logger.info(
+      { event: "email_job_completed", jobId: job.id, jobType: job.name },
+      "Background email delivered",
+    );
+  });
+  worker.on("failed", (job, err) => {
+    const attemptsMade = job?.attemptsMade ?? 0;
+    const attemptsAllowed = job?.opts?.attempts ?? 1;
+    const exhausted = attemptsMade >= attemptsAllowed;
+    const context = {
+      event: exhausted ? "email_job_failed" : "email_job_retrying",
+      jobId: job?.id ?? null,
+      jobType: job?.name ?? null,
+      attemptsMade,
+      attemptsAllowed,
+      err: err.message,
+    };
+
+    if (exhausted) {
+      logger.error(context, "Background email delivery exhausted all attempts");
+    } else {
+      logger.warn(context, "Background email delivery will retry");
+    }
+  });
+  worker.on("stalled", (jobId) => {
+    logger.warn(
+      { event: "email_job_stalled", jobId },
+      "Background email job stalled",
+    );
+  });
+  worker.on("error", (err) => {
+    logger.error(
+      { event: "email_worker_error", err: err.message },
+      "Background email worker error",
+    );
+  });
+
+  return worker;
 };

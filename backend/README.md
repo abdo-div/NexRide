@@ -92,6 +92,11 @@ error-reporting service integrated. If you add one, wire it in `app.js` /
 `package.json`, and strip authorization headers, cookies, JWTs, request bodies
 and payment credentials from the payloads you send.
 
+The supplied VPS monitor checks readiness, services, disks, backup freshness,
+and TLS, with state-change webhook alerts. Journald retention, stable workflow
+event names, installation, and the required off-host uptime monitor are covered
+in [`docs/VPS_MONITORING.md`](../docs/VPS_MONITORING.md).
+
 ## Run locally
 
 ```powershell
