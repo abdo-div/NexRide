@@ -193,6 +193,12 @@ export const validateProductionEnv = (env = process.env) => {
     problems.push("PORT must be an integer from 1 to 65535.");
   }
 
+  if (valueOf(env, "BIND_HOST") !== "127.0.0.1") {
+    problems.push(
+      "BIND_HOST must be 127.0.0.1 in production so only the local reverse proxy can reach Node directly.",
+    );
+  }
+
   for (const name of ["JWT_SECRET", "JWT_EXPIRES_IN", "JWT_COOKIE_EXPIRES_IN"]) {
     const value = valueOf(env, name);
     if (!value) problems.push(`${name} is required in production.`);

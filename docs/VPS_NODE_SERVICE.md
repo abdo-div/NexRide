@@ -28,7 +28,7 @@ file in Git. Install Node.js 24 so `node` resolves to `/usr/bin/node`, then:
 ```bash
 cd /srv/nexride/backend
 sudo -u nexride npm ci --omit=dev
-sudo -u nexride /usr/bin/node scripts/validateProductionEnv.js
+sudo -u nexride env PRODUCTION_ENV_FILE=/etc/nexride/backend.env /usr/bin/node scripts/validateProductionEnv.js
 sudo install -o root -g root -m 0644 /srv/nexride/deploy/systemd/nexride.service /etc/systemd/system/nexride.service
 sudo systemctl daemon-reload
 sudo systemctl enable --now nexride
@@ -61,7 +61,7 @@ restart:
 ```bash
 cd /srv/nexride/backend
 sudo -u nexride npm ci --omit=dev
-sudo -u nexride /usr/bin/node scripts/validateProductionEnv.js
+sudo -u nexride env PRODUCTION_ENV_FILE=/etc/nexride/backend.env /usr/bin/node scripts/validateProductionEnv.js
 sudo systemctl restart nexride
 curl --fail http://127.0.0.1:3000/health/readiness
 ```
