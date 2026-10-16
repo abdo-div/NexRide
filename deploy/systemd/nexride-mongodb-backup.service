@@ -1,6 +1,6 @@
 [Unit]
 Description=NexRide consistent MongoDB backup
-Documentation=file:///srv/nexride/docs/VPS_MONGODB.md
+Documentation=file:///srv/nexride/current/docs/VPS_MONGODB.md
 After=mongod.service
 Requires=mongod.service
 

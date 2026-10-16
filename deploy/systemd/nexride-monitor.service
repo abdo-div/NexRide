@@ -1,6 +1,6 @@
 [Unit]
 Description=NexRide production health and backup monitor
-Documentation=file:///srv/nexride/docs/VPS_MONITORING.md
+Documentation=file:///srv/nexride/current/docs/VPS_MONITORING.md
 Wants=network-online.target
 After=network-online.target nexride.service nginx.service mongod.service redis-server.service
 

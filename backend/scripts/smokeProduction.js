@@ -1,4 +1,11 @@
 const baseUrl = (process.env.SMOKE_BASE_URL || "http://localhost:3000").replace(/\/+$/, "");
+const requireAuthenticatedWorkflows = process.env.SMOKE_REQUIRE_AUTH !== "false";
+
+const smokeUrl = new URL(baseUrl);
+const isLoopback = ["localhost", "127.0.0.1", "::1"].includes(smokeUrl.hostname);
+if (smokeUrl.protocol !== "https:" && !isLoopback && process.env.SMOKE_ALLOW_HTTP !== "true") {
+  throw new Error("SMOKE_BASE_URL must use HTTPS (set SMOKE_ALLOW_HTTP=true only for an isolated test host)");
+}
 
 const checks = [];
 
@@ -21,7 +28,12 @@ const check = async (name, path, options = {}, expected = [200]) => {
 
 const loginAndCheck = async (label, identifier, password, protectedPath) => {
   if (!identifier || !password) {
-    checks.push({ name: `${label} authenticated workflow`, ok: true, status: "SKIPPED", ms: 0 });
+    checks.push({
+      name: `${label} authenticated workflow`,
+      ok: !requireAuthenticatedWorkflows,
+      status: requireAuthenticatedWorkflows ? "MISSING" : "SKIPPED",
+      ms: 0,
+    });
     return;
   }
 
@@ -65,5 +77,5 @@ if (failed.length > 0) {
   console.error(`\nSmoke test failed: ${failed.length} check(s) did not pass.`);
   process.exitCode = 1;
 } else {
-  console.log("\nSmoke test passed. Skipped role checks require SMOKE_* credentials for full certification.");
+  console.log("\nSmoke test passed.");
 }
