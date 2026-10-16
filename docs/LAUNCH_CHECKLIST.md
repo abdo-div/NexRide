@@ -37,7 +37,8 @@ This checklist is the release gate. A launch is approved only when every require
 - [ ] One low-value real payment completes and appears once in the ledger.
 - [ ] One real refund follows the documented cancellation policy.
 - [ ] SMTP sends signup/admin notification/password-reset email and links use the public domain.
-- [ ] Uploaded company, user, and vehicle images survive a redeploy (persistent/object storage).
+- [ ] Public media and private partner documents live under separate `/var/lib/nexride` paths, not the release checkout.
+- [ ] The nightly file backup and encrypted off-host copy succeeded; an isolated archive verification passed.
 
 ## 4. Golden-path acceptance
 

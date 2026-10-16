@@ -1,8 +1,8 @@
 import multer from "multer";
-import sharp from "sharp";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
 import * as userService from "../services/userService.js";
+import { saveUserPhoto } from "../utils/userImages.js";
 
 // Multer Storage Configuration
 const multerStorage = multer.memoryStorage();
@@ -33,11 +33,7 @@ export const resizeUserPhoto = catchAsync(async (req, res, next) => {
 
   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
 
-  await sharp(req.file.buffer)
-    .resize(500, 500)
-    .toFormat("jpeg")
-    .jpeg({ quality: 90 })
-    .toFile(`public/users/${req.file.filename}`);
+  await saveUserPhoto(req.file.buffer, req.file.filename);
 
   next();
 });
