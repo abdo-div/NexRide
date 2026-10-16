@@ -47,6 +47,16 @@ machine with all three role credentials. Missing credentials fail certification
 by default. Set `SMOKE_REQUIRE_AUTH=false` only for a deliberately partial test;
 that result cannot approve a launch.
 
+Verify the live host against the exact deployed commit, then attach its output to
+the release sign-off record:
+
+```bash
+sudo sh /srv/nexride/current/deploy/release/verify-host.sh <full-40-character-sha> https://your-domain.example
+```
+
+`HOST VERIFIED` covers automatable host conditions only. Complete
+[`PRODUCTION_SIGN_OFF.md`](./PRODUCTION_SIGN_OFF.md) before declaring GO.
+
 ## Explicit rollback
 
 List installed releases and choose a known-good full SHA. Never roll application
