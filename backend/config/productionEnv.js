@@ -89,6 +89,14 @@ const validateMongo = (env, problems) => {
     problems.push("The configured MongoDB URI must use mongodb:// or mongodb+srv://.");
     return;
   }
+  if (!parsed.username || !parsed.password) {
+    problems.push(
+      "The production MongoDB URI must include dedicated application credentials.",
+    );
+  }
+  if (!parsed.pathname || parsed.pathname === "/") {
+    problems.push("The production MongoDB URI must name the application database.");
+  }
   if (parsed.protocol === "mongodb:" && !parsed.searchParams.get("replicaSet")) {
     problems.push(
       "A mongodb:// production URI must name replicaSet because booking workflows use transactions.",

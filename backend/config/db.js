@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import logger from "../utils/logger.js";
-import { syncAllIndexes } from "../utils/syncIndexes.js";
 
 const getMongoUri = () => {
   return (
@@ -24,11 +23,6 @@ const connectDB = async () => {
     });
 
     logger.database(`Connected to host: ${conn.connection.host}`);
-
-    // autoIndex is disabled in production, so declared indexes (including the
-    // unique constraints) are never created there. Reconcile them when the
-    // deployment opts in via SYNC_INDEXES.
-    await syncAllIndexes();
 
     return true;
   } catch (error) {

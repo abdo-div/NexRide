@@ -1,0 +1,4 @@
+# Install as /etc/nexride/mongodump.yml with owner root:root and mode 0600.
+# Keep the password separate from the URI so it cannot appear in `ps` output.
+uri: "mongodb://nexride_backup@127.0.0.1:27017/?authSource=admin&replicaSet=rs0"
+password: "REPLACE_WITH_BACKUP_USER_PASSWORD"

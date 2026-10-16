@@ -16,7 +16,8 @@ This checklist is the release gate. A launch is approved only when every require
 - [ ] `NODE_ENV=production`.
 - [ ] The supplied `nexride.service` is installed, enabled, and running as the dedicated `nexride` user on Node.js 24.
 - [ ] `systemctl restart nexride` completes cleanly and `journalctl -u nexride` shows no forced-shutdown or restart loop.
-- [ ] MongoDB is reachable, access-restricted, backed up, and a restore has been tested.
+- [ ] MongoDB is an authenticated replica set bound only to a trusted interface; `db.hello()` reports a writable primary.
+- [ ] The nightly MongoDB backup timer succeeded, its encrypted off-host copy exists, and an isolated restore drill passed.
 - [ ] Redis is reachable over TLS where supported and configured for persistence/availability.
 - [ ] `JWT_SECRET` is unique, random, and at least 32 bytes.
 - [ ] `FRONTEND_URL` and `FRONTEND_DOMAIN` exactly match the public HTTPS origin.
@@ -24,7 +25,7 @@ This checklist is the release gate. A launch is approved only when every require
 - [ ] Nginx proxies to `127.0.0.1:3000`; Node, MongoDB, and Redis are not publicly reachable.
 - [ ] UFW and any provider firewall expose only the confirmed SSH port plus TCP 80/443.
 - [ ] `certbot renew --dry-run` succeeds and automatic renewal is enabled.
-- [ ] Production indexes have been synchronized with `SYNC_INDEXES=true npm run sync-indexes`, then the flag removed.
+- [ ] `npm run sync-indexes` reports a reviewed plan, then `npm run sync-indexes -- --apply` succeeds after a current backup.
 - [ ] `/health/liveness` returns 200.
 - [ ] `/health/readiness` returns 200 with database and cache connected.
 
