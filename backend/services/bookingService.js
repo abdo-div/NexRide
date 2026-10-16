@@ -13,6 +13,7 @@ import {
   buildDateOverlapFilter,
 } from "../utils/bookingStatus.js";
 import { getPlatformPolicy } from "./platformPolicyService.js";
+import { resolveClientUrl } from "../config/clientUrl.js";
 
 // The search allowlist is deliberately limited to fields stored on the booking
 // document. Populated references (vehicle make/model, customer and partner
@@ -72,7 +73,7 @@ export const getBookingById = factory.getOne(Booking);
  * Sends a transactional email notification when a booking is confirmed
  */
 export const confirmBookingAndNotify = async (booking, user) => {
-  const bookingURL = `${process.env.CLIENT_URL || "https://nexride.com"}/my-bookings/${booking._id}`;
+  const bookingURL = `${resolveClientUrl()}/my-bookings/${booking._id}`;
 
   // Non-blocking email delivery
   new Email(user, bookingURL)
@@ -330,7 +331,7 @@ export const notifyBookingCancellation = (booking, reason = "booking cancelled")
   const customer = booking.customerId;
   if (!customer?.email) return;
 
-  const bookingURL = `${process.env.CLIENT_URL || "https://nexride.com"}/my-bookings/${booking._id}`;
+  const bookingURL = `${resolveClientUrl()}/my-bookings/${booking._id}`;
   new Email(customer, bookingURL)
     .sendBookingCancellation({
       vehicleName: booking.vehicleId

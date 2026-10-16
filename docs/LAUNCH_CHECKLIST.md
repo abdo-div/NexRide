@@ -9,6 +9,7 @@ This checklist is the release gate. A launch is approved only when every require
 - [ ] `npm ci && npm run lint && npm test && npm run build` passes in `frontend`.
 - [ ] `npm ci && npm test` passes in `backend`.
 - [ ] Production secrets are stored in the hosting provider, never in Git.
+- [ ] `npm run validate:production-env` passes in `backend` using the exact VPS environment.
 
 ## 2. Infrastructure
 
