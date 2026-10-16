@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { ZodError } from "zod";
 import fs from "fs/promises";
+import path from "node:path";
+import { spawnSync } from "node:child_process";
 import User from "../models/User_model.js";
 import Company from "../models/Company_model.js";
 import AppError from "../utils/appError.js";
@@ -12,6 +14,10 @@ import {
   slugify,
 } from "../services/companyApplicationService.js";
 import { companyApplicationSchema } from "../validations/companyApplication.validation.js";
+import {
+  companyDocumentsDirectory,
+  privateStorageRoot,
+} from "../config/privateStorage.js";
 
 process.env.FRONTEND_URL ??= "http://localhost:5173";
 process.env.NODE_ENV ??= "test";
@@ -264,6 +270,7 @@ test("application rejects when the company name is already under review", async 
 });
 
 test("application persists uploaded document metadata when files are provided", async (t) => {
+  const writtenPaths = [];
   t.mock.method(User, "findOne", async () => null);
   t.mock.method(User, "find", () => ({ select: () => ({ lean: async () => [] }) }));
   t.mock.method(Company, "exists", async () => null);
@@ -277,7 +284,9 @@ test("application persists uploaded document metadata when files are provided", 
     },
   }));
   t.mock.method(fs, "mkdir", async () => undefined);
-  t.mock.method(fs, "writeFile", async () => undefined);
+  t.mock.method(fs, "writeFile", async (filePath) => {
+    writtenPaths.push(path.resolve(filePath));
+  });
 
   const data = validApplication();
   data.documents = [
@@ -295,7 +304,48 @@ test("application persists uploaded document metadata when files are provided", 
 
   assert.equal(company.applicationDocuments.length, 2);
   assert.equal(company.applicationDocuments[0].kind, "COMMERCIAL_REGISTRY");
-  assert.match(company.applicationDocuments[0].url, /^\/company-documents\//);
+  assert.match(
+    company.applicationDocuments[0].url,
+    /^\/api\/v1\/companies\/application-documents\//,
+  );
+  assert.equal(writtenPaths.length, 2);
+  assert.ok(
+    writtenPaths.every((filePath) =>
+      filePath.startsWith(path.resolve(companyDocumentsDirectory)),
+    ),
+  );
+});
+
+test("partner documents use storage outside the anonymously served public tree", () => {
+  const publicRoot = path.resolve("public");
+  const relativeToPublic = path.relative(publicRoot, privateStorageRoot);
+
+  assert.notEqual(relativeToPublic, "");
+  assert.ok(
+    relativeToPublic.startsWith("..") || path.isAbsolute(relativeToPublic),
+    `private storage unexpectedly resolves inside ${publicRoot}`,
+  );
+});
+
+test("private document storage fails closed when configured beneath public", () => {
+  const result = spawnSync(
+    process.execPath,
+    ["--input-type=module", "--eval", "import('./config/privateStorage.js')"],
+    {
+      cwd: path.resolve("."),
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        PRIVATE_STORAGE_DIR: path.resolve("public", "private-documents"),
+      },
+    },
+  );
+
+  assert.notEqual(result.status, 0);
+  assert.match(
+    `${result.stdout}${result.stderr}`,
+    /PRIVATE_STORAGE_DIR must not be inside backend\/public/,
+  );
 });
 
 test("schema rejects an invalid fleet tier and empty categories", () => {

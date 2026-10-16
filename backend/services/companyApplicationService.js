@@ -1,19 +1,15 @@
 import fs from "fs/promises";
 import path from "path";
-import { fileURLToPath } from "url";
 import User from "../models/User_model.js";
 import Company from "../models/Company_model.js";
 import AppError from "../utils/appError.js";
 import { normalisePhoneNumber } from "./authService.js";
 import { addEmailToQueue } from "../queues/emailQueue.js";
 import logger from "../utils/logger.js";
-
-const DOCUMENTS_DIR = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "..",
-  "public",
-  "company-documents",
-);
+import {
+  companyDocumentApiPath,
+  companyDocumentsDirectory,
+} from "../config/privateStorage.js";
 
 /** Mirrors the Company model's pre-save slug transform (lowercase + dashes). */
 export const slugify = (str) =>
@@ -53,7 +49,7 @@ const rollbackApplication = async (userId, companyId) => {
   if (companyId) {
     try {
       await Company.deleteOne({ _id: companyId });
-      await fs.rm(path.join(DOCUMENTS_DIR, String(companyId)), {
+      await fs.rm(path.join(companyDocumentsDirectory, String(companyId)), {
         recursive: true,
         force: true,
       });
@@ -207,7 +203,10 @@ export const applyForCompany = async ({ data, files = [] }) => {
 
     if (files.length > 0) {
       const documents = [];
-      const companyDir = path.join(DOCUMENTS_DIR, String(company._id));
+      const companyDir = path.join(
+        companyDocumentsDirectory,
+        String(company._id),
+      );
       await fs.mkdir(companyDir, { recursive: true });
 
       for (const file of files) {
@@ -226,7 +225,10 @@ export const applyForCompany = async ({ data, files = [] }) => {
           kind: meta.kind ?? "OTHER",
           mimeType: file.mimetype,
           size: file.size,
-          url: `/company-documents/${company._id}/${storedName}`,
+          // This URL is intentionally under the authenticated API namespace.
+          // The download handler is added separately; the file itself never
+          // lives beneath Express's anonymously served public directory.
+          url: companyDocumentApiPath(company._id, storedName),
         });
       }
 
