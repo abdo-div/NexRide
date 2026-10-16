@@ -70,8 +70,10 @@ Never commit these credentials. All checks must report `PASS`; `SKIPPED` role ch
 
 ## 6. Operations and rollback
 
-- [ ] Error logs and uptime alerts are visible to the launch owner.
-- [ ] A named person monitors bookings, payment callbacks, email failures, and Redis/Mongo health.
+- [ ] The on-host monitor timer passes and a real test alert plus recovery reaches the incident channel.
+- [ ] An external monitor outside the VPS checks public liveness/readiness, TLS, and host availability.
+- [ ] Journald or the company log platform retains searchable structured logs with alerts for 5xx responses, payment verification rejection, and email job failure.
+- [ ] Two named responders monitor bookings, payment callbacks, email failures, Redis/Mongo health, backups, disk pressure, and TLS expiry.
 - [ ] Previous deploy artifact and database restore instructions are available.
 - [ ] Rollback trigger is agreed: elevated 5xx rate, payment mismatch, duplicate booking, or readiness failure.
 - [ ] Emergency contact details shown on the site are real and staffed.

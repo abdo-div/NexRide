@@ -12,6 +12,7 @@ import {
   verifyTransaction,
   finalizeVerifiedPayment,
 } from "../services/moamalat.service.js";
+import logger from "../utils/logger.js";
 /**
  * Validate the booking's stored amount (in LYD)
  */
@@ -225,6 +226,15 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
     ) {
       throw new AppError("Completed payment has inconsistent booking state.", 409);
     }
+    logger.info(
+      {
+        event: "payment_verification_replayed",
+        paymentId: paymentDoc._id,
+        bookingId: booking._id,
+        gateway: "MOAMALAT",
+      },
+      "Completed payment verification replayed",
+    );
     return res.status(200).json({
       verified: true,
       merchantReference,
@@ -266,6 +276,16 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
   });
 
   if (!result.verified) {
+    logger.warn(
+      {
+        event: "payment_verification_rejected",
+        paymentId: paymentDoc._id,
+        bookingId: booking._id,
+        gateway: "MOAMALAT",
+        gatewayStatus: result.status || null,
+      },
+      "Payment verification rejected",
+    );
     return res.status(200).json({
       verified: false,
       reason: result.reason || "Transaction details did not match.",
@@ -292,6 +312,16 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
   );
 
   const amountLyd = Number(result.amount) / 1000;
+
+  logger.info(
+    {
+      event: "payment_completed",
+      paymentId: paymentDoc._id,
+      bookingId: booking._id,
+      gateway: "MOAMALAT",
+    },
+    "Payment completed",
+  );
 
   return res.status(200).json({
     verified: true,
