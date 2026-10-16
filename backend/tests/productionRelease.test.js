@@ -34,6 +34,8 @@ test("deployment verifies artifacts and restores the previous release on failure
   assert.match(deploy, /restoring the previous release/);
   assert.match(deploy, /"\$root\/\$previous\/deploy\/systemd\/nexride\.service"/);
   assert.match(deploy, /PRODUCTION_ENV_FILE=\/etc\/nexride\/backend\.env/);
+  assert.match(deploy, /chown -R root:nexride "\$incoming"/);
+  assert.match(deploy, /chmod -R go-w "\$incoming"/);
 });
 
 test("explicit rollback is allowlisted by full commit SHA and health checked", () => {

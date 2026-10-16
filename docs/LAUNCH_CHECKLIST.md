@@ -13,6 +13,7 @@ This checklist is the release gate. A launch is approved only when every require
 
 ## 2. Infrastructure
 
+- [ ] `sudo sh /srv/nexride/current/deploy/release/verify-host.sh <full-sha> https://your-domain.example` reports `HOST VERIFIED` for the exact deployed SHA.
 - [ ] `NODE_ENV=production`.
 - [ ] The supplied `nexride.service` is installed, enabled, and running as the dedicated `nexride` user on Node.js 24.
 - [ ] `systemctl restart nexride` completes cleanly and `journalctl -u nexride` shows no forced-shutdown or restart loop.
@@ -78,3 +79,8 @@ Never commit these credentials. All checks must report `PASS`; `SKIPPED` role ch
 - [ ] Rollback trigger is agreed: elevated 5xx rate, payment mismatch, duplicate booking, or readiness failure.
 - [ ] Emergency contact details shown on the site are real and staffed.
 - [ ] After launch, re-run smoke tests and verify the first real customer booking end-to-end.
+
+## 7. Go/no-go approval
+
+- [ ] A completed copy of [`PRODUCTION_SIGN_OFF.md`](./PRODUCTION_SIGN_OFF.md) links the CI, host, recovery, external-service, and human-acceptance evidence.
+- [ ] The release owner and operations owner both record `GO` for the same full Git SHA.

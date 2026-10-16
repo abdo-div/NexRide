@@ -54,6 +54,8 @@ chown -R nexride:nexride "$incoming"
 runuser -u nexride -- npm ci --omit=dev --prefix "$incoming/backend"
 runuser -u nexride -- env PRODUCTION_ENV_FILE=/etc/nexride/backend.env \
   /usr/bin/node "$incoming/backend/scripts/validateProductionEnv.js"
+chown -R root:nexride "$incoming"
+chmod -R go-w "$incoming"
 mv -- "$incoming" "$target"
 incoming=
 
