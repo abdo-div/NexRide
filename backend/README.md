@@ -23,6 +23,10 @@ nightly backups, and isolated restore drills are documented in
 [`docs/VPS_MONGODB.md`](../docs/VPS_MONGODB.md). Database indexes are never
 reconciled automatically during API startup.
 
+Production Redis ACLs, persistence, memory policy, and VPS verification are
+documented in [`docs/VPS_REDIS.md`](../docs/VPS_REDIS.md). The bundled local
+configuration binds Redis to loopback; remote services must use `rediss://`.
+
 ## Install and configure
 
 From the repository root:
@@ -61,7 +65,7 @@ The full list of supported names and secret placeholders is in [`.env.example`](
 | --- | --- |
 | `JWT_SECRET` | Required private secret used to sign and verify session tokens. It must be at least 32 bytes; startup fails if it is missing or too short. |
 | `MONGODB_URI` | MongoDB connection URI. Alternatives supported by the code are `MONGO_URI`, `DATABASE_URI`, `DATABASE_URL`, and `DATABASE`. If none is set, the local replica-set URI above is used. |
-| `REDIS_URL` | Redis connection URI. Without it, configure `REDIS_HOST`, `REDIS_PORT`, and `REDIS_PASSWORD`; defaults are `127.0.0.1:6379`. Other URL aliases are read by the code, but use `REDIS_URL` for URI-based deployments. |
+| `REDIS_URL` | Redis connection URI. Production remote services must use `rediss://` with a named ACL user and password. For a local VPS instance, configure `REDIS_HOST`, `REDIS_PORT`, `REDIS_USERNAME`, and `REDIS_PASSWORD`. Other URL aliases are read by the code, but use `REDIS_URL` for URI-based deployments. |
 | `PORT`, `BIND_HOST`, `NODE_ENV` | HTTP port, listener address, and runtime mode. Production requires `BIND_HOST=127.0.0.1` so Node is reachable only through the local Nginx proxy. |
 | `DNS_SERVERS` | Optional comma-separated IP addresses used to override Node DNS resolution when the host resolver cannot resolve MongoDB Atlas/SRV records. For example, `DNS_SERVERS=8.8.8.8,1.1.1.1`. Omit it to use the host/system resolver. |
 | `FRONTEND_DOMAIN` | Optional comma-separated exact origins allowed by CORS. Development defaults include `http://localhost:5173` and `http://localhost:5174`; configure deployment origins explicitly, for example `FRONTEND_DOMAIN=https://app.example.com,https://admin.example.com`. |

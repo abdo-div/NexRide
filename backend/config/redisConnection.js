@@ -23,6 +23,7 @@ export const resolveRedisConnection = (env = process.env) => {
     connection: {
       host: env.REDIS_HOST || "127.0.0.1",
       port: Number(env.REDIS_PORT) || 6379,
+      username: env.REDIS_USERNAME || undefined,
       password: env.REDIS_PASSWORD || undefined,
     },
     options: {},

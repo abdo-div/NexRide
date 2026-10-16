@@ -128,16 +128,50 @@ const validateRedis = (env, problems) => {
     const redisUrl = valueOf(env, redisUrls[0]);
     if (PLACEHOLDER_PATTERN.test(redisUrl)) {
       problems.push(`${redisUrls[0]} still contains a placeholder value.`);
-    } else if (!parseUrl(redisUrl, ["redis:", "rediss:"])) {
+      return;
+    }
+
+    const parsed = parseUrl(redisUrl, ["redis:", "rediss:"]);
+    if (!parsed) {
       problems.push("The configured Redis URL must use redis:// or rediss://.");
+      return;
+    }
+    if (!parsed.username || !parsed.password) {
+      problems.push(
+        "The production Redis URL must include a named ACL user and password.",
+      );
+    }
+    if (parsed.protocol === "redis:" && !isLoopbackHost(parsed.hostname)) {
+      problems.push(
+        "A remote production Redis URL must use rediss:// so credentials and traffic are encrypted.",
+      );
     }
     return;
   }
 
-  if (!configured(env, "REDIS_HOST")) {
+  const host = valueOf(env, "REDIS_HOST");
+  if (!host) {
     problems.push(
       "Redis is enabled, so configure REDIS_URL or an explicit REDIS_HOST (localhost is allowed on a single VPS).",
     );
+    return;
+  }
+  if (!isLoopbackHost(host)) {
+    problems.push(
+      "REDIS_HOST must be loopback in production; use a rediss:// REDIS_URL for a remote Redis service.",
+    );
+  }
+
+  const redisPort = Number(valueOf(env, "REDIS_PORT"));
+  if (!Number.isInteger(redisPort) || redisPort < 1 || redisPort > 65535) {
+    problems.push("REDIS_PORT must be an integer from 1 to 65535.");
+  }
+  for (const name of ["REDIS_USERNAME", "REDIS_PASSWORD"]) {
+    const value = valueOf(env, name);
+    if (!value) problems.push(`${name} is required when Redis is enabled.`);
+    else if (PLACEHOLDER_PATTERN.test(value)) {
+      problems.push(`${name} still contains a placeholder value.`);
+    }
   }
 };
 

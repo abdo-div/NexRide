@@ -1,0 +1,5 @@
+# Replace the password, save as /etc/redis/nexride.acl, then set root:redis
+# ownership and mode 0640. Never commit the real ACL file.
+user default off
+user nexride on >replace-with-a-long-random-password resetkeys ~nexride:* resetchannels &nexride:* +@all -acl +acl|whoami -bgrewriteaof -bgsave -config -debug -flushall -flushdb -migrate -module -monitor -psync -replicaof -restore -save -shutdown -slaveof -sync
+

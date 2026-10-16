@@ -18,7 +18,9 @@ This checklist is the release gate. A launch is approved only when every require
 - [ ] `systemctl restart nexride` completes cleanly and `journalctl -u nexride` shows no forced-shutdown or restart loop.
 - [ ] MongoDB is an authenticated replica set bound only to a trusted interface; `db.hello()` reports a writable primary.
 - [ ] The nightly MongoDB backup timer succeeded, its encrypted off-host copy exists, and an isolated restore drill passed.
-- [ ] Redis is reachable over TLS where supported and configured for persistence/availability.
+- [ ] Redis uses the dedicated `nexride` ACL user; the default user is disabled and TCP is loopback-only (or the managed service uses `rediss://`).
+- [ ] `deploy/redis/verify.sh` passes, AOF/RDB persistence is healthy, and Redis has enough disk and memory headroom.
+- [ ] The single-VPS Redis failure window is accepted, or a managed/replicated Redis service has been provisioned for high availability.
 - [ ] `JWT_SECRET` is unique, random, and at least 32 bytes.
 - [ ] `FRONTEND_URL` and `FRONTEND_DOMAIN` exactly match the public HTTPS origin.
 - [ ] DNS and TLS certificate are valid; HTTP redirects to HTTPS.
