@@ -13,6 +13,7 @@ interface CommandBarProps {
   segment: string | null;
   onSegmentChange: (id: string | null) => void;
   segmentCounts: Record<string, number>;
+  onOpenFilters: () => void;
 }
 
 const PARAM_ICONS = [MapPin, Calendar, SlidersHorizontal];
@@ -22,6 +23,7 @@ export const CommandBar: React.FC<CommandBarProps> = ({
   segment,
   onSegmentChange,
   segmentCounts,
+  onOpenFilters,
 }) => {
   const { t } = useTranslation();
 
@@ -33,9 +35,8 @@ export const CommandBar: React.FC<CommandBarProps> = ({
           {params.map((p, i) => {
             const Icon = PARAM_ICONS[i % PARAM_ICONS.length];
             return (
-              <button
+              <div
                 key={p.label}
-                type="button"
                 className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-sm hover:bg-slate-50 transition-colors text-left"
               >
                 <Icon className="text-[#142B4A] w-[18px] h-[18px]" />
@@ -45,11 +46,13 @@ export const CommandBar: React.FC<CommandBarProps> = ({
                   </span>
                   <span className="text-xs font-bold text-[#0F172A]">{p.value}</span>
                 </div>
-              </button>
+              </div>
             );
           })}
           <button
             type="button"
+            onClick={onOpenFilters}
+            aria-label={t("fleet.filters.title")}
             className="p-2.5 px-3.5 rounded-xl bg-[#142B4A] text-white hover:bg-blue-700 shadow-sm transition-all flex items-center justify-center"
           >
             <Search className="w-5 h-5" />

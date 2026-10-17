@@ -67,22 +67,36 @@ export const initialsFrom = (name: string): string =>
     .map((word) => word[0]?.toUpperCase() ?? "")
     .join("") || "?";
 
+const mediaUrl = (value: string, fallbackDirectory: string): string => {
+  if (/^(https?:\/\/|data:|blob:)/i.test(value)) return value;
+
+  let normalizedPath = value.replaceAll("\\", "/").replace(/^\/+/, "");
+  normalizedPath = normalizedPath.replace(/^public\//i, "");
+
+  const parts = normalizedPath.split("/").filter(Boolean);
+  const knownDirectory = /^(cars|vehicles|companies|users)$/i.test(parts[0] ?? "")
+    ? parts.shift()!.toLowerCase()
+    : fallbackDirectory;
+  const encodedPath = parts.length > 0
+    ? parts.map((part) => encodeURIComponent(part)).join("/")
+    : encodeURIComponent(normalizedPath);
+
+  return `${API_ORIGIN}/public/${knownDirectory}/${encodedPath}`;
+};
+
 export const companyLogoUrl = (logo: string | null | undefined): string | null => {
   if (!logo || logo === "default-company-logo.png") return null;
-  if (/^(https?:\/\/|data:|blob:)/i.test(logo)) return logo;
-  return `${API_ORIGIN}/companies/${encodeURIComponent(logo.replace(/^\/+/, ""))}`;
+  return mediaUrl(logo, "companies");
 };
 
 /** Resolves a stored photo filename to a URL, falling back to the placeholder. */
 export const photoUrl = (photo: string | undefined): string => {
   if (!photo) return PLACEHOLDER_IMAGE;
-  if (/^https?:\/\//i.test(photo)) return photo;
-  const normalizedPath = photo.replace(/^\/+/, "");
-  if (/^(cars|vehicles)\//i.test(normalizedPath)) {
-    return `${API_ORIGIN}/${normalizedPath}`;
-  }
+  const normalizedPath = photo.replaceAll("\\", "/").replace(/^\/+/, "");
+  const storagePath = normalizedPath.replace(/^public\//i, "");
+  if (/^(cars|vehicles)\//i.test(storagePath)) return mediaUrl(photo, "vehicles");
   const directory = normalizedPath.startsWith("vehicle-") ? "vehicles" : "cars";
-  return `${API_ORIGIN}/${directory}/${encodeURIComponent(normalizedPath)}`;
+  return mediaUrl(photo, directory);
 };
 
 const isCompanyRef = (
