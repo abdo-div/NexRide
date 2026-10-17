@@ -38,9 +38,12 @@ export const checkAvailabilitySchema = z.object({
 
 export const cancelBookingSchema = z.object({
   params: z.object({ id: objectId }),
-  body: z.object({
-    reason: z.string().trim().min(1).max(500).nullable().optional(),
-  }).strict(),
+  body: z
+    .object({
+      reason: z.string().trim().min(1).max(500).nullable().optional(),
+    })
+    .strict()
+    .default({}),
 });
 
 export const updateBookingStatusSchema = z.object({

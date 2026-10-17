@@ -88,6 +88,7 @@ export const bookingApi = {
   cancel: (id: string): Promise<BookingResponse> =>
     request<BookingResponse>(`/bookings/${encodeURIComponent(id)}/cancel`, {
       method: "PATCH",
+      body: {},
     }),
 
   /**
