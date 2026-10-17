@@ -155,6 +155,7 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
               type="button"
               onClick={prev}
               disabled={!canGoPrev}
+              aria-label="Previous month"
               className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-600 hover:bg-slate-100 disabled:opacity-30"
             >
               <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
@@ -163,6 +164,7 @@ const CalendarPopup: React.FC<CalendarPopupProps> = ({
               type="button"
               onClick={next}
               disabled={!canGoNext}
+              aria-label="Next month"
               className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-600 hover:bg-slate-100 disabled:opacity-30"
             >
               <ChevronRight className="w-4 h-4 rtl:rotate-180" />

@@ -172,8 +172,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onForgotPassword }) => {
       <p className="text-[11px] text-center text-slate-500 pt-1">
         {t("auth.signin.contactFleetDesk")}{" "}
         <a
-          href="#fleet-desk"
-          onClick={(e) => e.preventDefault()}
+          href="tel:+218910008820"
           className="text-[#142B4A] font-semibold hover:underline"
         >
           {t("auth.signin.contactFleetDeskLink")}

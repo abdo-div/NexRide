@@ -19,7 +19,7 @@ export const FeaturedHeader: React.FC = () => {
       </div>
 
       <a
-        href="#all-cars"
+        href="/fleet"
         className="inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors group self-start md:self-auto"
       >
         <span>{t("home.featured.viewAll")}</span>

@@ -18,6 +18,21 @@ export const Footer: React.FC = () => {
   const { user } = useAuth();
   const isCompany = user?.role?.trim() === "company";
   const lang = (i18n.language in LANGUAGES ? i18n.language : "ar") as LanguageKey;
+  const contactNumber = "+218910008820";
+  const contactUrl = `https://wa.me/${contactNumber.replace(/\D/g, "")}`;
+  const [shareState, setShareState] = useState<"idle" | "copied">("idle");
+
+  const handleShare = async () => {
+    const shareData = { title: "NexRide", url: window.location.href };
+    try {
+      if (navigator.share) await navigator.share(shareData);
+      else await navigator.clipboard.writeText(shareData.url);
+      setShareState("copied");
+      window.setTimeout(() => setShareState("idle"), 2000);
+    } catch {
+      setShareState("idle");
+    }
+  };
 
   const EXPLORE_LINKS: FooterSection = {
     title: t("footer.explore"),
@@ -71,15 +86,33 @@ export const Footer: React.FC = () => {
             </p>
 
             <div className="flex items-center gap-2">
-              <button className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+              <Link
+                to="/"
+                aria-label={lang === "ar" ? "الصفحة الرئيسية" : "NexRide home"}
+                title={lang === "ar" ? "الصفحة الرئيسية" : "NexRide home"}
+                className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+              >
                 <Globe className="w-3.5 h-3.5" />
-              </button>
-              <button className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+              </Link>
+              <button
+                type="button"
+                onClick={() => void handleShare()}
+                aria-label={lang === "ar" ? "مشاركة نيكس رايد" : "Share NexRide"}
+                title={shareState === "copied" ? (lang === "ar" ? "تم نسخ الرابط" : "Link copied") : (lang === "ar" ? "مشاركة" : "Share")}
+                className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+              >
                 <Share2 className="w-3.5 h-3.5" />
               </button>
-              <button className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+              <a
+                href={contactUrl}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={lang === "ar" ? "تواصل عبر واتساب" : "Contact NexRide on WhatsApp"}
+                title={lang === "ar" ? "تواصل عبر واتساب" : "Contact us on WhatsApp"}
+                className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+              >
                 <MessageSquare className="w-3.5 h-3.5" />
-              </button>
+              </a>
             </div>
           </div>
 

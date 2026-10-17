@@ -31,20 +31,22 @@ export const OperatorProfile: React.FC<{ detail: VehicleDetail }> = ({ detail })
         </div>
       </div>
       <div className="flex items-center gap-3 w-full md:w-auto">
-        <button
-          type="button"
+        <a
+          href="https://wa.me/218910008820"
+          target="_blank"
+          rel="noreferrer"
           className="flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] hover:bg-[#F1F5F9] text-[#0F172A] text-[13px] font-semibold flex items-center justify-center gap-2 transition-colors"
         >
           <MessageCircle className="w-[18px] h-[18px] text-[#142B4A]" />
           {t("vehicleDetail.agencyWhatsapp")}
-        </button>
-        <button
-          type="button"
+        </a>
+        <a
+          href="tel:+218910008820"
           className="flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] hover:bg-[#F1F5F9] text-[#0F172A] text-[13px] font-semibold flex items-center justify-center gap-2 transition-colors"
         >
           <Phone className="w-[18px] h-[18px] text-[#142B4A]" />
           {t("vehicleDetail.directCall")}
-        </button>
+        </a>
       </div>
     </section>
   );

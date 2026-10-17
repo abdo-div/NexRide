@@ -285,6 +285,7 @@ export const AdminLayout: React.FC = () => {
 
             <button
               type="button"
+              onClick={() => navigate("/admin/bookings?status=PENDING")}
               aria-label={t("admin.layout.notifications")}
               className="relative rounded-xl p-2 text-[#434655] transition-colors hover:bg-[#F1F5F9]"
             >

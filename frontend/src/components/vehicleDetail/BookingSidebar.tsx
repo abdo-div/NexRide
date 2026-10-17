@@ -298,12 +298,12 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
             </p>
           </div>
         </div>
-        <button
-          type="button"
+        <a
+          href="tel:+218910008820"
           className="px-3 py-1.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] hover:bg-[#F1F5F9] text-[#142B4A] text-[12px] font-bold transition-colors"
         >
           {t("vehicleDetail.inquire")}
-        </button>
+        </a>
       </div>
 
       {plan && (
