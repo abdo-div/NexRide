@@ -1,4 +1,3 @@
-import { API_ORIGIN } from "./vehicleApi";
 import type { AdminCustomerDto, AdminPaymentDto } from "../types/admin";
 import type { BookingDto } from "../types/booking";
 import { RESERVED_BOOKING_STATUSES } from "./companyView";
@@ -98,13 +97,21 @@ export const customerChannels = (
  */
 export const userPhotoUrl = (photo: string | undefined): string => {
   if (!photo) return "";
-  if (/^https?:\/\//i.test(photo)) return photo;
-  const normalizedPath = photo.replace(/^\/+/, "");
-  if (/^(users|avatars)\//i.test(normalizedPath)) {
-    return `${API_ORIGIN}/${normalizedPath}`;
+  const value = photo.trim();
+  if (/^(https?:\/\/|blob:|data:image\/)/i.test(value)) return value;
+
+  const normalizedPath = value.replace(/^\/+/, "").replace(/^public\//i, "");
+  const match = normalizedPath.match(/^(?:users|avatars)\/(.+)$/i);
+  const filename = match?.[1] ?? (normalizedPath.startsWith("user-") ? normalizedPath : "");
+
+  if (filename) {
+    const encodedFilename = filename
+      .split("/")
+      .filter(Boolean)
+      .map(encodeURIComponent)
+      .join("/");
+    return `/public/users/${encodedFilename}`;
   }
-  if (normalizedPath.startsWith("user-")) {
-    return `${API_ORIGIN}/users/${encodeURIComponent(normalizedPath)}`;
-  }
+
   return "";
 };
