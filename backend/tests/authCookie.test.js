@@ -45,6 +45,7 @@ test("authentication exposes the JWT only through a hardened HTTP-only cookie", 
   assert.equal(state.cookie.options.httpOnly, true);
   assert.equal(state.cookie.options.sameSite, "lax");
   assert.equal(state.cookie.options.secure, false);
+  assert.equal(state.cookie.options.partitioned, false);
   assert.equal(state.cookie.options.path, "/");
   assert.ok(state.cookie.options.expires instanceof Date);
 });
@@ -80,6 +81,7 @@ test("production sessions support credentialed requests from a separate frontend
 
   assert.equal(state.cookie.options.secure, true);
   assert.equal(state.cookie.options.sameSite, "none");
+  assert.equal(state.cookie.options.partitioned, true);
 });
 
 test("logout expires the cookie with the same security attributes", () => {
