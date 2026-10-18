@@ -84,6 +84,27 @@ test("production sessions support credentialed requests from a separate frontend
   assert.equal(state.cookie.options.partitioned, true);
 });
 
+test("HTTPS cross-origin logins use a partitioned cookie even when NODE_ENV is not production", () => {
+  const { response, state } = responseDouble();
+  createSendToken(
+    { _id: "dddddddddddddddddddddddd", password: "secret" },
+    200,
+    {
+      protocol: "https",
+      secure: true,
+      headers: { origin: "https://nexride-2-v7el.onrender.com" },
+      get(name) {
+        return name === "host" ? "nexride-1-llcx.onrender.com" : undefined;
+      },
+    },
+    response,
+  );
+
+  assert.equal(state.cookie.options.secure, true);
+  assert.equal(state.cookie.options.sameSite, "none");
+  assert.equal(state.cookie.options.partitioned, true);
+});
+
 test("logout expires the cookie with the same security attributes", () => {
   const { response, state } = responseDouble();
 

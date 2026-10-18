@@ -6,6 +6,12 @@ import * as authService from "../services/authService.js";
  */
 const cookieSecurityOptions = (req) => {
   const isProduction = process.env.NODE_ENV === "production";
+  const requestOrigin = req.headers.origin;
+  const isHttpsCrossOriginRequest =
+    typeof requestOrigin === "string" &&
+    requestOrigin.startsWith("https://") &&
+    requestOrigin !== `${req.protocol}://${req.get?.("host")}`;
+  const requiresCrossSiteCookie = isProduction || isHttpsCrossOriginRequest;
 
   return {
     httpOnly: true,
@@ -13,13 +19,13 @@ const cookieSecurityOptions = (req) => {
     // only attach a credentialed cookie to those API requests when production
     // uses SameSite=None, which in turn requires Secure.
     secure:
-      isProduction ||
+      requiresCrossSiteCookie ||
       req.secure ||
       req.headers["x-forwarded-proto"] === "https",
-    sameSite: isProduction ? "none" : "lax",
+    sameSite: requiresCrossSiteCookie ? "none" : "lax",
     // CHIPS keeps the session usable when privacy controls block ordinary
     // third-party cookies between separate Render frontend/API domains.
-    partitioned: isProduction,
+    partitioned: requiresCrossSiteCookie,
     path: "/",
   };
 };
