@@ -22,6 +22,7 @@ import {
 import type { BookingDto } from "../../types/booking";
 import { photoUrl } from "../../lib/vehicleMapper";
 import { bookingApi } from "../../lib/bookingApi";
+import { useDialog } from "../../context/useDialog";
 import {
   formatDate,
   formatLYD,
@@ -30,7 +31,7 @@ import {
   saveBlobAsFile,
   vehicleRefOf,
   vehicleTitle,
-  daysUntil,
+  pickupTiming,
   providerOf,
 } from "../../lib/bookingView";
 
@@ -60,6 +61,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
 }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { confirm: confirmDialog } = useDialog();
   const [busy, setBusy] = useState(false);
 
   const status = booking.bookingStatus;
@@ -80,6 +82,8 @@ export const BookingCard: React.FC<BookingCardProps> = ({
   const isPendingPayment = status === "PENDING_PAYMENT";
   const isCompleted = status === "COMPLETED";
   const isTerminated = status === "CANCELLED" || status === "EXPIRED";
+  const pickup = pickupTiming(booking.startDate);
+  const pickupIsOverdue = isUpcoming && pickup.phase === "overdue";
 
   const photo = photoUrl(vehicle?.photos?.[0]);
 
@@ -93,7 +97,9 @@ export const BookingCard: React.FC<BookingCardProps> = ({
     ? "bg-slate-100 text-slate-500"
     : "bg-[#EFF6FF] text-[#0D2039]";
 
-  const statusLabel = isUpcoming
+  const statusLabel = pickupIsOverdue
+    ? t("myBookings.status.overduePickup")
+    : isUpcoming
     ? t("myBookings.status.upcoming")
     : t(`myBookings.status.${status}`);
 
@@ -125,7 +131,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
   };
 
   const requestCancel = async () => {
-    const confirmed = window.confirm(
+    const confirmed = await confirmDialog(
       `${t("myBookings.cancelConfirmTitle")}\n${t("myBookings.cancelConfirmBody")}`,
     );
     if (!confirmed || busy) return;
@@ -190,9 +196,13 @@ export const BookingCard: React.FC<BookingCardProps> = ({
           </span>
         )}
         {isUpcoming && (
-          <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">
-            <CalendarClock className="w-3.5 h-3.5" />
-            {t("myBookings.startsIn", { days: Math.max(1, daysUntil(booking.startDate)) })}
+          <span className={`inline-flex items-center gap-1 text-xs font-semibold ${pickupIsOverdue ? "text-rose-700" : "text-emerald-700"}`}>
+            {pickupIsOverdue ? <CircleAlert className="w-3.5 h-3.5" /> : <CalendarClock className="w-3.5 h-3.5" />}
+            {pickup.phase === "future"
+              ? t("myBookings.startsIn", { days: pickup.days })
+              : pickup.phase === "today"
+              ? t("myBookings.pickupToday")
+              : t("myBookings.pickupOverdue", { days: pickup.days })}
           </span>
         )}
         {isPendingPayment && (

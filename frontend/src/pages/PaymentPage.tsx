@@ -13,6 +13,7 @@ import { bookingApi } from "../lib/bookingApi";
 import { ApiError } from "../lib/apiClient";
 import type { BookingDto } from "../types/booking";
 import { moamalatApi } from "../lib/moamalatApi";
+import { useDialog } from "../context/useDialog";
 import {
   loadMoamalatLightbox,
   openMoamalatLightbox,
@@ -51,6 +52,7 @@ const PaymentPage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { confirm: confirmDialog } = useDialog();
 
   const [booking, setBooking] = useState<BookingDto | null>(null);
   const [status, setStatus] = useState<PaymentStatus>("loading");
@@ -149,6 +151,10 @@ const PaymentPage: React.FC = () => {
     try {
       await loadMoamalatLightbox();
       const init = await moamalatApi.initiate(booking._id);
+      if (import.meta.env.DEV) {
+        console.debug("[Moamalat] initiate response:", init);
+        console.debug("[Moamalat] LightBox params:", init.data.gateway.params);
+      }
       openMoamalatLightbox(init.data.gateway.params, {
         onComplete: (response) => {
           handleVerified(init.data.payment.merchantReference, response);
@@ -161,13 +167,8 @@ const PaymentPage: React.FC = () => {
           );
         },
         onCancel: () => {
-          setStatus("preparing");
-          void bookingApi
-            .cancel(booking._id)
-            .catch(() => undefined)
-            .finally(() => {
-              navigate(`/cars/${vehicleIdOf(booking)}`, { replace: true });
-            });
+          // Do NOT cancel the booking — the user may want to retry.
+          setStatus("ready");
         },
       });
     } catch (err) {
@@ -177,6 +178,30 @@ const PaymentPage: React.FC = () => {
       }
       setStatus("gatewayError");
       setError(err instanceof Error ? err.message : t("payment.gatewayError"));
+    }
+  };
+
+  const [cancelling, setCancelling] = useState(false);
+
+  const handleCancelReservation = async () => {
+    if (!booking || cancelling) return;
+    const confirmMessage = t("payment.cancelConfirm", {
+      defaultValue:
+        "Are you sure you want to cancel this reservation? The vehicle will be immediately released back to the fleet.",
+    });
+    if (!(await confirmDialog(confirmMessage))) return;
+
+    setCancelling(true);
+    try {
+      await bookingApi.cancel(booking._id, "Customer cancelled payment");
+      navigate("/fleet", { replace: true });
+    } catch {
+      setError(
+        t("payment.cancelFailed", {
+          defaultValue: "Unable to cancel reservation. Please try again.",
+        }),
+      );
+      setCancelling(false);
     }
   };
 
@@ -339,6 +364,16 @@ const PaymentPage: React.FC = () => {
                       >
                         {t("payment.backToFleet")}
                       </Link>
+                      <button
+                        type="button"
+                        onClick={handleCancelReservation}
+                        disabled={cancelling}
+                        className="px-5 py-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 text-[14px] font-bold transition-all disabled:opacity-50"
+                      >
+                        {cancelling
+                          ? t("common.cancelling", { defaultValue: "Cancelling..." })
+                          : t("payment.cancelReservation", { defaultValue: "Cancel & Free Vehicle" })}
+                      </button>
                     </div>
                   </div>
                 )}
@@ -355,14 +390,29 @@ const PaymentPage: React.FC = () => {
                 )}
 
                 {status === "ready" && (
-                  <button
-                    type="button"
-                    onClick={handlePay}
-                    className="w-full py-4 rounded-xl bg-[#0F172A] hover:bg-slate-800 text-white text-[15px] font-bold transition-all flex items-center justify-center gap-2"
-                  >
-                    <ShieldCheck className="w-5 h-5" />
-                    {t("payment.payButton")}
-                  </button>
+                  <div className="flex flex-col gap-3">
+                    <button
+                      type="button"
+                      onClick={handlePay}
+                      className="w-full py-4 rounded-xl bg-[#0F172A] hover:bg-slate-800 text-white text-[15px] font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <ShieldCheck className="w-5 h-5" />
+                      {t("payment.payButton")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCancelReservation}
+                      disabled={cancelling}
+                      className="w-full py-2.5 text-center text-xs text-red-600 hover:text-red-700 font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <XCircle className="w-3.5 h-3.5" />
+                      {cancelling
+                        ? t("common.cancelling", { defaultValue: "Cancelling..." })
+                        : t("payment.cancelAndRelease", {
+                            defaultValue: "Cancel reservation & release vehicle",
+                          })}
+                    </button>
+                  </div>
                 )}
               </>
             )}

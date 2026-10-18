@@ -247,7 +247,7 @@ block scripts
             if (res.redirected) window.location.href = res.url;
             else window.location.href = "/fleet";
           }).catch(function () {
-            alert("Upload failed. Please try again.");
+            window.nexrideNotify("Upload failed. Please try again.");
           });
         });
       }

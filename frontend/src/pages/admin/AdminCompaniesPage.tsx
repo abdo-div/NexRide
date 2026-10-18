@@ -31,6 +31,7 @@ import {
   vehiclesOf,
 } from "../../lib/companyView";
 import { initialsFrom } from "../../lib/vehicleMapper";
+import { useDialog } from "../../context/useDialog";
 import { StatusPill } from "../../components/admin/StatusPill";
 import { AdminCompaniesTable } from "../../components/admin/AdminCompaniesTable";
 import {
@@ -98,6 +99,7 @@ const richnessOf = (
 
 export const AdminCompaniesPage: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const { confirm: confirmDialog } = useDialog();
   const navigate = useNavigate();
   // KPI/dossier sections read the bounded registries, so they follow the
   // registry's own load state rather than the table's page state.
@@ -262,7 +264,7 @@ export const AdminCompaniesPage: React.FC = () => {
   };
 
   const removeCompany = async (company: AdminCompanyDto) => {
-    const confirmed = window.confirm(
+    const confirmed = await confirmDialog(
       t("admin.companies.dossier.removeConfirm", { name: company.name }),
     );
     if (!confirmed) return;

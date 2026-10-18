@@ -18,6 +18,7 @@ import { ApiError } from "../../lib/apiClient";
 import type { CompanyVehicleData } from "../../types/companyVehicle";
 import { FleetStatusPill } from "./CompanyFleetBits";
 import { categoryLabel } from "./companyFleetUi";
+import { useDialog } from "../../context/useDialog";
 
 interface CompanyVehicleHeaderProps {
   data: CompanyVehicleData;
@@ -35,6 +36,7 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
   loading,
 }) => {
   const { t } = useTranslation();
+  const { confirm: confirmDialog } = useDialog();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [actionBusy, setActionBusy] = useState(false);
@@ -63,8 +65,8 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
     [showToast, t],
   );
 
-  const handleMaintenance = () => {
-    if (!window.confirm(t("company.vehiclePage.header.maintenanceConfirm"))) return;
+  const handleMaintenance = async () => {
+    if (!(await confirmDialog(t("company.vehiclePage.header.maintenanceConfirm")))) return;
     void runAction(
       () => companyVehicleApi.updateStatus(vehicle.id, "MAINTENANCE"),
       "company.vehiclePage.header.maintenanceDone",
@@ -72,8 +74,8 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
     );
   };
 
-  const handleTogglePublish = () => {
-    if (!window.confirm(t("company.vehiclePage.header.publishConfirm"))) return;
+  const handleTogglePublish = async () => {
+    if (!(await confirmDialog(t("company.vehiclePage.header.publishConfirm")))) return;
     const nextStatus = vehicle.listingStatus === "PUBLISHED" ? "SUSPENDED" : "PUBLISHED";
     void runAction(
       () => companyVehicleApi.updateStatus(vehicle.id, nextStatus),
@@ -84,8 +86,8 @@ export const CompanyVehicleHeader: React.FC<CompanyVehicleHeaderProps> = ({
     );
   };
 
-  const handleArchive = () => {
-    if (!window.confirm(t("company.vehiclePage.header.archiveConfirm"))) return;
+  const handleArchive = async () => {
+    if (!(await confirmDialog(t("company.vehiclePage.header.archiveConfirm")))) return;
     setActionBusy(true);
     companyVehicleApi
       .archive(vehicle.id)

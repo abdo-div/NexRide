@@ -133,8 +133,8 @@ block scripts
         });
         const data = await res.json();
         if (data.status === 'success') window.location.assign('/');
-        else alert(data.message);
-      } catch(e) { alert('Something went wrong. Please try again.'); }
+        else window.nexrideNotify(data.message);
+      } catch(e) { window.nexrideNotify('Something went wrong. Please try again.'); }
     });
 
     // Signup via axios
@@ -154,6 +154,6 @@ block scripts
         });
         const data = await res.json();
         if (data.status === 'success') window.location.assign('/');
-        else alert(data.message);
-      } catch(e) { alert('Something went wrong. Please try again.'); }
+        else window.nexrideNotify(data.message);
+      } catch(e) { window.nexrideNotify('Something went wrong. Please try again.'); }
     });

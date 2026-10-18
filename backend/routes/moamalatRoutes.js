@@ -1,9 +1,11 @@
 import express from "express";
 import {
   getGatewayConfig,
+  diagnose,
   createPayment,
   initiatePayment,
   verifyPayment,
+  releasePayment,
 } from "../controllers/moamalatController.js";
 import { protect, restrictTo } from "../middlewares/authMiddleware.js";
 import { idempotency } from "../middlewares/idempotence.middleware.js";
@@ -31,6 +33,9 @@ const router = express.Router();
  *         description: LightBox configuration
  */
 router.get("/config", getGatewayConfig);
+
+// DEV-ONLY: Hash/config diagnostics (returns 404 in production)
+router.get("/diagnose", diagnose);
 
 // Payment creation & initialization routes
 
@@ -108,6 +113,41 @@ router.post(
   paymentVerificationLimiter,
   validate(verifyPaymentSchema),
   verifyPayment,
+);
+
+/**
+ * @openapi
+ * /payments/moamalat/release:
+ *   post:
+ *     tags: [Moamalat]
+ *     summary: Release a booking whose payment did not succeed
+ *     description: >
+ *       Retires an unpaid PENDING_PAYMENT booking and returns its vehicle to the
+ *       market, so a failed Moamalat payment never keeps the car rented. Only
+ *       the owning customer may release their own booking.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [bookingId]
+ *             properties:
+ *               bookingId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Release outcome for the booking
+ *       403:
+ *         description: Customer role required
+ */
+router.post(
+  "/release",
+  protect,
+  restrictTo("customer"),
+  idempotency(86400),
+  validate(initiatePaymentSchema),
+  releasePayment,
 );
 
 export default router;

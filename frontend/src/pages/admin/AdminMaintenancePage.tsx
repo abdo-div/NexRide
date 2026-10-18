@@ -35,6 +35,7 @@ import type {
   MaintenanceDispatchStatus,
   MaintenanceEventDto,
 } from "../../types/admin";
+import { useDialog } from "../../context/useDialog";
 
 const PAGE_SIZE = 20;
 const STATUS_OPTIONS: MaintenanceDispatchStatus[] = [
@@ -52,6 +53,7 @@ const formatCount = (value: number): string =>
 
 export const AdminMaintenancePage: React.FC = () => {
   const { t } = useTranslation();
+  const { confirm: confirmDialog } = useDialog();
   const { hub } = useAdminHub();
   const {
     data,
@@ -231,7 +233,7 @@ export const AdminMaintenancePage: React.FC = () => {
     const vehicle = vehicleOf(event);
     const vehicleId = vehicle?._id ?? String(event.vehicleId);
     if (!vehicleId) return;
-    if (!window.confirm(t("admin.maintenance.dossier.releaseConfirmTitle"))) return;
+    if (!(await confirmDialog(t("admin.maintenance.dossier.releaseConfirmTitle")))) return;
     setBusy(true);
     try {
       await adminApi.releaseMaintenanceVehicle(vehicleId);

@@ -15,12 +15,14 @@ import { FinancialCard } from "../components/bookingDetails/FinancialCard";
 import { ChecklistCard } from "../components/bookingDetails/ChecklistCard";
 import { ConciergeCard } from "../components/bookingDetails/ConciergeCard";
 import { BookingReviewCard } from "../components/bookingDetails/BookingReviewCard";
+import { useDialog } from "../context/useDialog";
 
 const TOAST_MS = 3000;
 
 export const BookingDetailsPage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
   const { t } = useTranslation();
+  const { confirm: confirmDialog } = useDialog();
 
   const [booking, setBooking] = useState<BookingDto | null>(null);
   const [loading, setLoading] = useState(true);
@@ -111,7 +113,7 @@ export const BookingDetailsPage: React.FC = () => {
 
   const handleCancel = async () => {
     if (!booking) return;
-    const confirmed = window.confirm(
+    const confirmed = await confirmDialog(
       `${t("bookingDetails.cancelConfirmTitle")}\n${t("bookingDetails.cancelConfirmBody")}`,
     );
     if (!confirmed) return;

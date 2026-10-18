@@ -66,7 +66,7 @@ export const companyBookingsApi = {
    * Cancel a booking (PATCH /bookings/:id/cancel). Tenant-scoped; the company
    * can cancel any of its own non-terminal bookings with an optional reason.
    */
-  cancel: (bookingId: string, reason: string, signal?: AbortSignal) =>
+  cancel: (bookingId: string, reason: string | null, signal?: AbortSignal) =>
     request<CompanyBookingStatusResponse>(`/bookings/${bookingId}/cancel`, {
       method: "PATCH",
       body: { reason },

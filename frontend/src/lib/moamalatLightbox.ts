@@ -3,6 +3,8 @@ import type { MoamalatGatewayParams } from "./moamalatApi";
 
 let lightboxPromise: Promise<LightboxApi> | null = null;
 let scriptPromise: Promise<void> | null = null;
+let loadedLightboxUrl: string | null = null;
+let activeMessageHandler: ((event: MessageEvent) => void) | null = null;
 const LIGHTBOX_LOAD_TIMEOUT_MS = 12_000;
 
 export const getLightboxApi = (): LightboxApi | null =>
@@ -76,6 +78,7 @@ export const loadMoamalatLightbox = async (): Promise<LightboxApi> => {
   if (!lightboxPromise) {
     lightboxPromise = (async () => {
       const { data } = await moamalatApi.getConfig();
+      loadedLightboxUrl = data.lightBoxUrl;
       const loadAttempt = async () => {
         try {
           await injectScript(data.lightBoxUrl);
@@ -137,45 +140,71 @@ export const openMoamalatLightbox = (
   if (!api) {
     throw new Error("The Moamalat payment window is not loaded");
   }
+
+  document.querySelectorAll("iframe#Lightbox").forEach((item) => item.remove());
+  if (activeMessageHandler) {
+    window.removeEventListener("message", activeMessageHandler);
+  }
+
+  const scriptUrl =
+    loadedLightboxUrl ||
+    document.querySelector<HTMLScriptElement>("script[data-moamalat-lightbox]")?.src;
+  if (!scriptUrl) throw new Error("The Moamalat checkout URL is unavailable");
+
+  const gatewayOrigin = new URL(scriptUrl).origin;
+  const checkoutUrl = new URL("/Home/LightboxHostedCheckout/", gatewayOrigin);
+  checkoutUrl.searchParams.set("paymentMethodFromLightBox", "2");
+  checkoutUrl.searchParams.set("OrderID", "");
+  checkoutUrl.searchParams.set("MID", params.MID);
+  checkoutUrl.searchParams.set("MerchantReference", params.MerchantReference);
+  checkoutUrl.searchParams.set("amount", String(Number(params.AmountTrxn) / 1000));
+  checkoutUrl.searchParams.set("TID", params.TID);
+  checkoutUrl.searchParams.set("secureHashAnonymous", params.SecureHash);
+  checkoutUrl.searchParams.set("trxDateTime", params.TrxDateTime);
+  checkoutUrl.searchParams.set("feeAmount", "0");
+
   let settled = false;
-  api.Checkout.configure = {
-    ...params,
-    completeCallback: (response) => {
-      if (settled) return;
-      settled = true;
-      if (import.meta.env.DEV) {
-        console.debug("MOAMALAT COMPLETE CALLBACK:", response);
-      }
-      try {
-        api.Checkout.closeLightbox();
-      } catch {
-        /* ignore */
-      }
-      callbacks.onComplete(response);
-    },
-    errorCallback: (err) => {
-      // Some LightBox versions emit an error/cancel event while closing after
-      // a successful completion. Never let that overwrite a valid payment.
-      if (settled) return;
-      settled = true;
-      if (import.meta.env.DEV) {
-        console.error("MOAMALAT ERROR CALLBACK:", err);
-      }
-      callbacks.onError?.(err);
-    },
-    cancelCallback: () => {
-      if (settled) return;
-      settled = true;
-      if (import.meta.env.DEV) {
-        console.debug("MOAMALAT CANCEL CALLBACK");
-      }
-      callbacks.onCancel?.();
-    },
+  const cleanup = () => {
+    document.querySelectorAll("iframe#Lightbox").forEach((item) => item.remove());
+    if (activeMessageHandler) {
+      window.removeEventListener("message", activeMessageHandler);
+      activeMessageHandler = null;
+    }
   };
-  api.Checkout.showLightbox();
+  activeMessageHandler = (event: MessageEvent) => {
+    if (event.origin !== gatewayOrigin || !event.data || settled) return;
+    if (event.data.callback === "completeCallback") {
+      settled = true;
+      cleanup();
+      callbacks.onComplete(event.data.paymentInfo ?? {});
+    } else if (event.data.callback === "errorCallback") {
+      settled = true;
+      cleanup();
+      callbacks.onError?.(event.data.Info);
+    } else if (event.data.callback === "cancelCallback") {
+      settled = true;
+      cleanup();
+      callbacks.onCancel?.();
+    }
+  };
+  window.addEventListener("message", activeMessageHandler);
+
+  const iframe = document.createElement("iframe");
+  iframe.id = "Lightbox";
+  iframe.title = "Moamalat secure payment";
+  iframe.src = checkoutUrl.toString();
+  iframe.style.cssText =
+    "z-index:999999;display:block;background:transparent;border:0;overflow:auto;" +
+    "visibility:visible;margin:0;padding:0;position:fixed;inset:0;width:100%;height:100%;";
+  document.body.appendChild(iframe);
 };
 
 export const closeMoamalatLightbox = (): void => {
+  document.querySelectorAll("iframe#Lightbox").forEach((item) => item.remove());
+  if (activeMessageHandler) {
+    window.removeEventListener("message", activeMessageHandler);
+    activeMessageHandler = null;
+  }
   try {
     getLightboxApi()?.Checkout.closeLightbox();
   } catch {

@@ -6,6 +6,8 @@ import { SEGMENTS } from "../../data/vehicleData";
 export interface ParamPill {
   label: string;
   value: string;
+  onClick?: () => void;
+  active?: boolean;
 }
 
 interface CommandBarProps {
@@ -34,26 +36,51 @@ export const CommandBar: React.FC<CommandBarProps> = ({
         <div className="flex flex-wrap items-center gap-2 bg-slate-100/90 border border-[#E2E8F0] p-1.5 rounded-2xl shadow-sm">
           {params.map((p, i) => {
             const Icon = PARAM_ICONS[i % PARAM_ICONS.length];
+            const isClickable = Boolean(p.onClick);
+            const Component = isClickable ? "button" : "div";
+
             return (
-              <div
+              <Component
                 key={p.label}
-                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#FFFFFF] border border-[#E2E8F0] shadow-sm hover:bg-slate-50 transition-colors text-left"
+                type={isClickable ? "button" : undefined}
+                onClick={p.onClick}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border border-[#E2E8F0] shadow-sm transition-colors text-left ${
+                  p.active
+                    ? "bg-[#142B4A] text-white border-[#142B4A]"
+                    : isClickable
+                      ? "bg-[#FFFFFF] hover:bg-slate-50 cursor-pointer"
+                      : "bg-[#FFFFFF] hover:bg-slate-50"
+                }`}
               >
-                <Icon className="text-[#142B4A] w-[18px] h-[18px]" />
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                <Icon
+                  className={`w-[18px] h-[18px] ${
+                    p.active ? "text-blue-300" : "text-[#142B4A]"
+                  }`}
+                />
+                <div className="flex flex-col text-start">
+                  <span
+                    className={`text-[10px] font-semibold uppercase tracking-wider ${
+                      p.active ? "text-slate-300" : "text-slate-500"
+                    }`}
+                  >
                     {p.label}
                   </span>
-                  <span className="text-xs font-bold text-[#0F172A]">{p.value}</span>
+                  <span
+                    className={`text-xs font-bold ${
+                      p.active ? "text-white" : "text-[#0F172A]"
+                    }`}
+                  >
+                    {p.value}
+                  </span>
                 </div>
-              </div>
+              </Component>
             );
           })}
           <button
             type="button"
             onClick={onOpenFilters}
             aria-label={t("fleet.filters.title")}
-            className="p-2.5 px-3.5 rounded-xl bg-[#142B4A] text-white hover:bg-blue-700 shadow-sm transition-all flex items-center justify-center"
+            className="p-2.5 px-3.5 rounded-xl bg-[#142B4A] text-white hover:bg-blue-700 shadow-sm transition-all flex items-center justify-center cursor-pointer"
           >
             <Search className="w-5 h-5" />
           </button>

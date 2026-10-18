@@ -31,6 +31,7 @@ import {
 import { useAdminSettings } from "../../hooks/useAdminSettings";
 import { formatLYD } from "../../lib/bookingView";
 import type { PlatformSettings } from "../../types/admin";
+import { useDialog } from "../../context/useDialog";
 
 /**
  * Platform Settings & Governance (/admin/settings). The left rail reads a
@@ -173,6 +174,7 @@ const SectionShell: React.FC<{
 
 export const AdminSettingsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const { confirm: confirmDialog } = useDialog();
   const { settings, registry, gateways, governance, loading, error, saving, reload, save } =
     useAdminSettings();
 
@@ -221,7 +223,7 @@ export const AdminSettingsPage: React.FC = () => {
   };
 
   const handleReset = async () => {
-    if (!window.confirm(t("admin.settings.resetConfirm"))) return;
+    if (!(await confirmDialog(t("admin.settings.resetConfirm")))) return;
     try {
       const updated = await save({ reset: true });
       if (updated) setDraft(clone(updated));
@@ -241,7 +243,7 @@ export const AdminSettingsPage: React.FC = () => {
     const confirmText = next
       ? t("admin.settings.danger.freezeConfirm")
       : t("admin.settings.danger.unfreezeConfirm");
-    if (!window.confirm(confirmText)) return;
+    if (!(await confirmDialog(confirmText))) return;
     try {
       const updated = await save({ emergency: { bookingFreeze: next } });
       if (updated) setDraft(clone(updated));

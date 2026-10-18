@@ -3,6 +3,15 @@
     "ar": "العربية",
     "en": "English"
   },
+  "dialogs": {
+    "confirmTitle": "Please confirm",
+    "inputTitle": "Additional details",
+    "confirm": "Confirm",
+    "submit": "Continue",
+    "cancel": "Cancel",
+    "close": "Close dialog",
+    "reasonPlaceholder": "Add a reason or note…"
+  },
   "nav": {
     "home": "Home",
     "browseCars": "Browse Cars",
@@ -191,6 +200,8 @@
     "provider": "Provider: {{name}}",
     "freeCancel": "Free cancellation until {{date}}",
     "startsIn": "Pickup in {{days}} days",
+    "pickupToday": "Pickup is today",
+    "pickupOverdue": "Pickup was {{days}} days ago",
     "endedOn": "Trip ended on {{date}}",
     "rated": "Service rated 5.0★",
     "invoiceNote": "Official tax invoice issued",
@@ -208,6 +219,7 @@
       "PAID": "Paid",
       "CONFIRMED": "Confirmed",
       "upcoming": "Upcoming Scheduled",
+      "overduePickup": "Pickup overdue",
       "ACTIVE": "Active • Secured for you",
       "COMPLETED": "Completed & Handed Back",
       "CANCELLED": "Cancelled",
@@ -1038,7 +1050,7 @@
       "toggleFavorite": "Toggle favorite",
       "periodDays": "{{count}}-days",
       "details": "Details",
-      "reserve": "Reserve ({{total}} LYD)",
+      "reserve": "Reserve Now",
       "specs": {
         "engine": "Engine",
         "capacity": "Capacity",

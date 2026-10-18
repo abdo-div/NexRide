@@ -348,6 +348,37 @@ html(lang='en')
     block scripts
     script(src='/js/theme.js')
     script.
+      // Shared non-blocking notification for the server-rendered legacy pages.
+      window.nexrideNotify = function(message, tone) {
+        const palette = tone === 'success'
+          ? { icon: 'check_circle', accent: 'text-tertiary', border: 'border-tertiary/40' }
+          : { icon: 'error', accent: 'text-error', border: 'border-error/40' };
+        let stack = document.getElementById('nexride-toast-stack');
+        if (!stack) {
+          stack = document.createElement('div');
+          stack.id = 'nexride-toast-stack';
+          stack.className = 'fixed top-20 right-4 z-[200] flex w-[calc(100%-2rem)] max-w-sm flex-col gap-3';
+          document.body.appendChild(stack);
+        }
+        const toast = document.createElement('div');
+        toast.className = 'glass-card flex items-start gap-3 rounded-2xl border bg-surface-container-high/95 px-4 py-3 text-on-surface shadow-2xl backdrop-blur-xl ' + palette.border;
+        const icon = document.createElement('span');
+        icon.className = 'material-symbols-outlined mt-0.5 text-xl ' + palette.accent;
+        icon.textContent = palette.icon;
+        const text = document.createElement('p');
+        text.className = 'min-w-0 flex-1 font-body-md text-body-md leading-6';
+        text.textContent = String(message || 'Something went wrong. Please try again.');
+        const close = document.createElement('button');
+        close.type = 'button';
+        close.className = 'material-symbols-outlined rounded-lg p-1 text-on-surface-variant hover:bg-surface-variant/40 hover:text-on-surface';
+        close.setAttribute('aria-label', 'Dismiss notification');
+        close.textContent = 'close';
+        close.addEventListener('click', function() { toast.remove(); });
+        toast.append(icon, text, close);
+        stack.appendChild(toast);
+        setTimeout(function() { toast.remove(); }, 6000);
+      };
+
       // Navbar scroll effect — fixed size, only shadow changes
       const nav = document.getElementById('main-nav');
       if(nav) {

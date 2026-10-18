@@ -52,6 +52,15 @@ export interface VerifyResponse {
   data?: VerifyResult;
 }
 
+export interface ReleaseResponse {
+  status: string;
+  data: {
+    released: boolean;
+    bookingStatus: string | null;
+    paymentStatus: string | null;
+  };
+}
+
 /**
  * Moamalat gateway API surface.
  */
@@ -83,5 +92,17 @@ export const moamalatApi = {
     request("/payments/moamalat/verify", {
       method: "POST",
       body: payload,
+    }),
+
+  /**
+   * Releases a booking whose payment did not succeed so the vehicle is not left
+   * rented to the customer. Called when the gateway errors or the user abandons
+   * checkout before a successful capture.
+   */
+  release: (bookingId: string): Promise<ReleaseResponse> =>
+    request("/payments/moamalat/release", {
+      method: "POST",
+      body: { bookingId },
+      headers: { "Idempotency-Key": crypto.randomUUID() },
     }),
 };

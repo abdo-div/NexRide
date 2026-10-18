@@ -3,6 +3,7 @@ import {
   formatLYD,
   isTerminatedStatus,
   isUpcomingStatus,
+  pickupTiming,
   referenceCodeFrom,
   rentalDays,
 } from "./bookingView";
@@ -24,6 +25,23 @@ describe("booking view helpers", () => {
   it("calculates rental duration with a one-day minimum", () => {
     expect(rentalDays("2026-10-12T10:00:00Z", "2026-10-15T10:00:00Z")).toBe(3);
     expect(rentalDays("2026-10-12T10:00:00Z", "2026-10-12T12:00:00Z")).toBe(1);
+  });
+
+  it("reports future, same-day, and overdue pickup dates truthfully", () => {
+    const now = new Date(2026, 9, 17, 12);
+
+    expect(pickupTiming("2026-10-20T10:00:00", now)).toEqual({
+      phase: "future",
+      days: 3,
+    });
+    expect(pickupTiming("2026-10-17T01:00:00", now)).toEqual({
+      phase: "today",
+      days: 0,
+    });
+    expect(pickupTiming("2026-10-05T10:00:00", now)).toEqual({
+      phase: "overdue",
+      days: 12,
+    });
   });
 
   it("formats Libyan dinar values consistently", () => {
