@@ -268,10 +268,11 @@ test("the vehicle dossier maps specs, ledger metrics, calendar and trips", async
     vehicleId: vehicleA,
     page: 1,
     limit: 8,
+    now: new Date("2026-10-10T12:00:00.000Z"),
   });
 
   assert.equal(response.vehicle.code, `NR-VH-${vehicleA.slice(-5).toUpperCase()}`);
-  // The confirmed Oct 8-12 trip overlaps the test run date, so the derived
+  // The confirmed Oct 8-12 trip overlaps the fixed test date, so the derived
   // display state is rented even though the physical vehicle state is healthy.
   assert.equal(response.vehicle.displayStatus, "rented");
   assert.equal(response.vehicle.doors, 4);

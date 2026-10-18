@@ -61,4 +61,3 @@ test("the Redis systemd override contains the service blast radius", async () =>
   assert.match(unit, /^ReadWritePaths=\/var\/lib\/redis \/var\/log\/redis \/run\/redis$/m);
   assert.match(unit, /^RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6$/m);
 });
-

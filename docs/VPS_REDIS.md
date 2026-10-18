@@ -139,4 +139,3 @@ availability. The application can fall back to MongoDB for booking safety, but
 email queue jobs can be delayed while Redis is unavailable. If those jobs must
 survive total VPS loss, use managed Redis with replication, automatic failover,
 TLS, and provider backups, and test that recovery process before launch.
-

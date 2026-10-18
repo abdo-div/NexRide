@@ -198,7 +198,14 @@ const mapTripRow = (doc) => {
  * against the resolved company tenant, so a company session can never read
  * another operator's vehicle even by guessing its id.
  */
-export const buildCompanyVehicleDetail = async ({ companyId, vehicleId, search, page, limit }) => {
+export const buildCompanyVehicleDetail = async ({
+  companyId,
+  vehicleId,
+  search,
+  page,
+  limit,
+  now = new Date(),
+}) => {
   if (!companyId || !mongoose.isValidObjectId(companyId)) {
     throw new AppError("A valid company id is required for the vehicle dossier.", 400);
   }
@@ -225,7 +232,6 @@ export const buildCompanyVehicleDetail = async ({ companyId, vehicleId, search, 
     { defaultLimit: 8, maxLimit: 50 },
   );
 
-  const now = new Date();
   const ledger = await Booking.find({
     vehicleId: new mongoose.Types.ObjectId(vehicleId),
     companyId: new mongoose.Types.ObjectId(companyId),

@@ -11,4 +11,3 @@ Unit=nexride-monitor.service
 
 [Install]
 WantedBy=timers.target
-

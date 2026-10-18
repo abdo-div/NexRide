@@ -94,4 +94,3 @@ directory layout, then extracts into a temporary `/var/tmp` directory and
 removes it. Record the archive, date, size, duration, and result. Periodically
 perform a full recovery on a disposable host and compare representative image
 and private-document checksums before declaring disaster recovery tested.
-
