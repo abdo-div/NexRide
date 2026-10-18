@@ -134,7 +134,15 @@ export const BookingDetailsHeader: React.FC<BookingDetailsHeaderProps> = ({
           <button
             type="button"
             onClick={onPrintGate}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#0F172A] rounded-xl text-sm font-semibold transition-colors cursor-pointer"
+            disabled={!isPaid}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#0F172A] rounded-xl text-sm font-semibold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            title={
+              !isPaid
+                ? t("bookingDetails.gatePassLockedTooltip", {
+                    defaultValue: "Payment required to unlock gate pass",
+                  })
+                : undefined
+            }
           >
             <ReceiptText className="w-4 h-4" />
             <span className="hidden sm:inline">{t("bookingDetails.gatePass")}</span>

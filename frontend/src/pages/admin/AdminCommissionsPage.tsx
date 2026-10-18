@@ -29,6 +29,7 @@ import { AdminPayoutsTable } from "../../components/admin/AdminPayoutsTable";
 import { AdminPayoutDossier } from "../../components/admin/AdminPayoutDossier";
 import { CommissionFlow } from "../../components/admin/CommissionFlow";
 import type { AdminPayoutRow } from "../../types/admin";
+import { useDialog } from "../../context/useDialog";
 
 const PAGE_SIZE = 20;
 const STATUS_OPTIONS = [
@@ -42,6 +43,7 @@ const CYCLE_OPTIONS = ["monthly", "biweekly", "week"] as const;
 
 export const AdminCommissionsPage: React.FC = () => {
   const { t } = useTranslation();
+  const { confirm: confirmDialog } = useDialog();
   const {
     data,
     loading: registryLoading,
@@ -151,7 +153,7 @@ export const AdminCommissionsPage: React.FC = () => {
   };
 
   const handleDispatchBatch = async () => {
-    if (!window.confirm(t("admin.commissions.toast.dispatchConfirmTitle"))) return;
+    if (!(await confirmDialog(t("admin.commissions.toast.dispatchConfirmTitle")))) return;
     setBusy(true);
     try {
       const res = await adminApi.dispatchPayoutBatch();
@@ -172,7 +174,7 @@ export const AdminCommissionsPage: React.FC = () => {
 
   const handleApproveSettle = async (row: AdminPayoutRow) => {
     const count = row.bookings;
-    if (!window.confirm(t("admin.commissions.toast.settleConfirmTitle"))) return;
+    if (!(await confirmDialog(t("admin.commissions.toast.settleConfirmTitle")))) return;
     setBusy(true);
     try {
       await adminApi.settlePayoutBatch(rowCompanyIdOf(row) || undefined);

@@ -15,6 +15,7 @@ import {
 import { formatLYD } from "../../lib/bookingView";
 import { photoUrl } from "../../lib/vehicleMapper";
 import type { CompanyBookingRow } from "../../types/companyBookings";
+import { useDialog } from "../../context/useDialog";
 
 interface CompanyBookingInspectDrawerProps {
   row: CompanyBookingRow | null;
@@ -25,7 +26,7 @@ interface CompanyBookingInspectDrawerProps {
   /** Attest a pending cash-on-delivery payment at pick-up. */
   onCollectCash: (paymentId: string) => void;
   /** Cancel the booking with an operator reason. */
-  onCancel: (reason: string) => void;
+  onCancel: (reason: string | null) => void;
 }
 
 const CHECK_KEYS = ["gps", "ready", "paid", "signed"] as const;
@@ -41,6 +42,7 @@ export const CompanyBookingInspectDrawer: React.FC<
   CompanyBookingInspectDrawerProps
 > = ({ row, busy, onClose, onAdvance, onCollectCash, onCancel }) => {
   const { t } = useTranslation();
+  const { prompt: promptDialog } = useDialog();
 
   if (!row) {
     return (
@@ -134,11 +136,11 @@ export const CompanyBookingInspectDrawer: React.FC<
     };
   })();
 
-  const handleCancelClick = () => {
+  const handleCancelClick = async () => {
     if (busy) return;
-    const reason = window.prompt(t("company.bookingsPage.inspect.cancelPrompt"));
+    const reason = await promptDialog(t("company.bookingsPage.inspect.cancelPrompt"));
     if (reason === null) return;
-    onCancel(reason.trim());
+    onCancel(reason.trim() || null);
   };
 
   return (

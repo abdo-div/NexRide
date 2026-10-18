@@ -19,6 +19,7 @@ import { AdminLayout } from "./components/admin/AdminLayout";
 import { CompanyRoute } from "./components/company/CompanyRoute";
 import { CompanyLayout } from "./components/company/CompanyLayout";
 import { SmoothScroll } from "./components/SmoothScroll";
+import { DialogProvider } from "./context/DialogContext";
 
 // Only the landing page is needed for the initial public load. Browsing, auth,
 // booking, checkout and payment screens are separate chunks so a first-time
@@ -214,8 +215,9 @@ function PublicShell() {
 function App() {
   return (
     <BrowserRouter>
-      <ScrollToTop />
-      <AuthProvider>
+      <DialogProvider>
+        <ScrollToTop />
+        <AuthProvider>
         <SmoothScroll><Routes>
           <Route element={<PublicShell />}>
             <Route path="/" element={<StaffLandingRoute><HomePage /></StaffLandingRoute>} />
@@ -431,7 +433,8 @@ function App() {
             <Route path="settings" element={<CompanySettingsPage />} />
           </Route>
         </Routes></SmoothScroll>
-      </AuthProvider>
+        </AuthProvider>
+      </DialogProvider>
     </BrowserRouter>
   );
 }

@@ -221,9 +221,9 @@ const validateMoamalat = (env, problems) => {
     }
   }
   const key = valueOf(env, "MOAMALAT_SECURE_KEY");
-  if (key && (!/^[a-fA-F0-9]+$/.test(key) || key.length < 64 || key.length % 2 !== 0)) {
+  if (key && (!/^[a-fA-F0-9]+$/.test(key) || key.length < 32 || key.length % 2 !== 0)) {
     problems.push(
-      "MOAMALAT_SECURE_KEY must be an even-length hexadecimal key of at least 32 bytes.",
+      "MOAMALAT_SECURE_KEY must be an even-length hexadecimal key of at least 16 bytes.",
     );
   }
 };

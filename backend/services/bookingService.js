@@ -14,6 +14,7 @@ import {
 } from "../utils/bookingStatus.js";
 import { getPlatformPolicy } from "./platformPolicyService.js";
 import { resolveClientUrl } from "../config/clientUrl.js";
+import { releaseVehicleHold } from "./reservationHold.service.js";
 
 // The search allowlist is deliberately limited to fields stored on the booking
 // document. Populated references (vehicle make/model, customer and partner
@@ -473,9 +474,118 @@ export const cancelBookingById = async (bookingId, user, { reason = null } = {})
     throw error;
   }
 
+  try {
+    await releaseVehicleHold(booking.vehicleId);
+  } catch {
+    // Redis holds live outside Mongo; release is best-effort.
+  }
+
   notifyBookingCancellation(booking, reason ?? "booking cancelled");
 
   return booking;
+};
+
+/**
+ * Releases a reservation whose online payment did not succeed.
+ *
+ * A `PENDING_PAYMENT`/`UNPAID` booking occupies the vehicle's dates (see
+ * DATE_BLOCKING_BOOKING_STATUSES), so an unsuccessful Moamalat attempt must not
+ * leave the car rented to that customer: the booking is retired to `EXPIRED`
+ * and the unit is returned to the market in the same transaction. Nothing was
+ * collected, so there is no refund to compute; any dangling `PENDING` ledger
+ * row is retired to `FAILED` so it cannot dangle forever.
+ *
+ * Idempotent and safe to call after a late success: once the booking is no
+ * longer `PENDING_PAYMENT`/`UNPAID` (e.g. the customer paid, or the reaper
+ * already expired it) nothing is changed. A maintenance lock always wins over
+ * returning the unit to the market, mirroring the cancellation guard.
+ */
+export const releaseUnpaidBooking = async (
+  bookingId,
+  { reason = "Payment was not completed" } = {},
+) => {
+  const booking = await Booking.findById(bookingId);
+  if (!booking) throw new AppError("Booking not found", 404);
+
+  if (
+    booking.bookingStatus !== "PENDING_PAYMENT" ||
+    booking.paymentStatus !== "UNPAID"
+  ) {
+    return {
+      released: false,
+      bookingStatus: booking.bookingStatus,
+      paymentStatus: booking.paymentStatus,
+    };
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  let released = false;
+  try {
+    // Re-read under the transaction so a payment that lands between the read
+    // above and now is never clobbered with a release write.
+    const current = await Booking.findById(bookingId).session(session);
+    if (
+      !current ||
+      current.bookingStatus !== "PENDING_PAYMENT" ||
+      current.paymentStatus !== "UNPAID"
+    ) {
+      await session.abortTransaction();
+      return {
+        released: false,
+        bookingStatus: current?.bookingStatus ?? null,
+        paymentStatus: current?.paymentStatus ?? null,
+      };
+    }
+
+    current.bookingStatus = "EXPIRED";
+    current.cancellationReason = current.cancellationReason ?? reason;
+    await current.save({ session, validateBeforeSave: false });
+
+    await Payment.updateMany(
+      { bookingId: current._id, status: "PENDING" },
+      { $set: { status: "FAILED", refundReason: reason } },
+      { session },
+    );
+
+    // Never release a unit an operator quarantined for maintenance.
+    const openMaintenance = await MaintenanceEvent.exists({
+      vehicleId: current.vehicleId,
+      status: { $ne: "COMPLETED" },
+    }).session(session);
+
+    if (!openMaintenance) {
+      await Vehicle.findByIdAndUpdate(
+        current.vehicleId,
+        { $set: { operationalStatus: "AVAILABLE" } },
+        { session },
+      );
+    }
+
+    await session.commitTransaction();
+    released = true;
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    await session.endSession();
+  }
+
+  if (released) {
+    // The Redis checkout hold lives outside Mongo; clearing it is best-effort.
+    try {
+      await releaseVehicleHold(booking.vehicleId);
+    } catch {
+      /* a leftover key self-expires after its TTL */
+    }
+  }
+
+  return {
+    released,
+    bookingStatus: released ? "EXPIRED" : booking.bookingStatus,
+    paymentStatus: "UNPAID",
+  };
 };
 
 /**
@@ -505,7 +615,7 @@ export const BOOKING_STATUS_TRANSITIONS = Object.freeze({
  * separate "COLLECTED" booking state - cash collection writes the same field -
  * so a single `paymentStatus === "PAID"` guard is the unified precondition.
  */
-const PAYMENT_REQUIRED_TARGETS = new Set(["PAID", "CONFIRMED", "COMPLETED"]);
+const PAYMENT_REQUIRED_TARGETS = new Set(["PAID", "CONFIRMED", "ACTIVE", "COMPLETED"]);
 
 /**
  * Company Fleet Status Lifecycle Transition with a strict state machine.

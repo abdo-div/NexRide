@@ -83,12 +83,13 @@ export const bookingApi = {
   /**
    * Request cancellation of a booking owned by the logged-in customer.
    * Applies the cancellation business rules (free-cancellation windows,
-   * refund handling) on the backend.
+   * refund handling) on the backend. An optional reason is forwarded so the
+   * cancellation (e.g. an abandoned payment) is attributable in the ledger.
    */
-  cancel: (id: string): Promise<BookingResponse> =>
+  cancel: (id: string, reason?: string): Promise<BookingResponse> =>
     request<BookingResponse>(`/bookings/${encodeURIComponent(id)}/cancel`, {
       method: "PATCH",
-      body: {},
+      body: reason ? { reason } : {},
     }),
 
   /**

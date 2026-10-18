@@ -161,9 +161,11 @@ block scripts
       try {
         const res = await fetch('/api/v1/users/updateMe', { method: 'PATCH', body: form });
         const data = await res.json();
-        if (data.status === 'success') { alert('Profile updated!'); window.location.reload(); }
-        else alert(data.message);
-      } catch(e) { alert('Update failed.'); }
+        if (data.status === 'success') {
+          window.nexrideNotify('Profile updated!', 'success');
+          setTimeout(() => window.location.reload(), 900);
+        } else window.nexrideNotify(data.message);
+      } catch(e) { window.nexrideNotify('Update failed.'); }
     });
 
     // Password update
@@ -178,9 +180,9 @@ block scripts
           method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
         });
         const data = await res.json();
-        if (data.status === 'success') alert('Password updated successfully!');
-        else alert(data.message);
-      } catch(e) { alert('Password update failed.'); }
+        if (data.status === 'success') window.nexrideNotify('Password updated successfully!', 'success');
+        else window.nexrideNotify(data.message);
+      } catch(e) { window.nexrideNotify('Password update failed.'); }
     });
 
     // Input label focus effect

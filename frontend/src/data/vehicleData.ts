@@ -11,17 +11,23 @@ export const LOCATION_OPTIONS = [
   { id: "Al Khums", label: "fleet.filters.locations.alKhums" },
 ];
 
+export interface DynamicFilterOption {
+  id: string;
+  label: string;
+  count: number;
+}
+
 export const BODY_PROFILES = [
-  { id: "suv", label: "fleet.filters.bodies.suv", count: 25 },
-  { id: "coupe", label: "fleet.filters.bodies.coupe", count: 12 },
-  { id: "sedan", label: "fleet.filters.bodies.sedan", count: 22 },
-  { id: "offroad", label: "fleet.filters.bodies.offroad", count: 16 },
+  { id: "sedan", label: "fleet.filters.bodies.sedan" },
+  { id: "suv", label: "fleet.filters.bodies.suv" },
+  { id: "coupe", label: "fleet.filters.bodies.coupe" },
+  { id: "offroad", label: "fleet.filters.bodies.offroad" },
 ];
 
 export const DRIVETRAIN_OPTIONS = [
-  { id: "auto", label: "fleet.filters.drivetrains.automatic", count: 72 },
-  { id: "manual", label: "fleet.filters.drivetrains.manual", count: 12 },
-  { id: "octane", label: "fleet.filters.drivetrains.highOctane", count: 68 },
+  { id: "auto", label: "fleet.filters.drivetrains.automatic" },
+  { id: "manual", label: "fleet.filters.drivetrains.manual" },
+  { id: "octane", label: "fleet.filters.drivetrains.highOctane" },
 ];
 
 export const CERTIFIED_FLEETS = [

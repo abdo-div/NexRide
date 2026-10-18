@@ -64,4 +64,17 @@ describe("interactive control contracts", () => {
 
     expect(missingActions).toEqual([]);
   });
+
+  it("uses the in-app dialog system instead of native browser popups", () => {
+    const nativeDialogs: string[] = [];
+
+    for (const file of tsxFiles(sourceRoot)) {
+      const contents = readFileSync(file, "utf8");
+      if (/window\.(?:alert|confirm|prompt)\s*\(/.test(contents)) {
+        nativeDialogs.push(relative(sourceRoot, file));
+      }
+    }
+
+    expect(nativeDialogs).toEqual([]);
+  });
 });
