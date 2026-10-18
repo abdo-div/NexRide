@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css'
 import { translationsReady } from './i18n'
 import App from './App.tsx'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+import { API_BASE_URL, resolveCanonicalAppUrl } from './lib/apiClient'
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim()
 
@@ -38,4 +39,14 @@ async function bootstrap() {
   )
 }
 
-void bootstrap()
+const canonicalAppUrl = resolveCanonicalAppUrl(
+  API_BASE_URL,
+  window.location.href,
+  import.meta.env.PROD,
+)
+
+if (canonicalAppUrl) {
+  window.location.replace(canonicalAppUrl)
+} else {
+  void bootstrap()
+}
