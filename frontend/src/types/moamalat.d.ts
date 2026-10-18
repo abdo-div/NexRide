@@ -24,6 +24,7 @@ declare global {
   }
 
   interface LightboxCheckoutConfig {
+    paymentMethodFromLightBox: number;
     MID: string;
     TID: string;
     AmountTrxn: string;

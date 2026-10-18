@@ -87,6 +87,23 @@ export const toggleVerificationSchema = z.object({
   }),
 });
 
+export const applicationDocumentParamsSchema = z.object({
+  params: z.object({
+    companyId: objectId,
+    storedName: z
+      .string()
+      .min(1)
+      .max(180)
+      .regex(
+        /^\d{10,}-\d{1,10}-[A-Za-z0-9][A-Za-z0-9._-]*$/,
+        "Invalid application document name",
+      )
+      .refine((value) => !value.includes(".."), {
+        message: "Invalid application document name",
+      }),
+  }),
+});
+
 export const registerCompanySchema = z.object({
   body: z.object({
     companyName: z.string().trim().min(2).max(120),

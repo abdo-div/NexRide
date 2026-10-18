@@ -86,6 +86,11 @@ import { swaggerSpec } from "./config/swagger.js";
 import AppError from "./utils/appError.js";
 import globalErrorHandler from "./middlewares/errorMiddleware.js";
 import { isDevelopment } from "./config/env.js";
+import {
+  companyImagesDirectory,
+  userImagesDirectory,
+  vehicleImagesDirectory,
+} from "./config/publicStorage.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -162,6 +167,24 @@ if (isDevelopment()) {
 // serve-static's directory redirects is important here: a request such as
 // /public/index.html must never bounce between a directory URL and the SPA.
 const staticOptions = { index: false, redirect: false };
+
+// Generated media lives outside the release checkout in production. Preserve
+// the historical /vehicles, /users, /companies and /public/* URLs so existing
+// database filenames and clients continue to work after the storage move.
+const generatedMediaOptions = {
+  ...staticOptions,
+  dotfiles: "deny",
+  immutable: true,
+  maxAge: "1y",
+};
+for (const [route, directory] of [
+  ["/vehicles", vehicleImagesDirectory],
+  ["/users", userImagesDirectory],
+  ["/companies", companyImagesDirectory],
+]) {
+  app.use(route, express.static(directory, generatedMediaOptions));
+  app.use(`/public${route}`, express.static(directory, generatedMediaOptions));
+}
 
 app.use("/public", express.static(backendPublicPath, staticOptions));
 app.use(express.static(backendPublicPath, staticOptions));

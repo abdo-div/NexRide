@@ -22,6 +22,7 @@ import {
   calculateBookingExtras,
   MUNICIPAL_FEE_LYD,
 } from "../utils/bookingPricing.js";
+import logger from "../utils/logger.js";
 // Administrative register.
 //
 // The search allowlist lives in the service (`BOOKING_SEARCH_FIELDS`) because the
@@ -337,6 +338,18 @@ export const createBooking = catchAsync(async (req, res, next) => {
 
   const data = { booking };
   if (payment) data.payment = payment;
+
+  logger.info(
+    {
+      event: "booking_created",
+      bookingId: booking._id,
+      vehicleId: booking.vehicleId,
+      companyId: booking.companyId,
+      bookingStatus: booking.bookingStatus,
+      paymentMethod: payment?.paymentMethod ?? null,
+    },
+    "Booking created",
+  );
 
   res.status(201).json({
     status: "success",

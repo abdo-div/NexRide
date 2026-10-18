@@ -16,11 +16,7 @@ import { addEmailToQueue } from "../queues/emailQueue.js";
 // Formatting helpers (Moamalat field formats)
 // -----------------------------------------------------------------------------
 
-/**
- * Moamalat validates DateTimeLocalTrxn as Libyan local time. Production hosts
- * commonly run in UTC, so Date#getHours() can make an otherwise valid signed
- * order two hours stale and the LightBox reports it as "Order not found".
- */
+/** Date parts in Moamalat's business timezone, used by date-only API filters. */
 const moamalatDateParts = (date) => {
   const formatter = new Intl.DateTimeFormat("en-US", {
     timeZone: moamalatConfig.timeZone,
@@ -47,13 +43,23 @@ const moamalatDateParts = (date) => {
  */
 export const amountToUnits = (amountLyd) => Math.round(amountLyd * 1000);
 
-/** YYYYMMDDHHmm — used in the checkout SecureHash string. */
+/**
+ * Moamalat's shared test merchant only approves its published cards for a
+ * fixed 10 LYD transaction. Live merchants must always charge the booking's
+ * full amount.
+ */
+export const gatewayAmountForBooking = (bookingAmount) =>
+  moamalatConfig.env === "test"
+    ? moamalatConfig.testAmount
+    : Number(bookingAmount);
+
+/** YYYYMMDDHHmm — required by the LightBox script used by this project. */
 export const formatTrxDateTime = (date = new Date()) => {
   const parts = moamalatDateParts(date);
   return `${parts.year}${parts.month}${parts.day}${parts.hour}${parts.minute}`;
 };
 
-/** YYMMDDHHmmss — used in the verification SecureHash string + API body. */
+/** YYMMDDHHmmss — required by the FilterTransactions API. */
 export const formatVerificationDateTime = (date = new Date()) => {
   const parts = moamalatDateParts(date);
   return (
@@ -201,7 +207,7 @@ export const verifySecureHashSignature = ({
  */
 export const buildCheckoutParams = (booking, merchantReference) => {
   const trxDateTime = formatTrxDateTime();
-  const amount = amountToUnits(booking.totalAmount);
+  const amount = amountToUnits(gatewayAmountForBooking(booking.totalAmount));
 
   return {
     MID: moamalatConfig.merchantId,
@@ -216,6 +222,144 @@ export const buildCheckoutParams = (booking, merchantReference) => {
       merchantReference,
       terminalId: moamalatConfig.terminalId,
     }),
+  };
+};
+
+// -----------------------------------------------------------------------------
+// Gateway diagnostics (development only)
+//
+// These helpers reproduce what the hosted checkout page sends to the gateway so
+// the diagnostic endpoint can show the raw round-trip (order creation and,
+// optionally, the card-payment step) without a browser. They must never run in
+// production: the controller gates them behind isDevelopment() + test env.
+// -----------------------------------------------------------------------------
+
+const postToGateway = async (url, body, token) => {
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+    const text = await response.text();
+    let gateway = null;
+    try {
+      gateway = JSON.parse(text);
+    } catch {
+      gateway = null;
+    }
+    return {
+      httpStatus: response.status,
+      gateway,
+      raw: gateway ? undefined : text.slice(0, 800),
+      error: null,
+    };
+  } catch (err) {
+    return { httpStatus: null, gateway: null, raw: undefined, error: err.message };
+  }
+};
+
+/**
+ * Creates a Moamalat order exactly the way the hosted LightBox page does
+ * (POST {lightBoxApi}/LightboxHostedCheckout) so the diagnose endpoint can show
+ * the raw gateway response. Never charges anything.
+ */
+export const probeCheckoutOrder = async ({ amount, merchantReference }) => {
+  const units = amountToUnits(amount);
+  const trxDateTime = formatTrxDateTime();
+  const request = {
+    OrderID: "",
+    MID: moamalatConfig.merchantId,
+    TID: moamalatConfig.terminalId,
+    Amount: amount,
+    Referrer: "",
+    PaymentMethodFromLightBox: 2,
+    MerchantReference: merchantReference,
+    SecureHashAnonymous: generateSecureHash({
+      amount: units,
+      trxDateTime,
+      merchantId: moamalatConfig.merchantId,
+      merchantReference,
+      terminalId: moamalatConfig.terminalId,
+    }),
+    TrxDateTime: trxDateTime,
+    feeAmount: 0,
+    AdditionalCustomerDataReq: {},
+  };
+
+  const result = await postToGateway(
+    `${moamalatConfig.lightBoxApiUrl}LightboxHostedCheckout`,
+    request,
+  );
+  return { request, ...result };
+};
+
+/**
+ * Mirrors the hosted page's card submission (POST {lightBoxApi}/PayByCard with
+ * the order token). Only used by the dev-only diagnose endpoint with the
+ * published sandbox test card; it must never run against production.
+ */
+export const probePayByCard = async ({ order, token, card }) => {
+  if (!order || !token) {
+    return {
+      attempted: false,
+      reason: "No order/token available to probe the card step.",
+    };
+  }
+
+  const request = {
+    CardPaymentModel: {
+      amount: order.amount,
+      currency: order.currency,
+      orderID: order.orderID,
+      terminalId: order.terminalID,
+      merchantId: order.merchantID,
+      merchantName: order.merchantName,
+      merchantReference: order.merchantReferenceNumber,
+      cardNumber: card.number,
+      expiration: card.expiration,
+      nameOnCard: card.nameOnCard,
+      cVV: card.cvv,
+      isSaveCard: false,
+      isTokenized: false,
+      deviceFingerPrint: JSON.stringify({ diagnostic: true }),
+      ReturnURL: "",
+      additionalCustomerData: JSON.stringify({}),
+    },
+    token,
+    amount: order.amount,
+    customerPaymentOrderFields: [],
+  };
+
+  const result = await postToGateway(
+    `${moamalatConfig.lightBoxApiUrl}PayByCard`,
+    request,
+    token,
+  );
+  return { attempted: true, ...result };
+};
+
+/**
+ * Builds a compact, secret-free summary of a gateway order response.
+ */
+export const summariseGatewayOrder = (gateway) => {
+  const order = gateway?.orderDetailsModel;
+  if (!order) return null;
+  return {
+    merchantName: order.merchantName ?? null,
+    amount: order.amount ?? null,
+    currency: order.currency ?? null,
+    terminalId: order.terminalID ?? order.terminalId ?? null,
+    merchantId: order.merchantID ?? order.merchantId ?? null,
+    orderID: order.orderID ?? null,
+    isCyberSource: order.isCyberSource ?? null,
+    isNPG: order.isNPG ?? null,
   };
 };
 

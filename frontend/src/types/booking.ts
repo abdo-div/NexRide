@@ -69,6 +69,12 @@ export interface BookingDto {
   companyShare: number;
   bookingStatus: BookingStatus;
   paymentStatus: PaymentStatus;
+  /** Populated when the API includes the booking's latest payment attempt. */
+  paymentMethod?: string;
+  paymentId?:
+    | string
+    | { _id?: string; paymentMethod?: string }
+    | null;
   createdAt: string;
   updatedAt?: string;
 }

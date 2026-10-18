@@ -9,16 +9,26 @@ This checklist is the release gate. A launch is approved only when every require
 - [ ] `npm ci && npm run lint && npm test && npm run build` passes in `frontend`.
 - [ ] `npm ci && npm test` passes in `backend`.
 - [ ] Production secrets are stored in the hosting provider, never in Git.
+- [ ] `npm run validate:production-env` passes in `backend` using the exact VPS environment.
 
 ## 2. Infrastructure
 
+- [ ] `sudo sh /srv/nexride/current/deploy/release/verify-host.sh <full-sha> https://your-domain.example` reports `HOST VERIFIED` for the exact deployed SHA.
 - [ ] `NODE_ENV=production`.
-- [ ] MongoDB is reachable, access-restricted, backed up, and a restore has been tested.
-- [ ] Redis is reachable over TLS where supported and configured for persistence/availability.
+- [ ] The supplied `nexride.service` is installed, enabled, and running as the dedicated `nexride` user on Node.js 24.
+- [ ] `systemctl restart nexride` completes cleanly and `journalctl -u nexride` shows no forced-shutdown or restart loop.
+- [ ] MongoDB is an authenticated replica set bound only to a trusted interface; `db.hello()` reports a writable primary.
+- [ ] The nightly MongoDB backup timer succeeded, its encrypted off-host copy exists, and an isolated restore drill passed.
+- [ ] Redis uses the dedicated `nexride` ACL user; the default user is disabled and TCP is loopback-only (or the managed service uses `rediss://`).
+- [ ] `deploy/redis/verify.sh` passes, AOF/RDB persistence is healthy, and Redis has enough disk and memory headroom.
+- [ ] The single-VPS Redis failure window is accepted, or a managed/replicated Redis service has been provisioned for high availability.
 - [ ] `JWT_SECRET` is unique, random, and at least 32 bytes.
 - [ ] `FRONTEND_URL` and `FRONTEND_DOMAIN` exactly match the public HTTPS origin.
 - [ ] DNS and TLS certificate are valid; HTTP redirects to HTTPS.
-- [ ] Production indexes have been synchronized with `SYNC_INDEXES=true npm run sync-indexes`, then the flag removed.
+- [ ] Nginx proxies to `127.0.0.1:3000`; Node, MongoDB, and Redis are not publicly reachable.
+- [ ] UFW and any provider firewall expose only the confirmed SSH port plus TCP 80/443.
+- [ ] `certbot renew --dry-run` succeeds and automatic renewal is enabled.
+- [ ] `npm run sync-indexes` reports a reviewed plan, then `npm run sync-indexes -- --apply` succeeds after a current backup.
 - [ ] `/health/liveness` returns 200.
 - [ ] `/health/readiness` returns 200 with database and cache connected.
 
@@ -28,7 +38,8 @@ This checklist is the release gate. A launch is approved only when every require
 - [ ] One low-value real payment completes and appears once in the ledger.
 - [ ] One real refund follows the documented cancellation policy.
 - [ ] SMTP sends signup/admin notification/password-reset email and links use the public domain.
-- [ ] Uploaded company, user, and vehicle images survive a redeploy (persistent/object storage).
+- [ ] Public media and private partner documents live under separate `/var/lib/nexride` paths, not the release checkout.
+- [ ] The nightly file backup and encrypted off-host copy succeeded; an isolated archive verification passed.
 
 ## 4. Golden-path acceptance
 
@@ -60,9 +71,16 @@ Never commit these credentials. All checks must report `PASS`; `SKIPPED` role ch
 
 ## 6. Operations and rollback
 
-- [ ] Error logs and uptime alerts are visible to the launch owner.
-- [ ] A named person monitors bookings, payment callbacks, email failures, and Redis/Mongo health.
+- [ ] The on-host monitor timer passes and a real test alert plus recovery reaches the incident channel.
+- [ ] An external monitor outside the VPS checks public liveness/readiness, TLS, and host availability.
+- [ ] Journald or the company log platform retains searchable structured logs with alerts for 5xx responses, payment verification rejection, and email job failure.
+- [ ] Two named responders monitor bookings, payment callbacks, email failures, Redis/Mongo health, backups, disk pressure, and TLS expiry.
 - [ ] Previous deploy artifact and database restore instructions are available.
 - [ ] Rollback trigger is agreed: elevated 5xx rate, payment mismatch, duplicate booking, or readiness failure.
 - [ ] Emergency contact details shown on the site are real and staffed.
 - [ ] After launch, re-run smoke tests and verify the first real customer booking end-to-end.
+
+## 7. Go/no-go approval
+
+- [ ] A completed copy of [`PRODUCTION_SIGN_OFF.md`](./PRODUCTION_SIGN_OFF.md) links the CI, host, recovery, external-service, and human-acceptance evidence.
+- [ ] The release owner and operations owner both record `GO` for the same full Git SHA.

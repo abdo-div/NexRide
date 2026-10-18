@@ -68,13 +68,13 @@ export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave
           <Heart className={`w-[18px] h-[18px] ${saved ? "fill-[#142B4A] text-[#142B4A]" : ""}`} />
           {saved ? t("nav.saved") : t("vehicleDetail.save")}
         </button>
-        <button
-          type="button"
+        <Link
+          to="/terms"
           className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-[#64748B] hover:text-[#0F172A] transition-colors shadow-sm text-[13px] font-medium"
         >
           <Download className="w-[18px] h-[18px]" />
           {t("vehicleDetail.termsSheet")}
-        </button>
+        </Link>
       </div>
     </div>
   );

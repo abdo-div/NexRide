@@ -78,6 +78,7 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
           type="button"
           onClick={() => setFav((f) => !f)}
           aria-label={t("fleet.card.toggleFavorite")}
+          aria-pressed={fav}
           className="absolute top-4 end-4 p-2 rounded-full bg-white/90 backdrop-blur-md text-slate-600 hover:text-red-500 border border-[#E2E8F0] shadow-sm transition-colors"
           whileHover={reduceMotion ? undefined : { scale: 1.12, rotate: -7 }}
           whileTap={reduceMotion ? undefined : { scale: 0.88 }}

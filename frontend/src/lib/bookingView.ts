@@ -66,8 +66,33 @@ export const rentalDays = (startIso: string, endIso: string): number =>
     ),
   );
 
-export const daysUntil = (iso: string): number =>
-  Math.ceil((new Date(iso).getTime() - Date.now()) / 86400000);
+export type PickupTiming = {
+  phase: "future" | "today" | "overdue";
+  days: number;
+};
+
+/** Calendar-day pickup timing; unlike an hour countdown, this stays truthful all day. */
+export const pickupTiming = (
+  iso: string,
+  now: Date = new Date(),
+): PickupTiming => {
+  const pickup = new Date(iso);
+  const pickupDay = new Date(
+    pickup.getFullYear(),
+    pickup.getMonth(),
+    pickup.getDate(),
+  ).getTime();
+  const today = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+  ).getTime();
+  const difference = Math.round((pickupDay - today) / 86400000);
+
+  if (difference > 0) return { phase: "future", days: difference };
+  if (difference < 0) return { phase: "overdue", days: Math.abs(difference) };
+  return { phase: "today", days: 0 };
+};
 
 /** Triggers a browser download for a Blob (invoice PDFs, CSV exports). */
 export const saveBlobAsFile = (blob: Blob, filename: string): void => {

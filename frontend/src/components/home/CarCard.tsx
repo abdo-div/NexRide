@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 import { Heart, GasPump as Fuel, Gauge, UsersThree as Users, MapPin, CheckCircle as CheckCircle2 } from "@phosphor-icons/react";
 import type { Car } from "../../types/car";
 
@@ -16,6 +17,7 @@ const TYPE_LABEL_KEYS: Record<string, string> = {
 
 export const CarCard: React.FC<CarCardProps> = ({ car }) => {
   const { t } = useTranslation();
+  const [saved, setSaved] = useState(false);
   const typeKey = TYPE_LABEL_KEYS[car.type.toLowerCase()];
   const transmissionKey =
     car.transmission.toLowerCase() === "manual"
@@ -49,10 +51,12 @@ export const CarCard: React.FC<CarCardProps> = ({ car }) => {
 
         <button
           type="button"
+          onClick={() => setSaved((value) => !value)}
+          aria-pressed={saved}
           aria-label={t("data.common.saveCar")}
           className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-md text-slate-600 hover:text-rose-500 hover:bg-white shadow-xs transition-colors"
         >
-          <Heart className="w-4 h-4" />
+          <Heart className="w-4 h-4" weight={saved ? "fill" : "regular"} />
         </button>
 
         <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-slate-900/70 backdrop-blur-md text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-md">
@@ -105,12 +109,12 @@ export const CarCard: React.FC<CarCardProps> = ({ car }) => {
             </div>
           </div>
 
-          <a
-            href={`#book-${car.id}`}
+          <Link
+            to={`/fleet?category=${encodeURIComponent(car.type.toLowerCase())}`}
             className="premium-button px-4 py-2 text-xs font-bold"
           >
             {t("data.common.rentNow")}
-          </a>
+          </Link>
         </div>
       </div>
     </div>

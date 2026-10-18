@@ -52,12 +52,21 @@ export interface VerifyResponse {
   data?: VerifyResult;
 }
 
+export interface ReleaseResponse {
+  status: string;
+  data: {
+    released: boolean;
+    bookingStatus: string | null;
+    paymentStatus: string | null;
+  };
+}
+
 /**
  * Moamalat gateway API surface.
  */
 export const moamalatApi = {
   getConfig: (): Promise<GatewayConfigResponse> =>
-    request("/payments/moamalat/config", { auth: false }),
+    request("/payments/moamalat/config"),
 
   create: (payload: {
     amount: number;
@@ -66,14 +75,12 @@ export const moamalatApi = {
   }): Promise<InitiateResponse> =>
     request("/payments/moamalat/create", {
       method: "POST",
-      auth: true,
       body: payload,
     }),
 
   initiate: (bookingId: string): Promise<InitiateResponse> =>
     request("/payments/moamalat/init", {
       method: "POST",
-      auth: true,
       body: { bookingId },
       headers: { "Idempotency-Key": crypto.randomUUID() },
     }),
@@ -84,7 +91,18 @@ export const moamalatApi = {
   }): Promise<VerifyResponse> =>
     request("/payments/moamalat/verify", {
       method: "POST",
-      auth: false,
       body: payload,
+    }),
+
+  /**
+   * Releases a booking whose payment did not succeed so the vehicle is not left
+   * rented to the customer. Called when the gateway errors or the user abandons
+   * checkout before a successful capture.
+   */
+  release: (bookingId: string): Promise<ReleaseResponse> =>
+    request("/payments/moamalat/release", {
+      method: "POST",
+      body: { bookingId },
+      headers: { "Idempotency-Key": crypto.randomUUID() },
     }),
 };

@@ -241,6 +241,7 @@ export const CompaniesPage: React.FC = () => {
                   setPage(1);
                 }}
                 title={t("companies.gridView")}
+                aria-label={t("companies.gridView")}
                 className={`p-2 rounded-lg transition-all ${
                   view === "grid"
                     ? "bg-white text-[#142B4A] shadow-sm"
@@ -256,6 +257,7 @@ export const CompaniesPage: React.FC = () => {
                   setPage(1);
                 }}
                 title={t("companies.listView")}
+                aria-label={t("companies.listView")}
                 className={`p-2 rounded-lg transition-all ${
                   view === "list"
                     ? "bg-white text-[#142B4A] shadow-sm"

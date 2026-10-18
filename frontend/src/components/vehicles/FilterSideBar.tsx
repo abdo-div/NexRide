@@ -9,18 +9,49 @@ export interface LocationOption {
   count: number;
 }
 
+export interface BodyOption {
+  id: string;
+  label: string;
+  count: number;
+}
+
+export interface DriveOption {
+  id: string;
+  label: string;
+  count: number;
+}
+
+export interface OperatorOption {
+  id: string;
+  name: string;
+  rating: string;
+  count: number;
+}
+
+export interface PerkOption {
+  id: string;
+  label: string;
+  count: number;
+}
+
 export interface FilterSelection {
   maxPrice: number;
   onMaxPriceChange: (n: number) => void;
+  minPrice?: number;
+  totalMaxPrice?: number;
   locations: LocationOption[];
   selectedLocations: string[];
   onToggleLocation: (id: string) => void;
+  bodies?: BodyOption[];
   selectedBodies: string[];
   onToggleBody: (id: string) => void;
+  drives?: DriveOption[];
   selectedDrives: string[];
   onToggleDrive: (id: string) => void;
+  operators?: OperatorOption[];
   selectedOperators: string[];
   onToggleOperator: (id: string) => void;
+  perks?: PerkOption[];
   selectedPerks: string[];
   onTogglePerk: (id: string) => void;
   onReset: () => void;
@@ -54,15 +85,21 @@ const BoxRow: React.FC<{
 export const FilterSideBar: React.FC<FilterSelection> = ({
   maxPrice,
   onMaxPriceChange,
+  minPrice = 0,
+  totalMaxPrice,
   locations,
   selectedLocations,
   onToggleLocation,
+  bodies,
   selectedBodies,
   onToggleBody,
+  drives,
   selectedDrives,
   onToggleDrive,
+  operators,
   selectedOperators,
   onToggleOperator,
+  perks,
   selectedPerks,
   onTogglePerk,
   onReset,
@@ -71,6 +108,19 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
   onApply,
 }) => {
   const { t } = useTranslation();
+  const sliderMax = totalMaxPrice ?? maxPrice;
+
+  const bodyList = bodies ?? BODY_PROFILES.map((b) => ({ ...b, count: 0 }));
+  const driveList = drives ?? DRIVETRAIN_OPTIONS.map((d) => ({ ...d, count: 0 }));
+  const operatorList =
+    operators ??
+    CERTIFIED_FLEETS.map((f) => ({
+      id: f.id,
+      name: f.name,
+      rating: f.rating,
+      count: 0,
+    }));
+  const perkList = perks ?? PERK_OPTIONS.map((p) => ({ ...p, count: 0 }));
 
   return (
     <aside className={`bg-[#FFFFFF] rounded-2xl p-6 border border-[#E2E8F0] shadow-sm flex flex-col gap-6 ${sticky ? "lg:sticky lg:top-28" : ""}`}>
@@ -90,24 +140,26 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
       </div>
 
       {/* Locations */}
-      <div className="flex flex-col gap-3">
-        <span className="text-xs font-bold uppercase tracking-wider text-[#0F172A]">
-          {t("fleet.filters.libyanLocation")}
-        </span>
-        <div className="space-y-2">
-          {locations.map((l) => (
-            <BoxRow
-              key={l.id}
-              checked={selectedLocations.includes(l.id)}
-              label={t(l.label)}
-              trailing={
-                <span className="text-[10px] font-semibold text-slate-400">{l.count}</span>
-              }
-              onToggle={() => onToggleLocation(l.id)}
-            />
-          ))}
+      {locations.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#0F172A]">
+            {t("fleet.filters.libyanLocation")}
+          </span>
+          <div className="space-y-2">
+            {locations.map((l) => (
+              <BoxRow
+                key={l.id}
+                checked={selectedLocations.includes(l.id)}
+                label={t(l.label)}
+                trailing={
+                  <span className="text-[10px] font-semibold text-slate-400">{l.count}</span>
+                }
+                onToggle={() => onToggleLocation(l.id)}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Rate per day */}
       <div className="flex flex-col gap-3">
@@ -130,16 +182,16 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
         </div>
         <input
           type="range"
-          min={100}
-          max={2500}
-          step={50}
+          min={minPrice}
+          max={sliderMax}
+          step={sliderMax <= 500 ? 10 : 50}
           value={maxPrice}
           onChange={(e) => onMaxPriceChange(Number(e.target.value))}
           className="w-full accent-[#142B4A] bg-slate-200 rounded-lg h-1.5 cursor-pointer"
         />
         <div className="flex justify-between text-[10px] font-semibold text-slate-500">
-          <span>{t("fleet.filters.priceMin")}</span>
-          <span>{t("fleet.filters.priceMax")}</span>
+          <span>{minPrice.toLocaleString()} LYD</span>
+          <span>{sliderMax.toLocaleString()} LYD</span>
         </div>
       </div>
 
@@ -149,7 +201,7 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
           {t("fleet.filters.bodyProfile")}
         </span>
         <div className="grid grid-cols-2 gap-2">
-          {BODY_PROFILES.map((b) => (
+          {bodyList.map((b) => (
             <label
               key={b.id}
               className="p-2.5 rounded-xl bg-slate-50/80 hover:bg-slate-100 border border-[#E2E8F0] cursor-pointer flex items-center gap-2 text-[13px] font-medium text-slate-800 transition-colors"
@@ -177,7 +229,7 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
           {t("fleet.filters.drivetrainSpecs")}
         </span>
         <div className="space-y-2">
-          {DRIVETRAIN_OPTIONS.map((d) => (
+          {driveList.map((d) => (
             <BoxRow
               key={d.id}
               checked={selectedDrives.includes(d.id)}
@@ -192,27 +244,29 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
       </div>
 
       {/* Certified fleets */}
-      <div className="flex flex-col gap-3">
-        <span className="text-xs font-bold uppercase tracking-wider text-[#0F172A]">
-          {t("fleet.filters.certifiedFleets")}
-        </span>
-        <div className="space-y-2">
-          {CERTIFIED_FLEETS.map((f) => (
-            <BoxRow
-              key={f.id}
-              checked={selectedOperators.includes(f.id)}
-              label={f.name}
-              trailing={
-                <span className="text-[10px] font-bold text-[#F97316] flex items-center">
-                  <Star className="w-3 h-3 fill-[#F97316] text-[#F97316] me-0.5" />
-                  {f.rating}
-                </span>
-              }
-              onToggle={() => onToggleOperator(f.id)}
-            />
-          ))}
+      {operatorList.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#0F172A]">
+            {t("fleet.filters.certifiedFleets")}
+          </span>
+          <div className="space-y-2">
+            {operatorList.map((f) => (
+              <BoxRow
+                key={f.id}
+                checked={selectedOperators.includes(f.id)}
+                label={f.name}
+                trailing={
+                  <span className="text-[10px] font-bold text-[#F97316] flex items-center">
+                    <Star className="w-3 h-3 fill-[#F97316] text-[#F97316] me-0.5" />
+                    {f.rating}
+                  </span>
+                }
+                onToggle={() => onToggleOperator(f.id)}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Reservation perks */}
       <div className="flex flex-col gap-3">
@@ -220,19 +274,22 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
           {t("fleet.filters.reservationPerks")}
         </span>
         <div className="space-y-2">
-          {PERK_OPTIONS.map((p) => (
+          {perkList.map((p) => (
             <label
               key={p.id}
-              className="flex items-center gap-2 text-[13px] font-medium text-slate-800 cursor-pointer"
+              className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-50/80 hover:bg-slate-100 border border-[#E2E8F0] text-[13px] font-medium text-slate-800 cursor-pointer transition-colors"
             >
-              <input
-                type="checkbox"
-                checked={selectedPerks.includes(p.id)}
-                onChange={() => onTogglePerk(p.id)}
-                className="accent-[#142B4A] w-4 h-4 rounded focus:ring-blue-500 border-slate-300"
-              />
-              <CheckSquare className="w-3.5 h-3.5 text-slate-300" />
-              <span>{t(p.label)}</span>
+              <span className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={selectedPerks.includes(p.id)}
+                  onChange={() => onTogglePerk(p.id)}
+                  className="accent-[#142B4A] w-4 h-4 rounded focus:ring-blue-500 border-slate-300"
+                />
+                <CheckSquare className="w-3.5 h-3.5 text-slate-400" />
+                <span>{t(p.label)}</span>
+              </span>
+              <span className="text-[10px] font-semibold text-slate-400">{p.count}</span>
             </label>
           ))}
         </div>

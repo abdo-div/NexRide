@@ -256,7 +256,10 @@ block scripts
     const bookBtn = document.getElementById('book-btn');
     if (bookBtn) {
       bookBtn.addEventListener('click', async () => {
-        if (!startInput.value || !endInput.value) return alert('Please select rental dates.');
+        if (!startInput.value || !endInput.value) {
+          window.nexrideNotify('Please select rental dates.');
+          return;
+        }
         bookBtn.textContent = 'Processing...';
         bookBtn.disabled = true;
         try {
@@ -382,11 +385,11 @@ block scripts
               window.location.reload();
             } else {
               res.json().then(function(data) {
-                alert(data.message || 'Failed to submit review.');
+                window.nexrideNotify(data.message || 'Failed to submit review.');
               });
             }
           }).catch(function() {
-            alert('Network error. Please try again.');
+            window.nexrideNotify('Network error. Please try again.');
           });
         });
       }

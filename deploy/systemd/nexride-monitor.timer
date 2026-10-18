@@ -1,0 +1,13 @@
+[Unit]
+Description=Check NexRide production health every minute
+
+[Timer]
+OnBootSec=2m
+OnUnitActiveSec=1m
+RandomizedDelaySec=10s
+AccuracySec=10s
+Persistent=true
+Unit=nexride-monitor.service
+
+[Install]
+WantedBy=timers.target

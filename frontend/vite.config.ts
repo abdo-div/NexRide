@@ -5,6 +5,18 @@ import tailwindcss from "@tailwindcss/vite";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    proxy: {
+      "/api": "http://localhost:3000",
+      // Uploaded media is served by Express, not Vite. Keep these narrowly
+      // scoped under /public so SPA routes such as /companies still work when
+      // the development page is refreshed directly.
+      "/public/vehicles": "http://localhost:3000",
+      "/public/companies": "http://localhost:3000",
+      "/public/users": "http://localhost:3000",
+      "/public/cars": "http://localhost:3000",
+    },
+  },
   build: {
     chunkSizeWarningLimit: 500,
     rollupOptions: {

@@ -1,5 +1,4 @@
 import { request, API_BASE_URL, ApiError } from "./apiClient";
-import { getToken } from "./tokenStorage";
 import type { BookingDto } from "../types/booking";
 
 export interface AvailabilityResult {
@@ -43,7 +42,7 @@ export interface CreateBookingPayload {
 /**
  * Booking API surface used by the checkout flow. The availability check is
  * public (same data the fleet search derives), while create/get require the
- * customer's JWT; POST also sends an Idempotency-Key so the backend collapses
+ * customer's HTTP-only session cookie; POST also sends an Idempotency-Key so the backend collapses
  * retries of the same submission.
  */
 export const bookingApi = {
@@ -59,7 +58,6 @@ export const bookingApi = {
       endDate,
     });
     return request(`/bookings/check-availability?${query.toString()}`, {
-      auth: false,
       signal,
     });
   },
@@ -67,13 +65,12 @@ export const bookingApi = {
   create: (payload: CreateBookingPayload): Promise<BookingResponse> =>
     request<BookingResponse>("/bookings", {
       method: "POST",
-      auth: true,
       body: payload,
       headers: { "Idempotency-Key": crypto.randomUUID() },
     }),
 
   get: (id: string, signal?: AbortSignal): Promise<BookingResponse> =>
-    request(`/bookings/${encodeURIComponent(id)}`, { auth: true, signal }),
+    request(`/bookings/${encodeURIComponent(id)}`, { signal }),
 
   /**
    * Fetch the logged-in customer's own bookings (self-service ledger).
@@ -81,33 +78,31 @@ export const bookingApi = {
    * authenticated user's data.
    */
   listMy: (signal?: AbortSignal): Promise<MyBookingsResponse> =>
-    request<MyBookingsResponse>("/bookings/my-bookings", { auth: true, signal }),
+    request<MyBookingsResponse>("/bookings/my-bookings", { signal }),
 
   /**
    * Request cancellation of a booking owned by the logged-in customer.
    * Applies the cancellation business rules (free-cancellation windows,
-   * refund handling) on the backend.
+   * refund handling) on the backend. An optional reason is forwarded so the
+   * cancellation (e.g. an abandoned payment) is attributable in the ledger.
    */
-  cancel: (id: string): Promise<BookingResponse> =>
+  cancel: (id: string, reason?: string): Promise<BookingResponse> =>
     request<BookingResponse>(`/bookings/${encodeURIComponent(id)}/cancel`, {
       method: "PATCH",
-      auth: true,
+      body: reason ? { reason } : {},
     }),
 
   /**
    * Downloads the official invoice PDF for a paid booking. Uses a raw fetch
-   * (the endpoint streams binary application/pdf, not JSON) so the JWT is
-   * attached as a header and the response is returned as a Blob for the caller
-   * to save.
+   * (the endpoint streams binary application/pdf, not JSON) and returns the
+   * response as a Blob for the caller to save.
    */
   downloadInvoice: async (bookingId: string): Promise<Blob> => {
-    const token = getToken();
     const response = await fetch(
       `${API_BASE_URL}/bookings/${encodeURIComponent(bookingId)}/invoice`,
       {
         headers: {
           Accept: "application/pdf",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         credentials: "include",
       },

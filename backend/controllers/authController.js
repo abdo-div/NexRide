@@ -4,23 +4,28 @@ import * as authService from "../services/authService.js";
 /**
  * Helper utility to sign JWT and attach HTTP-only cookie
  */
-const createSendToken = (user, statusCode, req, res) => {
+const cookieSecurityOptions = (req) => ({
+  httpOnly: true,
+  secure: req.secure || req.headers["x-forwarded-proto"] === "https",
+  sameSite: "lax",
+  path: "/",
+});
+
+export const createSendToken = (user, statusCode, req, res) => {
   const token = authService.signToken(user._id);
 
   res.cookie("jwt", token, {
+    ...cookieSecurityOptions(req),
     expires: new Date(
       Date.now() +
         (process.env.JWT_COOKIE_EXPIRES_IN || 90) * 24 * 60 * 60 * 1000
     ),
-    httpOnly: true,
-    secure: req.secure || req.headers["x-forwarded-proto"] === "https",
   });
 
   user.password = undefined;
 
   res.status(statusCode).json({
     status: "success",
-    token,
     data: { user },
   });
 };
@@ -45,8 +50,8 @@ export const googleLogin = catchAsync(async (req, res) => {
 
 export const logout = (req, res) => {
   res.cookie("jwt", "loggedout", {
-    expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true,
+    ...cookieSecurityOptions(req),
+    expires: new Date(0),
   });
 
   res.status(200).json({ status: "success" });

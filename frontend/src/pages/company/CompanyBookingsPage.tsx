@@ -138,7 +138,7 @@ export const CompanyBookingsPage: React.FC = () => {
   );
 
   const handleCancel = useCallback(
-    (reason: string) =>
+    (reason: string | null) =>
       runAction(
         () => (selectedId ? companyBookingsApi.cancel(selectedId, reason) : Promise.reject()),
         "company.bookingsPage.toasts.bookingCancelled",

@@ -145,7 +145,9 @@ export const PartnerRail: React.FC<RailProps> = ({ activeStep, draft }) => {
             {t("partner.rail.conciergePhone")}
           </a>
           <a
-            href="#"
+            href="https://wa.me/218910008820"
+            target="_blank"
+            rel="noreferrer"
             className="flex items-center gap-2 text-sm font-bold hover:text-[#CBD5E1] transition-colors"
           >
             <MessageCircle className="w-[18px] h-[18px] text-[#FFDBCA]" />

@@ -3,6 +3,15 @@
     "ar": "العربية",
     "en": "English"
   },
+  "dialogs": {
+    "confirmTitle": "Please confirm",
+    "inputTitle": "Additional details",
+    "confirm": "Confirm",
+    "submit": "Continue",
+    "cancel": "Cancel",
+    "close": "Close dialog",
+    "reasonPlaceholder": "Add a reason or note…"
+  },
   "nav": {
     "home": "Home",
     "browseCars": "Browse Cars",
@@ -191,6 +200,8 @@
     "provider": "Provider: {{name}}",
     "freeCancel": "Free cancellation until {{date}}",
     "startsIn": "Pickup in {{days}} days",
+    "pickupToday": "Pickup is today",
+    "pickupOverdue": "Pickup was {{days}} days ago",
     "endedOn": "Trip ended on {{date}}",
     "rated": "Service rated 5.0★",
     "invoiceNote": "Official tax invoice issued",
@@ -208,6 +219,7 @@
       "PAID": "Paid",
       "CONFIRMED": "Confirmed",
       "upcoming": "Upcoming Scheduled",
+      "overduePickup": "Pickup overdue",
       "ACTIVE": "Active • Secured for you",
       "COMPLETED": "Completed & Handed Back",
       "CANCELLED": "Cancelled",
@@ -447,7 +459,13 @@
     "active": "Active",
     "rights": "© 2026 NexRide Libya Mobility Technologies",
     "systemsOperational": "All Systems Operational",
-    "currency": "LYD (د.ل)"
+    "currency": "LYD (د.ل)",
+    "legal": {
+      "label": "Legal documents",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "cancellation": "Cancellation & refunds"
+    }
   },
   "cta": {
     "badge": "UNLOCK LIBYA'S PREMIER ROADS",
@@ -1032,7 +1050,7 @@
       "toggleFavorite": "Toggle favorite",
       "periodDays": "{{count}}-days",
       "details": "Details",
-      "reserve": "Reserve ({{total}} LYD)",
+      "reserve": "Reserve Now",
       "specs": {
         "engine": "Engine",
         "capacity": "Capacity",
@@ -1451,7 +1469,10 @@
       "ctaDone": "Booking Confirmed! SMS Voucher Dispatched",
       "viewConfirmation": "View Booking Confirmation",
       "secureNote": "Bank-grade encrypted transaction via Libyan Payment Network",
-      "agreementNote": "By clicking confirm, you agree to NexRide's Master Rental Agreement, Libyan Road Authority guidelines, and {{operator}} Terms.",
+      "agreementNote": "By clicking confirm, you agree to NexRide's Terms and the disclosed conditions of {{operator}}.",
+      "legalTerms": "Terms",
+      "legalPrivacy": "Privacy",
+      "legalCancellation": "Cancellation & refunds",
       "valueProps": {
         "freeCancel": {
           "title": "Free Cancel",

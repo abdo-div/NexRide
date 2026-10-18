@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
   ShieldCheck,
@@ -302,6 +302,7 @@ const buildConfirmation = (
 export const BookingConfirmationPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const bookingId = searchParams.get("booking");
   const paymentMethod = searchParams.get("paymentMethod") ?? undefined;
 
@@ -527,6 +528,64 @@ export const BookingConfirmationPage: React.FC = () => {
             >
               <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
               {t("booking.notFound.action")}
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // An online booking that was not completed must NEVER render confirmation or consider the car rented.
+  if (
+    booking.bookingStatus === "PENDING_PAYMENT" &&
+    booking.paymentStatus !== "PAID" &&
+    paymentMethod !== "CASH_ON_DELIVERY"
+  ) {
+    navigate(`/payment/${booking._id}`, { replace: true });
+    return (
+      <div className="bg-[#F8FAFC] min-h-screen">
+        <div className="pt-20 flex flex-col items-center justify-center gap-4 min-h-[70vh]">
+          <span className="w-8 h-8 border-2 border-[#142B4A] border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-[#64748B]">{t("payment.preparing", { defaultValue: "Redirecting to payment..." })}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (booking.bookingStatus === "CANCELLED" || booking.bookingStatus === "EXPIRED") {
+    return (
+      <div className="bg-[#F8FAFC] min-h-screen">
+        <div className="max-w-2xl mx-auto px-6 pt-32 pb-20 text-center">
+          <div className="mx-auto w-16 h-16 rounded-full bg-red-50 text-red-600 flex items-center justify-center mb-5">
+            <CalendarX2 className="w-8 h-8" />
+          </div>
+          <h1 className="text-2xl font-bold text-[#0F172A]">
+            {booking.bookingStatus === "CANCELLED"
+              ? t("booking.cancelled.title", { defaultValue: "Reservation Cancelled" })
+              : t("booking.expired.title", { defaultValue: "Reservation Expired" })}
+          </h1>
+          <p className="mt-2 text-sm text-slate-500 max-w-md mx-auto">
+            {booking.bookingStatus === "CANCELLED"
+              ? t("booking.cancelled.desc", {
+                  defaultValue: "This reservation was cancelled. The vehicle has been released back to the fleet and is not rented.",
+                })
+              : t("booking.expired.desc", {
+                  defaultValue: "Payment was not completed in time and this reservation has expired. The vehicle has been released.",
+                })}
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              to="/fleet"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#142B4A] hover:bg-[#0D2039] text-white text-xs font-bold transition-colors"
+            >
+              {t("checkout.unavailable.browse", { defaultValue: "Browse fleet" })}
+            </Link>
+            <Link
+              to="/my-bookings"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] hover:bg-[#F1F5F9] text-slate-700 text-xs font-bold transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+              {t("bookingDetails.backToList", { defaultValue: "Back to my bookings" })}
             </Link>
           </div>
         </div>

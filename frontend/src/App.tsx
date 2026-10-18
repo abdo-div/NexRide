@@ -19,6 +19,7 @@ import { AdminLayout } from "./components/admin/AdminLayout";
 import { CompanyRoute } from "./components/company/CompanyRoute";
 import { CompanyLayout } from "./components/company/CompanyLayout";
 import { SmoothScroll } from "./components/SmoothScroll";
+import { DialogProvider } from "./context/DialogContext";
 
 // Only the landing page is needed for the initial public load. Browsing, auth,
 // booking, checkout and payment screens are separate chunks so a first-time
@@ -39,6 +40,7 @@ const CompanyApplicationStatusPage = lazy(
   () => import("./pages/company/CompanyApplicationStatusPage"),
 );
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+const LegalPage = lazy(() => import("./pages/LegalPage"));
 const MyBookingsPage = lazy(() => import("./pages/MyBookingsPage"));
 const MyProfilePage = lazy(() => import("./pages/MyProfilePage"));
 const BookingDetailsPage = lazy(() => import("./pages/BookingDetailsPage"));
@@ -213,8 +215,9 @@ function PublicShell() {
 function App() {
   return (
     <BrowserRouter>
-      <ScrollToTop />
-      <AuthProvider>
+      <DialogProvider>
+        <ScrollToTop />
+        <AuthProvider>
         <SmoothScroll><Routes>
           <Route element={<PublicShell />}>
             <Route path="/" element={<StaffLandingRoute><HomePage /></StaffLandingRoute>} />
@@ -341,6 +344,18 @@ function App() {
               }
             />
             <Route
+              path="/terms"
+              element={<LazyRoute><LegalPage documentKey="terms" /></LazyRoute>}
+            />
+            <Route
+              path="/privacy"
+              element={<LazyRoute><LegalPage documentKey="privacy" /></LazyRoute>}
+            />
+            <Route
+              path="/cancellation-policy"
+              element={<LazyRoute><LegalPage documentKey="cancellation" /></LazyRoute>}
+            />
+            <Route
               path="/my-bookings"
               element={
                 <ProtectedRoute>
@@ -418,7 +433,8 @@ function App() {
             <Route path="settings" element={<CompanySettingsPage />} />
           </Route>
         </Routes></SmoothScroll>
-      </AuthProvider>
+        </AuthProvider>
+      </DialogProvider>
     </BrowserRouter>
   );
 }

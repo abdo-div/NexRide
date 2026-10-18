@@ -18,6 +18,19 @@ The NexRide backend is an Express API for the vehicle-rental marketplace and its
 
 The server can start when MongoDB or Redis is unavailable, but it runs in a degraded state; readiness reports `503` until both are available. Local defaults target MongoDB at `mongodb://127.0.0.1:27017/nexride?replicaSet=rs0` and Redis at `127.0.0.1:6379`.
 
+Production MongoDB setup, access control, plan-first index reconciliation,
+nightly backups, and isolated restore drills are documented in
+[`docs/VPS_MONGODB.md`](../docs/VPS_MONGODB.md). Database indexes are never
+reconciled automatically during API startup.
+
+Production Redis ACLs, persistence, memory policy, and VPS verification are
+documented in [`docs/VPS_REDIS.md`](../docs/VPS_REDIS.md). The bundled local
+configuration binds Redis to loopback; remote services must use `rediss://`.
+
+Generated public media and protected partner documents use separate persistent
+roots in production. Migration, backup, and restore verification are documented
+in [`docs/VPS_STORAGE.md`](../docs/VPS_STORAGE.md).
+
 ## Install and configure
 
 From the repository root:
@@ -30,6 +43,24 @@ Copy-Item .env.example .env
 
 Edit `backend/.env` for your local services and integrations. Do not commit `.env` or put credentials in source control. The server loads environment files in this order: `backend/config.env` (legacy), `backend/.env`, then the repository-root `.env`; it uses the first file that exists. Variables already supplied by the shell are retained.
 
+For a VPS deployment, copy `.env.production.example` into the host's secret
+configuration, replace every placeholder, and validate it before starting:
+
+```powershell
+npm run validate:production-env
+```
+
+Production startup runs the same validation automatically and reports all
+configuration problems together without printing secret values.
+On the VPS, validate the protected systemd environment file explicitly with
+`PRODUCTION_ENV_FILE=/etc/nexride/backend.env npm run validate:production-env`.
+
+The supported runtime is pinned to Node.js 24 in `package.json`. Production is
+run as one systemd-managed process because the API process also owns the email
+worker and booking-expiry scheduler; starting multiple instances would run
+those jobs more than once. Install and operate the supplied unit by following
+[`docs/VPS_NODE_SERVICE.md`](../docs/VPS_NODE_SERVICE.md).
+
 ### Environment variables
 
 The full list of supported names and secret placeholders is in [`.env.example`](./.env.example). Key configuration:
@@ -38,18 +69,19 @@ The full list of supported names and secret placeholders is in [`.env.example`](
 | --- | --- |
 | `JWT_SECRET` | Required private secret used to sign and verify session tokens. It must be at least 32 bytes; startup fails if it is missing or too short. |
 | `MONGODB_URI` | MongoDB connection URI. Alternatives supported by the code are `MONGO_URI`, `DATABASE_URI`, `DATABASE_URL`, and `DATABASE`. If none is set, the local replica-set URI above is used. |
-| `REDIS_URL` | Redis connection URI. Without it, configure `REDIS_HOST`, `REDIS_PORT`, and `REDIS_PASSWORD`; defaults are `127.0.0.1:6379`. Other URL aliases are read by the code, but use `REDIS_URL` for URI-based deployments. |
-| `PORT`, `NODE_ENV` | HTTP port and runtime mode. `PORT` defaults to `3000`; set `NODE_ENV` to `development` or `production` as appropriate. |
+| `REDIS_URL` | Redis connection URI. Production remote services must use `rediss://` with a named ACL user and password. For a local VPS instance, configure `REDIS_HOST`, `REDIS_PORT`, `REDIS_USERNAME`, and `REDIS_PASSWORD`. Other URL aliases are read by the code, but use `REDIS_URL` for URI-based deployments. |
+| `PORT`, `BIND_HOST`, `NODE_ENV` | HTTP port, listener address, and runtime mode. Production requires `BIND_HOST=127.0.0.1` so Node is reachable only through the local Nginx proxy. |
 | `DNS_SERVERS` | Optional comma-separated IP addresses used to override Node DNS resolution when the host resolver cannot resolve MongoDB Atlas/SRV records. For example, `DNS_SERVERS=8.8.8.8,1.1.1.1`. Omit it to use the host/system resolver. |
 | `FRONTEND_DOMAIN` | Optional comma-separated exact origins allowed by CORS. Development defaults include `http://localhost:5173` and `http://localhost:5174`; configure deployment origins explicitly, for example `FRONTEND_DOMAIN=https://app.example.com,https://admin.example.com`. |
-| `FRONTEND_URL`, `CLIENT_URL` | Frontend URL used in auth links and client URL used in booking emails, respectively. |
+| `FRONTEND_URL` | Public HTTPS frontend origin used for authentication and booking email links. |
 | `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USERNAME`, `EMAIL_PASSWORD`, `EMAIL_FROM`, `EMAIL_FROM_NAME` | Local/development SMTP and sender configuration. Development defaults to a local SMTP server at `127.0.0.1:1025`. |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USERNAME`, `SMTP_PASSWORD` | Production SMTP configuration. |
 | `MOAMALAT_ENV`, `MOAMALAT_MID`, `MOAMALAT_TID`, `MOAMALAT_SECURE_KEY` | Optional Moamalat environment and merchant credentials. Payment initiation requires the merchant ID, terminal ID, and signing key. |
 | `JWT_EXPIRES_IN`, `JWT_COOKIE_EXPIRES_IN` | Token and cookie expiration configuration. |
 | `REDIS_PROBE_TIMEOUT_MS`, `LOG_LEVEL` | Optional Redis probe timeout and logging level. |
+| `PUBLIC_STORAGE_DIR`, `PRIVATE_STORAGE_DIR` | Separate absolute persistent roots for generated public media and protected partner documents. Both are required in production and must not overlap. |
 
-All payment and mail credentials are optional for features that do not use those integrations. Never place real credentials in the example file.
+Payment and mail credentials can be omitted in development when those features are not used. They are required by the production preflight because checkout and account recovery are launch-critical. Never place real credentials in an example file.
 
 ### Observability
 
@@ -59,6 +91,11 @@ error-reporting service integrated. If you add one, wire it in `app.js` /
 `server.js` at startup behind an environment variable, add the dependency to
 `package.json`, and strip authorization headers, cookies, JWTs, request bodies
 and payment credentials from the payloads you send.
+
+The supplied VPS monitor checks readiness, services, disks, backup freshness,
+and TLS, with state-change webhook alerts. Journald retention, stable workflow
+event names, installation, and the required off-host uptime monitor are covered
+in [`docs/VPS_MONITORING.md`](../docs/VPS_MONITORING.md).
 
 ## Run locally
 
@@ -78,7 +115,7 @@ The API is mounted primarily under `/api/v1` (users, vehicles/cars, companies, b
 
 ## Authentication and access
 
-Signup and login return a JWT and set an HTTP-only cookie. API clients can also send the token as a Bearer token. User status is checked on authenticated requests, and role-based middleware restricts administrative operations to admins. Company users must belong to an approved company; tenant-scoped payment and company operations are restricted to that company.
+Signup and login establish an HTTP-only, SameSite session cookie; the JWT is never exposed in the browser response body. Browser requests include that cookie through `credentials: "include"`. User status is checked on authenticated requests, and role-based middleware restricts administrative operations to admins. Company users must belong to an approved company; tenant-scoped payment and company operations are restricted to that company.
 
 ## Tests
 

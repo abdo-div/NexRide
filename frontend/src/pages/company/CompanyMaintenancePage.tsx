@@ -28,6 +28,7 @@ import type {
   MaintenanceCategory,
   MaintenanceEventDto,
 } from "../../types/admin";
+import { useDialog } from "../../context/useDialog";
 
 /** Records due-less pending work surfaced under the ledger. */
 const UPCOMING_WINDOW = 35;
@@ -40,6 +41,7 @@ const MOUNTED_AT = Date.now();
  *  create/complete/release lifecycle for the operator's own fleet. */
 export const CompanyMaintenancePage: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const { confirm: confirmDialog } = useDialog();
   const {
     data,
     summary,
@@ -119,7 +121,7 @@ export const CompanyMaintenancePage: React.FC = () => {
     const vehicle = typeof event.vehicleId === "object" ? event.vehicleId : null;
     const vehicleId = vehicle?._id ?? String(event.vehicleId);
     if (!vehicleId) return;
-    if (!window.confirm(t("company.maintenance.drawer.releaseConfirm"))) return;
+    if (!(await confirmDialog(t("company.maintenance.drawer.releaseConfirm")))) return;
     const ok = await releaseVehicle(vehicleId);
     showToast(ok ? t("company.maintenance.toasts.released") : t("company.maintenance.toasts.error"));
   };

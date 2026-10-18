@@ -1,0 +1,22 @@
+[Unit]
+Description=NexRide consistent MongoDB backup
+Documentation=file:///srv/nexride/current/docs/VPS_MONGODB.md
+After=mongod.service
+Requires=mongod.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+Environment=NEXRIDE_MONGODB_RETENTION_DAYS=14
+ExecStart=/usr/bin/flock -n /run/lock/nexride-mongodb-backup.lock /usr/local/sbin/nexride-mongodb-backup
+
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/backups/nexride/mongodb /run/lock
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6

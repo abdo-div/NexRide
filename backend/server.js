@@ -6,6 +6,7 @@ import { configureDnsServers } from "./config/dnsConfig.js";
 import { validateJwtSecret } from "./config/jwt.js";
 import { validateNodeEnv, getNodeEnv } from "./config/env.js";
 import { getClientUrl } from "./config/clientUrl.js";
+import { validateProductionEnv } from "./config/productionEnv.js";
 
 // Load the environment file wherever it actually lives, regardless of the
 // working directory the server is started from. Candidates are checked in
@@ -31,6 +32,7 @@ validateJwtSecret();
 // would have to fall back to the request host, which a forged Host header
 // controls.
 getClientUrl({ allowLocalFallback: false });
+if (getNodeEnv() === "production") validateProductionEnv();
 configureDnsServers(process.env.DNS_SERVERS);
 
 const { default: mongoose } = await import("mongoose");
@@ -45,10 +47,11 @@ const { redisClient, bullmqConnection } = await import("./config/redis.js");
 connectDB();
 
 const PORT = process.env.PORT || 3000;
+const BIND_HOST = process.env.BIND_HOST || "0.0.0.0";
 
 let listening = false;
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, BIND_HOST, () => {
   // On Windows a second process can bind a port that is already in use
   // (SO_REUSEADDR), which fires this callback even though the process does not
   // own the socket. Only announce success when the socket was really acquired.
@@ -56,9 +59,12 @@ const server = app.listen(PORT, () => {
   listening = true;
 
   chalkLogger.success(
-    `NexRide API running in ${getNodeEnv()} mode on port ${PORT} 🚀`,
+    `NexRide API running in ${getNodeEnv()} mode at ${BIND_HOST}:${PORT} 🚀`,
   );
-  logger.info({ port: PORT, env: getNodeEnv() }, "NexRide API started");
+  logger.info(
+    { host: BIND_HOST, port: PORT, env: getNodeEnv() },
+    "NexRide API started",
+  );
 });
 
 // Without this handler a port conflict crashes the process with a raw stack
@@ -114,9 +120,22 @@ startBookingExpiryReaper();
 // Graceful Shutdown (SIGTERM / SIGINT)
 // -----------------------------------------------------------------------------
 let forceExitTimer = null;
+let shuttingDown = false;
 
 const shutdown = async (signal, exitCode = 0) => {
+  // systemd may send another signal while an earlier shutdown is draining
+  // requests. Starting cleanup twice can close shared clients out from under
+  // the first pass, so subsequent signals only leave an audit trail.
+  if (shuttingDown) {
+    logger.warn({ signal }, "Shutdown already in progress");
+    return;
+  }
+  shuttingDown = true;
+
   chalkLogger.info(`Received ${signal}. Gracefully shutting down...`);
+
+  // Do not start any more scheduled work while existing HTTP requests drain.
+  stopBookingExpiryReaper();
 
   forceExitTimer = setTimeout(() => {
     logger.warn("Graceful shutdown timed out; forcing exit.");
@@ -140,9 +159,6 @@ const shutdown = async (signal, exitCode = 0) => {
 };
 
 const cleanupResources = async (exitCode = 0) => {
-  // Stop the booking expiry reaper so no sweep outlives the database
-  stopBookingExpiryReaper();
-
   // Stop the BullMQ email worker and finish in-flight jobs
   try {
     await emailWorker.close();
@@ -175,6 +191,12 @@ process.on("SIGTERM", () => shutdown("SIGTERM"));
 process.on("SIGINT", () => shutdown("SIGINT"));
 
 process.on("unhandledRejection", (err) => {
-  logger.error(`UNHANDLED REJECTION! 💥 Shutting down... ${err.message}`);
+  const message = err instanceof Error ? err.message : String(err);
+  logger.error({ err: message }, "Unhandled rejection; shutting down");
   shutdown("unhandledRejection", 1);
+});
+
+process.on("uncaughtException", (err) => {
+  logger.fatal({ err: err.message }, "Uncaught exception; shutting down");
+  shutdown("uncaughtException", 1);
 });

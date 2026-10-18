@@ -10,7 +10,6 @@ import type {
 
 interface SessionResponse {
   status: string;
-  token: string;
   data: { user: AuthUser };
 }
 
@@ -23,21 +22,18 @@ export const authApi = {
   signIn: ({ identifier, password }: SignInInput) =>
     request<SessionResponse>("/users/login", {
       method: "POST",
-      auth: false,
       body: { identifier, password },
     }),
 
   signUp: (input: SignUpInput) =>
     request<SessionResponse>("/users/signup", {
       method: "POST",
-      auth: false,
       body: input,
     }),
 
   googleSignIn: ({ idToken }: GoogleSignInInput) =>
     request<SessionResponse>("/auth/google", {
       method: "POST",
-      auth: false,
       body: { idToken },
     }),
 
@@ -47,14 +43,12 @@ export const authApi = {
   requestPasswordReset: ({ identifier }: ForgotPasswordInput) =>
     request<{ status: string; message: string }>("/users/forgot-password", {
       method: "POST",
-      auth: false,
       body: { identifier },
     }),
 
   resetPassword: ({ token, password, passwordConfirm }: ResetPasswordInput) =>
     request<SessionResponse>(`/users/reset-password/${encodeURIComponent(token)}`, {
       method: "PATCH",
-      auth: false,
       body: { password, passwordConfirm },
     }),
 

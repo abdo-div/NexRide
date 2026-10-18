@@ -1,5 +1,4 @@
 import { request, ApiError, API_BASE_URL } from "./apiClient";
-import { getToken } from "./tokenStorage";
 import type {
   CompanyEarningsData,
   CompanyEarningsQuery,
@@ -39,7 +38,7 @@ const buildQuery = (query: CompanyEarningsQuery): string => {
  * /payments/tenant/earnings). The deck always reflects the tenant's whole
  * ledger inside the selected range; only the register page honors the search /
  * status / vehicle / method filters. For a company session the tenant comes
- * from the JWT, so a forged `companyId` query key can never leak another
+ * from the authenticated session, so a forged `companyId` query key can never leak another
  * operator's ledger.
  */
 export const companyEarningsApi = {
@@ -57,13 +56,11 @@ export const companyEarningsApi = {
    * endpoint streams binary application/pdf, not JSON.
    */
   downloadInvoice: async (paymentId: string): Promise<Blob> => {
-    const token = getToken();
     const response = await fetch(
       `${API_BASE_URL}/payments/${encodeURIComponent(paymentId)}/invoice`,
       {
         headers: {
           Accept: "application/pdf",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         credentials: "include",
       },

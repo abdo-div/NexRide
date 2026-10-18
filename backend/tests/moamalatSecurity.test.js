@@ -13,6 +13,7 @@ import {
   formatDateParam,
   formatTrxDateTime,
   formatVerificationDateTime,
+  generateSecureHash,
 } from "../services/moamalat.service.js";
 
 const customerA = "aaaaaaaaaaaaaaaaaaaaaaaa";
@@ -76,12 +77,35 @@ const routeHandlers = (path) => {
   return layer.route.stack.map((item) => item.handle);
 };
 
-test("Moamalat timestamps use Libya time independently of the server timezone", () => {
+test("Moamalat timestamps use the gateway's Libya-local formats", () => {
   const utcDate = new Date("2026-10-11T22:30:45.000Z");
 
   assert.equal(formatTrxDateTime(utcDate), "202610120030");
   assert.equal(formatVerificationDateTime(utcDate), "261012003045");
   assert.equal(formatDateParam(utcDate), "20261012");
+});
+
+test("checkout signing matches the current Moamalat sandbox format", (t) => {
+  const oldKey = process.env.MOAMALAT_SECURE_KEY;
+  process.env.MOAMALAT_SECURE_KEY =
+    "3a488a89b3f7993476c252f017c488bb";
+  t.after(() => {
+    if (oldKey === undefined) delete process.env.MOAMALAT_SECURE_KEY;
+    else process.env.MOAMALAT_SECURE_KEY = oldKey;
+  });
+
+  const signature = generateSecureHash({
+    amount: 100000,
+    trxDateTime: "1661666940",
+    merchantId: "10081014649",
+    merchantReference: "1",
+    terminalId: "99179395",
+  });
+
+  assert.equal(
+    signature,
+    "19AA453AA49CF140C6B058152DE65C1E4868A8F76C8B7AAFE5C1A01DDA8D84B1",
+  );
 });
 
 test("Moamalat create and init are protected and customer-only", async () => {
@@ -120,7 +144,7 @@ test("Moamalat initialization schema rejects caller-supplied money and reference
   );
 });
 
-test("initialization checks ownership and signs the database booking amount", async (t) => {
+test("sandbox initialization signs the fixed approved test amount", async (t) => {
   withGatewayConfig(t);
   const booking = makeBooking();
   t.mock.method(Booking, "findById", async () => booking);
@@ -135,7 +159,7 @@ test("initialization checks ownership and signs the database booking amount", as
 
   const response = await invoke(createPayment, customerRequest({ bookingId }));
   assert.equal(response.statusCode, 200);
-  assert.equal(response.body.AmountTrxn, "88250");
+  assert.equal(response.body.AmountTrxn, "10000");
   assert.equal(response.body.data.payment.amount, booking.totalAmount);
   assert.equal(response.body.data.payment.bookingId, bookingId);
   assert.ok(response.body.SecureHash);
@@ -283,7 +307,7 @@ test("verified amount must match the stored booking, and repeated verification i
           DateTransactions: [
             {
               MerchantReference: requestBody.MerchantReference,
-              AmountTrxn: "88250",
+              AmountTrxn: "10000",
               Status: "Approved",
               TransactionId: "gateway-txn-1",
             },
@@ -300,7 +324,7 @@ test("verified amount must match the stored booking, and repeated verification i
     body: { merchantReference },
   });
   assert.equal(first.body.verified, true);
-  assert.equal(first.body.data.amount, booking.totalAmount);
+  assert.equal(first.body.data.amount, 10);
   assert.equal(payment.status, "COMPLETED");
   assert.equal(booking.bookingStatus, "PAID");
   assert.equal(booking.paymentStatus, "PAID");

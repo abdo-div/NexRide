@@ -11,7 +11,29 @@ import {
   generateMerchantReference as generateBookingRef,
   verifyTransaction,
   finalizeVerifiedPayment,
+  formatTrxDateTime,
+  amountToUnits,
+  probeCheckoutOrder,
+  probePayByCard,
+  gatewayAmountForBooking,
 } from "../services/moamalat.service.js";
+import { releaseUnpaidBooking } from "../services/bookingService.js";
+import { isDevelopment } from "../config/env.js";
+import logger from "../utils/logger.js";
+
+/**
+ * A gateway error or a not-yet-indexed transaction is transient: the customer
+ * may still retry, so the reservation is left in place (the expiry reaper is
+ * the backstop). Any other explicit non-approval is definitive and releases the
+ * vehicle immediately, so a failed payment never keeps the car rented.
+ */
+const TRANSIENT_REJECTION_STATUSES = new Set(["GATEWAY_ERROR", "NOT_FOUND"]);
+const isDefinitivePaymentRejection = (result) =>
+  result?.verified === false &&
+  typeof result.status === "string" &&
+  result.status.length > 0 &&
+  !TRANSIENT_REJECTION_STATUSES.has(result.status) &&
+  result.status.toLowerCase() !== "approved";
 /**
  * Validate the booking's stored amount (in LYD)
  */
@@ -56,6 +78,104 @@ export const getGatewayConfig = catchAsync(async (req, res, next) => {
       env: moamalatConfig.env,
     },
   });
+});
+
+/**
+ * DEV-ONLY: Returns a test hash computation so you can verify the HMAC logic
+ * without creating a real booking. Accepts an optional ?amount=LYD query param.
+ * Hit GET /api/v1/payments/moamalat/diagnose to inspect.
+ *
+ * When pointed at the test gateway it also performs a live order probe (the same
+ * call the hosted LightBox page makes) and, with ?pay=1, attempts the card step
+ * with Moamalat's published sandbox card so the raw gateway response is visible.
+ * Never runs against production and never logs the secure key.
+ */
+export const diagnose = catchAsync(async (req, res) => {
+  if (!isDevelopment()) {
+    return res.status(404).json({ error: "Not found." });
+  }
+
+  const testAmount = Number(req.query.amount) || 150;
+  const testRef = `NX-DIAG-${Date.now().toString(36)}`;
+  const fakeBooking = { totalAmount: testAmount };
+  const params = buildCheckoutParams(fakeBooking, testRef);
+  const transactionTimestamp = formatTrxDateTime();
+
+  const payload = {
+    status: "success",
+    env: moamalatConfig.env,
+    lightBoxUrl: moamalatConfig.lightBoxUrl,
+    lightBoxApiUrl: moamalatConfig.lightBoxApiUrl,
+    mid: moamalatConfig.merchantId,
+    tid: moamalatConfig.terminalId,
+    secureKeyLength: moamalatConfig.secureKey.length,
+    secureKeyLooksHex: /^[0-9a-f]+$/i.test(moamalatConfig.secureKey),
+    timeZone: moamalatConfig.timeZone,
+    transactionTimestamp,
+    testAmount,
+    testAmountUnits: amountToUnits(testAmount),
+    params,
+    hashString: `Amount=${params.AmountTrxn}&DateTimeLocalTrxn=${params.TrxDateTime}&MerchantId=${params.MID}&MerchantReference=${params.MerchantReference}&TerminalId=${params.TID}`,
+    hint: "TrxDateTime must use the LightBox timestamp format and be signed without alteration.",
+  };
+
+  // Only ever probe the gateway in the test environment, and allow opting out.
+  if (isMoamalatConfigured() && moamalatConfig.env === "test" && req.query.live !== "0") {
+    const probe = await probeCheckoutOrder({
+      amount: testAmount,
+      merchantReference: params.MerchantReference,
+    });
+
+    payload.gateway = {
+      url: `${moamalatConfig.lightBoxApiUrl}LightboxHostedCheckout`,
+      httpStatus: probe.httpStatus,
+      error: probe.error ?? null,
+      message: probe.gateway?.message ?? null,
+      messageMeaning:
+        probe.gateway?.message === 7
+          ? "success (order created)"
+          : probe.gateway?.message === 0
+            ? "Order Not Found"
+            : null,
+      hasToken: Boolean(probe.gateway?.token),
+      order: probe.gateway?.orderDetailsModel
+        ? {
+            merchantName: probe.gateway.orderDetailsModel.merchantName,
+            amount: probe.gateway.orderDetailsModel.amount,
+            currency: probe.gateway.orderDetailsModel.currency,
+            isCyberSource: probe.gateway.orderDetailsModel.isCyberSource,
+            isNPG: probe.gateway.orderDetailsModel.isNPG,
+            orderID: probe.gateway.orderDetailsModel.orderID,
+          }
+        : null,
+      raw: probe.raw ?? null,
+    };
+
+    if (req.query.pay === "1") {
+      const card = {
+        number: String(req.query.cardNumber || "6395043835180860"),
+        expiration: String(req.query.exp || "0127"),
+        cvv: String(req.query.cvv || "123"),
+        nameOnCard: "DIAGNOSTIC TEST",
+      };
+      const pay = await probePayByCard({
+        order: probe.gateway?.orderDetailsModel,
+        token: probe.gateway?.token,
+        card,
+      });
+      payload.payProbe = {
+        url: `${moamalatConfig.lightBoxApiUrl}PayByCard`,
+        attempted: pay.attempted,
+        httpStatus: pay.httpStatus ?? null,
+        error: pay.error ?? null,
+        message: pay.gateway?.message ?? null,
+        errorMessage: pay.gateway?.errorMessage ?? null,
+        vpcMessage: pay.gateway?.vpcMessage ?? null,
+      };
+    }
+  }
+
+  return res.status(200).json(payload);
 });
 
 /**
@@ -225,6 +345,15 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
     ) {
       throw new AppError("Completed payment has inconsistent booking state.", 409);
     }
+    logger.info(
+      {
+        event: "payment_verification_replayed",
+        paymentId: paymentDoc._id,
+        bookingId: booking._id,
+        gateway: "MOAMALAT",
+      },
+      "Completed payment verification replayed",
+    );
     return res.status(200).json({
       verified: true,
       merchantReference,
@@ -261,11 +390,40 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
 
   const result = await verifyTransaction({
     merchantReference: String(merchantReference),
-    expectedAmount: booking.totalAmount,
+    expectedAmount: gatewayAmountForBooking(booking.totalAmount),
     systemReference,
   });
 
   if (!result.verified) {
+    logger.warn(
+      {
+        event: "payment_verification_rejected",
+        paymentId: paymentDoc._id,
+        bookingId: booking._id,
+        gateway: "MOAMALAT",
+        gatewayStatus: result.status || null,
+      },
+      "Payment verification rejected",
+    );
+
+    // A definitively rejected payment must not leave the car rented to this
+    // customer. Releasing is best-effort: the response still reports the
+    // rejection, and the expiry reaper is the backstop if this write fails.
+    if (isDefinitivePaymentRejection(result)) {
+      await releaseUnpaidBooking(booking._id, {
+        reason: "Moamalat did not approve the payment.",
+      }).catch((err) => {
+        logger.warn(
+          {
+            event: "payment_release_failed",
+            bookingId: booking._id,
+            err: err.message,
+          },
+          "Could not release booking after a rejected payment",
+        );
+      });
+    }
+
     return res.status(200).json({
       verified: false,
       reason: result.reason || "Transaction details did not match.",
@@ -293,6 +451,16 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
 
   const amountLyd = Number(result.amount) / 1000;
 
+  logger.info(
+    {
+      event: "payment_completed",
+      paymentId: paymentDoc._id,
+      bookingId: booking._id,
+      gateway: "MOAMALAT",
+    },
+    "Payment completed",
+  );
+
   return res.status(200).json({
     verified: true,
     merchantReference: result.merchantReference,
@@ -315,6 +483,52 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
             vehicleId: updatedBooking.vehicleId,
           }
         : null,
+    },
+  });
+});
+
+/**
+ * Releases an owned booking whose Moamalat payment did not succeed so the
+ * vehicle is not left rented to the customer. The LightBox can error or cancel
+ * without ever reaching the verify step, so the client calls this to free the
+ * car immediately instead of waiting for the reservation to time out.
+ */
+export const releasePayment = catchAsync(async (req, res, next) => {
+  const bookingId = req.body?.bookingId;
+  const booking = await Booking.findById(bookingId);
+  if (!booking) {
+    throw new AppError("No booking found with that ID", 404);
+  }
+
+  const customerId = req.user?._id || req.user?.id;
+  if (!customerId) {
+    throw new AppError("You must be logged in to release a booking.", 401);
+  }
+  const bookingCustomerId = booking.customerId?._id ?? booking.customerId;
+  if (!bookingCustomerId || bookingCustomerId.toString() !== customerId.toString()) {
+    throw new AppError("You can only release your own booking.", 403);
+  }
+
+  const result = await releaseUnpaidBooking(bookingId, {
+    reason: "Moamalat payment was not completed.",
+  });
+
+  logger.info(
+    {
+      event: "payment_released",
+      bookingId: booking._id,
+      released: result.released,
+      gateway: "MOAMALAT",
+    },
+    "Payment release requested",
+  );
+
+  return res.status(200).json({
+    status: "success",
+    data: {
+      released: result.released,
+      bookingStatus: result.bookingStatus,
+      paymentStatus: result.paymentStatus,
     },
   });
 });

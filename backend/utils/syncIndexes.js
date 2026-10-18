@@ -60,15 +60,20 @@ export const syncAllIndexes = async ({ enabled, dryRun = false } = {}) => {
 
   for (const model of models) {
     try {
-      const indexNames = model.schema
-        .indexes()
-        .map(([fields]) => Object.keys(fields).join("_"));
-
       if (dryRun) {
-        results.push({ model: model.modelName, status: "dry-run", indexNames });
+        const difference = await model.diffIndexes();
+        results.push({
+          model: model.modelName,
+          status: "dry-run",
+          toCreate: difference.toCreate,
+          toDrop: difference.toDrop,
+        });
         continue;
       }
 
+      const indexNames = model.schema
+        .indexes()
+        .map(([fields]) => Object.keys(fields).join("_"));
       await model.syncIndexes();
       results.push({ model: model.modelName, status: "synced", indexNames });
       logger.info(
@@ -122,23 +127,34 @@ export const findUniqueIndexViolations = async ({ enabled } = {}) => {
     for (const [fields, options] of model.schema.indexes()) {
       if (!options.unique) continue;
 
-      // A partial index cannot conflict with documents it does not cover.
-      if (options.partialFilterExpression) continue;
-
       const key = Object.keys(fields);
-      if (key.length !== 1) continue;
+      const groupId =
+        key.length === 1
+          ? `$${key[0]}`
+          : Object.fromEntries(key.map((field) => [field, `$${field}`]));
+      const pipeline = [];
 
-      const field = key[0];
-      const rows = await model
-        .aggregate([
-          { $group: { _id: `$${field}`, count: { $sum: 1 } } },
-          { $match: { count: { $gt: 1 }, _id: { $ne: null } } },
+      if (options.partialFilterExpression) {
+        pipeline.push({ $match: options.partialFilterExpression });
+      } else if (options.sparse) {
+        // A compound sparse index contains a document when at least one indexed
+        // field exists. Most application sparse uniques are single-field, but
+        // this mirrors MongoDB's compound behavior too.
+        pipeline.push({
+          $match: { $or: key.map((field) => ({ [field]: { $exists: true } })) },
+        });
+      }
+
+      pipeline.push(
+        { $group: { _id: groupId, count: { $sum: 1 } } },
+        { $match: { count: { $gt: 1 } } },
           { $project: { _id: 1, count: 1 } },
-        ])
-        .exec();
+      );
+
+      const rows = await model.aggregate(pipeline).allowDiskUse(true).exec();
 
       if (rows.length > 0) {
-        duplicates[`${model.modelName}.${field}`] = rows;
+        duplicates[`${model.modelName}.${key.join("+")}`] = rows;
       }
     }
   }

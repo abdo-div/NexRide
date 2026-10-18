@@ -4,7 +4,7 @@ import { CalendarDays } from "lucide-react";
 import { CheckoutIcon } from "./CheckoutIcon";
 import type { CheckoutMeta } from "../../types/checkout";
 
-export const ItinerarySection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => {
+export const ItinerarySection: React.FC<{ meta: CheckoutMeta; onChange: () => void }> = ({ meta, onChange }) => {
   const { t } = useTranslation();
   const { pickup, dropoff, days, durationLabel, cancelNote, changeLabel } = meta.itinerary;
 
@@ -19,6 +19,7 @@ export const ItinerarySection: React.FC<{ meta: CheckoutMeta }> = ({ meta }) => 
         </div>
         <button
           type="button"
+          onClick={onChange}
           className="px-3 py-1.5 rounded-lg bg-[#F8FAFC] text-[#142B4A] hover:bg-[#F1F5F9] text-[12px] font-semibold transition-colors flex items-center gap-1"
         >
           <CalendarDays className="w-[15px] h-[15px]" />

@@ -377,7 +377,10 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
                 {availabilityError}
               </div>
             )}
-            <ItinerarySection meta={meta} />
+            <ItinerarySection
+              meta={meta}
+              onChange={() => navigate(`/cars/${vehicleId}?${searchParams.toString()}`)}
+            />
             <DriverSection
               meta={meta}
               values={driverValues}

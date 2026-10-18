@@ -68,7 +68,7 @@ router.post("/signup", validate(signupSchema), signup);
  * /users/login:
  *   post:
  *     tags: [Authentication]
- *     summary: Sign in and receive a JWT
+ *     summary: Sign in and establish an HTTP-only cookie session
  *     security: []
  *     requestBody:
  *       required: true
@@ -78,7 +78,7 @@ router.post("/signup", validate(signupSchema), signup);
  *             $ref: '#/components/schemas/LoginRequest'
  *     responses:
  *       200:
- *         description: Authenticated; JWT returned and set as a cookie
+ *         description: Authenticated; HTTP-only session cookie set
  *       401:
  *         description: Invalid credentials
  */

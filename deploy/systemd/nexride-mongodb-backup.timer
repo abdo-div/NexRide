@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the NexRide MongoDB backup every night
+
+[Timer]
+OnCalendar=*-*-* 02:30:00
+RandomizedDelaySec=30m
+Persistent=true
+Unit=nexride-mongodb-backup.service
+
+[Install]
+WantedBy=timers.target

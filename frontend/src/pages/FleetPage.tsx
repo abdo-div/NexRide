@@ -60,7 +60,15 @@ export const FleetPage: React.FC = () => {
   );
 
   const filters = useVehicleFilters(allVehicles);
-  const { filteredVehicles, segmentCounts, locationOptions } = filters;
+  const {
+    filteredVehicles,
+    segmentCounts,
+    locationOptions,
+    bodyOptions,
+    driveOptions,
+    operatorOptions,
+    perkOptions,
+  } = filters;
 
   const [sort, setSort] = useState("recommended");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -206,7 +214,7 @@ export const FleetPage: React.FC = () => {
     });
   });
   filters.selectedBodies.forEach((id) => {
-    const b = BODY_PROFILES.find((x) => x.id === id);
+    const b = bodyOptions.find((x) => x.id === id) ?? BODY_PROFILES.find((x) => x.id === id);
     if (b) {
       tokenRows.push({
         label: t(b.label),
@@ -215,7 +223,7 @@ export const FleetPage: React.FC = () => {
     }
   });
   filters.selectedDrives.forEach((id) => {
-    const d = DRIVETRAIN_OPTIONS.find((x) => x.id === id);
+    const d = driveOptions.find((x) => x.id === id) ?? DRIVETRAIN_OPTIONS.find((x) => x.id === id);
     if (d) {
       tokenRows.push({
         label: t(d.label),
@@ -224,7 +232,9 @@ export const FleetPage: React.FC = () => {
     }
   });
   filters.selectedOperators.forEach((id) => {
-    const f = CERTIFIED_FLEETS.find((x) => x.id === id);
+    const f =
+      operatorOptions.find((x) => x.id === id) ??
+      CERTIFIED_FLEETS.find((x) => x.id === id);
     if (f) {
       tokenRows.push({
         label: t("fleet.tokens.fleet", { name: f.name }),
@@ -233,7 +243,7 @@ export const FleetPage: React.FC = () => {
     }
   });
   filters.selectedPerks.forEach((id) => {
-    const p = PERK_OPTIONS.find((x) => x.id === id);
+    const p = perkOptions.find((x) => x.id === id) ?? PERK_OPTIONS.find((x) => x.id === id);
     if (p) {
       tokenRows.push({
         label: t(p.label),
@@ -267,31 +277,93 @@ export const FleetPage: React.FC = () => {
 
       <CommandBar
         params={[
-          { label: t("fleet.params.location"), value: locationParam },
-          { label: t("fleet.params.schedule"), value: scheduleParam },
-          { label: t("fleet.params.tier"), value: tierParam },
+          {
+            label: t("fleet.params.location"),
+            value: locationParam,
+            onClick: () => {
+              if (window.matchMedia("(max-width: 1023px)").matches) {
+                setMobileFiltersOpen(true);
+              } else {
+                document.getElementById("fleet-filter-panel")?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }
+            },
+          },
+          {
+            label: t("fleet.params.schedule"),
+            value: scheduleParam,
+            onClick: () => {
+              if (window.matchMedia("(max-width: 1023px)").matches) {
+                setMobileFiltersOpen(true);
+              } else {
+                document.getElementById("fleet-filter-panel")?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }
+            },
+          },
+          {
+            label: t("fleet.params.tier"),
+            value: tierParam,
+            onClick: () => {
+              if (window.matchMedia("(max-width: 1023px)").matches) {
+                setMobileFiltersOpen(true);
+              } else {
+                document.getElementById("fleet-filter-panel")?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }
+            },
+          },
         ]}
         segment={filters.segment}
-        onSegmentChange={filters.setSegment}
+        onSegmentChange={(segId) => {
+          if (categoryParam) {
+            const next = new URLSearchParams(searchParams);
+            next.delete("category");
+            setSearchParams(next, { replace: true });
+          }
+          filters.setSegment(segId);
+        }}
         segmentCounts={segmentCounts}
+        onOpenFilters={() => {
+          if (window.matchMedia("(max-width: 1023px)").matches) {
+            setMobileFiltersOpen(true);
+          } else {
+            document.getElementById("fleet-filter-panel")?.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        }}
       />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Sidebar */}
-          <div className="hidden lg:block lg:col-span-4 xl:col-span-3">
+          <div id="fleet-filter-panel" className="hidden scroll-mt-24 lg:block lg:col-span-4 xl:col-span-3">
             <FilterSideBar
               maxPrice={filters.maxPrice}
               onMaxPriceChange={filters.setMaxPrice}
+              minPrice={filters.priceMin}
+              totalMaxPrice={filters.priceMax}
               locations={locationOptions}
               selectedLocations={filters.selectedLocations}
               onToggleLocation={handleToggleLocation}
+              bodies={bodyOptions}
               selectedBodies={filters.selectedBodies}
               onToggleBody={filters.toggleBody}
+              drives={driveOptions}
               selectedDrives={filters.selectedDrives}
               onToggleDrive={filters.toggleDrive}
+              operators={operatorOptions}
               selectedOperators={filters.selectedOperators}
               onToggleOperator={filters.toggleOperator}
+              perks={perkOptions}
               selectedPerks={filters.selectedPerks}
               onTogglePerk={filters.togglePerk}
               onReset={filters.resetFilters}
@@ -521,6 +593,8 @@ export const FleetPage: React.FC = () => {
                   </button>
                   <button
                     type="button"
+                    aria-current="page"
+                    disabled
                     className="w-9 h-9 rounded-xl bg-[#142B4A] text-white text-xs font-bold shadow-sm"
                   >
                     1
@@ -595,15 +669,21 @@ export const FleetPage: React.FC = () => {
               <FilterSideBar
                 maxPrice={filters.maxPrice}
                 onMaxPriceChange={filters.setMaxPrice}
+                minPrice={filters.priceMin}
+                totalMaxPrice={filters.priceMax}
                 locations={locationOptions}
                 selectedLocations={filters.selectedLocations}
                 onToggleLocation={handleToggleLocation}
+                bodies={bodyOptions}
                 selectedBodies={filters.selectedBodies}
                 onToggleBody={filters.toggleBody}
+                drives={driveOptions}
                 selectedDrives={filters.selectedDrives}
                 onToggleDrive={filters.toggleDrive}
+                operators={operatorOptions}
                 selectedOperators={filters.selectedOperators}
                 onToggleOperator={filters.toggleOperator}
+                perks={perkOptions}
                 selectedPerks={filters.selectedPerks}
                 onTogglePerk={filters.togglePerk}
                 onReset={filters.resetFilters}
