@@ -17,6 +17,9 @@ const cookieSecurityOptions = (req) => {
       req.secure ||
       req.headers["x-forwarded-proto"] === "https",
     sameSite: isProduction ? "none" : "lax",
+    // CHIPS keeps the session usable when privacy controls block ordinary
+    // third-party cookies between separate Render frontend/API domains.
+    partitioned: isProduction,
     path: "/",
   };
 };
