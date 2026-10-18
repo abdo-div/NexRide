@@ -5,29 +5,6 @@ export const API_BASE_URL = resolveApiBaseUrl(
   import.meta.env.VITE_API_BASE_URL,
 );
 
-/**
- * The production backend serves the built SPA as well as the API and uploaded
- * media. If a separate static Render site points at that backend, move the
- * browser to the backend origin so authentication cookies remain first-party
- * and relative media paths resolve against the service that owns the files.
- */
-export const resolveCanonicalAppUrl = (
-  apiBaseUrl: string,
-  currentUrl: string,
-  production: boolean,
-): string | null => {
-  if (!production) return null;
-
-  try {
-    const page = new URL(currentUrl);
-    const api = new URL(apiBaseUrl, page);
-    if (api.origin === page.origin) return null;
-    return `${api.origin}${page.pathname}${page.search}${page.hash}`;
-  } catch {
-    return null;
-  }
-};
-
 export interface ApiFieldError {
   field: string;
   message: string;

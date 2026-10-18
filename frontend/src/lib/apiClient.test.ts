@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { request, resolveApiBaseUrl, resolveCanonicalAppUrl } from "./apiClient";
+import { request, resolveApiBaseUrl } from "./apiClient";
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -20,35 +20,6 @@ describe("resolveApiBaseUrl", () => {
 
   it("supports a relative override", () => {
     expect(resolveApiBaseUrl("/nexride/api/v1/")).toBe("/nexride/api/v1");
-  });
-});
-
-describe("resolveCanonicalAppUrl", () => {
-  it("moves a production static frontend to the backend-hosted app", () => {
-    expect(
-      resolveCanonicalAppUrl(
-        "https://nexride-api.example/api/v1",
-        "https://nexride-web.example/payment/123?retry=1#checkout",
-        true,
-      ),
-    ).toBe("https://nexride-api.example/payment/123?retry=1#checkout");
-  });
-
-  it("does not redirect same-origin or development traffic", () => {
-    expect(
-      resolveCanonicalAppUrl(
-        "/api/v1",
-        "https://nexride.example/fleet",
-        true,
-      ),
-    ).toBeNull();
-    expect(
-      resolveCanonicalAppUrl(
-        "https://api.example/api/v1",
-        "http://localhost:5173/fleet",
-        false,
-      ),
-    ).toBeNull();
   });
 });
 
