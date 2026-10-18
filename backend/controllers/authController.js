@@ -4,12 +4,22 @@ import * as authService from "../services/authService.js";
 /**
  * Helper utility to sign JWT and attach HTTP-only cookie
  */
-const cookieSecurityOptions = (req) => ({
-  httpOnly: true,
-  secure: req.secure || req.headers["x-forwarded-proto"] === "https",
-  sameSite: "lax",
-  path: "/",
-});
+const cookieSecurityOptions = (req) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  return {
+    httpOnly: true,
+    // Render commonly hosts the frontend and API on separate origins. Browsers
+    // only attach a credentialed cookie to those API requests when production
+    // uses SameSite=None, which in turn requires Secure.
+    secure:
+      isProduction ||
+      req.secure ||
+      req.headers["x-forwarded-proto"] === "https",
+    sameSite: isProduction ? "none" : "lax",
+    path: "/",
+  };
+};
 
 export const createSendToken = (user, statusCode, req, res) => {
   const token = authService.signToken(user._id);

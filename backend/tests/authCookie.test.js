@@ -62,6 +62,26 @@ test("TLS requests issue secure session cookies", () => {
   assert.equal(state.cookie.options.secure, true);
 });
 
+test("production sessions support credentialed requests from a separate frontend origin", (t) => {
+  const previousNodeEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV = "production";
+  t.after(() => {
+    if (previousNodeEnv === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = previousNodeEnv;
+  });
+
+  const { response, state } = responseDouble();
+  createSendToken(
+    { _id: "cccccccccccccccccccccccc", password: "secret" },
+    200,
+    { secure: false, headers: {} },
+    response,
+  );
+
+  assert.equal(state.cookie.options.secure, true);
+  assert.equal(state.cookie.options.sameSite, "none");
+});
+
 test("logout expires the cookie with the same security attributes", () => {
   const { response, state } = responseDouble();
 
