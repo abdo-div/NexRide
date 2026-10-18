@@ -9,4 +9,3 @@ export const saveUserPhoto = (buffer, filename) =>
     process: (image) =>
       image.resize(500, 500).toFormat("jpeg").jpeg({ quality: 90 }),
   });
-

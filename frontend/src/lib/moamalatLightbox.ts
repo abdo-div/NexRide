@@ -210,4 +210,4 @@ export const closeMoamalatLightbox = (): void => {
   } catch {
     /* ignore */
   }
-};
+};

@@ -38,4 +38,3 @@ if (
     "PUBLIC_STORAGE_DIR and PRIVATE_STORAGE_DIR must be separate, non-overlapping directories.",
   );
 }
-

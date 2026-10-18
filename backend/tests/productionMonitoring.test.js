@@ -80,4 +80,3 @@ test("critical booking, payment, and email logs expose stable event names", () =
     /"email_job_failed"[\s\S]{0,250}job\.data\.(?:email|to)/,
   );
 });
-

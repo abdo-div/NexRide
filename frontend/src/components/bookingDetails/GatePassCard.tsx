@@ -157,4 +157,4 @@ export const GatePassCard: React.FC<GatePassCardProps> = ({ booking }) => {
   );
 };
 
-export default GatePassCard;
+export default GatePassCard;

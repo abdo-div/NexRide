@@ -47,4 +47,3 @@ export const saveProcessedImage = async ({
 
   return filename;
 };
-

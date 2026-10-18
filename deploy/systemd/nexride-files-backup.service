@@ -16,4 +16,3 @@ ProtectHome=true
 ProtectSystem=strict
 ReadOnlyPaths=/var/lib/nexride
 ReadWritePaths=/var/backups/nexride/files /run/lock
-

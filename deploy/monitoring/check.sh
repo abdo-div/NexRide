@@ -179,4 +179,3 @@ mv -- "$temporary_state" "$STATE_FILE"
 
 echo "NexRide monitor state: $current_state - $details"
 [[ "$current_state" == "OK" ]]
-

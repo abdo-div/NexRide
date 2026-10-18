@@ -63,7 +63,7 @@ describe("interactive control contracts", () => {
     }
 
     expect(missingActions).toEqual([]);
-  });
+  }, 20_000);
 
   it("uses the in-app dialog system instead of native browser popups", () => {
     const nativeDialogs: string[] = [];

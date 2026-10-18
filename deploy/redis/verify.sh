@@ -65,4 +65,3 @@ fi
 printf 'PASS: writes outside the nexride namespace are denied\n'
 
 printf 'Redis production verification passed.\n'
-

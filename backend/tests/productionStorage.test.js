@@ -124,4 +124,3 @@ test("nightly file backups are checksummed, retained, and restored in isolation"
   assert.match(timer, /^OnCalendar=/m);
   assert.match(timer, /^Persistent=true$/m);
 });
-

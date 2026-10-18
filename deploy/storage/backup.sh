@@ -68,4 +68,3 @@ find "$BACKUP_ROOT" -maxdepth 1 -type f \
 
 trap - EXIT
 echo "Persistent file backup completed: $archive"
-
