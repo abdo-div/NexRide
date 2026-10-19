@@ -293,7 +293,7 @@ test("a declined Moamalat transaction expires the booking and frees the car", as
   assert.equal(booking.paymentStatus, "UNPAID");
 });
 
-test("a not-yet-indexed transaction leaves the retry window open", async (t) => {
+test("a not-yet-indexed transaction releases the unpaid reservation", async (t) => {
   withGatewayConfig(t);
   const booking = makeBooking();
   const payment = {
@@ -307,9 +307,10 @@ test("a not-yet-indexed transaction leaves the retry window open", async (t) => 
   t.mock.method(Payment, "findOne", async () => payment);
   t.mock.method(Booking, "findById", () => thenableWithSession(booking));
   const started = stubTransaction(t);
-  t.mock.method(Payment, "updateMany", async () => {
-    throw new Error("a transient miss must not touch the ledger");
-  });
+  t.mock.method(Payment, "updateMany", async () => ({ modifiedCount: 1 }));
+  t.mock.method(MaintenanceEvent, "exists", () => thenableWithSession(null));
+  t.mock.method(Vehicle, "findByIdAndUpdate", async () => {});
+  t.mock.method(redisClient, "del", async () => {});
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () =>
     Response.json({
@@ -334,7 +335,7 @@ test("a not-yet-indexed transaction leaves the retry window open", async (t) => 
   });
 
   assert.equal(outcome.body.verified, false);
-  assert.equal(started(), 0);
-  assert.equal(booking.bookingStatus, "PENDING_PAYMENT");
+  assert.equal(started(), 1);
+  assert.equal(booking.bookingStatus, "EXPIRED");
   assert.equal(booking.paymentStatus, "UNPAID");
 });

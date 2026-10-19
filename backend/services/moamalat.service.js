@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import https from "node:https";
 import mongoose from "mongoose";
 import Payment from "../models/payment_model.js";
 import Booking from "../models/booking_model.js";
@@ -11,6 +12,36 @@ import {
 } from "../config/moamalat.js";
 import { releaseVehicleHold } from "./reservationHold.service.js";
 import { addEmailToQueue } from "../queues/emailQueue.js";
+
+const postJsonOverIpv4 = (url, body, timeoutMs = 15000) =>
+  new Promise((resolve, reject) => {
+    const payload = JSON.stringify(body);
+    const request = https.request(
+      url,
+      {
+        method: "POST",
+        family: 4,
+        headers: {
+          "Content-Type": "application/json",
+          "Content-Length": Buffer.byteLength(payload),
+        },
+        timeout: timeoutMs,
+      },
+      (response) => {
+        response.setEncoding("utf8");
+        let text = "";
+        response.on("data", (chunk) => { text += chunk; });
+        response.on("end", () => resolve({
+          ok: response.statusCode >= 200 && response.statusCode < 300,
+          status: response.statusCode,
+          text: async () => text,
+        }));
+      },
+    );
+    request.on("timeout", () => request.destroy(new Error("Moamalat request timed out")));
+    request.on("error", reject);
+    request.end(payload);
+  });
 
 // -----------------------------------------------------------------------------
 // Formatting helpers (Moamalat field formats)
@@ -408,11 +439,20 @@ export const verifyTransaction = async ({
   let gateway = null;
 
   try {
-    response = await fetch(moamalatConfig.verifyUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody),
-    });
+    try {
+      response = await fetch(moamalatConfig.verifyUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
+    } catch (fetchError) {
+      logger.warn({
+        channel: "moamalat",
+        event: "moamalat_fetch_ipv4_fallback",
+        causeCode: fetchError?.cause?.code ?? null,
+      }, "Retrying Moamalat verification over the IPv4 HTTPS transport");
+      response = await postJsonOverIpv4(moamalatConfig.verifyUrl, requestBody);
+    }
     responseText = await response.text();
     try {
       gateway = JSON.parse(responseText);

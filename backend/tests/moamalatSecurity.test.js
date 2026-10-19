@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import Booking from "../models/booking_model.js";
 import Payment from "../models/payment_model.js";
 import Vehicle from "../models/vehicle_model.js";
+import MaintenanceEvent from "../models/Maintenance_model.js";
 import { redisClient } from "../config/redis.js";
 import { createPayment, verifyPayment } from "../controllers/moamalatController.js";
 import { protect } from "../middlewares/authMiddleware.js";
@@ -30,6 +31,7 @@ const makeBooking = (overrides = {}) => ({
   totalAmount: 88.25,
   bookingStatus: "PENDING_PAYMENT",
   paymentStatus: "UNPAID",
+  async save() {},
   ...overrides,
 });
 
@@ -220,7 +222,21 @@ test("verification without a matching approved Moamalat transaction does not fin
     status: "PENDING",
   };
   t.mock.method(Payment, "findOne", async () => payment);
-  t.mock.method(Booking, "findById", async () => booking);
+  const bookingQuery = Promise.resolve(booking);
+  bookingQuery.session = () => bookingQuery;
+  t.mock.method(Booking, "findById", () => bookingQuery);
+  t.mock.method(mongoose, "startSession", async () => ({
+    startTransaction() {},
+    commitTransaction() {},
+    abortTransaction() {},
+    async endSession() {},
+  }));
+  t.mock.method(Payment, "updateMany", async () => ({ modifiedCount: 1 }));
+  const maintenanceQuery = Promise.resolve(null);
+  maintenanceQuery.session = () => maintenanceQuery;
+  t.mock.method(MaintenanceEvent, "exists", () => maintenanceQuery);
+  t.mock.method(Vehicle, "findByIdAndUpdate", async () => {});
+  t.mock.method(redisClient, "del", async () => {});
   let fetchCount = 0;
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => {
@@ -244,7 +260,7 @@ test("verification without a matching approved Moamalat transaction does not fin
   });
   assert.equal(response.body.verified, false);
   assert.equal(fetchCount, 1);
-  assert.equal(booking.bookingStatus, "PENDING_PAYMENT");
+  assert.equal(booking.bookingStatus, "EXPIRED");
   assert.equal(booking.paymentStatus, "UNPAID");
 });
 

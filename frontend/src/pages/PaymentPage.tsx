@@ -17,7 +17,6 @@ import { useDialog } from "../context/useDialog";
 import {
   loadMoamalatLightbox,
   openMoamalatLightbox,
-  getMoamalatErrorMessage,
 } from "../lib/moamalatLightbox";
 
 type PaymentStatus =
@@ -116,6 +115,15 @@ const PaymentPage: React.FC = () => {
     });
   };
 
+  const releaseFailedPayment = async () => {
+    if (!booking) return;
+    try {
+      await moamalatApi.release(booking._id);
+    } finally {
+      navigate("/fleet?payment=failed", { replace: true });
+    }
+  };
+
   const handleVerified = async (
     merchantReference: string,
     response?: LightboxCompleteResponse,
@@ -133,14 +141,10 @@ const PaymentPage: React.FC = () => {
       if (result.verified || result.data?.verified) {
         goToConfirmation();
       } else {
-        setStatus("failed");
-        setError(result.data?.reason || t("payment.gatewayNotApproved"));
+        await releaseFailedPayment();
       }
-    } catch (err) {
-      setStatus("failed");
-      setError(
-        err instanceof Error ? err.message : t("payment.gatewayError"),
-      );
+    } catch {
+      await releaseFailedPayment();
     }
   };
 
@@ -159,16 +163,11 @@ const PaymentPage: React.FC = () => {
         onComplete: (response) => {
           handleVerified(init.data.payment.merchantReference, response);
         },
-        onError: (gatewayError) => {
-          setStatus("gatewayError");
-          setError(
-            getMoamalatErrorMessage(gatewayError) ||
-              t("payment.gatewayError"),
-          );
+        onError: () => {
+          void releaseFailedPayment();
         },
         onCancel: () => {
-          // Do NOT cancel the booking — the user may want to retry.
-          setStatus("ready");
+          void releaseFailedPayment();
         },
       });
     } catch (err) {
@@ -176,8 +175,7 @@ const PaymentPage: React.FC = () => {
         navigate(freshCheckoutUrl(booking), { replace: true });
         return;
       }
-      setStatus("gatewayError");
-      setError(err instanceof Error ? err.message : t("payment.gatewayError"));
+      await releaseFailedPayment();
     }
   };
 

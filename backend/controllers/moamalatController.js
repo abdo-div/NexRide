@@ -22,19 +22,6 @@ import { isDevelopment } from "../config/env.js";
 import logger from "../utils/logger.js";
 
 /**
- * A gateway error or a not-yet-indexed transaction is transient: the customer
- * may still retry, so the reservation is left in place (the expiry reaper is
- * the backstop). Any other explicit non-approval is definitive and releases the
- * vehicle immediately, so a failed payment never keeps the car rented.
- */
-const TRANSIENT_REJECTION_STATUSES = new Set(["GATEWAY_ERROR", "NOT_FOUND"]);
-const isDefinitivePaymentRejection = (result) =>
-  result?.verified === false &&
-  typeof result.status === "string" &&
-  result.status.length > 0 &&
-  !TRANSIENT_REJECTION_STATUSES.has(result.status) &&
-  result.status.toLowerCase() !== "approved";
-/**
  * Validate the booking's stored amount (in LYD)
  */
 export function validateAmount(raw) {
@@ -388,11 +375,19 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
     throw new AppError("This booking is not eligible for payment verification.", 409);
   }
 
-  const result = await verifyTransaction({
-    merchantReference: String(merchantReference),
-    expectedAmount: gatewayAmountForBooking(booking.totalAmount),
-    systemReference,
-  });
+  let result;
+  try {
+    result = await verifyTransaction({
+      merchantReference: String(merchantReference),
+      expectedAmount: gatewayAmountForBooking(booking.totalAmount),
+      systemReference,
+    });
+  } catch (error) {
+    await releaseUnpaidBooking(booking._id, {
+      reason: "Payment verification could not be completed.",
+    }).catch(() => undefined);
+    throw error;
+  }
 
   if (!result.verified) {
     logger.warn(
@@ -406,23 +401,20 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
       "Payment verification rejected",
     );
 
-    // A definitively rejected payment must not leave the car rented to this
-    // customer. Releasing is best-effort: the response still reports the
-    // rejection, and the expiry reaper is the backstop if this write fails.
-    if (isDefinitivePaymentRejection(result)) {
-      await releaseUnpaidBooking(booking._id, {
-        reason: "Moamalat did not approve the payment.",
-      }).catch((err) => {
-        logger.warn(
-          {
-            event: "payment_release_failed",
-            bookingId: booking._id,
-            err: err.message,
-          },
-          "Could not release booking after a rejected payment",
-        );
-      });
-    }
+    // Any result other than verified payment releases the reservation. The
+    // customer explicitly has no rental until Moamalat confirms the charge.
+    await releaseUnpaidBooking(booking._id, {
+      reason: "Moamalat did not verify the payment.",
+    }).catch((err) => {
+      logger.warn(
+        {
+          event: "payment_release_failed",
+          bookingId: booking._id,
+          err: err.message,
+        },
+        "Could not release booking after an unverified payment",
+      );
+    });
 
     return res.status(200).json({
       verified: false,
