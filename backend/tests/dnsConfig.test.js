@@ -2,6 +2,16 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { configureDnsServers, parseDnsServers } from "../config/dnsConfig.js";
 
+test("prefers IPv4 for outbound fetches while retaining fallback resolution", () => {
+  const orders = [];
+  configureDnsServers(undefined, {
+    setServers: () => {},
+    setDefaultResultOrder: (value) => orders.push(value),
+  });
+
+  assert.deepEqual(orders, ["ipv4first"]);
+});
+
 test("configures both DNS servers from a comma-separated value", () => {
   const configured = [];
   const servers = configureDnsServers("8.8.8.8,1.1.1.1", {

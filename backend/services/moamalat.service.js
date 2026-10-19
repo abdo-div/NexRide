@@ -420,6 +420,16 @@ export const verifyTransaction = async ({
       gateway = null;
     }
   } catch (err) {
+    const cause = err?.cause;
+    logger.error({
+      channel: "moamalat",
+      event: "moamalat_verification_transport_failed",
+      error: err?.message ?? "Unknown transport error",
+      causeCode: cause?.code ?? null,
+      causeMessage: cause?.message ?? null,
+      address: cause?.address ?? null,
+      family: cause?.family ?? null,
+    });
     throw new AppError(
       `Moamalat verification request failed: ${err.message}`,
       502,
