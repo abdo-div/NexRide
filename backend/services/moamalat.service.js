@@ -1,11 +1,13 @@
 import crypto from "node:crypto";
 import https from "node:https";
+import tls from "node:tls";
 import mongoose from "mongoose";
 import Payment from "../models/payment_model.js";
 import Booking from "../models/booking_model.js";
 import AppError from "../utils/appError.js";
 import { logger } from "../utils/logger.js";
 import { isDevelopment } from "../config/env.js";
+import { MOAMALAT_INTERMEDIATE_CA } from "../config/moamalatCa.js";
 import {
   moamalatConfig,
   isMoamalatConfigured,
@@ -21,6 +23,7 @@ const postJsonOverIpv4 = (url, body, timeoutMs = 15000) =>
       {
         method: "POST",
         family: 4,
+        ca: [...tls.rootCertificates, MOAMALAT_INTERMEDIATE_CA],
         headers: {
           "Content-Type": "application/json",
           "Content-Length": Buffer.byteLength(payload),
