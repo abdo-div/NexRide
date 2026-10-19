@@ -6,6 +6,7 @@ import { useAuth } from "../context/useAuth";
 import { authApi } from "../lib/authApi";
 import { ApiError } from "../lib/apiClient";
 import { userPhotoUrl } from "../lib/customerView";
+import type { AuthUser } from "../types/auth";
 
 const text = {
   en: { home:"Home", account:"My account", title:"My Profile", titleAlt:"Profile and account settings", intro:"Manage the personal and contact information used for your NexRide reservations.", profile:"My Profile", rentals:"My Bookings / Rentals", securityNav:"Security & Password", customer:"NexRide customer", member:"Member since", photoTitle:"Profile Photo", photoText:"Your photo helps rental companies identify you at vehicle handover.", ready:"Ready", selected:"New photo selected", upload:"Upload new photo", photoHelp:"JPG or PNG. Maximum file size 5 MB.", personal:"Personal Information", personalText:"Update the details used for booking confirmations and rental receipts.", name:"Full name", email:"Email address", phone:"Phone number", cancel:"Cancel", save:"Save changes", saving:"Saving…", saved:"Profile updated successfully.", security:"Security & Password", securityText:"Change your password using your current account password.", current:"Current password", next:"New password", confirm:"Confirm new password", help:"Use at least 8 characters.", update:"Update password", updating:"Updating…", passwordSaved:"Password updated successfully.", required:"Complete all password fields.", short:"The new password must contain at least 8 characters.", mismatch:"The new passwords do not match.", loadError:"We could not refresh your profile. The saved session details are shown.", fileError:"Choose a JPG or PNG image smaller than 5 MB.", error:"Something went wrong. Please try again." },
@@ -39,7 +40,9 @@ export const MyProfilePage: React.FC = () => {
   const [passwordBusy, setPasswordBusy] = useState(false);
   const [showPasswords, setShowPasswords] = useState(false);
 
-  const setFormFromUser = useCallback((next = user) => { if (next) setForm({ name:next.name, email:next.email, phoneNumber:next.phoneNumber }); }, [user]);
+  const setFormFromUser = useCallback((next: AuthUser) => {
+    setForm({ name:next.name, email:next.email, phoneNumber:next.phoneNumber });
+  }, []);
   useEffect(() => { let active = true; authApi.me().then(({data}) => { if (active) { updateUser(data.user); setFormFromUser(data.user); } }).catch(() => active && setProfileNotice({kind:"error",text:c.loadError})); return () => { active = false; }; }, [c.loadError, setFormFromUser, updateUser]);
   useEffect(() => () => { if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current); }, []);
   const initials = useMemo(() => (user?.name ?? "N R").split(/\s+/).filter(Boolean).slice(0,2).map((part) => part[0]).join("").toUpperCase(), [user?.name]);
@@ -50,7 +53,7 @@ export const MyProfilePage: React.FC = () => {
 
   const clearSelectedPhoto = () => { if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current); previewUrlRef.current = ""; setPreview(""); setPhoto(null); };
   const selectPhoto = (file?: File) => { if (!file) return; if (!["image/jpeg","image/png"].includes(file.type) || file.size > 5*1024*1024) { setProfileNotice({kind:"error",text:c.fileError}); return; } if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current); const url = URL.createObjectURL(file); previewUrlRef.current = url; setPreview(url); setPhoto(file); setProfileNotice(null); };
-  const reset = () => { setFormFromUser(); clearSelectedPhoto(); setProfileNotice(null); };
+  const reset = () => { setFormFromUser(user); clearSelectedPhoto(); setProfileNotice(null); };
   const saveProfile = async (event:React.FormEvent) => { event.preventDefault(); setSaving(true); setProfileNotice(null); try { const payload = new FormData(); payload.append("name",form.name.trim()); payload.append("email",form.email.trim()); payload.append("phoneNumber",form.phoneNumber.trim()); if(photo) payload.append("photo",photo); const {data}=await authApi.updateProfile(payload); updateUser(data.user); setFormFromUser(data.user); clearSelectedPhoto(); setProfileNotice({kind:"success",text:c.saved}); } catch(error) { setProfileNotice({kind:"error",text:error instanceof ApiError?error.message:c.error}); } finally { setSaving(false); } };
   const savePassword = async (event:React.FormEvent) => { event.preventDefault(); setPasswordNotice(null); if(!passwords.passwordCurrent||!passwords.password||!passwords.passwordConfirm) return setPasswordNotice({kind:"error",text:c.required}); if(passwords.password.length<8) return setPasswordNotice({kind:"error",text:c.short}); if(passwords.password!==passwords.passwordConfirm) return setPasswordNotice({kind:"error",text:c.mismatch}); setPasswordBusy(true); try { const result=await authApi.updatePassword(passwords); adoptSession(result.data.user); setPasswords({passwordCurrent:"",password:"",passwordConfirm:""}); setPasswordNotice({kind:"success",text:c.passwordSaved}); } catch(error) { setPasswordNotice({kind:"error",text:error instanceof ApiError?error.message:c.error}); } finally { setPasswordBusy(false); } };
 

@@ -1,6 +1,7 @@
 import type { AdminCustomerDto, AdminPaymentDto } from "../types/admin";
 import type { BookingDto } from "../types/booking";
 import { RESERVED_BOOKING_STATUSES } from "./companyView";
+import { API_ORIGIN } from "./vehicleApi";
 
 /**
  * Renter-account views. Customers come from GET /api/v1/users?role=customer
@@ -110,7 +111,7 @@ export const userPhotoUrl = (photo: string | undefined): string => {
       .filter(Boolean)
       .map(encodeURIComponent)
       .join("/");
-    return `/public/users/${encodedFilename}`;
+    return `${API_ORIGIN}/public/users/${encodedFilename}`;
   }
 
   return "";
