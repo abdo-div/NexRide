@@ -4,7 +4,8 @@
     "en": "English"
   },
   "accessibility": {
-    "skipToContent": "Skip to main content"
+    "skipToContent": "Skip to main content",
+    "backToTop": "Back to top"
   },
   "dialogs": {
     "confirmTitle": "Please confirm",

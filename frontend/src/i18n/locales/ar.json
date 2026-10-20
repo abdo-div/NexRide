@@ -4,7 +4,8 @@
     "en": "English"
   },
   "accessibility": {
-    "skipToContent": "انتقل إلى المحتوى الرئيسي"
+    "skipToContent": "انتقل إلى المحتوى الرئيسي",
+    "backToTop": "العودة إلى أعلى الصفحة"
   },
   "dialogs": {
     "confirmTitle": "يرجى التأكيد",
