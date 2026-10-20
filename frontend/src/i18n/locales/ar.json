@@ -21,6 +21,10 @@
     "offlineBody": "قد لا تتوفر بيانات التوافر المباشر وإجراءات الحجز مؤقتاً.",
     "restoredTitle": "تمت استعادة الاتصال",
     "restoredBody": "عادت خدمات التوافر المباشر والحجز للعمل.",
+    "serviceUnavailableTitle": "خدمات NexRide غير متاحة مؤقتاً",
+    "serviceUnavailableBody": "تعذر الاتصال بالخادم. صفحتك الحالية آمنة—يرجى المحاولة بعد قليل.",
+    "serviceRestoredTitle": "عادت خدمات NexRide للعمل",
+    "serviceRestoredBody": "عادت خدمات التوافر المباشر والحجز للاستجابة.",
     "dismiss": "إغلاق تنبيه الاتصال"
   },
   "globalError": {

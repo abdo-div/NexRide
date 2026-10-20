@@ -1,3 +1,5 @@
+import { trackedFetch } from "./apiAvailability";
+
 export const resolveApiBaseUrl = (configuredUrl?: string): string =>
   (configuredUrl?.trim() || "/api/v1").replace(/\/+$/, "");
 
@@ -68,7 +70,7 @@ export async function request<T>(
 
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
+    response = await trackedFetch(`${API_BASE_URL}${path}`, {
       method,
       headers,
       body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),

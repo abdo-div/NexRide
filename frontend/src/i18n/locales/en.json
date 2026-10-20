@@ -21,6 +21,10 @@
     "offlineBody": "Live availability and booking actions may be temporarily unavailable.",
     "restoredTitle": "Connection restored",
     "restoredBody": "Live availability and booking services are back online.",
+    "serviceUnavailableTitle": "NexRide services are temporarily unavailable",
+    "serviceUnavailableBody": "We couldn't reach the server. Your current page is safe—please try again shortly.",
+    "serviceRestoredTitle": "NexRide services restored",
+    "serviceRestoredBody": "Live availability and booking services are responding again.",
     "dismiss": "Dismiss connection notice"
   },
   "globalError": {

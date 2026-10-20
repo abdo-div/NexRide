@@ -1,4 +1,5 @@
 import { request, API_BASE_URL, ApiError } from "./apiClient";
+import { trackedFetch } from "./apiAvailability";
 import type { BookingDto } from "../types/booking";
 
 export interface AvailabilityResult {
@@ -98,7 +99,7 @@ export const bookingApi = {
    * response as a Blob for the caller to save.
    */
   downloadInvoice: async (bookingId: string): Promise<Blob> => {
-    const response = await fetch(
+    const response = await trackedFetch(
       `${API_BASE_URL}/bookings/${encodeURIComponent(bookingId)}/invoice`,
       {
         headers: {
