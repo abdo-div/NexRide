@@ -472,7 +472,7 @@
   "footer": {
     "brandName": "NexRide Luxury Mobility",
     "hqTag": "Tripoli HQ",
-    "brandDesc": "Libya's premier executive transport and bespoke chauffeur service. Providing unmatched reliability, prestige fleets, and white-glove automotive solutions across Tripoli and international travel hubs.",
+    "brandDesc": "Libya's trusted car rental marketplace, connecting drivers with verified local fleets, transparent pricing, and dependable support.",
     "fullyInsuredFleet": "Fully Insured Fleet",
     "operations247": "24/7 Operations",
     "explore": "EXPLORE",
@@ -495,14 +495,22 @@
     "vipNewsletter": "VIP CONCIERGE & ALERTS",
     "vipDesc": "Stay updated on VIP arrivals, luxury catalog drops, and airport fleet allocations.",
     "subscribePlaceholder": "Enter your business email",
+    "subscribeEmailLabel": "Email address for VIP updates",
     "subscribe": "Subscribe",
     "subscribing": "Subscribing…",
     "subscribeSuccess": "You're on the VIP list. Watch your inbox.",
     "subscribeError": "Subscription failed. Please try again shortly.",
     "emergencyLine": "24/7 Libyan Emergency Line",
+    "callSupport": "Call NexRide support at",
     "active": "Active",
+    "share": "Share NexRide",
+    "shareStatus": {
+      "shared": "NexRide was shared successfully.",
+      "copied": "NexRide link copied to your clipboard.",
+      "error": "The link could not be shared. Please try again."
+    },
     "rights": "© 2026 NexRide Libya Mobility Technologies",
-    "systemsOperational": "All Systems Operational",
+    "systemsOperational": "Support available",
     "currency": "LYD (د.ل)",
     "legal": {
       "label": "Legal documents",
