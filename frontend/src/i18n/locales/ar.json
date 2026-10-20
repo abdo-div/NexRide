@@ -26,6 +26,13 @@
     "retry": "حاول مجدداً",
     "home": "العودة إلى الرئيسية"
   },
+  "notFound": {
+    "eyebrow": "المسار غير موجود",
+    "title": "هذا الطريق لا يؤدي إلى وجهة",
+    "description": "ربما تم نقل الصفحة أو أن العنوان غير صحيح. تصفح السيارات المتاحة أو ارجع إلى صفحة NexRide الرئيسية.",
+    "browseCars": "تصفح السيارات المتاحة",
+    "home": "العودة إلى الرئيسية"
+  },
   "seo": {
     "home": { "title": "تأجير سيارات مميز في ليبيا | NexRide", "description": "احجز سيارات موثوقة من شركاء أساطيل معتمدين في أنحاء ليبيا مع NexRide." },
     "fleet": { "title": "تصفح سيارات الإيجار في ليبيا | NexRide", "description": "قارن السيارات المتاحة والأسعار الواضحة والمشغلين الموثوقين في أنحاء ليبيا." },
@@ -38,7 +45,8 @@
     "cancellation": { "title": "سياسة الإلغاء | NexRide", "description": "تعرّف على سياسات إلغاء الحجوزات واسترداد الأموال وتعديلها في NexRide." },
     "booking": { "title": "حجز آمن | NexRide", "description": "أكمل حجز سيارتك الآمن عبر NexRide وقم بإدارته." },
     "account": { "title": "حسابك في NexRide", "description": "ادخل إلى حسابك في NexRide وقم بإدارته." },
-    "dashboard": { "title": "لوحة تحكم NexRide", "description": "لوحة عمليات NexRide الآمنة." }
+    "dashboard": { "title": "لوحة تحكم NexRide", "description": "لوحة عمليات NexRide الآمنة." },
+    "notFound": { "title": "الصفحة غير موجودة | NexRide", "description": "تعذر العثور على الصفحة المطلوبة. تصفح سيارات الإيجار المتاحة على NexRide." }
   },
   "nav": {
     "home": "الرئيسية",

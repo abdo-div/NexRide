@@ -3,7 +3,6 @@ import {
   BrowserRouter,
   Routes,
   Route,
-  Navigate,
   Outlet,
   useLocation,
 } from "react-router";
@@ -44,6 +43,7 @@ const CompanyApplicationStatusPage = lazy(
 );
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 const LegalPage = lazy(() => import("./pages/LegalPage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const MyBookingsPage = lazy(() => import("./pages/MyBookingsPage"));
 const MyProfilePage = lazy(() => import("./pages/MyProfilePage"));
 const BookingDetailsPage = lazy(() => import("./pages/BookingDetailsPage"));
@@ -391,7 +391,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<LazyRoute><NotFoundPage /></LazyRoute>} />
           </Route>
 
           <Route
@@ -415,6 +415,7 @@ function App() {
             <Route path="maintenance" element={<AdminMaintenancePage />} />
             <Route path="reports" element={<AdminReportsPage />} />
             <Route path="settings" element={<AdminSettingsPage />} />
+            <Route path="*" element={<AdminOverviewPage />} />
           </Route>
 
           <Route
@@ -437,6 +438,7 @@ function App() {
             <Route path="reviews" element={<CompanyReviewsPage />} />
             <Route path="payouts" element={<CompanyEarningsPage />} />
             <Route path="settings" element={<CompanySettingsPage />} />
+            <Route path="*" element={<CompanyDashboardPage />} />
           </Route>
           </Routes></SmoothScroll>
           </AuthProvider>

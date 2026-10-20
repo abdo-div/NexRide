@@ -26,6 +26,13 @@
     "retry": "Try again",
     "home": "Return home"
   },
+  "notFound": {
+    "eyebrow": "Route not found",
+    "title": "This road doesn’t lead anywhere",
+    "description": "The page may have moved or the address may be incorrect. Explore available cars or return to the NexRide homepage.",
+    "browseCars": "Browse available cars",
+    "home": "Return home"
+  },
   "seo": {
     "home": { "title": "Premium Car Rental in Libya | NexRide", "description": "Book trusted rental cars from verified fleet partners across Libya with NexRide." },
     "fleet": { "title": "Browse Rental Cars in Libya | NexRide", "description": "Compare available rental cars, transparent pricing, and trusted operators across Libya." },
@@ -38,7 +45,8 @@
     "cancellation": { "title": "Cancellation Policy | NexRide", "description": "Understand NexRide booking cancellation, refund, and amendment policies." },
     "booking": { "title": "Secure Booking | NexRide", "description": "Complete and manage your secure NexRide vehicle booking." },
     "account": { "title": "Your NexRide Account", "description": "Access and manage your NexRide account." },
-    "dashboard": { "title": "NexRide Dashboard", "description": "Secure NexRide operations dashboard." }
+    "dashboard": { "title": "NexRide Dashboard", "description": "Secure NexRide operations dashboard." },
+    "notFound": { "title": "Page Not Found | NexRide", "description": "The page you requested could not be found. Browse available rental cars on NexRide." }
   },
   "nav": {
     "home": "Home",

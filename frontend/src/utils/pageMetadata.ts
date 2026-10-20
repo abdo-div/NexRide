@@ -10,7 +10,8 @@ export type PageMetadataKey =
   | "cancellation"
   | "booking"
   | "account"
-  | "dashboard";
+  | "dashboard"
+  | "notFound";
 
 export interface PageMetadataRoute {
   key: PageMetadataKey;
@@ -48,5 +49,5 @@ export function resolvePageMetadata(pathname: string): PageMetadataRoute {
   if (pathname.startsWith("/admin") || pathname.startsWith("/company")) {
     return { key: "dashboard", indexable: false };
   }
-  return { key: "home", indexable: false };
+  return { key: "notFound", indexable: false };
 }
