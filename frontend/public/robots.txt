@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /company/
+Disallow: /checkout/
+Disallow: /payment/
+Disallow: /booking-confirmed/
+Disallow: /auth
+Disallow: /login
+Disallow: /my-bookings
+Disallow: /my-profile
+Disallow: /reset-password/
+
+Sitemap: https://nexride.ly/sitemap.xml
