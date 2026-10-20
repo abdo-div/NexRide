@@ -3,6 +3,9 @@
     "ar": "العربية",
     "en": "English"
   },
+  "accessibility": {
+    "skipToContent": "انتقل إلى المحتوى الرئيسي"
+  },
   "dialogs": {
     "confirmTitle": "يرجى التأكيد",
     "inputTitle": "تفاصيل إضافية",

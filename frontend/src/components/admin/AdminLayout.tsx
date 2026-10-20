@@ -306,7 +306,11 @@ export const AdminLayout: React.FC = () => {
         {/* ------------------------------------------------------------------ */}
         {/* Content */}
         {/* ------------------------------------------------------------------ */}
-        <main className="w-full min-w-0 bg-[#F8FAFC] pb-12 pt-16 lg:ps-72">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="w-full min-w-0 bg-[#F8FAFC] pb-12 pt-16 focus:outline-none lg:ps-72"
+        >
           <Outlet />
         </main>
       </div>

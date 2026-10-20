@@ -22,6 +22,7 @@ import { DialogProvider } from "./context/DialogContext";
 import { NetworkStatusBanner } from "./components/layouts/NetworkStatusBanner";
 import { GlobalErrorBoundary } from "./components/layouts/GlobalErrorBoundary";
 import { PageMetadata } from "./components/layouts/PageMetadata";
+import { SkipToContent } from "./components/layouts/SkipToContent";
 
 // Only the landing page is needed for the initial public load. Browsing, auth,
 // booking, checkout and payment screens are separate chunks so a first-time
@@ -207,7 +208,7 @@ function PublicShell() {
   return (
     <div className="flex min-h-screen flex-col">
       <NavBar />
-      <main className="flex-1">
+      <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
         <Outlet />
       </main>
       <Footer />
@@ -220,6 +221,7 @@ function App() {
     <BrowserRouter>
       <GlobalErrorBoundary>
         <PageMetadata />
+        <SkipToContent />
         <DialogProvider>
           <ScrollToTop />
           <NetworkStatusBanner />
