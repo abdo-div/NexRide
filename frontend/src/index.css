@@ -4,10 +4,26 @@
 
 :root {
   --app-font: "Manrope", sans-serif;
-  --premium-navy: #142b4a;
-  --premium-navy-hover: #0d2039;
-  --primary-action: linear-gradient(135deg, #0f1f36 0%, var(--premium-navy) 100%);
+  color-scheme: light;
+  --brand-950: #071426;
+  --brand-900: #0b1c30;
+  --brand-800: #142b4a;
+  --brand-700: #1d4f91;
+  --brand-600: #2563eb;
+  --brand-100: #dbeafe;
+  --brand-50: #eff6ff;
+  --surface: #ffffff;
+  --surface-subtle: #f8fafc;
+  --surface-muted: #f1f5f9;
+  --border-subtle: #e2e8f0;
+  --text-strong: #0f172a;
+  --text-muted: #64748b;
+  --premium-navy: var(--brand-800);
+  --premium-navy-hover: var(--brand-900);
+  --primary-action: linear-gradient(135deg, var(--brand-900) 0%, var(--brand-800) 100%);
   --primary-action-shadow: 0 12px 28px -12px rgb(15 23 42 / 65%), inset 0 1px rgb(255 255 255 / 14%);
+  --surface-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 10px 35px rgb(15 23 42 / 5%);
+  --surface-shadow-hover: 0 24px 65px -18px rgb(15 23 42 / 24%), 0 8px 22px rgb(37 99 235 / 8%);
 }
 
 [dir="rtl"] {
@@ -18,8 +34,8 @@ body {
   font-family: var(--app-font);
   min-width: 0;
   overflow-x: clip;
-  color: #0f172a;
-  background: #f8fafc;
+  color: var(--text-strong);
+  background: var(--surface-subtle);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -67,14 +83,16 @@ svg {
 }
 
 .premium-card {
-  box-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 10px 35px rgb(15 23 42 / 4%);
+  border-color: var(--border-subtle);
+  background: var(--surface);
+  box-shadow: var(--surface-shadow);
   transition: transform 320ms cubic-bezier(.22, 1, .36, 1), border-color 320ms ease, box-shadow 320ms ease;
 }
 
 .premium-card:hover {
   transform: translateY(-4px);
   border-color: rgb(148 163 184 / 55%);
-  box-shadow: 0 24px 65px -18px rgb(15 23 42 / 24%), 0 8px 22px rgb(37 99 235 / 8%);
+  box-shadow: var(--surface-shadow-hover);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -99,60 +117,6 @@ svg {
   transition: transform 240ms cubic-bezier(.22, 1, .36, 1), box-shadow 240ms ease, filter 240ms ease;
 }
 
-/* Keep primary actions consistent across customer, company, and admin views. */
-:is(button, a)[class~="bg-blue-600"],
-:is(button, a)[class~="bg-blue-700"],
-:is(button, a)[class~="bg-[#142B4A]"],
-:is(button, a)[class~="from-blue-600"] {
-  color: white;
-  background: var(--primary-action) !important;
-  border-color: rgb(255 255 255 / 12%);
-  box-shadow: var(--primary-action-shadow);
-  transition: transform 240ms cubic-bezier(.22, 1, .36, 1), box-shadow 240ms ease, filter 240ms ease;
-}
-
-/* One premium accent for interactive icons throughout the application. */
-svg[class*="text-blue-"],
-svg[class*="text-cyan-"],
-svg[class*="text-violet-"],
-svg[class*="text-orange-"],
-svg[class*="text-amber-"],
-svg[class*="text-emerald-"] {
-  color: var(--premium-navy) !important;
-}
-
-:is(button, a)[class~="bg-slate-500"],
-:is(button, a)[class~="bg-blue-600"],
-:is(button, a)[class~="bg-blue-700"],
-:is(button, a)[class~="bg-blue-800"],
-:is(button, a)[class*="from-blue-"] {
-  background: var(--primary-action) !important;
-}
-
-:is(button, a)[class~="bg-slate-500"]:hover,
-:is(button, a)[class~="bg-blue-600"]:hover,
-:is(button, a)[class~="bg-blue-700"]:hover,
-:is(button, a)[class~="bg-blue-800"]:hover,
-:is(button, a)[class*="from-blue-"]:hover {
-  background: var(--premium-navy-hover) !important;
-}
-
-:is(button, a)[class~="bg-blue-600"]:hover,
-:is(button, a)[class~="bg-blue-700"]:hover,
-:is(button, a)[class~="bg-[#142B4A]"]:hover,
-:is(button, a)[class~="from-blue-600"]:hover {
-  background: var(--primary-action) !important;
-  filter: brightness(1.08);
-  box-shadow: 0 18px 36px -14px rgb(15 23 42 / 72%), 0 8px 24px -12px rgb(37 99 235 / 65%), inset 0 1px rgb(255 255 255 / 18%);
-}
-
-:is(button, a)[class~="bg-blue-600"]:active,
-:is(button, a)[class~="bg-blue-700"]:active,
-:is(button, a)[class~="bg-[#142B4A]"]:active,
-:is(button, a)[class~="from-blue-600"]:active {
-  filter: brightness(.96);
-}
-
 :is(button, a):disabled {
   transform: none;
   filter: none;
@@ -166,6 +130,40 @@ svg[class*="text-emerald-"] {
 
 .premium-button:active {
   filter: brightness(.96);
+}
+
+.premium-surface {
+  border: 1px solid var(--border-subtle);
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  box-shadow: var(--surface-shadow);
+}
+
+.premium-field {
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-subtle);
+  color: var(--text-strong);
+  transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.premium-field:focus-within {
+  border-color: color-mix(in srgb, var(--brand-600) 55%, white);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px rgb(37 99 235 / 10%);
+}
+
+.section-kicker {
+  color: var(--brand-600);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.section-title {
+  color: var(--text-strong);
+  font-family: "Syne", "Manrope", var(--app-font);
+  font-weight: 700;
+  letter-spacing: -.035em;
 }
 /* Keep the legally required map credit compact and visually unobtrusive. */
 .vehicle-location-map .leaflet-control-attribution {
