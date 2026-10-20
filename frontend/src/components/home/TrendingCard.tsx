@@ -4,7 +4,7 @@ import { Link } from "react-router";
 import { Heart, Star, ArrowRight } from "@phosphor-icons/react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { TrendingCar } from "../../types/trendingCar";
-import { companyLogoUrl, initialsFrom } from "../../lib/vehicleMapper";
+import { applyVehicleImageFallback, companyLogoUrl, initialsFrom } from "../../lib/vehicleMapper";
 import { buttonHover, buttonTap, cardHover, hoverSpring } from "../../lib/motion";
 
 interface TrendingCardProps {
@@ -55,7 +55,10 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car, index = 0 }) =>
         <motion.img
           src={car.image}
           alt={car.title}
-          className="w-full h-full object-cover opacity-90"
+          loading="lazy"
+          decoding="async"
+          onError={applyVehicleImageFallback}
+          className="w-full h-full object-cover object-center opacity-90"
           whileHover={reduceMotion ? undefined : { scale: 1.055 }}
           transition={hoverSpring}
         />
