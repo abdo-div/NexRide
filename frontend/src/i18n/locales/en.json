@@ -19,6 +19,13 @@
     "restoredBody": "Live availability and booking services are back online.",
     "dismiss": "Dismiss connection notice"
   },
+  "globalError": {
+    "eyebrow": "Something went wrong",
+    "title": "We hit an unexpected roadblock",
+    "description": "Your data is safe. Refresh the page to try again, or return home and continue browsing.",
+    "retry": "Try again",
+    "home": "Return home"
+  },
   "nav": {
     "home": "Home",
     "browseCars": "Browse Cars",

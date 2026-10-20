@@ -21,6 +21,7 @@ import { CompanyLayout } from "./components/company/CompanyLayout";
 import { SmoothScroll } from "./components/SmoothScroll";
 import { DialogProvider } from "./context/DialogContext";
 import { NetworkStatusBanner } from "./components/layouts/NetworkStatusBanner";
+import { GlobalErrorBoundary } from "./components/layouts/GlobalErrorBoundary";
 
 // Only the landing page is needed for the initial public load. Browsing, auth,
 // booking, checkout and payment screens are separate chunks so a first-time
@@ -216,11 +217,12 @@ function PublicShell() {
 function App() {
   return (
     <BrowserRouter>
-      <DialogProvider>
-        <ScrollToTop />
-        <NetworkStatusBanner />
-        <AuthProvider>
-        <SmoothScroll><Routes>
+      <GlobalErrorBoundary>
+        <DialogProvider>
+          <ScrollToTop />
+          <NetworkStatusBanner />
+          <AuthProvider>
+          <SmoothScroll><Routes>
           <Route element={<PublicShell />}>
             <Route path="/" element={<StaffLandingRoute><HomePage /></StaffLandingRoute>} />
             <Route
@@ -434,9 +436,10 @@ function App() {
             <Route path="payouts" element={<CompanyEarningsPage />} />
             <Route path="settings" element={<CompanySettingsPage />} />
           </Route>
-        </Routes></SmoothScroll>
-        </AuthProvider>
-      </DialogProvider>
+          </Routes></SmoothScroll>
+          </AuthProvider>
+        </DialogProvider>
+      </GlobalErrorBoundary>
     </BrowserRouter>
   );
 }
