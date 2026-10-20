@@ -26,6 +26,20 @@
     "retry": "Try again",
     "home": "Return home"
   },
+  "seo": {
+    "home": { "title": "Premium Car Rental in Libya | NexRide", "description": "Book trusted rental cars from verified fleet partners across Libya with NexRide." },
+    "fleet": { "title": "Browse Rental Cars in Libya | NexRide", "description": "Compare available rental cars, transparent pricing, and trusted operators across Libya." },
+    "companies": { "title": "Verified Car Rental Companies | NexRide", "description": "Discover verified car rental companies and professional fleet partners operating across Libya." },
+    "company": { "title": "Rental Company Profile | NexRide", "description": "Explore this verified NexRide partner, its available vehicles, services, and customer information." },
+    "vehicle": { "title": "Rental Vehicle Details | NexRide", "description": "Review vehicle features, availability, pricing, and book securely through NexRide." },
+    "partner": { "title": "List Your Fleet with NexRide", "description": "Join NexRide as a fleet partner and grow your car rental business across Libya." },
+    "terms": { "title": "Terms and Conditions | NexRide", "description": "Read the terms and conditions governing use of the NexRide car rental platform." },
+    "privacy": { "title": "Privacy Policy | NexRide", "description": "Learn how NexRide collects, protects, and uses your personal information." },
+    "cancellation": { "title": "Cancellation Policy | NexRide", "description": "Understand NexRide booking cancellation, refund, and amendment policies." },
+    "booking": { "title": "Secure Booking | NexRide", "description": "Complete and manage your secure NexRide vehicle booking." },
+    "account": { "title": "Your NexRide Account", "description": "Access and manage your NexRide account." },
+    "dashboard": { "title": "NexRide Dashboard", "description": "Secure NexRide operations dashboard." }
+  },
   "nav": {
     "home": "Home",
     "browseCars": "Browse Cars",

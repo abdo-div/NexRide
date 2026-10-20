@@ -26,6 +26,20 @@
     "retry": "حاول مجدداً",
     "home": "العودة إلى الرئيسية"
   },
+  "seo": {
+    "home": { "title": "تأجير سيارات مميز في ليبيا | NexRide", "description": "احجز سيارات موثوقة من شركاء أساطيل معتمدين في أنحاء ليبيا مع NexRide." },
+    "fleet": { "title": "تصفح سيارات الإيجار في ليبيا | NexRide", "description": "قارن السيارات المتاحة والأسعار الواضحة والمشغلين الموثوقين في أنحاء ليبيا." },
+    "companies": { "title": "شركات تأجير سيارات معتمدة | NexRide", "description": "اكتشف شركات تأجير السيارات وشركاء الأساطيل المعتمدين العاملين في ليبيا." },
+    "company": { "title": "ملف شركة التأجير | NexRide", "description": "تعرّف على شريك NexRide المعتمد وسياراته المتاحة وخدماته ومعلومات العملاء." },
+    "vehicle": { "title": "تفاصيل سيارة الإيجار | NexRide", "description": "راجع مواصفات السيارة وتوافرها وسعرها واحجز بأمان عبر NexRide." },
+    "partner": { "title": "أضف أسطولك إلى NexRide", "description": "انضم إلى NexRide كشريك أسطول وطوّر أعمال تأجير السيارات في ليبيا." },
+    "terms": { "title": "الشروط والأحكام | NexRide", "description": "اطّلع على الشروط والأحكام المنظمة لاستخدام منصة NexRide لتأجير السيارات." },
+    "privacy": { "title": "سياسة الخصوصية | NexRide", "description": "تعرّف على كيفية جمع NexRide لمعلوماتك الشخصية وحمايتها واستخدامها." },
+    "cancellation": { "title": "سياسة الإلغاء | NexRide", "description": "تعرّف على سياسات إلغاء الحجوزات واسترداد الأموال وتعديلها في NexRide." },
+    "booking": { "title": "حجز آمن | NexRide", "description": "أكمل حجز سيارتك الآمن عبر NexRide وقم بإدارته." },
+    "account": { "title": "حسابك في NexRide", "description": "ادخل إلى حسابك في NexRide وقم بإدارته." },
+    "dashboard": { "title": "لوحة تحكم NexRide", "description": "لوحة عمليات NexRide الآمنة." }
+  },
   "nav": {
     "home": "الرئيسية",
     "browseCars": "تصفح السيارات",

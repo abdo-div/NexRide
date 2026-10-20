@@ -22,6 +22,7 @@ import { SmoothScroll } from "./components/SmoothScroll";
 import { DialogProvider } from "./context/DialogContext";
 import { NetworkStatusBanner } from "./components/layouts/NetworkStatusBanner";
 import { GlobalErrorBoundary } from "./components/layouts/GlobalErrorBoundary";
+import { PageMetadata } from "./components/layouts/PageMetadata";
 
 // Only the landing page is needed for the initial public load. Browsing, auth,
 // booking, checkout and payment screens are separate chunks so a first-time
@@ -218,6 +219,7 @@ function App() {
   return (
     <BrowserRouter>
       <GlobalErrorBoundary>
+        <PageMetadata />
         <DialogProvider>
           <ScrollToTop />
           <NetworkStatusBanner />

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import {
@@ -31,14 +30,6 @@ export const LegalPage = ({ documentKey }: { documentKey: LegalDocumentKey }) =>
   const document = getLegalDocument(documentKey, language);
   const homeLabel = language === "ar" ? "العودة إلى الرئيسية" : "Back to home";
   const navigationLabel = language === "ar" ? "الوثائق القانونية" : "Legal documents";
-
-  useEffect(() => {
-    const previousTitle = window.document.title;
-    window.document.title = `${document.title} | NexRide`;
-    return () => {
-      window.document.title = previousTitle;
-    };
-  }, [document.title]);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-20 pt-24 md:pt-28">
