@@ -165,6 +165,45 @@ svg {
   font-weight: 700;
   letter-spacing: -.035em;
 }
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-muted);
+}
+
+.skeleton-shimmer::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  transform: translateX(-100%);
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgb(255 255 255 / 72%) 48%,
+    transparent 76%
+  );
+  animation: skeleton-sweep 1.65s ease-in-out infinite;
+}
+
+.skeleton-shimmer-dark {
+  background: rgb(30 41 59 / 58%);
+}
+
+.skeleton-shimmer-dark::after {
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgb(148 163 184 / 14%) 48%,
+    transparent 76%
+  );
+}
+
+@keyframes skeleton-sweep {
+  to {
+    transform: translateX(100%);
+  }
+}
 /* Keep the legally required map credit compact and visually unobtrusive. */
 .vehicle-location-map .leaflet-control-attribution {
   background: rgb(255 255 255 / 78%);

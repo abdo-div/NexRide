@@ -53,11 +53,16 @@ export const TrendingRentals: React.FC<TrendingRentalsProps> = ({
       />
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+          role="status"
+          aria-busy="true"
+          aria-label={t("common.loading", { defaultValue: "Loading vehicles" })}
+        >
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="rounded-3xl border border-slate-200/80 h-[420px] bg-slate-200/60 animate-pulse"
+              className="skeleton-shimmer h-[420px] rounded-3xl border border-slate-200/80"
             />
           ))}
         </div>

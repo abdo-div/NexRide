@@ -22,7 +22,7 @@ const PAGE_SIZE = 6;
 const SKELETON_KEYS = ["a", "b", "c", "d", "e", "f"];
 
 const DirectorySkeleton: React.FC = () => (
-  <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-5 flex flex-col gap-4 animate-pulse">
+  <div className="skeleton-shimmer flex flex-col gap-4 rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 rounded-xl bg-slate-200" />
@@ -278,8 +278,10 @@ export const CompaniesPage: React.FC = () => {
         {loading && (
           <div
             className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"
+            role="status"
             aria-busy="true"
             aria-live="polite"
+            aria-label={t("common.loading", { defaultValue: "Loading companies" })}
           >
             {SKELETON_KEYS.map((key) => (
               <DirectorySkeleton key={key} />

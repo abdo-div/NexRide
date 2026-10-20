@@ -20,8 +20,8 @@ import {
 const SKELETON_KEYS = ["a", "b", "c", "d", "e", "f"];
 
 const VehicleCardSkeleton: React.FC = () => (
-  <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl overflow-hidden shadow-sm flex flex-col xl:flex-row animate-pulse">
-    <div className="xl:w-2/5 h-64 xl:h-auto bg-slate-200" />
+  <div className="skeleton-shimmer flex flex-col overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-sm xl:flex-row">
+    <div className="h-64 bg-slate-200/80 xl:h-auto xl:w-2/5" />
     <div className="xl:w-3/5 p-6 flex flex-col gap-5">
       <div className="h-3 w-20 rounded bg-slate-200" />
       <div className="h-6 w-2/3 rounded bg-slate-200" />

@@ -48,11 +48,16 @@ export const VehicleCategories: React.FC<VehicleCategoriesProps> = ({
 
       {/* Categories Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5"
+          role="status"
+          aria-busy="true"
+          aria-label={t("common.loading", { defaultValue: "Loading categories" })}
+        >
           {[0, 1, 2, 3, 4].map((i) => (
             <div
               key={i}
-              className="rounded-2xl border border-slate-200/80 h-[185px] bg-slate-100/70 animate-pulse"
+              className="skeleton-shimmer h-[185px] rounded-2xl border border-slate-200/80"
             />
           ))}
         </div>

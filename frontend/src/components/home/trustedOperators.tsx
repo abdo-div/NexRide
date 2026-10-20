@@ -52,11 +52,16 @@ export const TrustedOperators: React.FC<TrustedOperatorsProps> = ({
 
       {/* Operators Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div
+          className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
+          role="status"
+          aria-busy="true"
+          aria-label={t("common.loading", { defaultValue: "Loading operators" })}
+        >
           {[0, 1, 2, 3].map((i) => (
             <div
               key={i}
-              className="rounded-3xl border border-slate-200/80 h-[300px] bg-slate-200/60 animate-pulse"
+              className="skeleton-shimmer h-[300px] rounded-3xl border border-slate-200/80"
             />
           ))}
         </div>

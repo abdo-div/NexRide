@@ -15,6 +15,8 @@ describe("shared design system", () => {
       ".premium-field",
       ".section-kicker",
       ".section-title",
+      ".skeleton-shimmer",
+      "@keyframes skeleton-sweep",
     ]) {
       expect(stylesheet).toContain(token);
     }
