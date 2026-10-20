@@ -20,6 +20,7 @@ import { CompanyRoute } from "./components/company/CompanyRoute";
 import { CompanyLayout } from "./components/company/CompanyLayout";
 import { SmoothScroll } from "./components/SmoothScroll";
 import { DialogProvider } from "./context/DialogContext";
+import { NetworkStatusBanner } from "./components/layouts/NetworkStatusBanner";
 
 // Only the landing page is needed for the initial public load. Browsing, auth,
 // booking, checkout and payment screens are separate chunks so a first-time
@@ -217,6 +218,7 @@ function App() {
     <BrowserRouter>
       <DialogProvider>
         <ScrollToTop />
+        <NetworkStatusBanner />
         <AuthProvider>
         <SmoothScroll><Routes>
           <Route element={<PublicShell />}>

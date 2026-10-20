@@ -12,6 +12,13 @@
     "close": "Close dialog",
     "reasonPlaceholder": "Add a reason or note…"
   },
+  "networkStatus": {
+    "offlineTitle": "You're offline",
+    "offlineBody": "Live availability and booking actions may be temporarily unavailable.",
+    "restoredTitle": "Connection restored",
+    "restoredBody": "Live availability and booking services are back online.",
+    "dismiss": "Dismiss connection notice"
+  },
   "nav": {
     "home": "Home",
     "browseCars": "Browse Cars",
