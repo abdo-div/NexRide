@@ -584,9 +584,9 @@ export const SearchConsole: React.FC = () => {
   );
 
   return (
-    <div id="search-engine" className="relative z-[60] mt-8 w-full overflow-visible isolate">
+    <div id="search-engine" className="relative z-[60] mt-10 w-full overflow-visible isolate">
       {/* Card */}
-      <div className="overflow-visible rounded-[26px] border border-white/80 bg-white/95 p-1 shadow-[0_30px_80px_-28px_rgba(15,23,42,0.45),0_8px_24px_-12px_rgba(15,23,42,0.18)] ring-1 ring-slate-200/70 backdrop-blur-xl">
+      <div className="overflow-visible rounded-[26px] border border-white/20 bg-white/95 p-1 shadow-[0_34px_90px_-28px_rgba(0,0,0,.72),0_8px_24px_-12px_rgba(15,23,42,.35)] ring-1 ring-white/15 backdrop-blur-xl">
         {/* Main row */}
         <form
           className={`relative grid grid-cols-1 overflow-visible rounded-[22px] bg-slate-200/80 lg:grid-cols-[1.5fr_1fr_1fr_auto] lg:gap-px ${openPicker ? "z-30" : "z-10"}`}
@@ -736,7 +736,7 @@ export const SearchConsole: React.FC = () => {
               );
               setOpenPicker(null);
             }}
-            className="rounded-full border border-slate-200/80 bg-white/90 px-3.5 py-1.5 text-[11px] font-bold text-slate-600 shadow-sm backdrop-blur transition-colors hover:border-[#142b4a] hover:text-[#142b4a]"
+            className="rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-[11px] font-bold text-slate-200 shadow-sm backdrop-blur transition-colors hover:border-blue-400/70 hover:bg-blue-500/20 hover:text-white"
           >
             {pick}
           </button>
