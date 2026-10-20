@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
+  <title id="title">NexRide</title>
+  <desc id="description">NexRide monogram on a deep navy background</desc>
+  <defs>
+    <linearGradient id="background" x1="64" y1="48" x2="448" y2="464" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#142b4a" />
+      <stop offset="1" stop-color="#071426" />
+    </linearGradient>
+    <linearGradient id="route" x1="146" y1="128" x2="376" y2="392" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60a5fa" />
+      <stop offset="1" stop-color="#2563eb" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#background)" />
+  <path d="M132 368V144c0-17.7 14.3-32 32-32h25.3c11.1 0 21.4 5.7 27.3 15.1L320 292V144c0-17.7 14.3-32 32-32h28v256c0 17.7-14.3 32-32 32h-23.9c-11 0-21.2-5.6-27.1-14.9L192 220v148c0 17.7-14.3 32-32 32h-28Z" fill="white" />
+  <path d="M112 416h288" stroke="url(#route)" stroke-width="24" stroke-linecap="round" />
+  <circle cx="144" cy="416" r="22" fill="#93c5fd" />
+  <circle cx="368" cy="416" r="22" fill="#2563eb" />
+</svg>

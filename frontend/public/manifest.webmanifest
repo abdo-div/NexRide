@@ -1,0 +1,37 @@
+{
+  "id": "/",
+  "name": "NexRide Libya",
+  "short_name": "NexRide",
+  "description": "Book trusted rental cars from verified fleet partners across Libya.",
+  "lang": "ar",
+  "dir": "auto",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f8fafc",
+  "theme_color": "#071426",
+  "categories": ["travel", "transportation", "business"],
+  "icons": [
+    {
+      "src": "/nexride-app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse cars",
+      "short_name": "Cars",
+      "url": "/fleet",
+      "icons": [{ "src": "/nexride-app-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Rental companies",
+      "short_name": "Companies",
+      "url": "/companies",
+      "icons": [{ "src": "/nexride-app-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}
