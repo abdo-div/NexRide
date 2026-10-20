@@ -53,6 +53,10 @@
     "notFound": { "title": "Page Not Found | NexRide", "description": "The page you requested could not be found. Browse available rental cars on NexRide." }
   },
   "nav": {
+    "mainNavigation": "Main navigation",
+    "mobileNavigation": "Mobile navigation",
+    "openMenu": "Open navigation menu",
+    "closeMenu": "Close navigation menu",
     "home": "Home",
     "browseCars": "Browse Cars",
     "howItWorks": "How It Works",

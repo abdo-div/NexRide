@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Menu, X, Zap } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { NavBarLogo } from "./NavBarLogo";
 import { NavBarActions } from "./NavBarActions";
 import { useAuth } from "../../context/useAuth";
@@ -17,6 +17,9 @@ export const NavBar: React.FC = () => {
   const canApplyAsPartner = !isCompany && !isAdmin;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const firstMobileLinkRef = useRef<HTMLAnchorElement>(null);
+  const reduceMotion = useReducedMotion();
   const isHomePage = location.pathname === "/";
   const isFleetPage = location.pathname === "/fleet";
 
@@ -26,6 +29,27 @@ export const NavBar: React.FC = () => {
     window.addEventListener("scroll", updateNav, { passive: true });
     return () => window.removeEventListener("scroll", updateNav);
   }, []);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const focusFrame = window.requestAnimationFrame(() => firstMobileLinkRef.current?.focus());
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMobileMenuOpen(false);
+        window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+      }
+    };
+    document.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      document.removeEventListener("keydown", closeOnEscape);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileMenuOpen]);
 
   return (
     <header
@@ -45,7 +69,7 @@ export const NavBar: React.FC = () => {
 
         {/* Center: Navigation Pill Capsule */}
         <nav
-          aria-label="Main Navigation"
+          aria-label={t("nav.mainNavigation")}
           className="hidden xl:flex items-center bg-slate-100/80 p-1 rounded-full border border-slate-200/50 text-xs sm:text-sm font-semibold text-slate-600"
         >
           <Link
@@ -116,10 +140,12 @@ export const NavBar: React.FC = () => {
 
           {/* Mobile Menu Hamburger */}
           <button
+            ref={menuButtonRef}
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
-            aria-label="Toggle navigation menu"
+            aria-label={t(mobileMenuOpen ? "nav.closeMenu" : "nav.openMenu")}
             aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-navigation"
             className="xl:hidden w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 hover:text-blue-600 hover:bg-slate-200 transition-colors"
           >
             {mobileMenuOpen ? (
@@ -134,15 +160,31 @@ export const NavBar: React.FC = () => {
       {/* Mobile Animated Dropdown Drawer */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -12, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -12, scale: 0.98 }}
-            transition={{ duration: 0.2 }}
-            className="pointer-events-auto absolute top-16 left-3 right-3 sm:left-6 sm:right-6 max-w-lg mx-auto bg-white/95 backdrop-blur-xl border border-slate-200/80 rounded-3xl p-5 shadow-2xl xl:hidden z-50 flex flex-col gap-3"
-          >
+          <>
+            <motion.button
+              type="button"
+              aria-label={t("nav.closeMenu")}
+              onClick={() => {
+                setMobileMenuOpen(false);
+                window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+              }}
+              initial={reduceMotion ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={reduceMotion ? undefined : { opacity: 0 }}
+              className="pointer-events-auto fixed inset-0 z-40 cursor-default bg-slate-950/20 backdrop-blur-[2px] xl:hidden"
+            />
+            <motion.nav
+              id="mobile-navigation"
+              aria-label={t("nav.mobileNavigation")}
+              initial={reduceMotion ? false : { opacity: 0, y: -12, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={reduceMotion ? undefined : { opacity: 0, y: -12, scale: 0.98 }}
+              transition={{ duration: reduceMotion ? 0 : 0.2 }}
+              className="pointer-events-auto absolute top-16 left-3 right-3 sm:left-6 sm:right-6 max-w-lg mx-auto bg-white/95 backdrop-blur-xl border border-slate-200/80 rounded-3xl p-5 shadow-2xl xl:hidden z-50 flex flex-col gap-3"
+            >
             <div className="flex flex-col gap-1.5">
               <Link
+                ref={firstMobileLinkRef}
                 to="/"
                 onClick={() => setMobileMenuOpen(false)}
                 className={`px-4 py-2.5 rounded-2xl text-sm font-bold transition-all ${
@@ -212,7 +254,8 @@ export const NavBar: React.FC = () => {
                 </Link>
               </div>
             )}
-          </motion.div>
+            </motion.nav>
+          </>
         )}
       </AnimatePresence>
     </header>

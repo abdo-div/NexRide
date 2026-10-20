@@ -53,6 +53,10 @@
     "notFound": { "title": "الصفحة غير موجودة | NexRide", "description": "تعذر العثور على الصفحة المطلوبة. تصفح سيارات الإيجار المتاحة على NexRide." }
   },
   "nav": {
+    "mainNavigation": "التنقل الرئيسي",
+    "mobileNavigation": "التنقل على الهاتف",
+    "openMenu": "فتح قائمة التنقل",
+    "closeMenu": "إغلاق قائمة التنقل",
     "home": "الرئيسية",
     "browseCars": "تصفح السيارات",
     "howItWorks": "كيف تعمل الخدمة",
