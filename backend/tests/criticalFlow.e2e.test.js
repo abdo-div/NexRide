@@ -139,6 +139,78 @@ const login = async (email, password) => {
   return cookie;
 };
 
+const PASSWORD = "StrongPass123!";
+
+const seedMarketplace = async ({ secondCustomer = false } = {}) => {
+  const customer = await User.create({
+    name: "E2E Customer",
+    email: "customer-e2e@nexride.test",
+    phoneNumber: "+218910000001",
+    password: PASSWORD,
+    passwordConfirm: PASSWORD,
+    role: "customer",
+  });
+  const customerTwo = secondCustomer
+    ? await User.create({
+        name: "E2E Customer Two",
+        email: "customer-two-e2e@nexride.test",
+        phoneNumber: "+218910000004",
+        password: PASSWORD,
+        passwordConfirm: PASSWORD,
+        role: "customer",
+      })
+    : null;
+  const companyUser = await User.create({
+    name: "E2E Company Operator",
+    email: "company-e2e@nexride.test",
+    phoneNumber: "+218910000002",
+    password: PASSWORD,
+    passwordConfirm: PASSWORD,
+    role: "company",
+  });
+  const company = await Company.create({
+    ownerId: companyUser._id,
+    name: "NexRide E2E Rentals",
+    subdomain: "nexride-e2e-rentals",
+    slug: "nexride-e2e-rentals",
+    email: "rentals-e2e@nexride.test",
+    phone: "+218910000003",
+    city: "Tripoli",
+    address: "Airport Road",
+    status: "APPROVED",
+    approvedAt: new Date(),
+  });
+  companyUser.company = company._id;
+  await companyUser.save({ validateBeforeSave: false });
+
+  const vehicle = await Vehicle.create({
+    companyId: company._id,
+    make: "Mercedes-Benz",
+    model: "G-Class",
+    year: 2025,
+    type: "SUV",
+    transmission: "AUTOMATIC",
+    fuelType: "GASOLINE",
+    seats: 5,
+    dailyPrice: 500,
+    city: "Tripoli",
+    pickupLocation: "Airport Road depot",
+    listingStatus: "PUBLISHED",
+    operationalStatus: "AVAILABLE",
+  });
+
+  return { customer, customerTwo, companyUser, company, vehicle };
+};
+
+const futureBookingBody = (vehicle) => ({
+  vehicleId: vehicle._id.toString(),
+  startDate: new Date(Date.now() + 14 * 86400000).toISOString(),
+  endDate: new Date(Date.now() + 17 * 86400000).toISOString(),
+  pickupLocation: vehicle.pickupLocation,
+  paymentMethod: "CASH_ON_DELIVERY",
+  addonIds: ["insurance"],
+});
+
 before(async () => {
   if (unavailable) return;
   await new Promise((resolve) => {
@@ -172,66 +244,10 @@ test(
   { skip: unavailable },
   async (t) => {
     installStandaloneSessionShim(t);
-    const password = "StrongPass123!";
-    const customer = await User.create({
-      name: "E2E Customer",
-      email: "customer-e2e@nexride.test",
-      phoneNumber: "+218910000001",
-      password,
-      passwordConfirm: password,
-      role: "customer",
-    });
-    const companyUser = await User.create({
-      name: "E2E Company Operator",
-      email: "company-e2e@nexride.test",
-      phoneNumber: "+218910000002",
-      password,
-      passwordConfirm: password,
-      role: "company",
-    });
-    const company = await Company.create({
-      ownerId: companyUser._id,
-      name: "NexRide E2E Rentals",
-      subdomain: "nexride-e2e-rentals",
-      slug: "nexride-e2e-rentals",
-      email: "rentals-e2e@nexride.test",
-      phone: "+218910000003",
-      city: "Tripoli",
-      address: "Airport Road",
-      status: "APPROVED",
-      approvedAt: new Date(),
-    });
-    companyUser.company = company._id;
-    await companyUser.save({ validateBeforeSave: false });
-
-    const vehicle = await Vehicle.create({
-      companyId: company._id,
-      make: "Mercedes-Benz",
-      model: "G-Class",
-      year: 2025,
-      type: "SUV",
-      transmission: "AUTOMATIC",
-      fuelType: "GASOLINE",
-      seats: 5,
-      dailyPrice: 500,
-      city: "Tripoli",
-      pickupLocation: "Airport Road depot",
-      listingStatus: "PUBLISHED",
-      operationalStatus: "AVAILABLE",
-    });
-
-    const customerCookie = await login(customer.email, password);
-    const startDate = new Date(Date.now() + 14 * 86400000).toISOString();
-    const endDate = new Date(Date.now() + 17 * 86400000).toISOString();
+    const { customer, companyUser, vehicle } = await seedMarketplace();
+    const customerCookie = await login(customer.email, PASSWORD);
     const idempotencyKey = "e2e-checkout-550e8400-e29b-41d4-a716";
-    const bookingBody = {
-      vehicleId: vehicle._id.toString(),
-      startDate,
-      endDate,
-      pickupLocation: vehicle.pickupLocation,
-      paymentMethod: "CASH_ON_DELIVERY",
-      addonIds: ["insurance"],
-    };
+    const bookingBody = futureBookingBody(vehicle);
 
     const first = await jsonRequest("/api/v1/bookings", {
       method: "POST",
@@ -261,7 +277,7 @@ test(
     );
     assert.equal(forbidden.response.status, 403);
 
-    const companyCookie = await login(companyUser.email, password);
+    const companyCookie = await login(companyUser.email, PASSWORD);
     const collected = await jsonRequest(
       `/api/v1/payments/${paymentId}/collect-cash`,
       { method: "PATCH", cookie: companyCookie },
@@ -277,5 +293,65 @@ test(
     assert.equal(history.payload.results, 1);
     assert.equal(history.payload.data.bookings[0]._id, first.payload.data.booking._id);
     assert.equal(history.payload.data.bookings[0].paymentStatus, "PAID");
+  },
+);
+
+test(
+  "overlap rejection, cancellation and rebooking stay consistent through HTTP and MongoDB",
+  { skip: unavailable },
+  async (t) => {
+    installStandaloneSessionShim(t);
+    const { customer, customerTwo, vehicle } = await seedMarketplace({
+      secondCustomer: true,
+    });
+    const [firstCookie, secondCookie] = await Promise.all([
+      login(customer.email, PASSWORD),
+      login(customerTwo.email, PASSWORD),
+    ]);
+    const bookingBody = futureBookingBody(vehicle);
+
+    const first = await jsonRequest("/api/v1/bookings", {
+      method: "POST",
+      body: bookingBody,
+      cookie: firstCookie,
+      key: "e2e-overlap-first-550e8400",
+    });
+    assert.equal(first.response.status, 201, JSON.stringify(first.payload));
+
+    const collision = await jsonRequest("/api/v1/bookings", {
+      method: "POST",
+      body: bookingBody,
+      cookie: secondCookie,
+      key: "e2e-overlap-second-550e8400",
+    });
+    assert.equal(collision.response.status, 409, JSON.stringify(collision.payload));
+    assert.match(collision.payload.message, /already booked/i);
+
+    const cancelled = await jsonRequest(
+      `/api/v1/bookings/${first.payload.data.booking._id}/cancel`,
+      {
+        method: "PATCH",
+        body: { reason: "E2E change of plans" },
+        cookie: firstCookie,
+      },
+    );
+    assert.equal(cancelled.response.status, 200, JSON.stringify(cancelled.payload));
+    assert.equal(cancelled.payload.data.booking.bookingStatus, "CANCELLED");
+    const retiredPayment = await Payment.findById(first.payload.data.payment._id);
+    assert.equal(retiredPayment.status, "FAILED");
+
+    const rebooked = await jsonRequest("/api/v1/bookings", {
+      method: "POST",
+      body: bookingBody,
+      cookie: secondCookie,
+      key: "e2e-overlap-second-550e8400",
+    });
+    assert.equal(rebooked.response.status, 201, JSON.stringify(rebooked.payload));
+    assert.notEqual(
+      rebooked.payload.data.booking._id,
+      first.payload.data.booking._id,
+    );
+    assert.equal(await Booking.countDocuments({}), 2);
+    assert.equal(await Payment.countDocuments({}), 2);
   },
 );
