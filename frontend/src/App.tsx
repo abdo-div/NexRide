@@ -7,6 +7,7 @@ import {
   useLocation,
 } from "react-router";
 import { LoaderCircle } from "lucide-react";
+import { MotionConfig } from "framer-motion";
 import NavBar from "./components/layouts/NavBar";
 import { Footer } from "./components/layouts/Footer";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
@@ -219,16 +220,17 @@ function PublicShell() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <GlobalErrorBoundary>
-        <PageMetadata />
-        <SkipToContent />
-        <BackToTop />
-        <DialogProvider>
-          <ScrollToTop />
-          <NetworkStatusBanner />
-          <AuthProvider>
-          <SmoothScroll><Routes>
+    <MotionConfig reducedMotion="user">
+      <BrowserRouter>
+        <GlobalErrorBoundary>
+          <PageMetadata />
+          <SkipToContent />
+          <BackToTop />
+          <DialogProvider>
+            <ScrollToTop />
+            <NetworkStatusBanner />
+            <AuthProvider>
+            <SmoothScroll><Routes>
           <Route element={<PublicShell />}>
             <Route path="/" element={<StaffLandingRoute><HomePage /></StaffLandingRoute>} />
             <Route
@@ -444,11 +446,12 @@ function App() {
             <Route path="settings" element={<CompanySettingsPage />} />
             <Route path="*" element={<CompanyDashboardPage />} />
           </Route>
-          </Routes></SmoothScroll>
-          </AuthProvider>
-        </DialogProvider>
-      </GlobalErrorBoundary>
-    </BrowserRouter>
+            </Routes></SmoothScroll>
+            </AuthProvider>
+          </DialogProvider>
+        </GlobalErrorBoundary>
+      </BrowserRouter>
+    </MotionConfig>
   );
 }
 
