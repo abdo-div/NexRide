@@ -31,7 +31,7 @@ interface CompanyFleetToolbarProps {
 }
 
 const selectClass =
-  "appearance-none rounded-xl border border-[#E5E7EB] bg-white py-2 pl-3 pr-8 text-sm font-medium text-[#565E74] shadow-sm outline-none transition-colors hover:border-[#C9D2E0] focus:border-[#142B4A] focus:ring-2 focus:ring-[#142B4A]/20 cursor-pointer";
+  "w-full appearance-none rounded-xl border border-[#E5E7EB] bg-white py-2.5 pl-3 pr-8 text-sm font-medium text-[#565E74] shadow-sm outline-none transition-colors hover:border-[#C9D2E0] focus:border-[#142B4A] focus:ring-2 focus:ring-[#142B4A]/20 cursor-pointer";
 
 const Select = <T extends string>({
   value,
@@ -42,7 +42,7 @@ const Select = <T extends string>({
   onChange: (value: T) => void;
   children: React.ReactNode;
 }) => (
-  <div className="relative">
+  <div className="relative min-w-[9rem] flex-1 sm:flex-none">
     <select
       value={value}
       onChange={(event) => onChange(event.target.value as T)}
@@ -147,7 +147,7 @@ export const CompanyFleetToolbar: React.FC<CompanyFleetToolbarProps> = ({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
         <Select value={status} onChange={onStatusChange}>
           <option value="all">{t("company.fleetPage.filters.statusAll")}</option>
           <option value="available">{t("company.fleetPage.filters.available")}</option>

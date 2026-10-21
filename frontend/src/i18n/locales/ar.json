@@ -2149,6 +2149,7 @@
       "fixErrors": "راجع الحقول المحددة قبل النشر."
     },
     "layout": {
+      "mobileNavigation": "تنقل عمليات الشركة",
       "operationsSubtitle": "عمليات الشريك",
       "certifiedStatus": "شريك معتمد",
       "certifiedBadge": "حزمة الضمان البنكي LFB",

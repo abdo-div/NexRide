@@ -66,12 +66,12 @@ export const CompanyFleetHeader: React.FC<CompanyFleetHeaderProps> = ({
           </p>
         </div>
 
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="grid w-full shrink-0 grid-cols-1 gap-2 sm:grid-cols-2 md:flex md:w-auto md:items-center md:gap-3">
           <button
             type="button"
             onClick={onExport}
             disabled={loading || data.list.length === 0}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#F8FAFC] px-4 py-2.5 text-sm font-semibold text-[#0B1C30] shadow-sm transition-all hover:bg-[#F1F5F9] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
           >
             <Download className="h-[18px] w-[18px] text-[#565E74]" aria-hidden="true" />
             {t("company.fleetPage.export")}
@@ -81,7 +81,7 @@ export const CompanyFleetHeader: React.FC<CompanyFleetHeaderProps> = ({
           </button>
           <Link
             to="/company/fleet/new"
-            className="inline-flex items-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-all hover:bg-[#0D2039]"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#142B4A] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(37,99,235,0.3)] transition-all hover:bg-[#0D2039]"
           >
             <Plus className="h-[18px] w-[18px]" aria-hidden="true" />
             {t("company.fleetPage.addVehicle")}

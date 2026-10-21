@@ -2149,6 +2149,7 @@
       "fixErrors": "Review the highlighted fields before publishing."
     },
     "layout": {
+      "mobileNavigation": "Company operations navigation",
       "operationsSubtitle": "Partner Ops",
       "certifiedStatus": "Certified Partner",
       "certifiedBadge": "LFB Escrow Suite",
