@@ -975,6 +975,11 @@
     "title": "Our Fleet",
     "subtitle": "Real-time availability confirmed with telemetry synchronization across every NexRide pick-up hub.",
     "verifiedMatch": "Verified vehicles matching your filters: {{count}}",
+    "hero": {
+      "verified": "Verified partners",
+      "support": "24/7 support",
+      "ready": "Road-ready fleet"
+    },
     "params": {
       "location": "Location",
       "schedule": "Schedule",
@@ -1059,6 +1064,7 @@
       "learnMore": "Learn More"
     },
     "commandBar": {
+      "browseBy": "Browse by",
       "all": "All ({{count}})",
       "segment": "{{label}} ({{count}})"
     },

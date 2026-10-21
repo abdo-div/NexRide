@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from "react-router";
-import { Car, ShieldCheck, ChevronLeft, ChevronRight, AlertTriangle, SlidersHorizontal, X } from "lucide-react";
+import { Car, ShieldCheck, ChevronLeft, ChevronRight, AlertTriangle, SlidersHorizontal, X, Sparkles, Headphones, BadgeCheck } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVehicles } from "../hooks/useVehicles";
 import { useVehicleFilters } from "../hooks/useVehicleFilters";
@@ -253,23 +253,29 @@ export const FleetPage: React.FC = () => {
   });
 
   return (
-    <div className="bg-[#F8FAFC] min-h-screen">
+    <div className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_45%,#f8fafc_100%)]">
       {/* Page header */}
-      <div className="bg-slate-900">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-28 pb-8">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-1.5">
+      <div className="relative overflow-hidden bg-[#071426]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_15%,rgba(59,130,246,.24),transparent_35%),radial-gradient(circle_at_85%_70%,rgba(249,115,22,.14),transparent_30%)]" />
+        <div className="absolute -end-24 top-8 h-72 w-72 rounded-full border border-white/10" />
+        <div className="relative mx-auto max-w-7xl px-6 pb-10 pt-32 lg:px-8 lg:pb-14">
+          <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+            <div className="max-w-2xl">
+              <p className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-blue-300">
+                <Sparkles className="h-3.5 w-3.5" />
                 {t("fleet.breadcrumb")}
               </p>
-              <h1 className="text-3xl lg:text-4xl font-bold text-white">{t("fleet.title")}</h1>
-              <p className="mt-2 text-sm text-slate-400 max-w-xl">{t("fleet.subtitle")}</p>
+              <h1 className="text-4xl font-black tracking-[-0.035em] text-white sm:text-5xl lg:text-6xl">{t("fleet.title")}</h1>
+              <p className="mt-4 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">{t("fleet.subtitle")}</p>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 text-white text-xs font-semibold">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              {t("fleet.verifiedMatch", {
-                count: companyParam ? vehicles.length : filteredVehicles.length,
-              })}
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              <div className="col-span-2 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[.07] px-4 py-3 text-white backdrop-blur-xl sm:col-span-3">
+                <ShieldCheck className="h-5 w-5 text-emerald-400" />
+                <span className="text-xs font-semibold">{t("fleet.verifiedMatch", { count: companyParam ? vehicles.length : filteredVehicles.length })}</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[.05] px-3 py-2.5 text-[11px] font-semibold text-slate-200"><BadgeCheck className="h-4 w-4 text-blue-300" />{t("fleet.hero.verified")}</div>
+              <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[.05] px-3 py-2.5 text-[11px] font-semibold text-slate-200"><Headphones className="h-4 w-4 text-orange-300" />{t("fleet.hero.support")}</div>
+              <div className="hidden items-center gap-2 rounded-2xl border border-white/10 bg-white/[.05] px-3 py-2.5 text-[11px] font-semibold text-slate-200 sm:flex"><Car className="h-4 w-4 text-emerald-300" />{t("fleet.hero.ready")}</div>
             </div>
           </div>
         </div>
@@ -342,7 +348,7 @@ export const FleetPage: React.FC = () => {
         }}
       />
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+      <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Sidebar */}
           <div id="fleet-filter-panel" className="hidden scroll-mt-24 lg:block lg:col-span-4 xl:col-span-3">
@@ -374,10 +380,10 @@ export const FleetPage: React.FC = () => {
           {/* Results */}
           <div className="lg:col-span-8 xl:col-span-9 flex flex-col gap-6 min-w-0">
             {/* Results bar */}
-            <div className="bg-[#FFFFFF] p-5 rounded-2xl border border-[#E2E8F0] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="premium-card flex flex-col justify-between gap-5 p-5 md:flex-row md:items-center md:p-6">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-3">
-                  <h2 className="text-2xl font-bold text-[#0F172A]">
+                  <h2 className="text-2xl font-black tracking-tight text-[#0F172A]">
                     {t("fleet.results.title")}
                   </h2>
                   <span className="px-2.5 py-0.5 rounded-full bg-slate-50 border border-slate-200 text-[10px] font-bold text-[#142B4A]">
@@ -407,10 +413,12 @@ export const FleetPage: React.FC = () => {
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                   {t("fleet.results.sortBy")}
                 </span>
+                <label className="sr-only" htmlFor="fleet-sort">{t("fleet.results.sortBy")}</label>
                 <select
+                  id="fleet-sort"
                   value={sort}
                   onChange={(e) => setSort(e.target.value)}
-                  className="bg-slate-50 border border-[#E2E8F0] text-slate-800 text-xs font-semibold px-3.5 py-2 rounded-xl focus:outline-none focus:ring-1 focus:ring-slate-500 cursor-pointer"
+                  className="premium-field min-w-44 cursor-pointer px-3.5 py-2.5 text-xs font-semibold text-slate-800"
                 >
                   <option value="recommended">{t("fleet.sort.recommended")}</option>
                   <option value="price-desc">{t("fleet.sort.priceDesc")}</option>
@@ -426,13 +434,13 @@ export const FleetPage: React.FC = () => {
                 {tokenRows.map((t) => (
                   <div
                     key={t.label}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#E2E8F0] text-slate-700 text-xs shadow-sm"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-[#142B4A]"
                   >
                     <span>{t.label}</span>
                     <button
                       type="button"
                       onClick={t.onRemove}
-                      className="text-slate-400 hover:text-[#142B4A]"
+                      className="grid h-5 w-5 place-items-center rounded-full text-slate-400 hover:bg-white hover:text-[#142B4A]"
                     >
                       ✕
                     </button>
