@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   API_AVAILABLE_EVENT,
+  API_REQUEST_TIMEOUT_MS,
   API_UNAVAILABLE_EVENT,
+  ApiTimeoutError,
   canRetryRequest,
   reportApiAvailable,
   trackedFetch,
@@ -9,6 +11,7 @@ import {
 
 afterEach(() => {
   reportApiAvailable();
+  vi.useRealTimers();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -83,6 +86,32 @@ describe("API availability tracking", () => {
       trackedFetch("/api/v1/bookings", { method: "POST" }),
     ).rejects.toThrow("connection reset");
     expect(fetchMock).toHaveBeenCalledOnce();
+  });
+
+  it("times out a hanging mutation without replaying it", async () => {
+    vi.useFakeTimers();
+    const browserWindow = new EventTarget();
+    const unavailable = vi.fn();
+    browserWindow.addEventListener(API_UNAVAILABLE_EVENT, unavailable);
+    vi.stubGlobal("window", browserWindow);
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(
+      (_input, init) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener(
+            "abort",
+            () => reject(init.signal?.reason),
+            { once: true },
+          );
+        }),
+    );
+
+    const pending = trackedFetch("/api/v1/bookings", { method: "POST" });
+    const rejection = expect(pending).rejects.toBeInstanceOf(ApiTimeoutError);
+    await vi.advanceTimersByTimeAsync(API_REQUEST_TIMEOUT_MS);
+    await rejection;
+
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(unavailable).toHaveBeenCalledOnce();
   });
 
   it("does not report an intentionally aborted request as an outage", async () => {
