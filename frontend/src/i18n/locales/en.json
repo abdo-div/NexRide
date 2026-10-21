@@ -1123,6 +1123,11 @@
     }
   },
   "vehicleDetail": {
+    "galleryLabel": "Vehicle photo gallery",
+    "openGallery": "Open gallery",
+    "closeGallery": "Close gallery",
+    "previousImage": "Previous image",
+    "nextImage": "Next image",
     "unavailable": {
       "title": "Details not available yet",
       "desc": "This vehicle came from the live fleet, but its detail page is not connected to the API yet. Head back to the fleet to keep browsing.",

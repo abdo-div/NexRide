@@ -29,7 +29,7 @@ export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-6">
       <nav className="flex items-center gap-2 text-[#64748B] font-medium text-[13px] overflow-x-auto py-1">
         <Link
-          to="/FleetPage"
+          to="/fleet"
           className="hover:text-[#142B4A] transition-colors flex items-center gap-1 shrink-0"
         >
           <Car className="w-4 h-4" />
@@ -38,7 +38,7 @@ export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave
         {crumbs.slice(1, -1).map((c) => (
           <React.Fragment key={c}>
             <Separator />
-            <Link to="/FleetPage" className="hover:text-[#142B4A] transition-colors shrink-0">
+            <Link to="/fleet" className="hover:text-[#142B4A] transition-colors shrink-0">
               {t(c)}
             </Link>
           </React.Fragment>

@@ -131,13 +131,13 @@ export const VehicleDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-[#F8FAFC] min-h-screen">
-      <div className="max-w-[1360px] mx-auto px-4 lg:px-8 pt-24 pb-20">
+    <div className="min-h-screen bg-[linear-gradient(180deg,#f1f5f9_0%,#ffffff_34%,#f8fafc_100%)]">
+      <div className="mx-auto max-w-[1360px] px-4 pb-20 pt-28 lg:px-8">
         <DetailBreadcrumbs crumbs={realDetail.crumbs} saved={saved} onToggleSave={() => setSaved((s) => !s)} />
         <DetailTitleBar detail={realDetail} />
         <DetailGallery detail={realDetail} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
           <div className="lg:col-span-8 flex flex-col gap-8">
             <MetricHighlights metrics={realDetail.metrics} />
             <VehicleDescription detail={realDetail} />

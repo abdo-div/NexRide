@@ -21,7 +21,7 @@ export const SimilarVehicles: React.FC<{ detail: VehicleDetail }> = ({ detail })
           <p className="text-[13px] text-[#64748B]">{t(detail.similarSub)}</p>
         </div>
         <Link
-          to="/FleetPage"
+          to="/fleet"
           className="text-[13px] text-[#142B4A] font-bold hover:underline flex items-center gap-1"
         >
           {t(detail.similarLinkLabel)}

@@ -79,8 +79,8 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
   const labelCls = "block mb-1 text-[11px] text-[#64748B] font-bold uppercase tracking-wider";
 
   return (
-    <aside className="lg:col-span-4 flex flex-col gap-4">
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#E2E8F0]">
+    <aside className="flex flex-col gap-4 lg:sticky lg:top-24 lg:col-span-4">
+      <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_24px_70px_-38px_rgba(15,23,42,.5)]">
         <div className="flex items-baseline justify-between mb-4">
           <div>
             <div className="flex items-baseline gap-1">
@@ -169,7 +169,7 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
             {detail.protectionPlans.map((p) => (
               <label
                 key={p.id}
-                className="flex items-center justify-between p-3 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] cursor-pointer hover:border-blue-300 transition-colors"
+                className={`flex cursor-pointer items-center justify-between rounded-2xl border p-3 transition-all ${protection === p.id ? "border-blue-300 bg-blue-50 shadow-sm" : "border-[#E2E8F0] bg-[#F8FAFC] hover:border-blue-200"}`}
               >
                 <div className="flex items-center gap-2.5">
                   <input
