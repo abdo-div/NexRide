@@ -1,5 +1,6 @@
 import React, { useId } from "react";
 import { Lock } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export interface ComingSoonPillProps {
   children: React.ReactNode;
@@ -109,6 +110,7 @@ export const EditField: React.FC<EditFieldProps> = ({
   disabled = false,
   required = false,
 }) => {
+  const { t } = useTranslation();
   const fieldId = useId();
   const inputClass = `w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm text-[#0B1C30] outline-none transition-colors placeholder:text-[#9AA4B5] focus:border-[#142B4A] focus:ring-2 focus:ring-[#142B4A]/15 ${
     error ? "border-[#E24A55]" : "border-[#E5E7EB]"
@@ -128,6 +130,8 @@ export const EditField: React.FC<EditFieldProps> = ({
       {type === "select" ? (
         <select
           id={fieldId}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? `${fieldId}-error` : undefined}
           value={value}
           onChange={(event) => onChange(event.target.value)}
           disabled={disabled}
@@ -145,6 +149,8 @@ export const EditField: React.FC<EditFieldProps> = ({
       ) : type === "textarea" ? (
         <textarea
           id={fieldId}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? `${fieldId}-error` : undefined}
           value={value}
           onChange={(event) => onChange(event.target.value)}
           disabled={disabled}
@@ -157,6 +163,8 @@ export const EditField: React.FC<EditFieldProps> = ({
         <div className="relative">
           <input
             id={fieldId}
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? `${fieldId}-error` : undefined}
             type={type}
             inputMode={type === "number" ? "decimal" : undefined}
             value={value}
@@ -177,7 +185,7 @@ export const EditField: React.FC<EditFieldProps> = ({
       )}
 
       {error ? (
-        <span className="text-[11px] font-semibold text-[#DC2626]">{error}</span>
+        <span id={`${fieldId}-error`} role="alert" className="text-[11px] font-semibold text-[#DC2626]">{t(error, error)}</span>
       ) : hint ? (
         <span className="text-[11px] text-[#9AA4B5]">{hint}</span>
       ) : null}

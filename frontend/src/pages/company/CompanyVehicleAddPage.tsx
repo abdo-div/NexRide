@@ -18,6 +18,7 @@ import { CompanyVehicleEditPricing } from "../../components/company/CompanyVehic
 import { CompanyVehicleEditLocation } from "../../components/company/CompanyVehicleEditLocation";
 import { CompanyVehicleEditPublish } from "../../components/company/CompanyVehicleEditPublish";
 import { CompanyVehicleEditPreview } from "../../components/company/CompanyVehicleEditPreview";
+import { useUnsavedChanges } from "../../hooks/useUnsavedChanges";
 
 /** Anchor-wrapper for sticky section navigation. */
 const SectionAnchor: React.FC<{ id: string; children: React.ReactNode }> = ({
@@ -43,6 +44,7 @@ export const CompanyVehicleAddPage: React.FC = () => {
 
   const form = useCompanyVehicleAddForm(handleCreated);
   const { saving, saved, saveError, saveDraft, saveChanges } = form;
+  useUnsavedChanges(form.dirty && !saving && !saved);
 
   return (
     <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">
@@ -136,7 +138,7 @@ export const CompanyVehicleAddPage: React.FC = () => {
             {saveError && (
               <div className="mt-4 flex items-start gap-2 rounded-xl bg-red-50 px-4 py-3 text-sm text-[#BA1A1A]">
                 <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
-                <span>{saveError}</span>
+                <span>{t(saveError, saveError)}</span>
               </div>
             )}
           </div>

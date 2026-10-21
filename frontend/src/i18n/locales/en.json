@@ -2134,6 +2134,14 @@
     "needFixes": "Please review the highlighted fields (Step {{n}}) and try again."
   },
   "company": {
+    "vehicleValidation": {
+      "required": "This field is required.",
+      "year": "Enter a valid vehicle year.",
+      "positive": "Enter a value greater than zero.",
+      "price": "Price must be greater than zero.",
+      "vin": "VIN must contain exactly 17 valid characters.",
+      "fixErrors": "Review the highlighted fields before publishing."
+    },
     "layout": {
       "operationsSubtitle": "Partner Ops",
       "certifiedStatus": "Certified Partner",

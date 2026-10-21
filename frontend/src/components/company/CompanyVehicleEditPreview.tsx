@@ -245,7 +245,7 @@ export const CompanyVehicleEditPreview: React.FC<CompanyVehicleEditPreviewProps>
         )}
         {saveError && !saved && (
           <div className="mb-3 rounded-lg bg-[#FFF0F0] px-3 py-2 text-xs font-semibold text-[#BA1A1A]">
-            {saveError}
+            {t(saveError, saveError)}
           </div>
         )}
 
