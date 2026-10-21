@@ -1,5 +1,8 @@
 # NexRide production go/no-go record
 
+Follow [`RELEASE_RUNBOOK.md`](./RELEASE_RUNBOOK.md) in order. This document is
+the evidence record; it does not replace the deployment and recovery procedure.
+
 Copy this file for each release and name it with the release date and full Git
 SHA. Store the completed record in the company's controlled operations system;
 do not commit credentials, customer data, payment data, or secret-bearing logs.
