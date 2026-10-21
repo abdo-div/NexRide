@@ -16,6 +16,7 @@ import { PaymentSection } from "../components/checkout/PaymentSection";
 import { BookingSummary } from "../components/checkout/BookingSummary";
 import type { CheckoutMeta } from "../types/checkout";
 import { moamalatApi } from "../lib/moamalatApi";
+import { useToast } from "../context/toastContextValue";
 import {
   loadMoamalatLightbox,
   openMoamalatLightbox,
@@ -48,6 +49,7 @@ export const CheckoutPage: React.FC = () => {
 
 const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   const { t, i18n } = useTranslation();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { status, vehicle: dto } = useVehicleDetail(vehicleId, false);
@@ -175,6 +177,11 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   const [driverValues, setDriverValues] = useState<Record<string, string>>({});
   const [driverConfirmed, setDriverConfirmed] = useState(false);
   const [activeStep, setActiveStep] = useState(1);
+
+  useEffect(() => {
+    if (!submitError) return;
+    showToast({ tone: "error", title: t("toasts.bookingFailed.title"), description: submitError });
+  }, [showToast, submitError, t]);
 
   const driverComplete = useMemo(() => {
     const allFieldsFilled = meta.driverFields.every(

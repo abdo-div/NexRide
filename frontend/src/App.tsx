@@ -26,6 +26,7 @@ import { PageMetadata } from "./components/layouts/PageMetadata";
 import { SkipToContent } from "./components/layouts/SkipToContent";
 import { BackToTop } from "./components/layouts/BackToTop";
 import { RouteAnnouncer } from "./components/layouts/RouteAnnouncer";
+import { ToastProvider } from "./context/ToastProvider";
 
 // Only the landing page is needed for the initial public load. Browsing, auth,
 // booking, checkout and payment screens are separate chunks so a first-time
@@ -229,6 +230,7 @@ function App() {
           <SkipToContent />
           <BackToTop />
           <DialogProvider>
+            <ToastProvider>
             <ScrollToTop />
             <NetworkStatusBanner />
             <AuthProvider>
@@ -450,6 +452,7 @@ function App() {
           </Route>
             </Routes></SmoothScroll>
             </AuthProvider>
+            </ToastProvider>
           </DialogProvider>
         </GlobalErrorBoundary>
       </BrowserRouter>

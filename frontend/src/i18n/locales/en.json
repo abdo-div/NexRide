@@ -1391,6 +1391,13 @@
       "backToFleet": "Back to Fleet"
     }
   },
+  "toasts": {
+    "linkCopied": { "title": "Link copied", "description": "The vehicle link is ready to share." },
+    "copyFailed": { "title": "Could not copy link", "description": "Copy the address from your browser and try again." },
+    "vehicleSaved": { "title": "Vehicle saved", "description": "You can return to this vehicle from your saved list." },
+    "vehicleRemoved": { "title": "Removed from saved", "description": "This vehicle is no longer in your saved list." },
+    "bookingFailed": { "title": "Booking could not be completed" }
+  },
   "checkout": {
     "flow": {
       "label": "Booking progress",

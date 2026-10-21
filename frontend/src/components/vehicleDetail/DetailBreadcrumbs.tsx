@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Car, Share2, Heart, Download } from "lucide-react";
+import { useToast } from "../../context/toastContextValue";
 
 interface Props {
   crumbs: string[];
@@ -13,15 +14,18 @@ const Separator = () => <span className="text-[#CBD5E1]">/</span>;
 
 export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave }) => {
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const [copied, setCopied] = React.useState(false);
 
   const share = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
+      showToast({ tone: "success", title: t("toasts.linkCopied.title"), description: t("toasts.linkCopied.description") });
       setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);
+      showToast({ tone: "error", title: t("toasts.copyFailed.title"), description: t("toasts.copyFailed.description") });
     }
   };
 
@@ -60,7 +64,10 @@ export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave
         </button>
         <button
           type="button"
-          onClick={onToggleSave}
+          onClick={() => {
+            onToggleSave();
+            showToast({ tone: saved ? "info" : "success", title: t(saved ? "toasts.vehicleRemoved.title" : "toasts.vehicleSaved.title"), description: t(saved ? "toasts.vehicleRemoved.description" : "toasts.vehicleSaved.description") });
+          }}
           className={`flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors shadow-sm text-[13px] font-medium ${
             saved ? "text-[#142B4A]" : "text-[#64748B] hover:text-[#0F172A]"
           }`}

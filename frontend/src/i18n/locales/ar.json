@@ -1391,6 +1391,13 @@
       "backToFleet": "العودة إلى الأسطول"
     }
   },
+  "toasts": {
+    "linkCopied": { "title": "تم نسخ الرابط", "description": "رابط المركبة جاهز للمشاركة." },
+    "copyFailed": { "title": "تعذّر نسخ الرابط", "description": "انسخ العنوان من المتصفح وحاول مجدداً." },
+    "vehicleSaved": { "title": "تم حفظ المركبة", "description": "يمكنك العودة إلى هذه المركبة من قائمة المحفوظات." },
+    "vehicleRemoved": { "title": "تمت الإزالة من المحفوظات", "description": "لم تعد هذه المركبة ضمن قائمة المحفوظات." },
+    "bookingFailed": { "title": "تعذّر إكمال الحجز" }
+  },
   "checkout": {
     "flow": {
       "label": "تقدم الحجز",
