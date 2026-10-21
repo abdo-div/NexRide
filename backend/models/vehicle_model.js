@@ -6,7 +6,6 @@ const vehicleSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: [true, "A vehicle must belong to a rental company"],
-      index: true,
     },
     make: {
       type: String,
@@ -201,6 +200,13 @@ vehicleSchema.index({
 });
 
 vehicleSchema.index({ companyId: 1, listingStatus: 1 });
+vehicleSchema.index({ companyId: 1, deletedAt: 1, createdAt: -1 });
+vehicleSchema.index({
+  listingStatus: 1,
+  operationalStatus: 1,
+  deletedAt: 1,
+  createdAt: -1,
+});
 vehicleSchema.index({ location: "2dsphere" }, { sparse: true });
 
 // -----------------------------------------------------------------------------

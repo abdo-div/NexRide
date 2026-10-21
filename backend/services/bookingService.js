@@ -275,7 +275,7 @@ export const createCustomerBooking = async (userId, bookingData, user) => {
  * Customer Self-Service Bookings
  */
 export const fetchCustomerBookings = async (userId) => {
-  return await Booking.find({ customerId: userId });
+  return await Booking.find({ customerId: userId }).sort({ createdAt: -1 });
 };
 
 /**

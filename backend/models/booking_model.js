@@ -11,19 +11,16 @@ const bookingSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: [true, "A booking must belong to a customer"],
-      index: true,
     },
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: [true, "A booking must belong to a rental company"],
-      index: true,
     },
     vehicleId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Vehicle",
       required: [true, "A booking must be linked to a vehicle"],
-      index: true,
     },
     idempotencyKey: {
       type: String,
@@ -196,15 +193,19 @@ const bookingSchema = new mongoose.Schema(
 // Indexes for Fast Availability Lookup & Tenant Filtering
 // -----------------------------------------------------------------------------
 // Prevents overlap queries from taking up excessive DB CPU
+// Equality fields lead range fields so MongoDB can narrow to one vehicle and
+// the blocking states before scanning the requested calendar window.
 bookingSchema.index({
   vehicleId: 1,
+  bookingStatus: 1,
   startDate: 1,
   endDate: 1,
-  bookingStatus: 1,
 });
-bookingSchema.index({ companyId: 1, bookingStatus: 1 });
+// Tenant dashboards and upcoming/on-road queries scope by company + state,
+// then walk the booking calendar.
+bookingSchema.index({ companyId: 1, bookingStatus: 1, startDate: 1, endDate: 1 });
+bookingSchema.index({ companyId: 1, createdAt: -1 });
 bookingSchema.index({ customerId: 1, createdAt: -1 });
-bookingSchema.index({ vehicleId: 1, startDate: 1, bookingStatus: 1 });
 // Durable retry protection. Redis accelerates replay responses, while this
 // unique index remains authoritative when Redis is unavailable or two copies
 // of the same request arrive before the cache has been written.
