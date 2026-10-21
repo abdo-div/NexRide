@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
-import { CalendarX2, CarFront } from "lucide-react";
+import { CarFront } from "lucide-react";
 import { bookingApi } from "../lib/bookingApi";
 import type { MyBookingsResponse } from "../lib/bookingApi";
 import type { BookingDto } from "../types/booking";
@@ -19,8 +18,8 @@ import {
 } from "../components/myBookings/BookingFilters";
 import { BookingCard } from "../components/myBookings/BookingCard";
 import { VipSupportBanner } from "../components/myBookings/VipSupportBanner";
-
-const TOAST_MS = 2800;
+import { CustomerStatePanel } from "../components/feedback/CustomerStatePanel";
+import { useToast } from "../context/toastContextValue";
 
 const inStatusTab = (booking: BookingDto, tab: BookingsTab): boolean => {
   const status = booking.bookingStatus;
@@ -41,6 +40,7 @@ const cloneCsvCell = (value: string | number): string =>
 
 export const MyBookingsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const { showToast } = useToast();
 
   const [bookings, setBookings] = useState<BookingDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +51,6 @@ export const MyBookingsPage: React.FC = () => {
   const [city, setCity] = useState("");
   const [sort, setSort] = useState<BookingsSort>("newest");
 
-  const [toast, setToast] = useState<string | null>(null);
   const [exportBusy, setExportBusy] = useState(false);
 
   const loadBookings = (signal?: AbortSignal) => {
@@ -85,10 +84,7 @@ export const MyBookingsPage: React.FC = () => {
     return () => controller.abort();
   }, []);
 
-  const showToast = (message: string) => {
-    setToast(message);
-    window.setTimeout(() => setToast(null), TOAST_MS);
-  };
+  const notify = (message: string) => showToast({ tone: "info", title: message });
 
   const cities = useMemo<string[]>(() => {
     const seen = new Set<string>();
@@ -145,7 +141,7 @@ export const MyBookingsPage: React.FC = () => {
   const handleExport = () => {
     if (exportBusy) return;
     if (filtered.length === 0) {
-      showToast(t("myBookings.invoiceUnavailable"));
+      notify(t("myBookings.invoiceUnavailable"));
       return;
     }
     setExportBusy(true);
@@ -181,7 +177,7 @@ export const MyBookingsPage: React.FC = () => {
         new Blob([csv], { type: "text/csv;charset=utf-8" }),
         `nexride-bookings-${new Date().toISOString().slice(0, 10)}.csv`,
       );
-      showToast(t("myBookings.exportToast"));
+      notify(t("myBookings.exportToast"));
     } finally {
       setExportBusy(false);
     }
@@ -198,6 +194,8 @@ export const MyBookingsPage: React.FC = () => {
       )
       .reduce((sum, booking) => sum + booking.totalAmount, 0) / 10,
   );
+  const hasFilters = tab !== "all" || search.trim() !== "" || city !== "";
+  const resetFilters = () => { setTab("all"); setSearch(""); setCity(""); setSort("newest"); };
 
   return (
     <div className="bg-[#F8FAFC] min-h-screen">
@@ -220,19 +218,7 @@ export const MyBookingsPage: React.FC = () => {
             ))}
           </section>
         ) : loadFailed ? (
-          <section className="bg-white border border-slate-200 rounded-2xl p-10 text-center">
-            <CalendarX2 className="w-10 h-10 mx-auto text-[#94A3B8]" />
-            <p className="mt-4 text-sm text-[#64748B]">
-              {t("myBookings.loadError")}
-            </p>
-            <button
-              type="button"
-              onClick={() => loadBookings()}
-              className="mt-4 px-5 py-2.5 bg-[#142B4A] hover:bg-[#0D2039] text-white text-sm font-bold rounded-lg transition-colors cursor-pointer"
-            >
-              {t("myBookings.retry")}
-            </button>
-          </section>
+          <CustomerStatePanel variant="error" title={t("myBookings.loadErrorTitle")} description={t("myBookings.loadError")} actionLabel={t("myBookings.retry")} onAction={() => loadBookings()} />
         ) : (
           <>
             <BookingFilters
@@ -249,30 +235,14 @@ export const MyBookingsPage: React.FC = () => {
             />
 
             {filtered.length === 0 ? (
-              <section className="bg-white border border-slate-200 rounded-2xl p-12 flex flex-col items-center text-center">
-                <div className="w-14 h-14 rounded-2xl bg-[#EFF6FF] text-[#142B4A] flex items-center justify-center">
-                  <CarFront className="w-7 h-7" />
-                </div>
-                <h3 className="mt-4 text-lg font-extrabold text-[#0F172A]">
-                  {t("myBookings.emptyTitle")}
-                </h3>
-                <p className="mt-1 text-sm text-[#64748B] max-w-sm">
-                  {t("myBookings.emptyBody")}
-                </p>
-                <Link
-                  to="/FleetPage"
-                  className="mt-5 px-5 py-2.5 bg-[#142B4A] hover:bg-[#0D2039] text-white text-sm font-bold rounded-lg transition-colors"
-                >
-                  {t("myBookings.emptyCta")}
-                </Link>
-              </section>
+              hasFilters ? <CustomerStatePanel variant="filtered" title={t("myBookings.filterEmptyTitle")} description={t("myBookings.filterEmptyBody")} actionLabel={t("myBookings.resetFilters")} onAction={resetFilters} /> : <CustomerStatePanel variant="empty" icon={CarFront} title={t("myBookings.emptyTitle")} description={t("myBookings.emptyBody")} actionLabel={t("myBookings.emptyCta")} actionHref="/fleet" />
             ) : (
               <section className="flex flex-col gap-4">
                 {filtered.map((booking) => (
                   <BookingCard
                     key={booking._id}
                     booking={booking}
-                    onToast={showToast}
+                    onToast={notify}
                     onCancelled={() => loadBookings()}
                   />
                 ))}
@@ -283,12 +253,6 @@ export const MyBookingsPage: React.FC = () => {
           </>
         )}
       </div>
-
-      {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-[#0F172A] text-white text-sm font-semibold px-5 py-3 rounded-xl shadow-xl animate-fade-in">
-          {toast}
-        </div>
-      )}
     </div>
   );
 };
