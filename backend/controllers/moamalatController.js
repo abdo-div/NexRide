@@ -41,6 +41,26 @@ export function validateAmount(raw) {
   return { ok: true, value: num };
 }
 
+const TERMINAL_PAYMENT_FAILURES = new Set([
+  "DECLINED",
+  "FAILED",
+  "REJECTED",
+  "CANCELLED",
+  "CANCELED",
+]);
+
+/**
+ * Only an explicit terminal gateway decision may retire a reservation.
+ * NOT_FOUND, transport errors and mismatched/unverifiable data are ambiguous:
+ * the customer may already have been charged while the gateway index or our
+ * network is lagging. Those bookings remain pending for a safe verification
+ * retry or the normal reservation reaper.
+ */
+export const shouldReleaseAfterVerification = (result) =>
+  TERMINAL_PAYMENT_FAILURES.has(
+    String(result?.status ?? "").trim().toUpperCase(),
+  );
+
 /**
  * LightBox script & config endpoint.
  * Serves both /api/config and /api/v1/payments/moamalat/config.
@@ -375,19 +395,11 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
     throw new AppError("This booking is not eligible for payment verification.", 409);
   }
 
-  let result;
-  try {
-    result = await verifyTransaction({
-      merchantReference: String(merchantReference),
-      expectedAmount: gatewayAmountForBooking(booking.totalAmount),
-      systemReference,
-    });
-  } catch (error) {
-    await releaseUnpaidBooking(booking._id, {
-      reason: "Payment verification could not be completed.",
-    }).catch(() => undefined);
-    throw error;
-  }
+  const result = await verifyTransaction({
+    merchantReference: String(merchantReference),
+    expectedAmount: gatewayAmountForBooking(booking.totalAmount),
+    systemReference,
+  });
 
   if (!result.verified) {
     logger.warn(
@@ -401,28 +413,31 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
       "Payment verification rejected",
     );
 
-    // Any result other than verified payment releases the reservation. The
-    // customer explicitly has no rental until Moamalat confirms the charge.
-    await releaseUnpaidBooking(booking._id, {
-      reason: "Moamalat did not verify the payment.",
-    }).catch((err) => {
-      logger.warn(
-        {
-          event: "payment_release_failed",
-          bookingId: booking._id,
-          err: err.message,
-        },
-        "Could not release booking after an unverified payment",
-      );
-    });
+    const terminalFailure = shouldReleaseAfterVerification(result);
+    if (terminalFailure) {
+      await releaseUnpaidBooking(booking._id, {
+        reason: `Moamalat payment ${String(result.status).toLowerCase()}.`,
+      }).catch((err) => {
+        logger.warn(
+          {
+            event: "payment_release_failed",
+            bookingId: booking._id,
+            err: err.message,
+          },
+          "Could not release booking after a terminal payment failure",
+        );
+      });
+    }
 
     return res.status(200).json({
       verified: false,
+      retryable: !terminalFailure,
       reason: result.reason || "Transaction details did not match.",
       status: result.status || null,
       gatewayAmount: result.gatewayAmount || null,
       data: {
         verified: false,
+        retryable: !terminalFailure,
         reason: result.reason || "Transaction details did not match.",
         status: result.status || null,
         gatewayAmount: result.gatewayAmount || null,

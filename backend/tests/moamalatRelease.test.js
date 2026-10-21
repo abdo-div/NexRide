@@ -8,6 +8,7 @@ import MaintenanceEvent from "../models/Maintenance_model.js";
 import { redisClient } from "../config/redis.js";
 import {
   releasePayment,
+  shouldReleaseAfterVerification,
   verifyPayment,
 } from "../controllers/moamalatController.js";
 import { releaseUnpaidBooking } from "../services/bookingService.js";
@@ -293,7 +294,7 @@ test("a declined Moamalat transaction expires the booking and frees the car", as
   assert.equal(booking.paymentStatus, "UNPAID");
 });
 
-test("a not-yet-indexed transaction releases the unpaid reservation", async (t) => {
+test("a not-yet-indexed transaction keeps the reservation pending for a safe retry", async (t) => {
   withGatewayConfig(t);
   const booking = makeBooking();
   const payment = {
@@ -335,7 +336,17 @@ test("a not-yet-indexed transaction releases the unpaid reservation", async (t) 
   });
 
   assert.equal(outcome.body.verified, false);
-  assert.equal(started(), 1);
-  assert.equal(booking.bookingStatus, "EXPIRED");
+  assert.equal(outcome.body.retryable, true);
+  assert.equal(started(), 0);
+  assert.equal(booking.bookingStatus, "PENDING_PAYMENT");
   assert.equal(booking.paymentStatus, "UNPAID");
+});
+
+test("only explicit terminal gateway failures release a reservation", () => {
+  for (const status of ["Declined", "FAILED", "rejected", "Cancelled", "canceled"]) {
+    assert.equal(shouldReleaseAfterVerification({ status }), true);
+  }
+  for (const status of ["NOT_FOUND", "GATEWAY_ERROR", "SIGNATURE_MISMATCH", null]) {
+    assert.equal(shouldReleaseAfterVerification({ status }), false);
+  }
 });

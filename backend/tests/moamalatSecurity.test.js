@@ -210,7 +210,7 @@ test("initialization rejects monetary overrides, paid bookings, and cancelled bo
   );
 });
 
-test("verification without a matching approved Moamalat transaction does not finalize", async (t) => {
+test("verification without a matching transaction stays pending for reconciliation", async (t) => {
   withGatewayConfig(t);
   const booking = makeBooking();
   const payment = {
@@ -259,8 +259,9 @@ test("verification without a matching approved Moamalat transaction does not fin
     body: { merchantReference },
   });
   assert.equal(response.body.verified, false);
+  assert.equal(response.body.retryable, true);
   assert.equal(fetchCount, 1);
-  assert.equal(booking.bookingStatus, "EXPIRED");
+  assert.equal(booking.bookingStatus, "PENDING_PAYMENT");
   assert.equal(booking.paymentStatus, "UNPAID");
 });
 
