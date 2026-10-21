@@ -247,3 +247,23 @@ svg {
 .vehicle-location-map .leaflet-control-attribution a {
   color: #475569;
 }
+@keyframes nexride-brand-marquee {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+.brand-marquee-track {
+  animation: nexride-brand-marquee 28s linear infinite;
+  will-change: transform;
+}
+
+.brand-marquee:hover .brand-marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-marquee-track {
+    animation: none;
+    transform: none;
+  }
+}

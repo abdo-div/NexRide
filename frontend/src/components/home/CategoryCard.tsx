@@ -40,6 +40,13 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, index = 0 
   };
 
   const iconTheme = "bg-slate-50 border-slate-200 text-[#142b4a]";
+  const imageByCategory: Record<string, string> = {
+    economy: "/nexride-hero-coast-v3.png",
+    "executive-suv": "/nexride-hero-mountain-v5.png",
+    "ultra-luxury": "/nexride-hero-sunset-v2.png",
+    "desert-4x4": "/3carsUpdated.png",
+    "electric-hybrid": "/nexride-hero-marina-v4.png",
+  };
 
   return (
     <motion.div
@@ -53,10 +60,15 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, index = 0 
       <Link
         to={`/fleet?category=${encodeURIComponent(category.id)}`}
         aria-label={`${t("home.categories.explore")} ${t(category.title)}`}
-        className="p-5 flex min-h-full flex-col justify-between rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+        className="flex min-h-full flex-col justify-between overflow-hidden rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
       >
       <div>
-        <div className="flex items-start justify-between gap-3 mb-5">
+        <div className="relative h-32 overflow-hidden bg-slate-100">
+          <img src={imageByCategory[category.id]} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/35 to-transparent" />
+        </div>
+        <div className="p-4 pb-0">
+        <div className="mb-3 flex items-start justify-between gap-3">
           <div
             className={`w-11 h-11 rounded-xl border flex items-center justify-center shadow-sm group-hover:bg-[#142b4a] group-hover:border-[#142b4a] group-hover:text-white transition-colors duration-300 ${iconTheme}`}
           >
@@ -73,10 +85,11 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, index = 0 
         <h3 className="font-extrabold text-base text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors">
           {t(category.title)}
         </h3>
+        </div>
       </div>
 
       {/* Pricing & Arrow Link */}
-      <div className="pt-4 mt-5 border-t border-slate-100/80 flex items-center justify-between">
+      <div className="mx-4 mt-4 flex items-center justify-between border-t border-slate-100/80 pb-4 pt-4">
         <div>
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">
             {t("home.categories.startingFrom")}

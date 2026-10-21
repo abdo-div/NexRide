@@ -584,7 +584,7 @@ export const SearchConsole: React.FC = () => {
   );
 
   return (
-    <div id="search-engine" className="relative z-[60] mt-10 w-full overflow-visible isolate">
+    <div id="search-engine" className="relative z-[60] mt-2 w-full overflow-visible isolate">
       {/* Card */}
       <div className="overflow-visible rounded-[26px] border border-white/20 bg-white/95 p-1 shadow-[0_34px_90px_-28px_rgba(0,0,0,.72),0_8px_24px_-12px_rgba(15,23,42,.35)] ring-1 ring-white/15 backdrop-blur-xl">
         {/* Main row */}
@@ -674,7 +674,7 @@ export const SearchConsole: React.FC = () => {
         </form>
 
         {/* Options row */}
-        <div className="relative z-0 mt-px flex flex-wrap items-center justify-between gap-2 rounded-b-[22px] bg-slate-50/90 px-5 py-3">
+        <div className="relative z-0 mt-px hidden flex-wrap items-center justify-between gap-2 rounded-b-[22px] bg-slate-50/90 px-5 py-3">
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
               type="checkbox"
@@ -718,7 +718,7 @@ export const SearchConsole: React.FC = () => {
       </div>
 
       {/* Popular picks */}
-      <div className={`relative z-0 mt-3 flex flex-wrap items-center gap-2 transition-opacity ${openPicker ? "invisible opacity-0" : "opacity-100"}`}>
+      <div className={`relative z-0 mt-3 hidden flex-wrap items-center gap-2 transition-opacity ${openPicker ? "invisible opacity-0" : "opacity-100"}`}>
         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
           {t("home.search.popular")}
         </span>

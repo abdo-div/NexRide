@@ -535,7 +535,11 @@
     "heading": "READY TO HIT THE ROAD?",
     "subtitle": "Join thousands of executives, travelers, and local drivers renting with complete peace of mind.",
     "exploreVehicles": "Explore All Vehicles",
-    "contactConcierge": "Contact VIP Concierge"
+    "contactConcierge": "Contact VIP Concierge",
+    "partnerBadge": "Grow with NexRide",
+    "partnerHeading": "Ready to Become a NexRide Partner?",
+    "partnerSubtitle": "Join our trusted rental-company network, reach new customers, and manage vehicles, bookings, and payments from one platform.",
+    "becomePartner": "Apply for Partnership"
   },
   "auth": {
     "breadcrumb": {
@@ -684,6 +688,22 @@
       "verifiedReviewed": "Verified & Reviewed",
       "bestPrices": "Best Prices",
       "marketCompetitive": "Market Competitive"
+    },
+    "brandStrip": {
+      "title": "Browse by Brand",
+      "subtitle": "Choose from the world's most trusted automotive names."
+    },
+    "trust": {
+      "supportTitle": "24/7 Support",
+      "supportDetail": "We are here whenever you need us.",
+      "fleetTitle": "Premium Fleet",
+      "fleetDetail": "Top brands and well-maintained vehicles."
+    },
+    "specialOffer": {
+      "eyebrow": "Special Offer",
+      "title": "Better Rides. Lower Prices.",
+      "subtitle": "Discover our best offers on premium cars and make your next journey more comfortable and affordable.",
+      "cta": "Explore Deals"
     },
     "featured": {
       "eyebrow": "Explore Collection",

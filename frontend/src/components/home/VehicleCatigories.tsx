@@ -22,7 +22,7 @@ export const VehicleCategories: React.FC<VehicleCategoriesProps> = ({
   const showError = error !== null && !loading;
 
   return (
-    <section className="w-full py-16 px-6 lg:px-12 bg-white border-b border-slate-100 overflow-hidden">
+    <section className="w-full overflow-hidden border-b border-slate-100 bg-[#f8fbff] px-6 py-12 lg:px-12">
       <div className="mx-auto max-w-7xl">
       {/* Header */}
       <motion.div
@@ -30,13 +30,13 @@ export const VehicleCategories: React.FC<VehicleCategoriesProps> = ({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-50px" }}
         transition={{ duration: 0.6 }}
-        className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10"
+        className="mb-7 flex flex-col justify-between gap-4 md:flex-row md:items-end"
       >
         <div>
           <span className="text-xs font-bold text-blue-600 uppercase tracking-widest block mb-2">
             {t("home.categories.eyebrow")}
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
             {t("home.categories.title")}
           </h2>
         </div>

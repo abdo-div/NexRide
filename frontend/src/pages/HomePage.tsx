@@ -2,14 +2,13 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useHomeData } from "../hooks/useHomeData";
 import { Hero } from "../components/home/Hero";
-import { VehicleCategories } from "../components/home/VehicleCatigories";
 import { TrendingRentals } from "../components/home/TrendingRentals";
-import { NationwidePresence } from "../components/home/NationwidePresence";
-import { HowItWorks } from "../components/home/HowItWorks";
-import { PartnerSection } from "../components/home/PartnerSection";
 import { TrustedOperators } from "../components/home/trustedOperators";
 import { UncompromisingStandards } from "../components/home/UncompromisingStandards";
 import { TrustStrip } from "../components/home/TrustStrip";
+import { BrandStrip } from "../components/home/BrandStrip";
+import { VehicleCategories } from "../components/home/VehicleCatigories";
+import { SpecialOffer } from "../components/home/SpecialOffer";
 import { ReadyToHitTheRoad } from "../components/layouts/ReadyToHitTheRoad";
 import { IconContext } from "@phosphor-icons/react";
 
@@ -26,35 +25,23 @@ export const HomePage: React.FC = () => {
     >
       <Hero />
       <TrustStrip />
-      <TrendingRentals
-        cars={home.trending}
-        types={home.types}
-        totalAvailable={home.totalAvailable}
-        loading={home.loading}
-        error={home.error}
-        onRetry={home.reload}
-      />
-      <VehicleCategories
-        categories={home.categories}
-        loading={home.loading}
-        error={home.error}
-        onRetry={home.reload}
-      />
-      <HowItWorks />
-      <NationwidePresence
-        hubs={home.regions}
-        loading={home.loading}
-        error={home.error}
-        onRetry={home.reload}
-      />
+      <VehicleCategories categories={home.categories} loading={home.loading} error={home.error} onRetry={home.reload} />
       <TrustedOperators
         operators={home.operators}
         loading={home.loading}
         error={home.error}
         onRetry={home.reload}
       />
+      <BrandStrip />
+      <TrendingRentals
+        cars={home.trending}
+        totalAvailable={home.totalAvailable}
+        loading={home.loading}
+        error={home.error}
+        onRetry={home.reload}
+      />
       <UncompromisingStandards />
-      <PartnerSection />
+      <SpecialOffer />
       <ReadyToHitTheRoad />
     </motion.div>
     </IconContext.Provider>
