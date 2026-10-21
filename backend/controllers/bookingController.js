@@ -109,6 +109,13 @@ export const bookingConcurrency = {
   releaseVehicleHold,
 };
 
+export const normalizeIdempotencyKey = (value) => {
+  if (value === undefined) return null;
+  if (typeof value !== "string") return undefined;
+  const key = value.trim();
+  return /^[A-Za-z0-9._:-]{8,128}$/.test(key) ? key : undefined;
+};
+
 /**
  * Customer booking creation
  */
@@ -123,6 +130,14 @@ export const createBooking = catchAsync(async (req, res, next) => {
   } = req.body;
   const start = new Date(startDate);
   const end = new Date(endDate);
+  const idempotencyKey = normalizeIdempotencyKey(
+    req.headers?.["idempotency-key"],
+  );
+  if (idempotencyKey === undefined) {
+    return next(
+      new AppError("Idempotency-Key must be 8-128 safe characters.", 400),
+    );
+  }
 
   // Redis provides a fast cross-instance checkout hold when available. MongoDB
   // remains the authoritative concurrency boundary: the transaction below
@@ -194,7 +209,23 @@ export const createBooking = catchAsync(async (req, res, next) => {
     // aborting after a successful commit caused checkout to report a failure
     // even though MongoDB had already stored the fully paid booking.
     await session.withTransaction(async () => {
-    // Distinguish a missing/unpublished listing (404) from a vehicle that is
+      // Redis may be absent and its response cache has a small write window.
+      // Persisting the key with the booking makes replay protection durable.
+      if (idempotencyKey) {
+        const existingBooking = await Booking.findOne({
+          customerId: req.user.id,
+          idempotencyKey,
+        }).session(session);
+        if (existingBooking) {
+          booking = existingBooking;
+          payment = await Payment.findOne({
+            bookingId: existingBooking._id,
+          }).session(session);
+          return;
+        }
+      }
+
+      // Distinguish a missing/unpublished listing (404) from a vehicle that is
     // simply not rentable right now (409), so a vehicle in MAINTENANCE
     // surfaces a clear conflict instead of a misleading "not found".
     const vehicle = await Vehicle.findById(vehicleId).session(session);
@@ -260,6 +291,7 @@ export const createBooking = catchAsync(async (req, res, next) => {
           customerId: req.user.id,
           companyId: vehicle.companyId,
           vehicleId,
+          ...(idempotencyKey ? { idempotencyKey } : {}),
           startDate: start,
           endDate: end,
           pickupLocation: pickupLocation || vehicle.pickupLocation,

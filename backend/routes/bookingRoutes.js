@@ -16,6 +16,7 @@ import {
   verifyTenantAccess,
 } from "../middlewares/authMiddleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
+import { idempotency } from "../middlewares/idempotence.middleware.js";
 import { idParamSchema } from "../validations/common.validation.js";
 import {
   createBookingSchema,
@@ -140,6 +141,9 @@ router.get(
 router.post(
   ["/", "/book"],
   restrictTo("customer"),
+  // Mounted after authentication so Redis entries are scoped to the customer,
+  // never to the shared anonymous namespace.
+  idempotency(86400),
   validate(createBookingSchema),
   createBooking,
 );

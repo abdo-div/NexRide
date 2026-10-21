@@ -59,7 +59,8 @@ export const idempotency =
       };
 
       next();
-    } catch (err) {
-      next(err);
+    } catch {
+      // Cache failures must never prevent the transaction-backed operation.
+      next();
     }
   };

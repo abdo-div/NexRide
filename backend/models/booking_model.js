@@ -25,6 +25,12 @@ const bookingSchema = new mongoose.Schema(
       required: [true, "A booking must be linked to a vehicle"],
       index: true,
     },
+    idempotencyKey: {
+      type: String,
+      trim: true,
+      maxlength: 128,
+      select: false,
+    },
 
     // -------------------------------------------------------------------------
     // Dates & Pickup Details
@@ -199,6 +205,13 @@ bookingSchema.index({
 bookingSchema.index({ companyId: 1, bookingStatus: 1 });
 bookingSchema.index({ customerId: 1, createdAt: -1 });
 bookingSchema.index({ vehicleId: 1, startDate: 1, bookingStatus: 1 });
+// Durable retry protection. Redis accelerates replay responses, while this
+// unique index remains authoritative when Redis is unavailable or two copies
+// of the same request arrive before the cache has been written.
+bookingSchema.index(
+  { customerId: 1, idempotencyKey: 1 },
+  { unique: true, partialFilterExpression: { idempotencyKey: { $type: "string" } } },
+);
 
 // -----------------------------------------------------------------------------
 // Hooks & Middleware

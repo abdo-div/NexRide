@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowRight, Check, UserRound, SlidersHorizontal, CreditCard } from "lucide-react";
@@ -53,6 +53,9 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { status, vehicle: dto } = useVehicleDetail(vehicleId, false);
+  // Keep one key for this mounted checkout. A retry after a timeout therefore
+  // retrieves the original reservation instead of attempting a second insert.
+  const bookingAttemptKey = useRef(crypto.randomUUID());
 
   const defaultStart = useMemo(() => toISODate(addDays(new Date(), 1)), []);
   const defaultEnd = useMemo(() => toISODate(addDays(new Date(), 4)), []);
@@ -219,14 +222,17 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
 
     if (tab === "cash") {
       try {
-        const result = await bookingApi.create({
-          vehicleId,
-          startDate,
-          endDate,
-          pickupLocation: locationParam || undefined,
-          paymentMethod: "CASH_ON_DELIVERY",
-          addonIds: Array.from(selected) as Array<"insurance" | "driver" | "childseat" | "delivery">,
-        });
+        const result = await bookingApi.create(
+          {
+            vehicleId,
+            startDate,
+            endDate,
+            pickupLocation: locationParam || undefined,
+            paymentMethod: "CASH_ON_DELIVERY",
+            addonIds: Array.from(selected) as Array<"insurance" | "driver" | "childseat" | "delivery">,
+          },
+          bookingAttemptKey.current,
+        );
         setPhase("done");
         const confirmationQuery = new URLSearchParams({
           booking: result.data.booking._id,
@@ -252,13 +258,16 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
 
     try {
       await loadMoamalatLightbox();
-      const result = await bookingApi.create({
-        vehicleId,
-        startDate,
-        endDate,
-        pickupLocation: locationParam || undefined,
-        addonIds: Array.from(selected) as Array<"insurance" | "driver" | "childseat" | "delivery">,
-      });
+      const result = await bookingApi.create(
+        {
+          vehicleId,
+          startDate,
+          endDate,
+          pickupLocation: locationParam || undefined,
+          addonIds: Array.from(selected) as Array<"insurance" | "driver" | "childseat" | "delivery">,
+        },
+        bookingAttemptKey.current,
+      );
 
       const booking = result.data.booking;
       const init = await moamalatApi.initiate(booking._id);

@@ -63,11 +63,14 @@ export const bookingApi = {
     });
   },
 
-  create: (payload: CreateBookingPayload): Promise<BookingResponse> =>
+  create: (
+    payload: CreateBookingPayload,
+    idempotencyKey = crypto.randomUUID(),
+  ): Promise<BookingResponse> =>
     request<BookingResponse>("/bookings", {
       method: "POST",
       body: payload,
-      headers: { "Idempotency-Key": crypto.randomUUID() },
+      headers: { "Idempotency-Key": idempotencyKey },
     }),
 
   get: (id: string, signal?: AbortSignal): Promise<BookingResponse> =>
