@@ -26,6 +26,37 @@
   --surface-shadow-hover: 0 24px 65px -18px rgb(15 23 42 / 24%), 0 8px 22px rgb(37 99 235 / 8%);
 }
 
+/* Shared operations surfaces keep every admin data screen visually aligned. */
+@layer components {
+  .admin-panel {
+    @apply overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_20px_60px_-42px_rgba(15,23,42,.45)];
+  }
+
+  .admin-table {
+    @apply w-full border-separate border-spacing-0 text-start;
+  }
+
+  .admin-table thead tr {
+    @apply bg-slate-50/90 text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500;
+  }
+
+  .admin-table thead th {
+    @apply border-b border-slate-200 px-4 py-3.5 whitespace-nowrap;
+  }
+
+  .admin-table tbody tr {
+    @apply transition-colors hover:bg-blue-50/40;
+  }
+
+  .admin-table tbody td {
+    @apply border-b border-slate-100 px-4 py-4 align-middle;
+  }
+
+  .admin-table tbody tr:last-child td {
+    @apply border-b-0;
+  }
+}
+
 [dir="rtl"] {
   --app-font: "Cairo", "Manrope", sans-serif;
 }

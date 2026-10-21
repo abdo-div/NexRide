@@ -62,7 +62,7 @@ export const AdminBookingsTable: React.FC<AdminBookingsTableProps> = ({
   return (
     <div>
       <div className="w-full overflow-x-auto">
-        <table className="w-full border-collapse text-left">
+        <table className="admin-table">
           <thead>
             <tr className="bg-[#F8FAFC] text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
               <th className="rounded-s-2xl px-4 py-3">{t("admin.table.bookingVehicle")}</th>
@@ -81,7 +81,7 @@ export const AdminBookingsTable: React.FC<AdminBookingsTableProps> = ({
               return (
                 <tr
                   key={booking._id}
-                  className="border-b border-slate-100 transition-colors last:border-0 hover:bg-[#F8FAFC]/50"
+                  className="group"
                 >
                   <td className="py-4 px-4">
                     <div className="flex items-center gap-3">
