@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, UserRound, SlidersHorizontal, CreditCard } from "lucide-react";
 import { getCheckoutMeta, computeCheckoutTotals } from "../data/checkoutData";
 import { useVehicleDetail } from "../hooks/useVehicleDetail";
 import { mapVehicle } from "../lib/vehicleMapper";
@@ -174,6 +174,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [driverValues, setDriverValues] = useState<Record<string, string>>({});
   const [driverConfirmed, setDriverConfirmed] = useState(false);
+  const [activeStep, setActiveStep] = useState(1);
 
   const driverComplete = useMemo(() => {
     const allFieldsFilled = meta.driverFields.every(
@@ -319,6 +320,15 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   };
 
   const unavailable = availability === "unavailable";
+  const steps = [
+    { id: 1, label: t("checkout.flow.details"), icon: UserRound },
+    { id: 2, label: t("checkout.flow.options"), icon: SlidersHorizontal },
+    { id: 3, label: t("checkout.flow.payment"), icon: CreditCard },
+  ];
+  const moveToStep = (step: number) => {
+    setActiveStep(step);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   if (status === "loading" || !vehicle || !totals) {
     return (
@@ -356,9 +366,27 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   return (
     <div className="bg-[#F8FAFC] min-h-screen">
       <div className="pt-20">
-        <CheckoutHeader vehicleId={vehicle.id} meta={meta} />
+        <CheckoutHeader vehicleId={vehicle.id} meta={meta} currentStep={activeStep} totalSteps={steps.length} />
       </div>
-      <div className="max-w-[1360px] mx-auto px-4 lg:px-8 py-8 w-full">
+      <div className="mx-auto w-full max-w-[1360px] px-4 py-8 lg:px-8">
+        <nav aria-label={t("checkout.flow.label")} className="mb-8 rounded-3xl border border-slate-200/80 bg-white p-3 shadow-[0_18px_50px_-36px_rgba(15,23,42,.5)]">
+          <ol className="grid grid-cols-3 gap-2">
+            {steps.map((step) => {
+              const Icon = step.icon;
+              const complete = activeStep > step.id;
+              const current = activeStep === step.id;
+              const reachable = step.id < activeStep || (step.id === 2 && driverComplete) || (step.id === 3 && driverComplete && activeStep >= 2);
+              return (
+                <li key={step.id}>
+                  <button type="button" disabled={!reachable && !current} onClick={() => moveToStep(step.id)} aria-current={current ? "step" : undefined} className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-start transition-all sm:px-5 ${current ? "bg-[#142B4A] text-white shadow-lg" : complete ? "bg-emerald-50 text-emerald-800" : "text-slate-400"}`}>
+                    <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${current ? "bg-white/15" : complete ? "bg-emerald-100" : "bg-slate-100"}`}>{complete ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}</span>
+                    <span className="hidden sm:block"><span className="block text-[10px] font-bold uppercase tracking-wider opacity-70">{t("checkout.flow.step", { number: step.id })}</span><span className="text-sm font-bold">{step.label}</span></span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </nav>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-7 flex flex-col gap-6">
             {availability === "checking" && (
@@ -377,24 +405,25 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
                 {availabilityError}
               </div>
             )}
-            <ItinerarySection
-              meta={meta}
-              onChange={() => navigate(`/cars/${vehicleId}?${searchParams.toString()}`)}
-            />
-            <DriverSection
-              meta={meta}
-              values={driverValues}
-              confirmed={driverConfirmed}
-              onFieldChange={updateDriverField}
-              onConfirmedChange={setDriverConfirmed}
-            />
-            <OptionsSection meta={meta} selected={selected} onToggle={toggle} />
-            <PaymentSection
-              meta={meta}
-              tab={tab}
-              onTab={setTab}
-              vehicleTitle={vehicle.title}
-            />
+            {activeStep === 1 && <>
+              <ItinerarySection meta={meta} onChange={() => navigate(`/cars/${vehicleId}?${searchParams.toString()}`)} />
+              <DriverSection meta={meta} values={driverValues} confirmed={driverConfirmed} onFieldChange={updateDriverField} onConfirmedChange={setDriverConfirmed} />
+              <div className="flex flex-col items-end gap-2">
+                <button type="button" disabled={!driverComplete || availability !== "available"} onClick={() => moveToStep(2)} className="premium-button inline-flex min-w-48 items-center justify-center gap-2 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none">{t("checkout.flow.continueOptions")}<ArrowRight className="h-4 w-4 rtl:rotate-180" /></button>
+                {!driverComplete && <p className="text-xs font-semibold text-amber-700">{t("checkout.driver.completionHint")}</p>}
+              </div>
+            </>}
+            {activeStep === 2 && <>
+              <OptionsSection meta={meta} selected={selected} onToggle={toggle} />
+              <div className="flex items-center justify-between gap-3">
+                <button type="button" onClick={() => moveToStep(1)} className="inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-100"><ArrowLeft className="h-4 w-4 rtl:rotate-180" />{t("checkout.flow.back")}</button>
+                <button type="button" onClick={() => moveToStep(3)} className="premium-button inline-flex items-center gap-2">{t("checkout.flow.continuePayment")}<ArrowRight className="h-4 w-4 rtl:rotate-180" /></button>
+              </div>
+            </>}
+            {activeStep === 3 && <>
+              <PaymentSection meta={meta} tab={tab} onTab={setTab} vehicleTitle={vehicle.title} />
+              <button type="button" onClick={() => moveToStep(2)} className="inline-flex w-fit items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-100"><ArrowLeft className="h-4 w-4 rtl:rotate-180" />{t("checkout.flow.backOptions")}</button>
+            </>}
           </div>
           {unavailable ? (
             <div className="lg:col-span-5 self-start lg:sticky lg:top-24 w-full">
@@ -432,7 +461,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
               onConfirm={onConfirm}
               tab={tab}
               error={submitError}
-              driverComplete={driverComplete}
+              driverComplete={driverComplete && activeStep === 3}
             />
           )}
         </div>

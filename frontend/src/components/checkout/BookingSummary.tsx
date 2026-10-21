@@ -37,7 +37,7 @@ export const BookingSummary: React.FC<Props> = ({
 
   return (
     <div className="lg:col-span-5 flex flex-col gap-6 lg:sticky lg:top-24 self-start w-full">
-      <div className="bg-white rounded-2xl p-6 shadow-xl border border-[#E2E8F0] flex flex-col gap-6">
+      <div className="flex flex-col gap-6 rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_24px_70px_-38px_rgba(15,23,42,.5)]">
         {/* Vehicle visual & heading */}
         <div className="flex flex-col gap-3.5">
           <div className="relative w-full h-52 rounded-xl overflow-hidden bg-slate-100">
@@ -231,7 +231,7 @@ export const BookingSummary: React.FC<Props> = ({
           )}
           {!driverComplete && phase !== "done" && (
             <p id="driver-completion-hint" className="text-center text-[12px] font-semibold text-amber-700">
-              {t("checkout.driver.completionHint")}
+              {t("checkout.flow.paymentHint")}
             </p>
           )}
           <div className="flex flex-col gap-2 text-center">

@@ -1392,6 +1392,19 @@
     }
   },
   "checkout": {
+    "flow": {
+      "label": "Booking progress",
+      "progress": "Step {{current}} of {{total}}",
+      "step": "Step {{number}}",
+      "details": "Trip & driver",
+      "options": "Options",
+      "payment": "Payment",
+      "continueOptions": "Continue to options",
+      "continuePayment": "Review payment",
+      "back": "Back to details",
+      "backOptions": "Back to options",
+      "paymentHint": "Complete the previous steps to unlock secure payment."
+    },
     "loading": "Loading vehicle & availability…",
     "pickupFallback": "Pickup location to be confirmed with the operator",
     "availability": {

@@ -1392,6 +1392,19 @@
     }
   },
   "checkout": {
+    "flow": {
+      "label": "تقدم الحجز",
+      "progress": "الخطوة {{current}} من {{total}}",
+      "step": "الخطوة {{number}}",
+      "details": "الرحلة والسائق",
+      "options": "الخيارات",
+      "payment": "الدفع",
+      "continueOptions": "المتابعة إلى الخيارات",
+      "continuePayment": "مراجعة الدفع",
+      "back": "العودة إلى التفاصيل",
+      "backOptions": "العودة إلى الخيارات",
+      "paymentHint": "أكمل الخطوات السابقة لفتح الدفع الآمن."
+    },
     "loading": "جارٍ تحميل السيارة والتوفر…",
     "pickupFallback": "سيتم تأكيد موقع الاستلام مع المزوّد",
     "availability": {
