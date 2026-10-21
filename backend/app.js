@@ -276,6 +276,8 @@ app.post(
 );
 app.post(
   "/api/payment/verify",
+  protect,
+  restrictTo("customer"),
   paymentVerificationLimiter,
   validate(verifyPaymentSchema),
   verifyPayment,

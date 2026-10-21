@@ -287,6 +287,7 @@ test("a declined Moamalat transaction expires the booking and frees the car", as
 
   const outcome = await invoke(verifyPayment, {
     body: { merchantReference },
+    user: { _id: customerA, id: customerA, role: "customer" },
   });
 
   assert.equal(outcome.body.verified, false);
@@ -333,6 +334,7 @@ test("a not-yet-indexed transaction keeps the reservation pending for a safe ret
 
   const outcome = await invoke(verifyPayment, {
     body: { merchantReference },
+    user: { _id: customerA, id: customerA, role: "customer" },
   });
 
   assert.equal(outcome.body.verified, false);

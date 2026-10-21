@@ -89,7 +89,6 @@ router.post(
  *   post:
  *     tags: [Moamalat]
  *     summary: Verify a completed Moamalat payment
- *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -110,6 +109,8 @@ router.post(
  */
 router.post(
   "/verify",
+  protect,
+  restrictTo("customer"),
   paymentVerificationLimiter,
   validate(verifyPaymentSchema),
   verifyPayment,

@@ -296,6 +296,11 @@ export const initiatePayment = createPayment;
  * Serves POST /api/payment/verify and POST /api/v1/payments/moamalat/verify.
  */
 export const verifyPayment = catchAsync(async (req, res, next) => {
+  const customerId = req.user?._id || req.user?.id;
+  if (!customerId) {
+    throw new AppError("You must be logged in to verify a payment.", 401);
+  }
+
   if (!isMoamalatConfigured()) {
     return res.status(500).json({
       verified: false,
@@ -331,6 +336,14 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
   const booking = await Booking.findById(bookingId);
   if (!booking) {
     throw new AppError("No booking found for this payment.", 404);
+  }
+
+  const bookingCustomerId = booking.customerId?._id ?? booking.customerId;
+  if (
+    !bookingCustomerId ||
+    bookingCustomerId.toString() !== customerId.toString()
+  ) {
+    throw new AppError("You can only verify payment for your own booking.", 403);
   }
 
   const paymentBookingId = paymentDoc.bookingId?._id ?? paymentDoc.bookingId;
