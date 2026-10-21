@@ -5,7 +5,8 @@
   },
   "accessibility": {
     "skipToContent": "انتقل إلى المحتوى الرئيسي",
-    "backToTop": "العودة إلى أعلى الصفحة"
+    "backToTop": "العودة إلى أعلى الصفحة",
+    "pageChanged": "تم الانتقال إلى {{title}}"
   },
   "dialogs": {
     "confirmTitle": "يرجى التأكيد",

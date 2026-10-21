@@ -25,6 +25,7 @@ import { GlobalErrorBoundary } from "./components/layouts/GlobalErrorBoundary";
 import { PageMetadata } from "./components/layouts/PageMetadata";
 import { SkipToContent } from "./components/layouts/SkipToContent";
 import { BackToTop } from "./components/layouts/BackToTop";
+import { RouteAnnouncer } from "./components/layouts/RouteAnnouncer";
 
 // Only the landing page is needed for the initial public load. Browsing, auth,
 // booking, checkout and payment screens are separate chunks so a first-time
@@ -224,6 +225,7 @@ function App() {
       <BrowserRouter>
         <GlobalErrorBoundary>
           <PageMetadata />
+          <RouteAnnouncer />
           <SkipToContent />
           <BackToTop />
           <DialogProvider>
