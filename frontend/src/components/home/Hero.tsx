@@ -31,7 +31,7 @@ export const Hero: React.FC = () => {
   };
 
   return (
-    <section className="relative z-40 flex min-h-[680px] w-full flex-col justify-end overflow-hidden border-b border-slate-800 bg-[#071426] pb-8 pt-28 sm:min-h-[700px] lg:min-h-[650px] lg:pt-24">
+    <section className="relative z-40 flex min-h-[680px] w-full flex-col justify-end overflow-visible border-b border-slate-800 bg-[#071426] pb-8 pt-28 sm:min-h-[700px] lg:min-h-[650px] lg:pt-24">
       <div className="absolute inset-0 z-0 overflow-hidden">
         <AnimatePresence initial={false} mode="sync">
           <motion.div

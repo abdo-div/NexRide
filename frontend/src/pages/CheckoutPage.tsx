@@ -256,6 +256,25 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
       return;
     }
 
+    let pendingBookingId: string | null = null;
+    const releasePendingBooking = async (bookingId: string) => {
+      try {
+        await moamalatApi.release(bookingId);
+      } catch (releaseError) {
+        // Keep a second authenticated path so a transient release-endpoint
+        // failure cannot leave the vehicle blocked by an unpaid booking.
+        try {
+          await bookingApi.cancel(bookingId, "Moamalat payment was not completed");
+        } catch {
+          throw releaseError;
+        }
+      } finally {
+        // The prior idempotency key points to the now-expired booking. A retry
+        // must create a fresh pending reservation.
+        bookingAttemptKey.current = crypto.randomUUID();
+      }
+    };
+
     try {
       await loadMoamalatLightbox();
       const result = await bookingApi.create(
@@ -270,6 +289,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
       );
 
       const booking = result.data.booking;
+      pendingBookingId = booking._id;
       const init = await moamalatApi.initiate(booking._id);
       const params = init.data.gateway.params;
 
@@ -289,6 +309,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
                 { replace: true },
               );
             } else {
+              await releasePendingBooking(booking._id);
               setPhase("idle");
               setSubmitError(
                 verifyRes.data?.reason ||
@@ -298,6 +319,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
               );
             }
           } catch (err) {
+            await releasePendingBooking(booking._id).catch(() => undefined);
             setPhase("idle");
             setSubmitError(
               err instanceof Error ? err.message : "Verification request failed.",
@@ -305,25 +327,32 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
           }
         },
         onError: (gatewayError) => {
-          setPhase("idle");
-          setSubmitError(
-            getMoamalatErrorMessage(gatewayError) ||
-              t("payment.gatewayError", {
-                defaultValue:
-                  "Moamalat payment gateway error. Please try again.",
-              }),
-          );
+          setPhase("processing");
+          void releasePendingBooking(booking._id)
+            .catch(() => undefined)
+            .finally(() => {
+              setPhase("idle");
+              setSubmitError(
+                getMoamalatErrorMessage(gatewayError) ||
+                  t("payment.gatewayError", {
+                    defaultValue:
+                      "Moamalat payment gateway error. Please try again.",
+                  }),
+              );
+            });
         },
         onCancel: () => {
           setSubmitError(null);
           setPhase("processing");
-          void bookingApi
-            .cancel(booking._id)
+          void releasePendingBooking(booking._id)
             .catch(() => undefined)
             .finally(() => setPhase("idle"));
         },
       });
     } catch (err) {
+      if (pendingBookingId) {
+        await releasePendingBooking(pendingBookingId).catch(() => undefined);
+      }
       setPhase("idle");
       setSubmitError(
         err instanceof ApiError && err.status === 409

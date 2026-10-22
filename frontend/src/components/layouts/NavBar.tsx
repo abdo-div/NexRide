@@ -22,6 +22,7 @@ export const NavBar: React.FC = () => {
   const reduceMotion = useReducedMotion();
   const isHomePage = location.pathname === "/";
   const isFleetPage = location.pathname === "/fleet";
+  const isMyBookingsPage = location.pathname === "/my-bookings";
   const onDarkHero = isHomePage && !isScrolled;
 
   useEffect(() => {
@@ -122,7 +123,15 @@ export const NavBar: React.FC = () => {
             <>
               <Link
                 to="/my-bookings"
-                className="px-3.5 py-1.5 rounded-full text-slate-600 hover:text-blue-600 hover:bg-white/60 transition-all"
+                className={`px-3.5 py-2 transition-all ${onDarkHero ? "border-b-2 border-transparent" : "rounded-full"} ${
+                  isMyBookingsPage
+                    ? onDarkHero
+                      ? "border-white font-bold text-white"
+                      : "bg-white font-bold text-blue-600 shadow-xs"
+                    : onDarkHero
+                      ? "text-white/80 hover:border-white hover:text-white"
+                      : "text-slate-600 hover:bg-white/60 hover:text-blue-600"
+                }`}
               >
                 {t("nav.myBookings")}
               </Link>
@@ -131,7 +140,7 @@ export const NavBar: React.FC = () => {
         </nav>
 
         {/* Left side: Actions & CTA (Add your fleet) */}
-        <div className={`flex items-center gap-2 ${onDarkHero ? "[&_button]:text-white" : ""}`}>
+        <div className="flex items-center gap-2">
           <NavBarActions onDark={onDarkHero} />
 
           {/* Mobile Menu Hamburger */}

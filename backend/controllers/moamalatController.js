@@ -47,14 +47,17 @@ const TERMINAL_PAYMENT_FAILURES = new Set([
   "REJECTED",
   "CANCELLED",
   "CANCELED",
+  // Verification is only requested after the LightBox reports completion.
+  // At that point NOT_FOUND is a failed attempt, not an in-progress checkout.
+  // Keeping it pending is what left vehicles reserved after Moamalat displayed
+  // its misleading "Order Not Found" error page.
+  "NOT_FOUND",
 ]);
 
 /**
- * Only an explicit terminal gateway decision may retire a reservation.
- * NOT_FOUND, transport errors and mismatched/unverifiable data are ambiguous:
- * the customer may already have been charged while the gateway index or our
- * network is lagging. Those bookings remain pending for a safe verification
- * retry or the normal reservation reaper.
+ * A terminal gateway decision after the LightBox completion callback retires
+ * the unpaid reservation. Transport and signature errors remain retryable,
+ * because they do not prove that the card transaction failed.
  */
 export const shouldReleaseAfterVerification = (result) =>
   TERMINAL_PAYMENT_FAILURES.has(
@@ -160,7 +163,10 @@ export const diagnose = catchAsync(async (req, res) => {
 
     if (req.query.pay === "1") {
       const card = {
-        number: String(req.query.cardNumber || "6395043835180860"),
+        // The formerly documented ...0860 sandbox card currently returns
+        // issuer response 61 (limit exceeded). Keep diagnostics on a verified
+        // working Moamalat sandbox card so /diagnose?pay=1 remains useful.
+        number: String(req.query.cardNumber || "6395043165725698"),
         expiration: String(req.query.exp || "0127"),
         cvv: String(req.query.cvv || "123"),
         nameOnCard: "DIAGNOSTIC TEST",

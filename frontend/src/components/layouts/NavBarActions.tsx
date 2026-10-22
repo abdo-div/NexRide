@@ -55,7 +55,7 @@ export const NavBarActions: React.FC<NavBarActionsProps> = ({ onDark = false }) 
   return (
     <div className="flex items-center gap-2 sm:gap-3 shrink-0">
       {/* Language Toggle */}
-      <LanguageToggle />
+      <LanguageToggle onDark={onDark} />
 
       {/* Auth / Profile Area */}
       {isAuthenticated ? (
@@ -65,7 +65,7 @@ export const NavBarActions: React.FC<NavBarActionsProps> = ({ onDark = false }) 
             onClick={() => setIsMenuOpen((open) => !open)}
             aria-expanded={isMenuOpen}
             aria-haspopup="menu"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-slate-700 hover:text-blue-600 hover:bg-slate-100 transition-colors"
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-colors ${onDark ? "text-white hover:bg-white/10" : "text-slate-700 hover:text-blue-600 hover:bg-slate-100"}`}
           >
             <span className="relative grid h-7 w-7 shrink-0 overflow-hidden rounded-full bg-blue-600 text-[10px] font-black text-white ring-2 ring-blue-100">
               {avatar ? (

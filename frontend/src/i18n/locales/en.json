@@ -852,10 +852,30 @@
       "saveCar": "Save car"
     },
     "categories": {
+      "sport": {
+        "badge": "Performance Ready",
+        "title": "SPORT",
+        "description": "Responsive coupes and sedans made for an engaging drive."
+      },
+      "luxury": {
+        "badge": "Premium Comfort",
+        "title": "LUXURY",
+        "description": "Refined premium vehicles for executive and special journeys."
+      },
+      "pickup": {
+        "badge": "Work & Adventure",
+        "title": "PICKUP",
+        "description": "Dependable pickups with the capability for work and travel."
+      },
       "economy": {
         "badge": "5.8L / 100km",
         "title": "ECONOMY",
         "description": "Kia Cerato, Hyundai Elantra, Toyota Corolla for city transit."
+      },
+      "suv": {
+        "badge": "Space & Versatility",
+        "title": "SUV",
+        "description": "Practical crossovers and SUVs for family trips and daily driving."
       },
       "executiveSuv": {
         "badge": "Full 4WD Equipped",

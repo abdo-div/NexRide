@@ -13,7 +13,6 @@ import type { SpecItem, TrendingCar } from "../types/trendingCar";
 import type {
   VehicleCompanyRef,
   VehicleDto,
-  VehicleFuelType,
   VehicleType,
 } from "../types/vehicle";
 
@@ -36,12 +35,12 @@ export interface HomeDataState {
 // starting price are computed from the live bookable fleet; a bucket with no
 // matching vehicle reports 0/null instead of a fabricated figure.
 const BUCKET_TYPES: Record<string, VehicleType[]> = {
-  economy: ["SEDAN", "HATCHBACK"],
-  "executive-suv": ["SUV"],
-  "ultra-luxury": ["LUXURY"],
-  "desert-4x4": ["PICKUP"],
+  sport: ["SEDAN"],
+  luxury: ["LUXURY"],
+  pickup: ["PICKUP"],
+  economy: ["HATCHBACK"],
+  suv: ["SUV"],
 };
-const ELECTRIC_FUELS: VehicleFuelType[] = ["ELECTRIC", "HYBRID"];
 
 const AVATAR_BG = [
   "bg-slate-900 text-white",
@@ -51,9 +50,6 @@ const AVATAR_BG = [
 ];
 
 const inBucket = (bucketId: string, vehicle: VehicleDto): boolean => {
-  if (bucketId === "electric-hybrid") {
-    return ELECTRIC_FUELS.includes(vehicle.fuelType);
-  }
   return BUCKET_TYPES[bucketId]?.includes(vehicle.type) ?? false;
 };
 

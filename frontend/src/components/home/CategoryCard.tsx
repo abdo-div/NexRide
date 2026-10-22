@@ -23,7 +23,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, index = 0 
   const reduceMotion = useReducedMotion();
   const iconClass = "h-6 w-6 transition-colors duration-300 group-hover:text-white";
   const renderIcon = () => {
-    if (category.id === "executive-suv") {
+    if (category.id === "suv") {
       return <Jeep weight="duotone" className={iconClass} />;
     }
 
@@ -41,11 +41,11 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, index = 0 
 
   const iconTheme = "bg-slate-50 border-slate-200 text-[#142b4a]";
   const imageByCategory: Record<string, string> = {
-    economy: "/nexride-hero-coast-v3.png",
-    "executive-suv": "/nexride-hero-mountain-v5.png",
-    "ultra-luxury": "/nexride-hero-sunset-v2.png",
-    "desert-4x4": "/3carsUpdated.png",
-    "electric-hybrid": "/nexride-hero-marina-v4.png",
+    sport: "/category-sport.png",
+    luxury: "/category-luxury.png",
+    pickup: "/category-pickup.png",
+    economy: "/category-economy.png",
+    suv: "/category-suv.png",
   };
 
   return (

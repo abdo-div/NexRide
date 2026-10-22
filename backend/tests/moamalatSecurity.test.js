@@ -255,7 +255,7 @@ test("initialization rejects monetary overrides, paid bookings, and cancelled bo
   );
 });
 
-test("verification without a matching transaction stays pending for reconciliation", async (t) => {
+test("verification without a matching transaction releases the unpaid booking", async (t) => {
   withGatewayConfig(t);
   const booking = makeBooking();
   const payment = {
@@ -305,9 +305,9 @@ test("verification without a matching transaction stays pending for reconciliati
     customerRequest({ merchantReference }),
   );
   assert.equal(response.body.verified, false);
-  assert.equal(response.body.retryable, true);
+  assert.equal(response.body.retryable, false);
   assert.equal(fetchCount, 1);
-  assert.equal(booking.bookingStatus, "PENDING_PAYMENT");
+  assert.equal(booking.bookingStatus, "EXPIRED");
   assert.equal(booking.paymentStatus, "UNPAID");
 });
 

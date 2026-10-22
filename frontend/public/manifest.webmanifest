@@ -14,6 +14,12 @@
   "categories": ["travel", "transportation", "business"],
   "icons": [
     {
+      "src": "/nexride-tab-icon.png",
+      "sizes": "339x341",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "/nexride-app-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
@@ -25,13 +31,13 @@
       "name": "Browse cars",
       "short_name": "Cars",
       "url": "/fleet",
-      "icons": [{ "src": "/nexride-app-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+      "icons": [{ "src": "/nexride-tab-icon.png", "sizes": "339x341", "type": "image/png" }]
     },
     {
       "name": "Rental companies",
       "short_name": "Companies",
       "url": "/companies",
-      "icons": [{ "src": "/nexride-app-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+      "icons": [{ "src": "/nexride-tab-icon.png", "sizes": "339x341", "type": "image/png" }]
     }
   ]
 }

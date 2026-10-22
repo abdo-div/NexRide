@@ -6,9 +6,9 @@ import { Link } from "react-router";
 export const SpecialOffer: React.FC = () => {
   const { t } = useTranslation();
   return (
-    <section className="relative overflow-hidden border-b border-white/10 bg-[#061528] text-white">
-      <img src="/nexride-hero-marina-v4.png" alt="" className="absolute inset-y-0 start-0 h-full w-full object-cover opacity-35 lg:w-1/2" />
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,21,40,.2),#061528_58%)] rtl:bg-[linear-gradient(270deg,rgba(6,21,40,.2),#061528_58%)]" />
+    <section className="relative overflow-hidden border-b border-white/10 bg-[#102b49] text-white">
+      <img src="/nexride-hero-marina-v4.png" alt="" className="absolute inset-y-0 start-0 h-full w-full object-cover opacity-60 lg:w-1/2" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(16,43,73,.08),#102b49_58%)] rtl:bg-[linear-gradient(270deg,rgba(16,43,73,.08),#102b49_58%)]" />
       <div className="relative mx-auto grid min-h-64 max-w-7xl items-center px-6 py-10 lg:grid-cols-2 lg:px-12">
         <div className="hidden lg:block" />
         <div>

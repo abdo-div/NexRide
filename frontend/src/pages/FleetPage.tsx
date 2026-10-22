@@ -103,16 +103,16 @@ export const FleetPage: React.FC = () => {
       : filteredVehicles;
     const scoped = companyScoped.filter((vehicle) => {
       switch (categoryParam) {
+        case "sport":
+          return vehicle.vehicleType === "SEDAN";
         case "economy":
-          return ["SEDAN", "HATCHBACK"].includes(vehicle.vehicleType);
-        case "executive-suv":
+          return vehicle.vehicleType === "HATCHBACK";
+        case "suv":
           return vehicle.vehicleType === "SUV";
-        case "ultra-luxury":
+        case "luxury":
           return vehicle.vehicleType === "LUXURY";
-        case "desert-4x4":
+        case "pickup":
           return vehicle.vehicleType === "PICKUP";
-        case "electric-hybrid":
-          return ["ELECTRIC", "HYBRID"].includes(vehicle.fuelType);
         default:
           return true;
       }
@@ -170,11 +170,11 @@ export const FleetPage: React.FC = () => {
 
   if (categoryParam) {
     const categoryKey: Record<string, string> = {
+      sport: "data.categories.sport.title",
+      luxury: "data.categories.luxury.title",
+      pickup: "data.categories.pickup.title",
       economy: "data.categories.economy.title",
-      "executive-suv": "data.categories.executiveSuv.title",
-      "ultra-luxury": "data.categories.ultraLuxury.title",
-      "desert-4x4": "data.categories.desert4x4.title",
-      "electric-hybrid": "data.categories.electricHybrid.title",
+      suv: "data.categories.suv.title",
     };
     tokenRows.push({
       label: t(categoryKey[categoryParam] ?? "fleet.params.allCategories"),

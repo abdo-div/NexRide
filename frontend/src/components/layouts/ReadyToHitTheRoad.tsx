@@ -10,9 +10,10 @@ export const ReadyToHitTheRoad: React.FC = () => {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section className="relative overflow-hidden border-b border-slate-900 bg-[#071426] px-6 py-10 text-start lg:px-12">
-      <img src="/3carsUpdated.png" alt="" className="absolute inset-0 h-full w-full object-cover object-[55%_58%] opacity-30" />
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(3,12,25,.98),rgba(3,12,25,.76),rgba(3,12,25,.94))]" />
+    <section className="relative overflow-hidden border-b border-slate-700 bg-[#102b49] px-6 py-10 text-start lg:px-12">
+      <img src="/partner-section-background.png" alt="" className="absolute inset-0 h-full w-full object-cover object-[50%_58%]" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,30,56,.80),rgba(10,55,98,.52),rgba(7,29,55,.76))]" />
+      <div className="absolute inset-0 bg-blue-700/10 mix-blend-color" />
 
       <motion.div
         initial={{ opacity: 0, y: 25 }}
