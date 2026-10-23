@@ -25,8 +25,10 @@ export const NavBarActions: React.FC<NavBarActionsProps> = ({ onDark = false }) 
   const menuRef = useRef<HTMLDivElement>(null);
   const isCustomer = user?.role?.trim() === "customer";
   const isCompany = user?.role?.trim() === "company";
-  const displayName = companyIdentity?.name || user?.name || "NexRide";
-  const displayEmail = companyIdentity?.email || user?.email || "";
+  const displayName =
+    (isCompany ? companyIdentity?.name : null) || user?.name || "NexRide";
+  const displayEmail =
+    (isCompany ? companyIdentity?.email : null) || user?.email || "";
   const avatar = isCompany
     ? companyLogoUrl(companyIdentity?.logo) ?? ""
     : userPhotoUrl(user?.photo);
@@ -39,10 +41,7 @@ export const NavBarActions: React.FC<NavBarActionsProps> = ({ onDark = false }) 
     .toUpperCase();
 
   useEffect(() => {
-    if (!isCompany) {
-      setCompanyIdentity(null);
-      return;
-    }
+    if (!isCompany) return;
 
     const controller = new AbortController();
     const refreshCompanyIdentity = () => {

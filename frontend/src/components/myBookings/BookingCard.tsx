@@ -444,7 +444,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
                 </div>
                 <button
                   type="button"
-                  onClick={() => onToast(t("myBookings.modifyInfo"))}
+                  onClick={openDetails}
                   className="py-1 text-center text-[11px] font-medium text-[#64748B] hover:text-[#142B4A] transition-colors cursor-pointer"
                 >
                   {t("myBookings.actions.modifyRequest")}
@@ -456,7 +456,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
               <>
                 <button
                   type="button"
-                  onClick={() => onToast(t("myBookings.modifyInfo"))}
+                  onClick={openDetails}
                   className="w-full py-2 px-4 bg-[#0F172A] hover:bg-[#1E293B] text-white text-sm font-bold rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer"
                 >
                   <PencilLine className="w-4 h-4" />

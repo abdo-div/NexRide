@@ -6,6 +6,7 @@ import {
   getMyBookings,
   getCompanyBookings,
   cancelBooking,
+  modifyBooking,
   updateBookingStatus,
   checkVehicleAvailability,
   downloadBookingInvoice,
@@ -22,6 +23,7 @@ import {
   createBookingSchema,
   checkAvailabilitySchema,
   cancelBookingSchema,
+  modifyBookingSchema,
   updateBookingStatusSchema,
 } from "../validations/booking.validation.js";
 
@@ -241,6 +243,35 @@ router.get(
   validate(idParamSchema()),
   verifyTenantAccess("Booking"),
   downloadBookingInvoice,
+);
+
+/**
+ * @openapi
+ * /bookings/{id}/modify:
+ *   patch:
+ *     tags: [Bookings]
+ *     summary: Modify an unpaid customer reservation
+ *     description: Rechecks availability and recalculates the price server-side.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Reservation updated
+ *       403:
+ *         description: Tenant access denied
+ *       409:
+ *         description: Date collision or booking already paid
+ */
+router.patch(
+  "/:id/modify",
+  restrictTo("customer"),
+  validate(modifyBookingSchema),
+  verifyTenantAccess("Booking"),
+  modifyBooking,
 );
 
 /**

@@ -46,6 +46,27 @@ export const cancelBookingSchema = z.object({
     .default({}),
 });
 
+export const modifyBookingSchema = z.object({
+  params: z.object({ id: objectId }),
+  body: z
+    .object({
+      startDate: isoDate,
+      endDate: isoDate,
+      pickupLocation: z.string().trim().min(1).max(300),
+      pickupMethod: ciEnum(["BRANCH_PICKUP", "DELIVERY"]),
+      addonIds: z
+        .array(z.enum(["insurance", "driver", "childseat", "delivery"]))
+        .max(4)
+        .default([]),
+    })
+    .strict()
+    .refine(dateRangeIsValid, dateRangeError)
+    .refine((data) => new Date(data.startDate) > new Date(), {
+      message: "Pickup date must be in the future",
+      path: ["startDate"],
+    }),
+});
+
 export const updateBookingStatusSchema = z.object({
   params: z.object({ id: objectId }),
   body: z.object({

@@ -16,6 +16,7 @@ import { ChecklistCard } from "../components/bookingDetails/ChecklistCard";
 import { ConciergeCard } from "../components/bookingDetails/ConciergeCard";
 import { BookingReviewCard } from "../components/bookingDetails/BookingReviewCard";
 import { useDialog } from "../context/useDialog";
+import { BookingModificationDialog } from "../components/bookingDetails/BookingModificationDialog";
 
 const TOAST_MS = 3000;
 
@@ -29,6 +30,7 @@ export const BookingDetailsPage: React.FC = () => {
   const [loadFailed, setLoadFailed] = useState(false);
   const [downloadBusy, setDownloadBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [modifyOpen, setModifyOpen] = useState(false);
 
   const showToast = useCallback((message: string) => {
     setToast(message);
@@ -108,7 +110,15 @@ export const BookingDetailsPage: React.FC = () => {
   };
 
   const handleModify = () => {
-    showToast(t("bookingDetails.modifyInfo"));
+    if (!booking) return;
+    if (
+      booking.bookingStatus !== "PENDING_PAYMENT" ||
+      booking.paymentStatus !== "UNPAID"
+    ) {
+      showToast(t("bookingModification.paidLocked"));
+      return;
+    }
+    setModifyOpen(true);
   };
 
   const handleCancel = async () => {
@@ -128,6 +138,17 @@ export const BookingDetailsPage: React.FC = () => {
 
   return (
     <div className="bg-[#F8FAFC] min-h-screen">
+      {modifyOpen && booking && (
+        <BookingModificationDialog
+          booking={booking}
+          onClose={() => setModifyOpen(false)}
+          onSaved={(updated) => {
+            setBooking(updated);
+            setModifyOpen(false);
+            showToast(t("bookingModification.success"));
+          }}
+        />
+      )}
       <div className="max-w-[1360px] mx-auto px-4 lg:px-8 pt-24 md:pt-28 pb-8 md:pb-12 flex flex-col gap-6">
         {loading ? (
           <section className="flex flex-col gap-4">

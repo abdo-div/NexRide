@@ -303,7 +303,7 @@
     "invoiceUnavailable": "The invoice becomes available once the booking is fully paid.",
     "downloadError": "Could not download the document right now.",
     "gpsInfo": "Live GPS tracking becomes available when your rental turns active.",
-    "modifyInfo": "A VIP concierge agent will reach out shortly to adjust your trip.",
+    "modifyInfo": "Open the booking details to change an unpaid reservation.",
     "currency": "LYD",
     "vipAvailability": "Available 24/7 all week",
     "vipTitle": "Need a hand with your trip?",
@@ -311,6 +311,30 @@
     "callConcierge": "Call Concierge",
     "whatsappCta": "Instant VIP WhatsApp Chat",
     "vipPhone": "+218 21 444-6397"
+  },
+  "bookingModification": {
+    "title": "Modify reservation",
+    "unpaidNote": "Availability and the final price will be recalculated securely before payment.",
+    "paidLocked": "This booking is already paid. Contact support to change it without risking your payment.",
+    "pickupDate": "Pickup date and time",
+    "returnDate": "Return date and time",
+    "location": "Pickup location",
+    "method": "Pickup method",
+    "branchPickup": "Pick up at branch",
+    "delivery": "Deliver the vehicle",
+    "addons": "Extras",
+    "addon": {
+      "insurance": "Insurance",
+      "driver": "Driver",
+      "childseat": "Child seat",
+      "delivery": "Delivery"
+    },
+    "close": "Close",
+    "cancel": "Keep current details",
+    "save": "Check availability and save",
+    "saving": "Checking…",
+    "success": "Reservation updated and price recalculated.",
+    "genericError": "We could not update this reservation. Please try again."
   },
   "bookingDetails": {
     "breadcrumbHome": "Home",

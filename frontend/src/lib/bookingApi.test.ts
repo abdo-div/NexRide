@@ -67,3 +67,27 @@ describe("bookingApi.create", () => {
     });
   });
 });
+
+describe("bookingApi.modify", () => {
+  it("sends only itinerary fields to the customer modification endpoint", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({ status: "success", data: { booking: { _id: "booking-id" } } }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+    const payload = {
+      startDate: "2027-01-10T10:00:00.000Z",
+      endDate: "2027-01-13T10:00:00.000Z",
+      pickupLocation: "Tripoli Airport",
+      pickupMethod: "DELIVERY" as const,
+      addonIds: ["insurance" as const],
+    };
+
+    await bookingApi.modify("booking-id", payload);
+
+    const [url, options] = fetchMock.mock.calls[0];
+    expect(url).toBe("/api/v1/bookings/booking-id/modify");
+    expect(options).toMatchObject({ method: "PATCH", body: JSON.stringify(payload) });
+  });
+});

@@ -130,6 +130,97 @@ export const checkAvailability = async (vehicleId, startDate, endDate) => {
 };
 
 /**
+ * Changes an unpaid reservation while preserving the same booking/payment
+ * identities. Paid reservations deliberately remain immutable here: Moamalat
+ * does not currently expose a trusted adjustment/refund API, so changing a
+ * paid total would make the booking ledger disagree with money actually moved.
+ */
+export const modifyUnpaidCustomerBooking = async (
+  bookingId,
+  customerId,
+  changes,
+) => {
+  const session = await mongoose.startSession();
+  let updatedBooking;
+
+  try {
+    await session.withTransaction(async () => {
+      const booking = await Booking.findById(bookingId).session(session);
+      if (!booking) throw new AppError("Booking not found", 404);
+
+      const ownerId = booking.customerId?._id ?? booking.customerId;
+      if (!ownerId || ownerId.toString() !== customerId.toString()) {
+        throw new AppError("You can only modify your own booking.", 403);
+      }
+
+      if (
+        booking.bookingStatus !== "PENDING_PAYMENT" ||
+        booking.paymentStatus !== "UNPAID"
+      ) {
+        throw new AppError(
+          "Paid or confirmed bookings cannot be changed online. Contact support to arrange a safe payment adjustment.",
+          409,
+        );
+      }
+
+      const start = new Date(changes.startDate);
+      const end = new Date(changes.endDate);
+      const vehicleId = booking.vehicleId?._id ?? booking.vehicleId;
+
+      const claimedVehicle = await Vehicle.findOneAndUpdate(
+        {
+          _id: vehicleId,
+          listingStatus: "PUBLISHED",
+          operationalStatus: "AVAILABLE",
+        },
+        { $set: { updatedAt: new Date() } },
+        { session, new: true },
+      );
+      if (!claimedVehicle) {
+        throw new AppError("Vehicle is no longer available for rental.", 409);
+      }
+
+      const collision = await Booking.findOne({
+        _id: { $ne: booking._id },
+        vehicleId,
+        bookingStatus: { $in: DATE_BLOCKING_BOOKING_STATUSES },
+        $or: buildDateOverlapFilter(start, end),
+      }).session(session);
+      if (collision) {
+        throw new AppError("Vehicle is already booked during these dates.", 409);
+      }
+
+      booking.startDate = start;
+      booking.endDate = end;
+      booking.pickupLocation = changes.pickupLocation;
+      booking.pickupMethod = changes.pickupMethod;
+      booking.addonIds = changes.addonIds ?? [];
+      booking.paymentSessionExpiresAt = null;
+      await booking.save({ session });
+
+      // Keep an existing cash/Moamalat intent aligned with the authoritative
+      // server-recalculated booking total. Payment's save hook recomputes its
+      // commission split; no client-supplied price is ever accepted.
+      const pendingPayment = await Payment.findOne({
+        bookingId: booking._id,
+        status: "PENDING",
+      }).session(session);
+      if (pendingPayment) {
+        pendingPayment.amount = booking.totalAmount;
+        pendingPayment.merchantReference = undefined;
+        await pendingPayment.save({ session });
+      }
+
+      updatedBooking = booking;
+    });
+  } finally {
+    await session.endSession();
+  }
+
+  return updatedBooking;
+};
+
+/**
  * Touching the row inside the transaction provides a write-conflict mutex
  * without overloading operationalStatus with a temporary reservation state.
  */

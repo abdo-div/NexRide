@@ -40,6 +40,14 @@ export interface CreateBookingPayload {
   addonIds?: Array<"insurance" | "driver" | "childseat" | "delivery">;
 }
 
+export interface ModifyBookingPayload {
+  startDate: string;
+  endDate: string;
+  pickupLocation: string;
+  pickupMethod: "BRANCH_PICKUP" | "DELIVERY";
+  addonIds: Array<"insurance" | "driver" | "childseat" | "delivery">;
+}
+
 /**
  * Booking API surface used by the checkout flow. The availability check is
  * public (same data the fleet search derives), while create/get require the
@@ -94,6 +102,12 @@ export const bookingApi = {
     request<BookingResponse>(`/bookings/${encodeURIComponent(id)}/cancel`, {
       method: "PATCH",
       body: reason ? { reason } : {},
+    }),
+
+  modify: (id: string, payload: ModifyBookingPayload): Promise<BookingResponse> =>
+    request<BookingResponse>(`/bookings/${encodeURIComponent(id)}/modify`, {
+      method: "PATCH",
+      body: payload,
     }),
 
   /**
