@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Building2, CheckCircle2, LockKeyhole, MessageSquareText, Send, Star } from "lucide-react";
+import { Building2, CheckCircle2, LockKeyhole, MessageSquareText, Pencil, Send, Star, Trash2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { vehicleApi, type ReviewEligibility } from "../../lib/vehicleApi";
 import type { BookingDto } from "../../types/booking";
+import { useDialog } from "../../context/useDialog";
 
 const idOf = (value: BookingDto["vehicleId"]) =>
   typeof value === "string" ? value : value._id;
@@ -12,6 +13,7 @@ export const BookingReviewCard: React.FC<{
   onNotice: (message: string) => void;
 }> = ({ booking, onNotice }) => {
   const { t, i18n } = useTranslation();
+  const { confirm: confirmDialog } = useDialog();
   const vehicleId = idOf(booking.vehicleId);
   const [state, setState] = useState<ReviewEligibility | null>(null);
   const [rating, setRating] = useState(0);
@@ -19,6 +21,7 @@ export const BookingReviewCard: React.FC<{
   const [review, setReview] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     if (booking.bookingStatus !== "COMPLETED") {
@@ -27,7 +30,14 @@ export const BookingReviewCard: React.FC<{
     const controller = new AbortController();
     vehicleApi
       .reviewEligibility(vehicleId, booking._id, controller.signal)
-      .then((response) => setState(response.data.eligibility))
+      .then((response) => {
+        const eligibility = response.data.eligibility;
+        setState(eligibility);
+        if (eligibility.review) {
+          setRating(eligibility.review.rating);
+          setReview(eligibility.review.review);
+        }
+      })
       .catch(() => setError(t("bookingDetails.review.loadError")));
     return () => controller.abort();
   }, [booking._id, booking.bookingStatus, t, vehicleId]);
@@ -43,18 +53,39 @@ export const BookingReviewCard: React.FC<{
     setSaving(true);
     setError("");
     try {
-      const response = await vehicleApi.createReview(vehicleId, rating, review.trim());
+      const response = state?.reviewed && state.review
+        ? await vehicleApi.updateReview(vehicleId, state.review._id, rating, review.trim())
+        : await vehicleApi.createReview(vehicleId, booking._id, rating, review.trim());
       setState((current) =>
         current
           ? { ...current, eligible: false, reviewed: true, review: response.data.review }
           : current,
       );
-      onNotice(t("bookingDetails.review.success"));
+      setEditing(false);
+      onNotice(t(state?.reviewed ? "bookingDetails.review.updateSuccess" : "bookingDetails.review.success"));
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : t("bookingDetails.review.error"));
     } finally {
       setSaving(false);
     }
+  };
+
+  const remove = async () => {
+    if (!state?.review) return;
+    const confirmed = await confirmDialog(t("bookingDetails.review.deleteConfirm"), { tone: "danger", confirmLabel: t("bookingDetails.review.delete") });
+    if (!confirmed) return;
+    setSaving(true);
+    setError("");
+    try {
+      await vehicleApi.deleteReview(vehicleId, state.review._id);
+      setState((current) => current ? { ...current, eligible: true, reviewed: false, review: null } : current);
+      setRating(0);
+      setReview("");
+      setEditing(false);
+      onNotice(t("bookingDetails.review.deleteSuccess"));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : t("bookingDetails.review.deleteError"));
+    } finally { setSaving(false); }
   };
 
   return (
@@ -90,7 +121,7 @@ export const BookingReviewCard: React.FC<{
           </div>
         ) : loading ? (
           <div className="h-32 animate-pulse rounded-xl bg-slate-100" />
-        ) : state?.reviewed ? (
+        ) : state?.reviewed && !editing ? (
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
             <div className="flex items-center gap-2 text-sm font-extrabold text-emerald-800">
               <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
@@ -108,6 +139,7 @@ export const BookingReviewCard: React.FC<{
             <p className="mt-3 text-xs font-semibold text-emerald-700">
               {t("bookingDetails.review.visible")}
             </p>
+            <div className="mt-4 flex flex-wrap gap-2"><button type="button" onClick={() => setEditing(true)} className="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-white px-4 py-2 text-xs font-bold text-blue-700"><Pencil className="h-4 w-4" />{t("bookingDetails.review.edit")}</button><button type="button" disabled={saving} onClick={() => void remove()} className="inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-white px-4 py-2 text-xs font-bold text-rose-600"><Trash2 className="h-4 w-4" />{t("bookingDetails.review.delete")}</button></div>
             {state.review?.companyResponse?.response ? (
               <div className="mt-5 rounded-2xl border border-blue-200 bg-white p-4 shadow-sm">
                 <div className="flex items-center gap-2 text-sm font-extrabold text-[#142B4A]">
@@ -135,7 +167,7 @@ export const BookingReviewCard: React.FC<{
               </p>
             )}
           </div>
-        ) : state?.eligible ? (
+        ) : state?.eligible || editing ? (
           <>
             <fieldset>
               <legend className="text-sm font-bold text-slate-900">
@@ -201,8 +233,9 @@ export const BookingReviewCard: React.FC<{
               className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#142B4A] px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#0D2039] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0"
             >
               <Send className="h-4 w-4" aria-hidden="true" />
-              {saving ? t("bookingDetails.review.saving") : t("bookingDetails.review.submit")}
+              {saving ? t("bookingDetails.review.saving") : t(editing ? "bookingDetails.review.saveChanges" : "bookingDetails.review.submit")}
             </button>
+            {editing && <button type="button" disabled={saving} onClick={() => { setEditing(false); setRating(state?.review?.rating ?? 0); setReview(state?.review?.review ?? ""); setError(""); }} className="mt-5 ms-2 inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-600"><X className="h-4 w-4" />{t("common.cancel")}</button>}
           </>
         ) : (
           <p className="text-sm font-medium text-slate-600">

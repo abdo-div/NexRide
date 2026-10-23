@@ -98,12 +98,21 @@ export const vehicleApi = {
       { signal },
     ),
 
-  createReview: (vehicleId: string, rating: number, review: string) =>
+  createReview: (vehicleId: string, bookingId: string, rating: number, review: string) =>
     request<{ status: string; data: { review: VehicleReviewDto } }>(
       `/vehicles/${encodeURIComponent(vehicleId)}/reviews`,
       {
         method: "POST",
-        body: { rating, review },
+        body: { bookingId, rating, review },
       },
     ),
+
+  updateReview: (vehicleId: string, reviewId: string, rating: number, review: string) =>
+    request<{ status: string; data: { review: VehicleReviewDto } }>(
+      `/vehicles/${encodeURIComponent(vehicleId)}/reviews/${encodeURIComponent(reviewId)}`,
+      { method: "PATCH", body: { rating, review } },
+    ),
+
+  deleteReview: (vehicleId: string, reviewId: string) =>
+    request<void>(`/vehicles/${encodeURIComponent(vehicleId)}/reviews/${encodeURIComponent(reviewId)}`, { method: "DELETE" }),
 };
