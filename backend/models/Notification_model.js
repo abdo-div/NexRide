@@ -20,6 +20,7 @@ const notificationSchema = new mongoose.Schema(
       enum: [
         "BOOKING_CREATED",
         "PAYMENT_COMPLETED",
+        "SUPPORT_REPLY",
         "PAYMENT_FAILED",
         "BOOKING_CONFIRMED",
         "BOOKING_CHANGED",

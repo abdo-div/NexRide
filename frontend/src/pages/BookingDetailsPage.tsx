@@ -209,7 +209,7 @@ export const BookingDetailsPage: React.FC = () => {
                 <GatePassCard booking={booking} />
                 <FinancialCard booking={booking} />
                 <ChecklistCard />
-                <ConciergeCard />
+                <ConciergeCard bookingId={booking._id} />
               </div>
             </div>
           </>

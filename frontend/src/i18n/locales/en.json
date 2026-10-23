@@ -369,6 +369,39 @@
     "done": "The refund has been completed.",
     "failed": "The refund needs attention. Please contact support with your booking code."
   },
+  "bookingSupport": {
+    "title": "Support for this booking",
+    "subtitle": "Your booking reference is attached automatically, so the team has the right context.",
+    "close": "Close",
+    "new": "New request",
+    "category": "Issue category",
+    "subject": "Subject",
+    "message": "How can we help?",
+    "reply": "Reply",
+    "urgent": "Urgent: pickup is within 24 hours or the vehicle is currently unsafe",
+    "create": "Create request",
+    "send": "Send reply",
+    "closeRequest": "Close request",
+    "you": "You",
+    "team": "NexRide support",
+    "error": "The support request could not be updated. Please try again.",
+    "firstResponse": "The team will reply here and notify you when a response arrives.",
+    "categories": {
+      "BOOKING_CHANGE": "Change my booking",
+      "PAYMENT": "Payment problem",
+      "PICKUP_RETURN": "Pickup or return",
+      "VEHICLE": "Vehicle issue",
+      "REFUND": "Refund",
+      "OTHER": "Other"
+    },
+    "status": {
+      "OPEN": "Open",
+      "WAITING_FOR_CUSTOMER": "Waiting for you",
+      "IN_PROGRESS": "In progress",
+      "RESOLVED": "Resolved",
+      "CLOSED": "Closed"
+    }
+  },
   "bookingDetails": {
     "breadcrumbHome": "Home",
     "breadcrumbList": "My Bookings",
@@ -510,6 +543,7 @@
       "name": "NexRide Tripoli Concierge Team",
       "role": "Executive Mitiga station coordinators",
       "body": "Available at the VIP lounge to ensure a smooth trip and handle official & logistics formalities.",
+      "openRequest": "Open booking support request",
       "call": "Direct call",
       "whatsapp": "WhatsApp"
     },
