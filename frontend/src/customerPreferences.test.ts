@@ -12,7 +12,8 @@ describe("saved customer preferences journey", () => {
   it("applies account defaults to fleet discovery", () => {
     const fleet = source("./pages/FleetPage.tsx");
     expect(fleet).toContain("preferences.preferredCity");
-    expect(fleet).toContain("preferences.vehicleTypes.join");
+    expect(fleet).toContain("preferences.vehicleTypes");
+    expect(fleet).toContain('searchTypes.join(",")');
     expect(fleet).toContain("preferences.transmission");
     expect(fleet).toContain("preferences.fuelType");
   });

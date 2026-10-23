@@ -59,6 +59,7 @@ const BookingDetailsPage = lazy(() => import("./pages/BookingDetailsPage"));
 const SavedVehiclesPage = lazy(() => import("./pages/SavedVehiclesPage"));
 const VehicleComparisonPage = lazy(() => import("./pages/VehicleComparisonPage"));
 const CustomerPreferencesPage = lazy(() => import("./pages/CustomerPreferencesPage"));
+const SavedSearchesPage = lazy(() => import("./pages/SavedSearchesPage"));
 const AdminOverviewPage = lazy(() =>
   import("./pages/admin/AdminOverviewPage").then((module) => ({
     default: module.AdminOverviewPage,
@@ -414,6 +415,7 @@ function App() {
             />
             <Route path="/compare" element={<LazyRoute><VehicleComparisonPage /></LazyRoute>} />
             <Route path="/preferences" element={<ProtectedRoute><LazyRoute><CustomerPreferencesPage /></LazyRoute></ProtectedRoute>} />
+            <Route path="/saved-searches" element={<ProtectedRoute><LazyRoute><SavedSearchesPage /></LazyRoute></ProtectedRoute>} />
             <Route
               path="/my-bookings/:bookingId"
               element={

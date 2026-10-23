@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams, useNavigate } from "react-router";
+import { useSearchParams, useNavigate, useLocation } from "react-router";
 import { Car, ShieldCheck, ChevronLeft, ChevronRight, AlertTriangle, SlidersHorizontal, X, Sparkles, Headphones, BadgeCheck } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVehicles } from "../hooks/useVehicles";
@@ -17,6 +17,10 @@ import {
   SEGMENTS,
 } from "../data/vehicleData";
 import { useCustomerPreferences } from "../context/useCustomerPreferences";
+import { useAuth } from "../context/useAuth";
+import { useToast } from "../context/toastContextValue";
+import { savedSearchApi } from "../lib/savedSearchApi";
+import type { VehicleType } from "../types/vehicle";
 
 const SKELETON_KEYS = ["a", "b", "c", "d", "e", "f"];
 
@@ -36,7 +40,10 @@ export const FleetPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const routeLocation = useLocation();
   const { preferences } = useCustomerPreferences();
+  const { user } = useAuth();
+  const { showToast } = useToast();
 
   // Location + dates chosen in the home search console. Passed straight to the
   // backend so availability is evaluated server-side against the booking
@@ -46,13 +53,20 @@ export const FleetPage: React.FC = () => {
   const searchEnd = searchParams.get("endDate") ?? "";
   const companyParam = searchParams.get("company") ?? "";
   const categoryParam = searchParams.get("category") ?? "";
+  const explicitTypes = searchParams.get("type")?.split(",").filter(Boolean) as VehicleType[] | undefined;
+  const categoryType: Record<string, VehicleType> = { sport: "SEDAN", economy: "HATCHBACK", suv: "SUV", luxury: "LUXURY", pickup: "PICKUP" };
+  const searchTypes = explicitTypes?.length ? explicitTypes : categoryParam && categoryType[categoryParam] ? [categoryType[categoryParam]] : preferences.vehicleTypes;
+  const searchTransmission = searchParams.get("transmission") ?? (preferences.transmission === "ANY" ? "" : preferences.transmission);
+  const searchFuelType = searchParams.get("fuelType") ?? (preferences.fuelType === "ANY" ? "" : preferences.fuelType);
+  const searchMaxPrice = searchParams.get("maxPrice");
   const hasSearch = Boolean(searchLocation || searchStart || searchEnd);
 
   const { vehicles: dtoVehicles, loading, error, reload } = useVehicles({
     location: searchLocation || undefined,
-    type: !categoryParam && preferences.vehicleTypes.length > 0 ? preferences.vehicleTypes.join(",") : undefined,
-    transmission: preferences.transmission === "ANY" ? undefined : preferences.transmission,
-    fuelType: preferences.fuelType === "ANY" ? undefined : preferences.fuelType,
+    type: searchTypes.length > 0 ? searchTypes.join(",") : undefined,
+    transmission: searchTransmission || undefined,
+    fuelType: searchFuelType || undefined,
+    maxPrice: searchMaxPrice ? Number(searchMaxPrice) : undefined,
     startDate: searchStart || undefined,
     endDate: searchEnd || undefined,
   });
@@ -77,6 +91,43 @@ export const FleetPage: React.FC = () => {
 
   const [sort, setSort] = useState("recommended");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [saveSearchOpen, setSaveSearchOpen] = useState(false);
+  const [searchName, setSearchName] = useState("");
+  const [searchAlerts, setSearchAlerts] = useState(true);
+  const [savingSearch, setSavingSearch] = useState(false);
+
+  const openSaveSearch = () => {
+    if (user?.role?.trim() !== "customer") {
+      navigate("/login", { state: { from: `${routeLocation.pathname}${routeLocation.search}` } });
+      return;
+    }
+    setSearchName(t("savedSearches.defaultName", { location: searchLocation || t("savedSearches.allLocations") }));
+    setSaveSearchOpen(true);
+  };
+
+  const saveCurrentSearch = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSavingSearch(true);
+    try {
+      await savedSearchApi.create({
+        name: searchName.trim(),
+        alertsEnabled: searchAlerts,
+        criteria: {
+          location: searchLocation,
+          type: searchTypes,
+          transmission: searchTransmission as "" | "MANUAL" | "AUTOMATIC",
+          fuelType: searchFuelType as "" | "GASOLINE" | "DIESEL" | "ELECTRIC" | "HYBRID",
+          maxPrice: filters.maxPrice < filters.priceMax ? filters.maxPrice : (searchMaxPrice ? Number(searchMaxPrice) : null),
+          startDate: searchStart || null,
+          endDate: searchEnd || null,
+        },
+      });
+      setSaveSearchOpen(false);
+      showToast({ tone: "success", title: t("savedSearches.savedTitle"), description: t("savedSearches.savedDescription") });
+    } catch (error) {
+      showToast({ tone: "error", title: t("savedSearches.errorTitle"), description: error instanceof Error ? error.message : t("savedSearches.errorDescription") });
+    } finally { setSavingSearch(false); }
+  };
 
   // A single sidebar location selection is pushed back into the URL `location`
   // param so the search API applies real booking availability server-side. The
@@ -341,6 +392,7 @@ export const FleetPage: React.FC = () => {
           filters.setSegment(segId);
         }}
         segmentCounts={segmentCounts}
+        onSaveSearch={openSaveSearch}
         onOpenFilters={() => {
           if (window.matchMedia("(max-width: 1023px)").matches) {
             setMobileFiltersOpen(true);
@@ -646,6 +698,16 @@ export const FleetPage: React.FC = () => {
       </div>
 
       <AnimatePresence>
+        {saveSearchOpen && (
+          <motion.div className="fixed inset-0 z-[80] grid place-items-center bg-slate-950/55 p-4 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSaveSearchOpen(false)}>
+            <motion.form onSubmit={saveCurrentSearch} role="dialog" aria-modal="true" aria-labelledby="save-search-title" initial={{ opacity: 0, y: 18, scale: .98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12, scale: .98 }} onClick={(event) => event.stopPropagation()} className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+              <div className="flex items-start justify-between gap-4"><div><h2 id="save-search-title" className="text-xl font-black text-slate-950">{t("savedSearches.dialogTitle")}</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("savedSearches.dialogDescription")}</p></div><button type="button" onClick={() => setSaveSearchOpen(false)} aria-label={t("common.close")} className="rounded-full bg-slate-100 p-2 text-slate-600"><X className="h-4 w-4" /></button></div>
+              <label className="mt-5 block text-sm font-bold text-slate-700">{t("savedSearches.name")}<input required maxLength={80} value={searchName} onChange={(event) => setSearchName(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" /></label>
+              <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50 p-4"><input type="checkbox" checked={searchAlerts} onChange={(event) => setSearchAlerts(event.target.checked)} className="mt-1 h-4 w-4 accent-blue-600" /><span><strong className="block text-sm text-slate-900">{t("savedSearches.alertLabel")}</strong><span className="mt-1 block text-xs leading-5 text-slate-600">{t("savedSearches.alertHint")}</span></span></label>
+              <div className="mt-6 flex gap-3"><button type="button" onClick={() => setSaveSearchOpen(false)} className="flex-1 rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700">{t("common.cancel")}</button><button disabled={savingSearch || !searchName.trim()} type="submit" className="flex-1 rounded-xl bg-blue-600 px-4 py-3 text-sm font-black text-white disabled:opacity-60">{savingSearch ? t("savedSearches.saving") : t("savedSearches.save")}</button></div>
+            </motion.form>
+          </motion.div>
+        )}
         {mobileFiltersOpen && (
           <motion.div
             className="fixed inset-0 z-[70] flex items-end bg-slate-950/45 p-0 backdrop-blur-sm lg:hidden"

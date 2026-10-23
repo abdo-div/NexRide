@@ -27,6 +27,7 @@ const notificationSchema = new mongoose.Schema(
         "BOOKING_CANCELLED",
         "PICKUP_REMINDER",
         "RETURN_REMINDER",
+        "SAVED_SEARCH_MATCH",
       ],
     },
     title: { type: String, required: true, trim: true, maxlength: 160 },

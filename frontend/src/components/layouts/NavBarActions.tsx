@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Heart, LayoutDashboard, LogOut, Settings2, UserRound, Zap } from "lucide-react";
+import { BellRing, Heart, LayoutDashboard, LogOut, Settings2, UserRound, Zap } from "lucide-react";
 import { LanguageToggle } from "./LanguageToggle";
 import { useAuth } from "../../context/useAuth";
 import { userPhotoUrl } from "../../lib/customerView";
@@ -189,6 +189,15 @@ export const NavBarActions: React.FC<NavBarActionsProps> = ({ onDark = false }) 
                   >
                     <Settings2 className="w-4 h-4 text-blue-600" />
                     <span>{t("nav.preferences")}</span>
+                  </Link>
+                  <Link
+                    to="/saved-searches"
+                    role="menuitem"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-slate-800 hover:bg-slate-50 hover:text-blue-600 transition-colors"
+                  >
+                    <BellRing className="w-4 h-4 text-blue-600" />
+                    <span>{t("nav.savedSearches")}</span>
                   </Link>
                 </>
               )}

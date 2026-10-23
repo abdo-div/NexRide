@@ -16,6 +16,7 @@ export const createCustomerNotification = async ({
   message,
   dedupeKey,
   sendEmail = true,
+  actionUrl = null,
 }) => {
   let notification;
   try {
@@ -25,7 +26,7 @@ export const createCustomerNotification = async ({
       type,
       title,
       message,
-      actionUrl: bookingId ? bookingUrl(bookingId) : "/my-bookings",
+      actionUrl: actionUrl ?? (bookingId ? bookingUrl(bookingId) : "/my-bookings"),
       dedupeKey,
       emailStatus: sendEmail ? "PENDING" : "NOT_REQUESTED",
     });

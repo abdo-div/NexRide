@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { MapPin, Calendar, SlidersHorizontal, Search } from "lucide-react";
+import { MapPin, Calendar, SlidersHorizontal, Search, BookmarkPlus } from "lucide-react";
 import { SEGMENTS } from "../../data/vehicleData";
 
 export interface ParamPill {
@@ -16,6 +16,7 @@ interface CommandBarProps {
   onSegmentChange: (id: string | null) => void;
   segmentCounts: Record<string, number>;
   onOpenFilters: () => void;
+  onSaveSearch: () => void;
 }
 
 const PARAM_ICONS = [MapPin, Calendar, SlidersHorizontal];
@@ -26,6 +27,7 @@ export const CommandBar: React.FC<CommandBarProps> = ({
   onSegmentChange,
   segmentCounts,
   onOpenFilters,
+  onSaveSearch,
 }) => {
   const { t } = useTranslation();
 
@@ -88,6 +90,7 @@ export const CommandBar: React.FC<CommandBarProps> = ({
 
         {/* Category pills */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <button type="button" onClick={onSaveSearch} className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100"><BookmarkPlus className="h-4 w-4" />{t("savedSearches.saveCurrent")}</button>
           <span className="me-1 shrink-0 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">{t("fleet.commandBar.browseBy")}</span>
           <button
             type="button"
