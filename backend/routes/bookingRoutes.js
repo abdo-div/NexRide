@@ -6,6 +6,7 @@ import {
   getMyBookings,
   getCompanyBookings,
   cancelBooking,
+  getCancellationQuote,
   modifyBooking,
   updateBookingStatus,
   checkVehicleAvailability,
@@ -272,6 +273,13 @@ router.patch(
   validate(modifyBookingSchema),
   verifyTenantAccess("Booking"),
   modifyBooking,
+);
+
+router.get(
+  "/:id/cancellation-quote",
+  validate(idParamSchema()),
+  verifyTenantAccess("Booking"),
+  getCancellationQuote,
 );
 
 /**

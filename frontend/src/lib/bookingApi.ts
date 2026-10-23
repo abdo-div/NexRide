@@ -1,6 +1,6 @@
 import { request, API_BASE_URL, ApiError } from "./apiClient";
 import { trackedFetch } from "./apiAvailability";
-import type { BookingDto } from "../types/booking";
+import type { BookingDto, CancellationQuote } from "../types/booking";
 
 export interface AvailabilityResult {
   isAvailable: boolean;
@@ -103,6 +103,9 @@ export const bookingApi = {
       method: "PATCH",
       body: reason ? { reason } : {},
     }),
+
+  cancellationQuote: (id: string, signal?: AbortSignal): Promise<{ status: string; data: { quote: CancellationQuote } }> =>
+    request(`/bookings/${encodeURIComponent(id)}/cancellation-quote`, { signal }),
 
   modify: (id: string, payload: ModifyBookingPayload): Promise<BookingResponse> =>
     request<BookingResponse>(`/bookings/${encodeURIComponent(id)}/modify`, {

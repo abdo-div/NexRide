@@ -22,7 +22,7 @@ import {
 import type { BookingDto } from "../../types/booking";
 import { photoUrl } from "../../lib/vehicleMapper";
 import { bookingApi } from "../../lib/bookingApi";
-import { useDialog } from "../../context/useDialog";
+import { CancellationDialog } from "../bookingDetails/CancellationDialog";
 import {
   formatDate,
   formatLYD,
@@ -61,8 +61,8 @@ export const BookingCard: React.FC<BookingCardProps> = ({
 }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { confirm: confirmDialog } = useDialog();
   const [busy, setBusy] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
 
   const status = booking.bookingStatus;
   const lang = i18n.language;
@@ -75,7 +75,9 @@ export const BookingCard: React.FC<BookingCardProps> = ({
   const currency = t("myBookings.currency");
   const days = rentalDays(booking.startDate, booking.endDate);
   const totalHours = Math.max(days * 24, 24);
-  const invoiceAvailable = booking.paymentStatus === "PAID";
+  const invoiceAvailable = ["PAID", "REFUNDED", "PARTIALLY_REFUNDED"].includes(
+    booking.paymentStatus,
+  );
 
   const isActive = status === "ACTIVE";
   const isUpcoming = status === "CONFIRMED" || status === "PAID";
@@ -103,10 +105,12 @@ export const BookingCard: React.FC<BookingCardProps> = ({
     ? t("myBookings.status.upcoming")
     : t(`myBookings.status.${status}`);
 
-  const paymentLabel = !invoiceAvailable
-    ? t("myBookings.unpaidTag")
-    : booking.paymentStatus === "REFUNDED"
+  const paymentLabel = booking.paymentStatus === "REFUNDED"
     ? t("myBookings.refundedTag")
+    : booking.paymentStatus === "PARTIALLY_REFUNDED"
+    ? t("myBookings.partiallyRefundedTag")
+    : !invoiceAvailable
+    ? t("myBookings.unpaidTag")
     : t("myBookings.paidTag");
 
   const openDetails = () => {
@@ -131,20 +135,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
   };
 
   const requestCancel = async () => {
-    const confirmed = await confirmDialog(
-      `${t("myBookings.cancelConfirmTitle")}\n${t("myBookings.cancelConfirmBody")}`,
-    );
-    if (!confirmed || busy) return;
-    setBusy(true);
-    try {
-      await bookingApi.cancel(booking._id);
-      onCancelled();
-      onToast(t("myBookings.cancelSuccess"));
-    } catch {
-      onToast(t("myBookings.cancelError"));
-    } finally {
-      setBusy(false);
-    }
+    if (!busy) setCancelOpen(true);
   };
 
   const rebook = () => navigate(`/vehicles/${vehicleId}`);
@@ -153,6 +144,18 @@ export const BookingCard: React.FC<BookingCardProps> = ({
   const Icon = isActive ? CircleAlert : isUpcoming ? CalendarClock : CircleCheck;
 
   return (
+    <>
+    {cancelOpen && (
+      <CancellationDialog
+        bookingId={booking._id}
+        onClose={() => setCancelOpen(false)}
+        onCancelled={() => {
+          setCancelOpen(false);
+          onCancelled();
+          onToast(t("myBookings.cancelSuccess"));
+        }}
+      />
+    )}
     <article
       className={`bg-white rounded-2xl border overflow-hidden transition-all ${
         isActive
@@ -527,6 +530,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
         </div>
       </div>
     </article>
+    </>
   );
 };
 

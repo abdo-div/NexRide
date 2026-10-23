@@ -37,6 +37,26 @@ describe("bookingApi.cancel", () => {
   });
 });
 
+describe("bookingApi.cancellationQuote", () => {
+  it("loads the authoritative quote before the customer confirms", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          status: "success",
+          data: { quote: { bookingId: "booking id", refundableAmount: 100 } },
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+
+    await bookingApi.cancellationQuote("booking id");
+
+    const [url, options] = fetchMock.mock.calls[0];
+    expect(url).toBe("/api/v1/bookings/booking%20id/cancellation-quote");
+    expect(options).toMatchObject({ credentials: "include" });
+  });
+});
+
 describe("bookingApi.create", () => {
   it("forwards a caller-stable idempotency key for safe checkout retries", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(

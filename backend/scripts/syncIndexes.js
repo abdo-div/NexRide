@@ -54,6 +54,7 @@ const MODEL_MODULES = [
   "../models/vehicle_model.js",
   "../models/booking_model.js",
   "../models/payment_model.js",
+  "../models/Refund_model.js",
   "../models/review_model.js",
   "../models/Maintenance_model.js",
   "../models/PlatformSettings_model.js",

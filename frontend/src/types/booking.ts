@@ -38,7 +38,29 @@ export type BookingStatus =
   | "CANCELLED"
   | "EXPIRED";
 
-export type PaymentStatus = "UNPAID" | "PAID" | "REFUNDED";
+export type PaymentStatus = "UNPAID" | "PAID" | "REFUNDED" | "PARTIALLY_REFUNDED";
+
+export interface CancellationQuote {
+  bookingId: string;
+  canCancel: boolean;
+  bookingStatus: BookingStatus;
+  currency: string;
+  paidAmount: number;
+  refundableAmount: number;
+  cancellationFee: number;
+  refundFraction: number;
+  refundRequired: boolean;
+  policy: { fullRefundHours: number; partialRefundHours: number };
+  refund: null | {
+    id: string;
+    status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
+    requestedAt: string;
+    processingAt?: string | null;
+    completedAt?: string | null;
+    failedAt?: string | null;
+    failureReason?: string | null;
+  };
+}
 
 export interface BookingDto {
   _id: string;

@@ -3,6 +3,7 @@ import { test } from "node:test";
 import mongoose from "mongoose";
 import Booking from "../models/booking_model.js";
 import Payment from "../models/payment_model.js";
+import Refund from "../models/Refund_model.js";
 import Vehicle from "../models/vehicle_model.js";
 import MaintenanceEvent from "../models/Maintenance_model.js";
 import AppError from "../utils/appError.js";
@@ -11,6 +12,7 @@ import {
   cancelBookingById,
   checkAvailability,
   computeRefundFraction,
+  getCancellationQuote,
   REFUND_POLICY,
 } from "../services/bookingService.js";
 import { buildPayoutSummary } from "../services/payoutService.js";
@@ -77,6 +79,50 @@ test("P1-2a: refund fraction follows the 48h / 24h cancellation policy", () => {
   assert.equal(computeRefundFraction(atPickup, now), 0);
 });
 
+test("Task 4: cancellation quote exposes the server-calculated refund and fee", async (t) => {
+  const booking = makePaidBooking(new Date(Date.now() + 72 * 3600e3));
+  const payment = makePaidPayment({ currency: "LYD" });
+  t.mock.method(Booking, "findById", async () => booking);
+  t.mock.method(Refund, "findOne", () => ({ sort: async () => null }));
+  t.mock.method(Payment, "findOne", () => ({ sort: async () => payment }));
+
+  const quote = await getCancellationQuote(bookingId);
+
+  assert.equal(quote.canCancel, true);
+  assert.equal(quote.paidAmount, 300);
+  assert.equal(quote.refundableAmount, 300);
+  assert.equal(quote.cancellationFee, 0);
+  assert.equal(quote.refundRequired, true);
+  assert.equal(quote.refund, null);
+});
+
+test("Task 4: a cancelled booking quote returns its persisted refund timeline", async (t) => {
+  const booking = makePaidBooking(new Date(Date.now() + 72 * 3600e3), {
+    bookingStatus: "CANCELLED",
+  });
+  const payment = makePaidPayment({ status: "PARTIALLY_REFUNDED", currency: "LYD" });
+  const requestedAt = new Date();
+  t.mock.method(Booking, "findById", async () => booking);
+  t.mock.method(Refund, "findOne", () => ({
+    sort: async () => ({
+      _id: "121212121212121212121212",
+      amount: 150,
+      refundFraction: 0.5,
+      status: "PROCESSING",
+      requestedAt,
+    }),
+  }));
+  t.mock.method(Payment, "findOne", () => ({ sort: async () => payment }));
+
+  const quote = await getCancellationQuote(bookingId);
+
+  assert.equal(quote.canCancel, false);
+  assert.equal(quote.refundableAmount, 150);
+  assert.equal(quote.cancellationFee, 150);
+  assert.equal(quote.refund.status, "PROCESSING");
+  assert.equal(quote.refund.requestedAt, requestedAt);
+});
+
 // ---------------------------------------------------------------------------
 // P1-2a cancellation refunds
 // ---------------------------------------------------------------------------
@@ -100,6 +146,7 @@ const setupCancel = async (t, { booking, paidPayment }) => {
     updates: [],
     failedPaymentCalls: [],
     restoreCalls: [],
+    refunds: [],
     restored: false,
   };
 
@@ -120,6 +167,10 @@ const setupCancel = async (t, { booking, paidPayment }) => {
   t.mock.method(Payment, "updateMany", async (filter, update) => {
     captures.failedPaymentCalls.push({ filter, update });
     return { modifiedCount: 1 };
+  });
+  t.mock.method(Refund, "create", async (docs, options) => {
+    captures.refunds.push({ docs, options });
+    return docs;
   });
   t.mock.method(MaintenanceEvent, "exists", () => ({
     session: async () =>
@@ -148,6 +199,7 @@ const makePaidBooking = (startDate, overrides = {}) => ({
   startDate,
   vehicleId,
   customerId: "999999999999999999999999",
+  companyId,
   ...overrides,
 });
 
@@ -179,6 +231,11 @@ test("P1-2a: cancelling far ahead of pickup refunds 100% and marks the payment R
   assert.equal(captures.updates[0].update.$set.refundAmount, 300);
   assert.equal(captures.updates[0].update.$set.refundedBy, userId);
   assert.equal(captures.updates[0].options.session, session);
+  assert.equal(captures.refunds.length, 1);
+  assert.equal(captures.refunds[0].docs[0].amount, 300);
+  assert.equal(captures.refunds[0].docs[0].feeAmount, 0);
+  assert.equal(captures.refunds[0].docs[0].status, "PENDING");
+  assert.equal(captures.refunds[0].options.session, session);
   assert.equal(captures.saves.length, 1);
   assert.equal(captures.saves[0].session, session);
   assert.equal(captures.saves[0].validateBeforeSave, false);
@@ -199,6 +256,7 @@ test("P1-2a: cancelling 30h before pickup refunds 50% and marks the payment PART
   assert.equal(captures.updates.length, 1);
   assert.equal(captures.updates[0].update.$set.status, "PARTIALLY_REFUNDED");
   assert.equal(captures.updates[0].update.$set.refundAmount, 150);
+  assert.equal(captures.refunds[0].docs[0].feeAmount, 150);
   assert.equal(session.committed, true);
 });
 

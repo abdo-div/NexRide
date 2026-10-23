@@ -15,15 +15,15 @@ import { FinancialCard } from "../components/bookingDetails/FinancialCard";
 import { ChecklistCard } from "../components/bookingDetails/ChecklistCard";
 import { ConciergeCard } from "../components/bookingDetails/ConciergeCard";
 import { BookingReviewCard } from "../components/bookingDetails/BookingReviewCard";
-import { useDialog } from "../context/useDialog";
 import { BookingModificationDialog } from "../components/bookingDetails/BookingModificationDialog";
+import { CancellationDialog } from "../components/bookingDetails/CancellationDialog";
+import { RefundTimeline } from "../components/bookingDetails/RefundTimeline";
 
 const TOAST_MS = 3000;
 
 export const BookingDetailsPage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
   const { t } = useTranslation();
-  const { confirm: confirmDialog } = useDialog();
 
   const [booking, setBooking] = useState<BookingDto | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,6 +31,7 @@ export const BookingDetailsPage: React.FC = () => {
   const [downloadBusy, setDownloadBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [modifyOpen, setModifyOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
 
   const showToast = useCallback((message: string) => {
     setToast(message);
@@ -121,20 +122,7 @@ export const BookingDetailsPage: React.FC = () => {
     setModifyOpen(true);
   };
 
-  const handleCancel = async () => {
-    if (!booking) return;
-    const confirmed = await confirmDialog(
-      `${t("bookingDetails.cancelConfirmTitle")}\n${t("bookingDetails.cancelConfirmBody")}`,
-    );
-    if (!confirmed) return;
-    try {
-      await bookingApi.cancel(booking._id);
-      setToast(t("bookingDetails.cancelSuccess"));
-      loadBooking();
-    } catch {
-      showToast(t("bookingDetails.cancelError"));
-    }
-  };
+  const handleCancel = () => booking && setCancelOpen(true);
 
   return (
     <div className="bg-[#F8FAFC] min-h-screen">
@@ -146,6 +134,17 @@ export const BookingDetailsPage: React.FC = () => {
             setBooking(updated);
             setModifyOpen(false);
             showToast(t("bookingModification.success"));
+          }}
+        />
+      )}
+      {cancelOpen && booking && (
+        <CancellationDialog
+          bookingId={booking._id}
+          onClose={() => setCancelOpen(false)}
+          onCancelled={() => {
+            setCancelOpen(false);
+            showToast(t("bookingDetails.cancelSuccess"));
+            loadBooking();
           }}
         />
       )}
@@ -190,6 +189,10 @@ export const BookingDetailsPage: React.FC = () => {
                 booking.bookingStatus === "EXPIRED"
               }
             />
+
+            {booking.bookingStatus === "CANCELLED" && (
+              <RefundTimeline bookingId={booking._id} />
+            )}
 
             <BookingReviewCard booking={booking} onNotice={showToast} />
 

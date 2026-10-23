@@ -3,6 +3,7 @@ import Booking from "../models/booking_model.js";
 import Vehicle from "../models/vehicle_model.js";
 import Company from "../models/Company_model.js";
 import Payment from "../models/payment_model.js";
+import Refund from "../models/Refund_model.js";
 import MaintenanceEvent from "../models/Maintenance_model.js";
 import AppError from "../utils/appError.js";
 import * as factory from "./serviceFactory.js";
@@ -417,6 +418,63 @@ export const computeRefundFraction = (
 
 const roundMoney = (value) => Number(Number(value).toFixed(2));
 
+const cancellationPolicy = async () => {
+  const { freeCancellationHours } = await getPlatformPolicy();
+  return {
+    fullRefundHours: freeCancellationHours,
+    partialRefundHours: freeCancellationHours / 2,
+    partialRefundFraction: REFUND_POLICY.partialRefundFraction,
+  };
+};
+
+export const getCancellationQuote = async (bookingId) => {
+  const booking = await Booking.findById(bookingId);
+  if (!booking) throw new AppError("Booking not found", 404);
+
+  const existingRefund = await Refund.findOne({ bookingId: booking._id }).sort({
+    createdAt: -1,
+  });
+  const payment = await Payment.findOne({
+    bookingId: booking._id,
+    status: { $in: ["COMPLETED", "REFUNDED", "PARTIALLY_REFUNDED"] },
+  }).sort({ createdAt: -1 });
+  const policy = await cancellationPolicy();
+  const paidAmount = Number(payment?.amount ?? 0);
+  const fraction = existingRefund
+    ? Number(existingRefund.refundFraction)
+    : computeRefundFraction(booking.startDate, new Date(), policy);
+  const refundableAmount = existingRefund
+    ? Number(existingRefund.amount)
+    : roundMoney(Math.min(paidAmount * fraction, paidAmount));
+
+  return {
+    bookingId: String(booking._id),
+    canCancel: !["CANCELLED", "COMPLETED", "ACTIVE"].includes(booking.bookingStatus),
+    bookingStatus: booking.bookingStatus,
+    currency: payment?.currency ?? "LYD",
+    paidAmount,
+    refundableAmount,
+    cancellationFee: roundMoney(Math.max(paidAmount - refundableAmount, 0)),
+    refundFraction: fraction,
+    refundRequired: refundableAmount > 0,
+    policy: {
+      fullRefundHours: policy.fullRefundHours,
+      partialRefundHours: policy.partialRefundHours,
+    },
+    refund: existingRefund
+      ? {
+          id: String(existingRefund._id),
+          status: existingRefund.status,
+          requestedAt: existingRefund.requestedAt,
+          processingAt: existingRefund.processingAt,
+          completedAt: existingRefund.completedAt,
+          failedAt: existingRefund.failedAt,
+          failureReason: existingRefund.failureReason,
+        }
+      : null,
+  };
+};
+
 /**
  * Non-blocking cancellation notice. Fire-and-forget by design: an email
  * provider hiccup must never roll back a cancellation that already committed.
@@ -477,15 +535,11 @@ export const cancelBookingById = async (bookingId, user, { reason = null } = {})
     booking.cancelledAt = new Date();
     booking.cancellationReason = reason ?? booking.cancellationReason;
 
-    const { freeCancellationHours } = await getPlatformPolicy();
+    const policy = await cancellationPolicy();
     const refundFraction = computeRefundFraction(
       booking.startDate,
       booking.cancelledAt,
-      {
-        fullRefundHours: freeCancellationHours,
-        partialRefundHours: freeCancellationHours / 2,
-        partialRefundFraction: REFUND_POLICY.partialRefundFraction,
-      },
+      policy,
     );
 
     // The latest completed ledger row is the one that was actually collected
@@ -518,6 +572,24 @@ export const cancelBookingById = async (bookingId, user, { reason = null } = {})
             },
           },
           { session, new: true, runValidators: true },
+        );
+
+        await Refund.create(
+          [{
+            bookingId: booking._id,
+            paymentId: paidPayment._id,
+            customerId: booking.customerId?._id ?? booking.customerId,
+            companyId: booking.companyId?._id ?? booking.companyId ?? paidPayment.companyId,
+            amount: refundAmount,
+            feeAmount: roundMoney(paidPayment.amount - refundAmount),
+            paidAmount: paidPayment.amount,
+            currency: paidPayment.currency ?? "LYD",
+            refundFraction,
+            status: "PENDING",
+            reason: reason ?? "Booking cancelled by customer",
+            requestedAt: booking.cancelledAt,
+          }],
+          { session },
         );
 
         booking.paymentStatus =

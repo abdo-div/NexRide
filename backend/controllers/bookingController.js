@@ -458,6 +458,11 @@ export const cancelBooking = catchAsync(async (req, res, next) => {
   });
 });
 
+export const getCancellationQuote = catchAsync(async (req, res) => {
+  const quote = await bookingService.getCancellationQuote(req.params.id);
+  res.status(200).json({ status: "success", data: { quote } });
+});
+
 export const modifyBooking = catchAsync(async (req, res) => {
   const booking = await bookingService.modifyUnpaidCustomerBooking(
     req.params.id,

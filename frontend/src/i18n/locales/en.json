@@ -246,6 +246,7 @@
     "paidTag": "Paid in full",
     "unpaidTag": "Payment pending",
     "refundedTag": "Refunded",
+    "partiallyRefundedTag": "Partially refunded",
     "securityNote": "Full protection & insurance, driver included",
     "paymentChannel": "Moamalat secured",
     "provider": "Provider: {{name}}",
@@ -341,6 +342,32 @@
     "saving": "Checking…",
     "success": "Reservation updated and price recalculated.",
     "genericError": "We could not update this reservation. Please try again."
+  },
+  "cancellation": {
+    "title": "Review cancellation",
+    "subtitle": "Check the exact refund before cancelling your booking.",
+    "paid": "Amount paid",
+    "fee": "Cancellation fee",
+    "refund": "Refundable amount",
+    "policy": "Full refund applies at least {{full}} hours before pickup; a partial refund applies from {{partial}} hours.",
+    "reason": "Reason (optional)",
+    "reasonPlaceholder": "Tell us why you are cancelling",
+    "processing": "Your refund request will be recorded immediately. Card refunds normally appear within 5–10 business days after processing.",
+    "noRefund": "This cancellation is outside the refundable window. The booking will be cancelled with no refund.",
+    "keep": "Keep booking",
+    "confirm": "Confirm cancellation",
+    "cancelling": "Cancelling…",
+    "close": "Close",
+    "error": "We could not load or complete the cancellation. Please try again."
+  },
+  "refundTimeline": {
+    "title": "Refund progress",
+    "requested": "Requested",
+    "processing": "Processing",
+    "completed": "Returned",
+    "estimate": "Your refund is queued. Card refunds normally appear within 5–10 business days after processing.",
+    "done": "The refund has been completed.",
+    "failed": "The refund needs attention. Please contact support with your booking code."
   },
   "bookingDetails": {
     "breadcrumbHome": "Home",
