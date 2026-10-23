@@ -15,6 +15,7 @@ import {
 import { getPlatformPolicy } from "./platformPolicyService.js";
 import { resolveClientUrl } from "../config/clientUrl.js";
 import { releaseVehicleHold } from "./reservationHold.service.js";
+import { notifyBookingEvent } from "./notificationService.js";
 
 // The search allowlist is deliberately limited to fields stored on the booking
 // document. Populated references (vehicle make/model, customer and partner
@@ -217,6 +218,7 @@ export const modifyUnpaidCustomerBooking = async (
     await session.endSession();
   }
 
+  void notifyBookingEvent(updatedBooking, "BOOKING_CHANGED").catch(() => {});
   return updatedBooking;
 };
 
@@ -572,6 +574,7 @@ export const cancelBookingById = async (bookingId, user, { reason = null } = {})
   }
 
   notifyBookingCancellation(booking, reason ?? "booking cancelled");
+  void notifyBookingEvent(booking, "BOOKING_CANCELLED").catch(() => {});
 
   return booking;
 };
@@ -670,6 +673,7 @@ export const releaseUnpaidBooking = async (
     } catch {
       /* a leftover key self-expires after its TTL */
     }
+    void notifyBookingEvent(booking, "PAYMENT_FAILED").catch(() => {});
   }
 
   return {
@@ -791,6 +795,12 @@ export const updateLifecycleStatus = async (bookingId, status, actorUser = null)
 
     await session.commitTransaction();
     session.endSession();
+    if (target === "CONFIRMED") {
+      void notifyBookingEvent(booking, "BOOKING_CONFIRMED").catch(() => {});
+    }
+    if (target === "CANCELLED") {
+      void notifyBookingEvent(booking, "BOOKING_CANCELLED").catch(() => {});
+    }
     return booking;
   } catch (error) {
     await session.abortTransaction();

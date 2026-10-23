@@ -14,6 +14,7 @@ import {
 } from "../config/moamalat.js";
 import { releaseVehicleHold } from "./reservationHold.service.js";
 import { addEmailToQueue } from "../queues/emailQueue.js";
+import { notifyBookingEvent } from "./notificationService.js";
 
 const postJsonOverIpv4 = (url, body, timeoutMs = 15000) =>
   new Promise((resolve, reject) => {
@@ -729,6 +730,7 @@ export const finalizeVerifiedPayment = async ({
           : "Your vehicle",
       }).catch(() => {});
     }
+    void notifyBookingEvent(booking, "PAYMENT_COMPLETED").catch(() => {});
   }
 
   return payment;

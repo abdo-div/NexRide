@@ -312,6 +312,12 @@
     "whatsappCta": "Instant VIP WhatsApp Chat",
     "vipPhone": "+218 21 444-6397"
   },
+  "notifications": {
+    "title": "Notifications",
+    "markAll": "Mark all read",
+    "loading": "Loading notifications…",
+    "empty": "You have no notifications yet."
+  },
   "bookingModification": {
     "title": "Modify reservation",
     "unpaidNote": "Availability and the final price will be recalculated securely before payment.",

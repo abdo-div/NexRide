@@ -21,6 +21,7 @@ import vehicleRouter from "./routes/vehicleRoutes.js";
 import viewRouter from "./routes/viewRoutes.js";
 import adminRouter from "./routes/admin.routes.js";
 import newsletterRouter from "./routes/newsletterRoutes.js";
+import notificationRouter from "./routes/notificationRoutes.js";
 import {
   getGatewayConfig,
   createPayment,
@@ -264,6 +265,7 @@ app.use("/api/v1/payments/moamalat", moamalatRouter);
 app.use("/api/v1/payments", paymentRouter);
 app.use("/api/v1/vehicles", vehicleRouter);
 app.use("/api/v1/newsletter", newsletterLimiter, newsletterRouter);
+app.use("/api/v1/notifications", notificationRouter);
 
 // Moamalat direct integration routes (manager specification)
 app.get("/api/config", getGatewayConfig);

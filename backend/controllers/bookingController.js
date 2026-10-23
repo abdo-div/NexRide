@@ -23,6 +23,7 @@ import {
   MUNICIPAL_FEE_LYD,
 } from "../utils/bookingPricing.js";
 import logger from "../utils/logger.js";
+import { notifyBookingEvent } from "../services/notificationService.js";
 // Administrative register.
 //
 // The search allowlist lives in the service (`BOOKING_SEARCH_FIELDS`) because the
@@ -382,6 +383,8 @@ export const createBooking = catchAsync(async (req, res, next) => {
     },
     "Booking created",
   );
+
+  void notifyBookingEvent(booking, "BOOKING_CREATED").catch(() => {});
 
   res.status(201).json({
     status: "success",

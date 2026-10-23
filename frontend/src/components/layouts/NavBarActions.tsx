@@ -7,6 +7,7 @@ import { useAuth } from "../../context/useAuth";
 import { userPhotoUrl } from "../../lib/customerView";
 import { companySettingsApi } from "../../lib/companySettingsApi";
 import { companyLogoUrl } from "../../lib/vehicleMapper";
+import { CustomerNotificationBell } from "./CustomerNotificationBell";
 
 interface NavBarActionsProps {
   onDark?: boolean;
@@ -107,6 +108,10 @@ export const NavBarActions: React.FC<NavBarActionsProps> = ({ onDark = false }) 
     <div className="flex items-center gap-2 sm:gap-3 shrink-0">
       {/* Language Toggle */}
       <LanguageToggle onDark={onDark} />
+
+      {isAuthenticated && isCustomer && (
+        <CustomerNotificationBell onDark={onDark} />
+      )}
 
       {/* Auth / Profile Area */}
       {isAuthenticated ? (
