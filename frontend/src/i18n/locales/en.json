@@ -76,6 +76,19 @@
     "companyDashboard": "Operator Dashboard",
     "libya": "LIBYA"
   },
+  "savedVehicles": {
+    "eyebrow": "Your shortlist",
+    "title": "Saved and recently viewed vehicles",
+    "description": "Keep your favourite vehicles in one place and quickly return to cars you recently explored.",
+    "favorites": "Favourite vehicles",
+    "favoritesDescription": "Your saved choices stay synced to your NexRide account on every device.",
+    "recent": "Recently viewed",
+    "recentDescription": "The latest available vehicles you opened, ordered by your most recent visit.",
+    "empty": "There are no vehicles in this section yet.",
+    "browse": "Browse available cars",
+    "errorTitle": "Could not update saved vehicles",
+    "errorDescription": "Please try again in a moment."
+  },
   "companies": {
     "breadcrumbHome": "Home",
     "breadcrumbCurrent": "Companies",

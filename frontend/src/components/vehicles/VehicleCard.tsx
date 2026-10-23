@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Heart, Star, Gauge, Armchair, Settings, Fuel, CheckCircle2 } from "lucide-react";
 import type { Vehicle } from "../../types/vehicle";
@@ -7,6 +7,9 @@ import { VehicleImage } from "../VehicleImage";
 import { companyLogoUrl } from "../../lib/vehicleMapper";
 import { motion, useReducedMotion } from "framer-motion";
 import { buttonHover, buttonTap, hoverSpring, softHoverSpring } from "../../lib/motion";
+import { useAuth } from "../../context/useAuth";
+import { useSavedVehicles } from "../../context/useSavedVehicles";
+import { useToast } from "../../context/toastContextValue";
 
 const SPEC_META: {
   key: keyof Vehicle["specs"];
@@ -37,7 +40,13 @@ const SPEC_META: {
 
 export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
   const { t } = useTranslation();
-  const [fav, setFav] = useState(!!vehicle.isFavorite);
+  const { user } = useAuth();
+  const { favoriteIds, toggleFavorite } = useSavedVehicles();
+  const { showToast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [saving, setSaving] = useState(false);
+  const fav = favoriteIds.has(vehicle.id);
   const reduceMotion = useReducedMotion();
 
   return (
@@ -76,10 +85,29 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
         </div>
         <motion.button
           type="button"
-          onClick={() => setFav((f) => !f)}
+          disabled={saving}
+          onClick={async () => {
+            if (user?.role?.trim() !== "customer") {
+              navigate("/login", { state: { from: location.pathname + location.search } });
+              return;
+            }
+            setSaving(true);
+            try {
+              const saved = await toggleFavorite(vehicle.id);
+              showToast({
+                tone: saved ? "success" : "info",
+                title: t(saved ? "toasts.vehicleSaved.title" : "toasts.vehicleRemoved.title"),
+                description: t(saved ? "toasts.vehicleSaved.description" : "toasts.vehicleRemoved.description"),
+              });
+            } catch {
+              showToast({ tone: "error", title: t("savedVehicles.errorTitle"), description: t("savedVehicles.errorDescription") });
+            } finally {
+              setSaving(false);
+            }
+          }}
           aria-label={t("fleet.card.toggleFavorite")}
           aria-pressed={fav}
-          className="absolute top-4 end-4 p-2 rounded-full bg-white/90 backdrop-blur-md text-slate-600 hover:text-red-500 border border-[#E2E8F0] shadow-sm transition-colors"
+          className="absolute top-4 end-4 p-2 rounded-full bg-white/90 backdrop-blur-md text-slate-600 hover:text-red-500 border border-[#E2E8F0] shadow-sm transition-colors disabled:cursor-wait disabled:opacity-60"
           whileHover={reduceMotion ? undefined : { scale: 1.12, rotate: -7 }}
           whileTap={reduceMotion ? undefined : { scale: 0.88 }}
           transition={hoverSpring}

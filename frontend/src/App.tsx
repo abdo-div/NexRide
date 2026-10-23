@@ -27,6 +27,7 @@ import { SkipToContent } from "./components/layouts/SkipToContent";
 import { BackToTop } from "./components/layouts/BackToTop";
 import { RouteAnnouncer } from "./components/layouts/RouteAnnouncer";
 import { ToastProvider } from "./context/ToastProvider";
+import { SavedVehiclesProvider } from "./context/SavedVehiclesProvider";
 
 // Only the landing page is needed for the initial public load. Browsing, auth,
 // booking, checkout and payment screens are separate chunks so a first-time
@@ -52,6 +53,7 @@ const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const MyBookingsPage = lazy(() => import("./pages/MyBookingsPage"));
 const MyProfilePage = lazy(() => import("./pages/MyProfilePage"));
 const BookingDetailsPage = lazy(() => import("./pages/BookingDetailsPage"));
+const SavedVehiclesPage = lazy(() => import("./pages/SavedVehiclesPage"));
 const AdminOverviewPage = lazy(() =>
   import("./pages/admin/AdminOverviewPage").then((module) => ({
     default: module.AdminOverviewPage,
@@ -234,6 +236,7 @@ function App() {
             <ScrollToTop />
             <NetworkStatusBanner />
             <AuthProvider>
+            <SavedVehiclesProvider>
             <SmoothScroll><Routes>
           <Route element={<PublicShell />}>
             <Route path="/" element={<StaffLandingRoute><HomePage /></StaffLandingRoute>} />
@@ -392,6 +395,16 @@ function App() {
               }
             />
             <Route
+              path="/saved-vehicles"
+              element={
+                <ProtectedRoute>
+                  <LazyRoute>
+                    <SavedVehiclesPage />
+                  </LazyRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/my-bookings/:bookingId"
               element={
                 <ProtectedRoute>
@@ -451,6 +464,7 @@ function App() {
             <Route path="*" element={<CompanyDashboardPage />} />
           </Route>
             </Routes></SmoothScroll>
+            </SavedVehiclesProvider>
             </AuthProvider>
             </ToastProvider>
           </DialogProvider>

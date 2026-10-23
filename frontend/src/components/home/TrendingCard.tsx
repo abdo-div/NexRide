@@ -1,11 +1,14 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { Heart, Star, ArrowRight } from "@phosphor-icons/react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { TrendingCar } from "../../types/trendingCar";
 import { applyVehicleImageFallback, companyLogoUrl, initialsFrom } from "../../lib/vehicleMapper";
 import { buttonHover, buttonTap, cardHover, hoverSpring } from "../../lib/motion";
+import { useAuth } from "../../context/useAuth";
+import { useSavedVehicles } from "../../context/useSavedVehicles";
+import { useToast } from "../../context/toastContextValue";
 
 interface TrendingCardProps {
   car: TrendingCar;
@@ -34,6 +37,13 @@ const BADGE_KEYS: Record<string, string> = {
 
 export const TrendingCard: React.FC<TrendingCardProps> = ({ car, index = 0 }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const { favoriteIds, toggleFavorite } = useSavedVehicles();
+  const { showToast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [saving, setSaving] = React.useState(false);
+  const saved = favoriteIds.has(car.id);
   const reduceMotion = useReducedMotion();
   return (
     <motion.div
@@ -82,13 +92,29 @@ export const TrendingCard: React.FC<TrendingCardProps> = ({ car, index = 0 }) =>
         {/* Saved Heart Button */}
         <motion.button
           type="button"
+          disabled={saving}
+          aria-pressed={saved}
           aria-label={t("data.common.saveCar")}
-          className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-slate-700 hover:text-rose-500 hover:bg-white shadow-xs transition-colors cursor-pointer pointer-events-auto"
+          onClick={async () => {
+            if (user?.role?.trim() !== "customer") {
+              navigate("/login", { state: { from: location.pathname } });
+              return;
+            }
+            setSaving(true);
+            try {
+              await toggleFavorite(car.id);
+            } catch {
+              showToast({ tone: "error", title: t("savedVehicles.errorTitle"), description: t("savedVehicles.errorDescription") });
+            } finally {
+              setSaving(false);
+            }
+          }}
+          className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-slate-700 hover:text-rose-500 hover:bg-white shadow-xs transition-colors cursor-pointer pointer-events-auto disabled:cursor-wait disabled:opacity-60"
           whileHover={reduceMotion ? undefined : { scale: 1.12, rotate: -7 }}
           whileTap={reduceMotion ? undefined : { scale: 0.9 }}
           transition={hoverSpring}
         >
-          <Heart className="w-4 h-4" />
+          <Heart className="w-4 h-4" weight={saved ? "fill" : "regular"} />
         </motion.button>
       </div>
 

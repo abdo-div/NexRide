@@ -64,10 +64,7 @@ export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave
         </button>
         <button
           type="button"
-          onClick={() => {
-            onToggleSave();
-            showToast({ tone: saved ? "info" : "success", title: t(saved ? "toasts.vehicleRemoved.title" : "toasts.vehicleSaved.title"), description: t(saved ? "toasts.vehicleRemoved.description" : "toasts.vehicleSaved.description") });
-          }}
+          onClick={onToggleSave}
           className={`flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors shadow-sm text-[13px] font-medium ${
             saved ? "text-[#142B4A]" : "text-[#64748B] hover:text-[#0F172A]"
           }`}
