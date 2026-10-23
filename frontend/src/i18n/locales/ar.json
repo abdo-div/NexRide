@@ -73,6 +73,7 @@
     "saved": "المحفوظة",
     "preferences": "تفضيلات التأجير",
     "savedSearches": "عمليات البحث المحفوظة",
+    "rewards": "المكافآت والعروض",
     "myBookings": "حجوزاتي",
     "adminPanel": "لوحة الإدارة",
     "companyDashboard": "لوحة المشغل",
@@ -184,6 +185,22 @@
     "browse": "تصفح الأسطول",
     "errorTitle": "تعذر تحديث البحث المحفوظ",
     "errorDescription": "يرجى المحاولة مرة أخرى بعد قليل."
+  },
+  "rewards": {
+    "eyebrow": "ولاء نيكس رايد",
+    "title": "المكافآت والعروض",
+    "description": "اكسب نقطة مقابل كل 10 د.ل مدفوعة وافتح مستويات ولاء أعلى مع رحلاتك.",
+    "points": "نقاط ولاء",
+    "tiers": { "EXPLORER": "مستكشف", "SILVER": "فضي", "GOLD": "ذهبي" },
+    "nextTier": "تحتاج {{points}} نقطة إضافية للوصول إلى {{tier}}",
+    "topTier": "لقد وصلت إلى أعلى مستوى ولاء لدينا.",
+    "paidTrips": "الرحلات المدفوعة المؤهلة",
+    "eligibleSpend": "إجمالي الإنفاق المؤهل",
+    "offers": "العروض المتاحة",
+    "percentOff": "خصم {{percent}}٪",
+    "offerTerms": "الحد الأدنى {{minimum}} د.ل، والحد الأقصى للخصم {{maximum}} د.ل.",
+    "findCar": "ابحث عن سيارتك القادمة",
+    "error": "تعذر تحميل مكافآتك الآن."
   },
   "companies": {
     "breadcrumbHome": "الرئيسية",
@@ -1689,6 +1706,15 @@
     "bookingFailed": { "title": "تعذّر إكمال الحجز" }
   },
   "checkout": {
+    "promotion": {
+      "label": "رمز العرض",
+      "placeholder": "أدخل الرمز",
+      "apply": "تطبيق",
+      "applying": "جارٍ التحقق...",
+      "discount": "خصم العرض",
+      "applied": "تم تطبيق الرمز — وفّرت {{amount}} د.ل.",
+      "error": "تعذر تطبيق هذا العرض."
+    },
     "flow": {
       "label": "تقدم الحجز",
       "progress": "الخطوة {{current}} من {{total}}",

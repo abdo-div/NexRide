@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
-import { BadgeCheck, Star, Shield, ArrowRight } from "lucide-react";
+import { BadgeCheck, Star, Shield, ArrowRight, Tag } from "lucide-react";
 import { CheckoutIcon } from "./CheckoutIcon";
 import type { CheckoutMeta, CheckoutTotals } from "../../types/checkout";
 import type { Vehicle } from "../../types/vehicle";
@@ -16,6 +16,12 @@ interface Props {
   tab?: "card" | "cash";
   error?: string | null;
   driverComplete: boolean;
+  promotionCode: string;
+  promotionDiscount: number;
+  promotionBusy: boolean;
+  promotionError: string | null;
+  onPromotionCodeChange: (value: string) => void;
+  onApplyPromotion: () => void;
 }
 
 const totalLyd = (n: number) => `${n.toLocaleString("en-US")} LYD`;
@@ -29,6 +35,12 @@ export const BookingSummary: React.FC<Props> = ({
   tab = "card",
   error,
   driverComplete,
+  promotionCode,
+  promotionDiscount,
+  promotionBusy,
+  promotionError,
+  onPromotionCodeChange,
+  onApplyPromotion,
 }) => {
   const { t } = useTranslation();
   const { itinerary, municipalLabel, securityDeposit, totalLabel, totalNote } = meta;
@@ -149,7 +161,10 @@ export const BookingSummary: React.FC<Props> = ({
               <span className="text-[#64748B]">{t(municipalLabel)}</span>
               <span className="font-semibold">{totalLyd(totals.municipalFee)}</span>
             </div>
+            {promotionDiscount > 0 && <div className="flex items-center justify-between font-bold text-emerald-700"><span>{t("checkout.promotion.discount")}</span><span>− {totalLyd(promotionDiscount)}</span></div>}
           </div>
+
+          <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-3"><label className="text-xs font-bold text-slate-700" htmlFor="promotion-code">{t("checkout.promotion.label")}</label><div className="mt-2 flex gap-2"><div className="relative min-w-0 flex-1"><Tag className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-500" /><input id="promotion-code" value={promotionCode} onChange={(event) => onPromotionCodeChange(event.target.value.toUpperCase())} placeholder={t("checkout.promotion.placeholder")} className="w-full rounded-xl border border-blue-100 bg-white py-2.5 ps-9 pe-3 text-sm font-bold uppercase outline-none focus:border-blue-400" /></div><button type="button" disabled={promotionBusy || !promotionCode.trim()} onClick={onApplyPromotion} className="rounded-xl bg-[#142B4A] px-4 text-xs font-black text-white disabled:opacity-50">{promotionBusy ? t("checkout.promotion.applying") : t("checkout.promotion.apply")}</button></div>{promotionError && <p role="alert" className="mt-2 text-xs font-semibold text-rose-600">{promotionError}</p>}{promotionDiscount > 0 && <p className="mt-2 text-xs font-bold text-emerald-700">{t("checkout.promotion.applied", { amount: promotionDiscount })}</p>}</div>
 
           <div className="p-3 rounded-xl bg-[#F1F5F9] flex items-center justify-between">
             <div className="flex items-center gap-2">

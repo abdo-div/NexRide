@@ -23,6 +23,7 @@ import {
   getMoamalatErrorMessage,
 } from "../lib/moamalatLightbox";
 import { useCustomerPreferences } from "../context/useCustomerPreferences";
+import { rewardApi } from "../lib/rewardApi";
 
 
 const addDays = (date: Date, days: number): Date => {
@@ -198,6 +199,10 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   const [driverValues, setDriverValues] = useState<Record<string, string>>({});
   const [driverConfirmed, setDriverConfirmed] = useState(false);
   const [activeStep, setActiveStep] = useState(1);
+  const [promotionCode, setPromotionCode] = useState("");
+  const [appliedPromotion, setAppliedPromotion] = useState<{ code: string; discountAmount: number } | null>(null);
+  const [promotionBusy, setPromotionBusy] = useState(false);
+  const [promotionError, setPromotionError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!submitError) return;
@@ -221,8 +226,25 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
     () => (vehicle ? computeCheckoutTotals(vehicle, meta, selected) : null),
     [vehicle, meta, selected],
   );
+  const displayTotals = useMemo(() => totals ? { ...totals, total: Math.max(0, totals.total - (appliedPromotion?.discountAmount ?? 0)) } : null, [totals, appliedPromotion]);
 
-  const toggle = (id: string) =>
+  const applyPromotion = async () => {
+    if (!promotionCode.trim()) return;
+    setPromotionBusy(true);
+    setPromotionError(null);
+    try {
+      const response = await rewardApi.quote({ code: promotionCode, vehicleId, startDate, endDate, addonIds: Array.from(selected) });
+      setAppliedPromotion({ code: response.data.quote.code, discountAmount: response.data.quote.discountAmount });
+      setPromotionCode(response.data.quote.code);
+    } catch (error) {
+      setAppliedPromotion(null);
+      setPromotionError(error instanceof Error ? error.message : t("checkout.promotion.error"));
+    } finally { setPromotionBusy(false); }
+  };
+
+  const toggle = (id: string) => {
+    setAppliedPromotion(null);
+    setPromotionError(null);
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -232,6 +254,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
       }
       return next;
     });
+  };
 
   const onConfirm = async () => {
     if (!vehicle || !totals || phase !== "idle" || !driverComplete) return;
@@ -248,6 +271,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
             pickupLocation: locationParam || undefined,
             paymentMethod: "CASH_ON_DELIVERY",
             addonIds: Array.from(selected) as Array<"insurance" | "driver" | "childseat" | "delivery">,
+            promotionCode: appliedPromotion?.code,
           },
           bookingAttemptKey.current,
         );
@@ -302,6 +326,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
           endDate,
           pickupLocation: locationParam || undefined,
           addonIds: Array.from(selected) as Array<"insurance" | "driver" | "childseat" | "delivery">,
+          promotionCode: appliedPromotion?.code,
         },
         bookingAttemptKey.current,
       );
@@ -393,7 +418,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  if (status === "loading" || !vehicle || !totals) {
+  if (status === "loading" || !vehicle || !totals || !displayTotals) {
     return (
       <div className="bg-[#F8FAFC] min-h-screen">
         <div className="pt-20 flex flex-col items-center justify-center gap-4 min-h-[70vh]">
@@ -519,12 +544,18 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
             <BookingSummary
               vehicle={vehicle}
               meta={meta}
-              totals={totals}
+              totals={displayTotals}
               phase={phase}
               onConfirm={onConfirm}
               tab={tab}
               error={submitError}
               driverComplete={driverComplete && activeStep === 3}
+              promotionCode={promotionCode}
+              promotionDiscount={appliedPromotion?.discountAmount ?? 0}
+              promotionBusy={promotionBusy}
+              promotionError={promotionError}
+              onPromotionCodeChange={(value) => { setPromotionCode(value); if (value !== appliedPromotion?.code) setAppliedPromotion(null); }}
+              onApplyPromotion={() => void applyPromotion()}
             />
           )}
         </div>

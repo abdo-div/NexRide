@@ -90,6 +90,7 @@ const bookingSchema = new mongoose.Schema(
       default: 0,
       min: [0, "Discount cannot be negative"],
     },
+    promotionCode: { type: String, trim: true, uppercase: true, maxlength: 32, default: null },
     addonIds: {
       type: [String],
       enum: ["insurance", "driver", "childseat", "delivery"],

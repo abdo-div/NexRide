@@ -17,13 +17,13 @@ export const createBookingSchema = z.object({
       endDate: isoDate,
       pickupLocation: z.string().trim().min(1).max(300).optional(),
       pickupMethod: ciEnum(["BRANCH_PICKUP", "DELIVERY"]).optional(),
-      discountAmount: z.coerce.number().min(0).optional(),
+      promotionCode: z.string().trim().min(1).max(32).optional(),
       paymentMethod: z.enum(["CASH_ON_DELIVERY"]).optional(),
       addonIds: z
         .array(z.enum(["insurance", "driver", "childseat", "delivery"]))
         .max(4)
         .default([]),
-    })
+    }).strict()
     .refine(dateRangeIsValid, dateRangeError),
 });
 export const checkAvailabilitySchema = z.object({

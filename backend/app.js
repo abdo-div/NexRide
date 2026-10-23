@@ -25,6 +25,7 @@ import notificationRouter from "./routes/notificationRoutes.js";
 import supportTicketRouter from "./routes/supportTicketRoutes.js";
 import customerVehicleActivityRouter from "./routes/customerVehicleActivityRoutes.js";
 import savedSearchRouter from "./routes/savedSearchRoutes.js";
+import rewardRouter from "./routes/rewardRoutes.js";
 import {
   getGatewayConfig,
   createPayment,
@@ -272,6 +273,7 @@ app.use("/api/v1/notifications", notificationRouter);
 app.use("/api/v1/support-tickets", supportTicketRouter);
 app.use("/api/v1/customer-vehicle-activity", customerVehicleActivityRouter);
 app.use("/api/v1/saved-searches", savedSearchRouter);
+app.use("/api/v1/rewards", rewardRouter);
 
 // Moamalat direct integration routes (manager specification)
 app.get("/api/config", getGatewayConfig);

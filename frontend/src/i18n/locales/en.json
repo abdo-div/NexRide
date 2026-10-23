@@ -73,6 +73,7 @@
     "saved": "Saved",
     "preferences": "Rental preferences",
     "savedSearches": "Saved searches",
+    "rewards": "Rewards & offers",
     "myBookings": "My Bookings",
     "adminPanel": "Admin Panel",
     "companyDashboard": "Operator Dashboard",
@@ -180,6 +181,22 @@
     "browse": "Browse the fleet",
     "errorTitle": "Saved search could not be updated",
     "errorDescription": "Please try again in a moment."
+  },
+  "rewards": {
+    "eyebrow": "NexRide loyalty",
+    "title": "Rewards and offers",
+    "description": "Earn one point for every 10 LYD paid and unlock higher loyalty tiers as you travel.",
+    "points": "loyalty points",
+    "tiers": { "EXPLORER": "Explorer", "SILVER": "Silver", "GOLD": "Gold" },
+    "nextTier": "{{points}} more points to reach {{tier}}",
+    "topTier": "You have reached our highest loyalty tier.",
+    "paidTrips": "Eligible paid trips",
+    "eligibleSpend": "Eligible paid value",
+    "offers": "Available offers",
+    "percentOff": "{{percent}}% off",
+    "offerTerms": "Minimum {{minimum}} LYD. Maximum discount {{maximum}} LYD.",
+    "findCar": "Find your next car",
+    "error": "We could not load your rewards right now."
   },
   "companies": {
     "breadcrumbHome": "Home",
@@ -1685,6 +1702,15 @@
     "bookingFailed": { "title": "Booking could not be completed" }
   },
   "checkout": {
+    "promotion": {
+      "label": "Promotion code",
+      "placeholder": "Enter code",
+      "apply": "Apply",
+      "applying": "Checking...",
+      "discount": "Promotion discount",
+      "applied": "Code applied — you save {{amount}} LYD.",
+      "error": "This promotion could not be applied."
+    },
     "flow": {
       "label": "Booking progress",
       "progress": "Step {{current}} of {{total}}",

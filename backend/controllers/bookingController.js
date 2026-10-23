@@ -24,6 +24,7 @@ import {
 } from "../utils/bookingPricing.js";
 import logger from "../utils/logger.js";
 import { notifyBookingEvent } from "../services/notificationService.js";
+import { calculatePromotionDiscount } from "../services/rewardService.js";
 // Administrative register.
 //
 // The search allowlist lives in the service (`BOOKING_SEARCH_FIELDS`) because the
@@ -127,6 +128,7 @@ export const createBooking = catchAsync(async (req, res, next) => {
     endDate,
     pickupLocation,
     paymentMethod,
+    promotionCode,
     addonIds = [],
   } = req.body;
   const start = new Date(startDate);
@@ -278,7 +280,14 @@ export const createBooking = catchAsync(async (req, res, next) => {
     const rentalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
     const rentalPrice = rentalDays * claimed.dailyPrice;
     const extras = calculateBookingExtras(addonIds, rentalDays);
-    const totalAmount = rentalPrice + extras.addonsTotal + MUNICIPAL_FEE_LYD;
+    const subtotal = rentalPrice + extras.addonsTotal + MUNICIPAL_FEE_LYD;
+    const promotion = await calculatePromotionDiscount({
+      code: promotionCode,
+      customerId: req.user.id,
+      subtotal,
+      session,
+    });
+    const totalAmount = subtotal - promotion.discountAmount;
     // The Booking pre-validation hook applies the company's override. These
     // values satisfy required fields until that authoritative snapshot runs.
     const platformPolicy = await getPlatformPolicy();
@@ -303,6 +312,8 @@ export const createBooking = catchAsync(async (req, res, next) => {
           addons: extras.addons,
           addonsTotal: extras.addonsTotal,
           municipalFee: MUNICIPAL_FEE_LYD,
+          discountAmount: promotion.discountAmount,
+          promotionCode: promotion.code,
           totalAmount,
           commissionRate,
           commissionAmount,

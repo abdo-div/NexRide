@@ -17,6 +17,8 @@ import { getPlatformPolicy } from "./platformPolicyService.js";
 import { resolveClientUrl } from "../config/clientUrl.js";
 import { releaseVehicleHold } from "./reservationHold.service.js";
 import { notifyBookingEvent } from "./notificationService.js";
+import { calculatePromotionDiscount } from "./rewardService.js";
+import { calculateBookingExtras, MUNICIPAL_FEE_LYD } from "../utils/bookingPricing.js";
 
 // The search allowlist is deliberately limited to fields stored on the booking
 // document. Populated references (vehicle make/model, customer and partner
@@ -236,6 +238,13 @@ export const modifyUnpaidCustomerBooking = async (
       booking.pickupLocation = changes.pickupLocation;
       booking.pickupMethod = changes.pickupMethod;
       booking.addonIds = changes.addonIds ?? [];
+      if (booking.promotionCode) {
+        const rentalDays = Math.ceil((end - start) / 86400000);
+        const extras = calculateBookingExtras(booking.addonIds, rentalDays);
+        const subtotal = rentalDays * claimedVehicle.dailyPrice + extras.addonsTotal + MUNICIPAL_FEE_LYD;
+        const promotion = await calculatePromotionDiscount({ code: booking.promotionCode, customerId, subtotal, session });
+        booking.discountAmount = promotion.discountAmount;
+      }
       booking.paymentSessionExpiresAt = null;
       await booking.save({ session });
 
@@ -304,7 +313,7 @@ export const createCustomerBooking = async (userId, bookingData, user) => {
     endDate,
     pickupLocation,
     pickupMethod,
-    discountAmount,
+    promotionCode,
   } = bookingData;
 
   if (!vehicleId) {
@@ -353,7 +362,10 @@ export const createCustomerBooking = async (userId, bookingData, user) => {
       throw new AppError("Vehicle is not linked to any rental company", 400);
     }
 
-    // Booking model pre-validate hook handles all financial calculations
+    const rentalDays = Math.ceil((end - start) / 86400000);
+    const subtotal = rentalDays * claimed.dailyPrice;
+    const promotion = await calculatePromotionDiscount({ code: promotionCode, customerId: userId, subtotal, session });
+    // Booking model pre-validate hook handles the complete financial calculation.
     const [newBooking] = await Booking.create(
       [
         {
@@ -364,7 +376,8 @@ export const createCustomerBooking = async (userId, bookingData, user) => {
           endDate,
           pickupLocation: pickupLocation || claimed.pickupLocation,
           pickupMethod: pickupMethod || "BRANCH_PICKUP",
-          discountAmount: discountAmount || 0,
+          discountAmount: promotion.discountAmount,
+          promotionCode: promotion.code,
           // dailyRate, totalDays, rentalPrice, totalAmount, commissionAmount,
           // companyShare are all auto-calculated by the booking model's
           // pre-validate hook
