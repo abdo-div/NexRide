@@ -3,12 +3,13 @@ import { Link } from "react-router";
 
 interface NavBarLogoProps {
   onDark?: boolean;
+  to?: string;
 }
 
-export const NavBarLogo: React.FC<NavBarLogoProps> = ({ onDark = false }) => {
+export const NavBarLogo: React.FC<NavBarLogoProps> = ({ onDark = false, to = "/" }) => {
   return (
     <Link
-      to="/"
+      to={to}
       aria-label="NexRide"
       className="group flex shrink-0 items-center"
     >

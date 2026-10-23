@@ -11,10 +11,19 @@ const createBookingsStub = (initial = []) => {
   const findCalls = [];
   const rows = [...initial];
 
-  const matchesQuery = (row, query) =>
-    row.bookingStatus === query.bookingStatus &&
-    row.paymentStatus === query.paymentStatus &&
-    row.createdAt.getTime() < query.createdAt.$lt.getTime();
+  const matchesQuery = (row, query) => {
+    const oldReservation =
+      row.createdAt.getTime() < query.$or[0].createdAt.$lt.getTime();
+    const expiredPaymentSession =
+      row.paymentSessionExpiresAt instanceof Date &&
+      row.paymentSessionExpiresAt.getTime() <=
+        query.$or[1].paymentSessionExpiresAt.$lte.getTime();
+    return (
+      row.bookingStatus === query.bookingStatus &&
+      row.paymentStatus === query.paymentStatus &&
+      (oldReservation || expiredPaymentSession)
+    );
+  };
 
   return {
     findCalls,
@@ -158,7 +167,10 @@ test("reaper expires a stale PENDING_PAYMENT booking and reconciles its payment,
   assert.equal(bookings.findCalls.length, 1);
   assert.equal(bookings.findCalls[0].bookingStatus, "PENDING_PAYMENT");
   assert.equal(bookings.findCalls[0].paymentStatus, "UNPAID");
-  assert.ok(bookings.findCalls[0].createdAt.$lt instanceof Date);
+  assert.ok(bookings.findCalls[0].$or[0].createdAt.$lt instanceof Date);
+  assert.ok(
+    bookings.findCalls[0].$or[1].paymentSessionExpiresAt.$lte instanceof Date,
+  );
   assert.equal(bookings.rows[0].bookingStatus, "EXPIRED");
   assert.equal(payments.paymentWrites.length, 1);
   assert.deepEqual(payments.paymentWrites[0].filter, {
@@ -176,6 +188,19 @@ test("reaper expires a stale PENDING_PAYMENT booking and reconciles its payment,
   assert.equal(sessionsStarted[0].committed, true);
   assert.equal(sessionsStarted[0].aborted, false);
   assert.equal(bookings.rows[0].saves[0].validateBeforeSave, false);
+});
+
+test("reaper expires a failed online payment at its hard session deadline", async () => {
+  const { expired, bookings } = await runSweep({
+    rows: [
+      pendingBooking(1, {
+        paymentSessionExpiresAt: minutesAgo(1),
+      }),
+    ],
+  });
+
+  assert.equal(expired, 1);
+  assert.equal(bookings.rows[0].bookingStatus, "EXPIRED");
 });
 
 test("reaper leaves a recent PENDING_PAYMENT booking alone", async () => {

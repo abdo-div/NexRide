@@ -6,6 +6,7 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { NavBarLogo } from "./NavBarLogo";
 import { NavBarActions } from "./NavBarActions";
 import { useAuth } from "../../context/useAuth";
+import { publicWebsiteHref } from "../../lib/publicWebsitePreview";
 
 export const NavBar: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -14,6 +15,11 @@ export const NavBar: React.FC = () => {
   const isCustomer = isAuthenticated && user?.role?.trim() === "customer";
   const isCompany = user?.role?.trim() === "company";
   const isAdmin = user?.role?.trim() === "admin";
+  const isStaffWebsitePreview =
+    (isCompany || isAdmin) &&
+    new URLSearchParams(location.search).get("preview") === "website";
+  const websiteHref = (href: string) =>
+    publicWebsiteHref(href, isStaffWebsitePreview);
   const canApplyAsPartner = !isCompany && !isAdmin;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -69,7 +75,7 @@ export const NavBar: React.FC = () => {
         }`}
       >
         {/* Right side: Logo & Brand Tagline */}
-        <NavBarLogo onDark={onDarkHero} />
+        <NavBarLogo onDark={onDarkHero} to={websiteHref("/")} />
 
         {/* Center: Navigation Pill Capsule */}
         <nav
@@ -77,7 +83,7 @@ export const NavBar: React.FC = () => {
           className={`hidden items-center gap-1 text-xs font-semibold sm:text-sm xl:flex ${onDarkHero ? "text-white/80" : "rounded-full border border-slate-200/50 bg-slate-100/80 p-1 text-slate-600"}`}
         >
           <Link
-            to="/"
+            to={websiteHref("/")}
             className={`px-4 py-2 transition-all ${onDarkHero ? "border-b-2 border-white text-white" : "rounded-full"} ${
               isHomePage
                 ? onDarkHero ? "font-bold" : "bg-white text-blue-600 font-bold shadow-xs"
@@ -88,7 +94,7 @@ export const NavBar: React.FC = () => {
           </Link>
 
           <Link
-            to="/fleet"
+            to={websiteHref("/fleet")}
             className={`px-3.5 py-2 transition-all ${onDarkHero ? "hover:text-white" : "rounded-full"} ${
               isFleetPage
                 ? "bg-white text-blue-600 font-bold shadow-xs"
@@ -99,21 +105,21 @@ export const NavBar: React.FC = () => {
           </Link>
 
           <Link
-            to="/#fleet-operators"
+            to={websiteHref("/#fleet-operators")}
             className={`px-3.5 py-2 transition-all ${onDarkHero ? "hover:text-white" : "rounded-full text-slate-600 hover:bg-white/60 hover:text-blue-600"}`}
           >
             {i18n.language === "ar" ? "عن الشركة" : t("nav.fleetPartners")}
           </Link>
 
           <Link
-            to="/#locations"
+            to={websiteHref("/#locations")}
             className={`px-3.5 py-2 transition-all ${onDarkHero ? "hover:text-white" : "rounded-full text-slate-600 hover:bg-white/60 hover:text-blue-600"}`}
           >
             {i18n.language === "ar" ? "المواقع والمطارات" : t("nav.locations")}
           </Link>
 
           <Link
-            to="/#contact"
+            to={websiteHref("/#contact")}
             className={`px-3.5 py-2 transition-all ${onDarkHero ? "hover:text-white" : "rounded-full text-slate-600 hover:bg-white/60 hover:text-blue-600"}`}
           >
             {t("nav.contact")}
@@ -190,7 +196,7 @@ export const NavBar: React.FC = () => {
             <div className="flex flex-col gap-1.5">
               <Link
                 ref={firstMobileLinkRef}
-                to="/"
+                to={websiteHref("/")}
                 onClick={() => setMobileMenuOpen(false)}
                 className={`px-4 py-2.5 rounded-2xl text-sm font-bold transition-all ${
                   isHomePage
@@ -201,28 +207,28 @@ export const NavBar: React.FC = () => {
                 {t("nav.home")}
               </Link>
               <Link
-                to="/fleet"
+                to={websiteHref("/fleet")}
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
               >
                 {t("nav.browseCars")}
               </Link>
               <Link
-                to="/#fleet-operators"
+                to={websiteHref("/#fleet-operators")}
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
               >
                 {i18n.language === "ar" ? "عن الشركة" : t("nav.fleetPartners")}
               </Link>
               <Link
-                to="/#locations"
+                to={websiteHref("/#locations")}
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
               >
                 {i18n.language === "ar" ? "المواقع والمطارات" : t("nav.locations")}
               </Link>
               <Link
-                to="/#contact"
+                to={websiteHref("/#contact")}
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-4 py-2.5 rounded-2xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all"
               >

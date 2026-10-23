@@ -83,7 +83,13 @@ export const expireStalePendingBookings = async ({
   const staleBookings = await bookings.find({
     bookingStatus: "PENDING_PAYMENT",
     paymentStatus: "UNPAID",
-    createdAt: { $lt: cutoff },
+    $or: [
+      { createdAt: { $lt: cutoff } },
+      // Online payment sessions have a shorter hard deadline written when the
+      // gateway is initialized. This remains effective when Moamalat fails
+      // silently and the browser never reaches errorCallback.
+      { paymentSessionExpiresAt: { $ne: null, $lte: now } },
+    ],
   });
 
   let expiredCount = 0;

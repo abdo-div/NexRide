@@ -5,6 +5,8 @@ import { LayoutDashboard, LogOut, UserRound, Zap } from "lucide-react";
 import { LanguageToggle } from "./LanguageToggle";
 import { useAuth } from "../../context/useAuth";
 import { userPhotoUrl } from "../../lib/customerView";
+import { companySettingsApi } from "../../lib/companySettingsApi";
+import { companyLogoUrl } from "../../lib/vehicleMapper";
 
 interface NavBarActionsProps {
   onDark?: boolean;
@@ -15,16 +17,66 @@ export const NavBarActions: React.FC<NavBarActionsProps> = ({ onDark = false }) 
   const { user, isAuthenticated, signOut } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [companyIdentity, setCompanyIdentity] = useState<{
+    name: string;
+    email: string;
+    logo: string;
+  } | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const isCustomer = user?.role?.trim() === "customer";
-  const avatar = userPhotoUrl(user?.photo);
-  const initials = (user?.name ?? "N")
+  const isCompany = user?.role?.trim() === "company";
+  const displayName = companyIdentity?.name || user?.name || "NexRide";
+  const displayEmail = companyIdentity?.email || user?.email || "";
+  const avatar = isCompany
+    ? companyLogoUrl(companyIdentity?.logo) ?? ""
+    : userPhotoUrl(user?.photo);
+  const initials = displayName
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
     .map((part) => part[0])
     .join("")
     .toUpperCase();
+
+  useEffect(() => {
+    if (!isCompany) {
+      setCompanyIdentity(null);
+      return;
+    }
+
+    const controller = new AbortController();
+    const refreshCompanyIdentity = () => {
+      void companySettingsApi
+        .get(controller.signal)
+        .then((response) => {
+          const profile = response.data?.settings?.profile;
+          if (!profile) return;
+          setCompanyIdentity({
+            name: profile.name,
+            email: profile.email,
+            logo: profile.logo,
+          });
+        })
+        .catch((error: unknown) => {
+          if ((error as { name?: string })?.name !== "AbortError") {
+            console.error("Unable to refresh company navigation identity", error);
+          }
+        });
+    };
+
+    refreshCompanyIdentity();
+    window.addEventListener(
+      "nexride:company-profile-updated",
+      refreshCompanyIdentity,
+    );
+    return () => {
+      controller.abort();
+      window.removeEventListener(
+        "nexride:company-profile-updated",
+        refreshCompanyIdentity,
+      );
+    };
+  }, [isCompany]);
 
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -79,7 +131,7 @@ export const NavBarActions: React.FC<NavBarActionsProps> = ({ onDark = false }) 
                 <span className="grid h-full w-full place-items-center">{initials}</span>
               )}
             </span>
-            <span className="max-w-[8rem] truncate">{user?.name}</span>
+            <span className="max-w-[8rem] truncate">{displayName}</span>
           </button>
 
           {isMenuOpen && (
@@ -92,8 +144,8 @@ export const NavBarActions: React.FC<NavBarActionsProps> = ({ onDark = false }) 
                   {avatar ? <img key={avatar} src={avatar} alt="" className="absolute inset-0 block h-full w-full rounded-full object-cover" /> : <span className="grid h-full w-full place-items-center">{initials}</span>}
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-bold text-slate-900">{user?.name}</p>
-                  <p className="truncate text-[11px] text-slate-500" dir="ltr">{user?.email}</p>
+                  <p className="truncate text-sm font-bold text-slate-900">{displayName}</p>
+                  <p className="truncate text-[11px] text-slate-500" dir="ltr">{displayEmail}</p>
                 </div>
               </div>
               {isCustomer && (

@@ -148,7 +148,7 @@ export const CompanyDashboardPage: React.FC = () => {
           <>
             <CompanyDashboardHeader
               data={data}
-              userName={user?.name}
+              userName={data.company?.name || user?.name}
               onExport={handleExport}
               exporting={loading}
               onRequestPayout={() => void handleRequestPayout()}

@@ -54,6 +54,8 @@ const TERMINAL_PAYMENT_FAILURES = new Set([
   "NOT_FOUND",
 ]);
 
+const PAYMENT_SESSION_TTL_MS = 3 * 60 * 1000;
+
 /**
  * A terminal gateway decision after the LightBox completion callback retires
  * the unpaid reservation. Transport and signature errors remain retryable,
@@ -245,6 +247,13 @@ export const createPayment = catchAsync(async (req, res, next) => {
   // 1 LYD = 1000 smallest units
   const merchantReference = generateBookingRef(booking._id);
   const params = buildCheckoutParams(booking, merchantReference);
+
+  // The gateway occasionally renders an error page without invoking any
+  // browser callback. Persist a server-enforced deadline so the background
+  // reaper releases this unpaid reservation even if the tab crashes, reloads,
+  // or is running an old frontend bundle.
+  booking.paymentSessionExpiresAt = new Date(Date.now() + PAYMENT_SESSION_TTL_MS);
+  await booking.save({ validateBeforeSave: false });
 
   let paymentDoc = await Payment.findOne({
     bookingId: booking._id,

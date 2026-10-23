@@ -164,6 +164,14 @@ const bookingSchema = new mongoose.Schema(
       default: "UNPAID",
       index: true,
     },
+    // Hard deadline for an online checkout attempt. This is deliberately
+    // separate from the general reservation window: a gateway page that dies
+    // without sending its callback must not leave the vehicle reserved.
+    paymentSessionExpiresAt: {
+      type: Date,
+      default: null,
+      index: true,
+    },
 
     // Cancellation metadata
     cancellationReason: {

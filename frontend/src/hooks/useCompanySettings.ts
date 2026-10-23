@@ -139,8 +139,16 @@ export const useCompanySettings = () => {
 
     setBusy(true);
     try {
-      await companySettingsApi.updateProfile(patch);
+      const response = await companySettingsApi.updateProfile(patch);
+      const saved = response.data?.company;
+      if (saved) {
+        setData((current) => current
+          ? { ...current, profile: { ...current.profile, ...saved } }
+          : current);
+        setDraft((current) => ({ ...current, ...saved }));
+      }
       setAttempt((n) => n + 1);
+      window.dispatchEvent(new CustomEvent("nexride:company-profile-updated"));
       return { ok: true, message: "" };
     } catch (error) {
       return { ok: false, message: errorMessage(error) };
