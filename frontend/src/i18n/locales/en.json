@@ -402,6 +402,50 @@
       "CLOSED": "Closed"
     }
   },
+  "handover": {
+    "cardTitle": "Pickup & return check-in",
+    "notReady": "Check-in becomes available after the company confirms your paid booking.",
+    "close": "Close",
+    "notes": "Notes for the rental company",
+    "notesPlaceholder": "Add any useful condition or handover details",
+    "confirm": "Save declaration",
+    "saving": "Saving…",
+    "error": "We could not save this declaration. Please try again.",
+    "pickup": {
+      "title": "Pickup acknowledgement",
+      "shortTitle": "Pickup check-in",
+      "subtitle": "Confirm these items after checking the vehicle with the rental agent.",
+      "pending": "Available when the vehicle is ready for handover",
+      "done": "Customer pickup acknowledgement saved",
+      "action": "Complete pickup check-in",
+      "licenceReady": "I have my valid original driving licence.",
+      "identityReady": "I have my passport or national ID.",
+      "vehicleInspected": "I inspected the vehicle condition with the agent.",
+      "fuelRecorded": "The starting fuel level and mileage were shown to me."
+    },
+    "return": {
+      "title": "Return declaration",
+      "shortTitle": "Return check-out",
+      "subtitle": "Record the vehicle condition before handing the keys to the rental agent.",
+      "pending": "Available while your rental is active",
+      "done": "Customer return declaration saved",
+      "action": "Complete return check-out",
+      "personalItemsRemoved": "I removed all personal belongings from the vehicle.",
+      "fuelLevel": "Current fuel level",
+      "odometer": "Odometer (km, optional)",
+      "fuelRestored": "Fuel restored according to the rental policy",
+      "damageReported": "I need to report new damage or a vehicle issue",
+      "damagePlaceholder": "Describe the location and nature of the damage or issue",
+      "describeDamage": "Describe the reported damage so the rental agent can inspect it."
+    },
+    "fuel": {
+      "EMPTY": "Empty",
+      "QUARTER": "Quarter",
+      "HALF": "Half",
+      "THREE_QUARTERS": "Three quarters",
+      "FULL": "Full"
+    }
+  },
   "bookingDetails": {
     "breadcrumbHome": "Home",
     "breadcrumbList": "My Bookings",

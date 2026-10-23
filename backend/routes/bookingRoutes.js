@@ -7,6 +7,7 @@ import {
   getCompanyBookings,
   cancelBooking,
   getCancellationQuote,
+  saveCustomerHandover,
   modifyBooking,
   updateBookingStatus,
   checkVehicleAvailability,
@@ -26,6 +27,7 @@ import {
   cancelBookingSchema,
   modifyBookingSchema,
   updateBookingStatusSchema,
+  customerHandoverSchema,
 } from "../validations/booking.validation.js";
 
 const router = express.Router();
@@ -273,6 +275,14 @@ router.patch(
   validate(modifyBookingSchema),
   verifyTenantAccess("Booking"),
   modifyBooking,
+);
+
+router.patch(
+  "/:id/handover/:stage",
+  restrictTo("customer"),
+  validate(customerHandoverSchema),
+  verifyTenantAccess("Booking"),
+  saveCustomerHandover,
 );
 
 router.get(

@@ -188,6 +188,33 @@ const bookingSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+
+    // Customer declarations complement the company-controlled booking status.
+    // They never start or complete a rental by themselves; they preserve what
+    // the customer acknowledged at pickup and reported before return.
+    handover: {
+      pickup: {
+        customerConfirmedAt: { type: Date, default: null },
+        licenceReady: { type: Boolean, default: false },
+        identityReady: { type: Boolean, default: false },
+        vehicleInspected: { type: Boolean, default: false },
+        fuelRecorded: { type: Boolean, default: false },
+        notes: { type: String, trim: true, maxlength: 1000, default: "" },
+      },
+      return: {
+        customerSubmittedAt: { type: Date, default: null },
+        personalItemsRemoved: { type: Boolean, default: false },
+        fuelRestored: { type: Boolean, default: false },
+        damageReported: { type: Boolean, default: false },
+        fuelLevel: {
+          type: String,
+          enum: ["EMPTY", "QUARTER", "HALF", "THREE_QUARTERS", "FULL", null],
+          default: null,
+        },
+        odometer: { type: Number, min: 0, default: null },
+        notes: { type: String, trim: true, maxlength: 1000, default: "" },
+      },
+    },
   },
   {
     timestamps: true,

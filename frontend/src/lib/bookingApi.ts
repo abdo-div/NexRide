@@ -48,6 +48,25 @@ export interface ModifyBookingPayload {
   addonIds: Array<"insurance" | "driver" | "childseat" | "delivery">;
 }
 
+export type HandoverPayload =
+  | {
+      stage: "PICKUP";
+      licenceReady: true;
+      identityReady: true;
+      vehicleInspected: true;
+      fuelRecorded: true;
+      notes?: string;
+    }
+  | {
+      stage: "RETURN";
+      personalItemsRemoved: true;
+      fuelRestored: boolean;
+      damageReported: boolean;
+      fuelLevel: "EMPTY" | "QUARTER" | "HALF" | "THREE_QUARTERS" | "FULL";
+      odometer?: number | null;
+      notes?: string;
+    };
+
 /**
  * Booking API surface used by the checkout flow. The availability check is
  * public (same data the fleet search derives), while create/get require the
@@ -112,6 +131,12 @@ export const bookingApi = {
       method: "PATCH",
       body: payload,
     }),
+
+  saveHandover: (id: string, payload: HandoverPayload): Promise<BookingResponse> =>
+    request<BookingResponse>(
+      `/bookings/${encodeURIComponent(id)}/handover/${payload.stage.toLowerCase()}`,
+      { method: "PATCH", body: payload },
+    ),
 
   /**
    * Downloads the official invoice PDF for a paid booking. Uses a raw fetch

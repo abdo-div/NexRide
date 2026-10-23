@@ -476,6 +476,15 @@ export const modifyBooking = catchAsync(async (req, res) => {
   });
 });
 
+export const saveCustomerHandover = catchAsync(async (req, res) => {
+  const booking = await bookingService.saveCustomerHandover(
+    req.params.id,
+    req.user.id,
+    req.body,
+  );
+  res.status(200).json({ status: "success", data: { booking } });
+});
+
 /**
  * Update booking status
  */

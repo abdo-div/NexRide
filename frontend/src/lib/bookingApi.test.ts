@@ -111,3 +111,28 @@ describe("bookingApi.modify", () => {
     expect(options).toMatchObject({ method: "PATCH", body: JSON.stringify(payload) });
   });
 });
+
+describe("bookingApi.saveHandover", () => {
+  it("stores the customer return declaration on its booking", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({ status: "success", data: { booking: { _id: "booking-id" } } }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+    const payload = {
+      stage: "RETURN" as const,
+      personalItemsRemoved: true as const,
+      fuelRestored: true,
+      damageReported: false,
+      fuelLevel: "FULL" as const,
+      odometer: 45000,
+    };
+
+    await bookingApi.saveHandover("booking-id", payload);
+
+    const [url, options] = fetchMock.mock.calls[0];
+    expect(url).toBe("/api/v1/bookings/booking-id/handover/return");
+    expect(options).toMatchObject({ method: "PATCH", body: JSON.stringify(payload) });
+  });
+});

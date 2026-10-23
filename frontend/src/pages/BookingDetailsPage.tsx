@@ -208,7 +208,7 @@ export const BookingDetailsPage: React.FC = () => {
               <div className="flex flex-col gap-6">
                 <GatePassCard booking={booking} />
                 <FinancialCard booking={booking} />
-                <ChecklistCard />
+                <ChecklistCard booking={booking} onUpdated={setBooking} />
                 <ConciergeCard bookingId={booking._id} />
               </div>
             </div>

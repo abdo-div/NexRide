@@ -99,4 +99,23 @@ export interface BookingDto {
     | null;
   createdAt: string;
   updatedAt?: string;
+  handover?: {
+    pickup?: {
+      customerConfirmedAt?: string | null;
+      licenceReady?: boolean;
+      identityReady?: boolean;
+      vehicleInspected?: boolean;
+      fuelRecorded?: boolean;
+      notes?: string;
+    };
+    return?: {
+      customerSubmittedAt?: string | null;
+      personalItemsRemoved?: boolean;
+      fuelRestored?: boolean;
+      damageReported?: boolean;
+      fuelLevel?: "EMPTY" | "QUARTER" | "HALF" | "THREE_QUARTERS" | "FULL" | null;
+      odometer?: number | null;
+      notes?: string;
+    };
+  };
 }

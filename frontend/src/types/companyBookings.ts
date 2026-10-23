@@ -94,6 +94,16 @@ export interface CompanyBookingDetail {
   companyShare: number;
   resolvedPayment: CompanyPaymentState;
   payoutStatus: string | null;
+  handover?: {
+    pickupConfirmedAt: string | null;
+    pickupNotes: string;
+    returnSubmittedAt: string | null;
+    returnNotes: string;
+    damageReported: boolean;
+    fuelRestored: boolean;
+    fuelLevel: string | null;
+    odometer: number | null;
+  };
   checks: CompanyHandoverCheck[];
 }
 

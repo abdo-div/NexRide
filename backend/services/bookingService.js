@@ -72,6 +72,45 @@ export const listBookings = async (query = {}) => {
 export const getAllBookings = factory.getAll(Booking);
 export const getBookingById = factory.getOne(Booking);
 
+export const saveCustomerHandover = async (bookingId, customerId, payload) => {
+  const booking = await Booking.findOne({ _id: bookingId, customerId });
+  if (!booking) throw new AppError("Booking not found", 404);
+
+  const stage = payload.stage;
+  booking.handover ??= {};
+  if (stage === "PICKUP") {
+    if (!["CONFIRMED", "ACTIVE"].includes(booking.bookingStatus)) {
+      throw new AppError("Pickup acknowledgement is not available for this booking", 409);
+    }
+    booking.handover.pickup = {
+      ...booking.handover.pickup?.toObject?.(),
+      licenceReady: true,
+      identityReady: true,
+      vehicleInspected: true,
+      fuelRecorded: true,
+      notes: payload.notes ?? "",
+      customerConfirmedAt: new Date(),
+    };
+  } else {
+    if (booking.bookingStatus !== "ACTIVE") {
+      throw new AppError("Return declaration is available only during an active rental", 409);
+    }
+    booking.handover.return = {
+      ...booking.handover.return?.toObject?.(),
+      personalItemsRemoved: true,
+      fuelRestored: payload.fuelRestored,
+      damageReported: payload.damageReported,
+      fuelLevel: payload.fuelLevel,
+      odometer: payload.odometer ?? null,
+      notes: payload.notes ?? "",
+      customerSubmittedAt: new Date(),
+    };
+  }
+
+  await booking.save({ validateBeforeSave: false });
+  return booking;
+};
+
 /**
  * Sends a transactional email notification when a booking is confirmed
  */
