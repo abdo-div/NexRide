@@ -21,6 +21,7 @@ import {
   updateMeSchema,
   adminUpdateUserSchema,
   updateUserStatusSchema,
+  updateCustomerPreferencesSchema,
 } from "../validations/user.validation.js";
 import { idParamSchema } from "../validations/common.validation.js";
 import {
@@ -40,6 +41,8 @@ import {
   getCustomerDriverDocuments,
   reviewCustomerDriverDocuments,
   downloadDriverDocument,
+  getMyPreferences,
+  updateMyPreferences,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -226,6 +229,13 @@ router.patch("/updatePassword", validate(updatePasswordSchema), updatePassword);
  *         description: Not authenticated
  */
 router.get("/me", getMe, getUserById);
+router.get("/me/preferences", restrictTo("customer"), getMyPreferences);
+router.patch(
+  "/me/preferences",
+  restrictTo("customer"),
+  validate(updateCustomerPreferencesSchema),
+  updateMyPreferences,
+);
 
 /**
  * @openapi

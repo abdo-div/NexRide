@@ -123,6 +123,18 @@ export const updateMe = catchAsync(async (req, res, next) => {
   });
 });
 
+export const getMyPreferences = catchAsync(async (req, res) => {
+  const user = await userService.fetchUserById(req.user.id);
+  res.status(200).json({ status: "success", data: { preferences: user.preferences } });
+});
+
+export const updateMyPreferences = catchAsync(async (req, res) => {
+  const user = await userService.updateCurrentUserProfile(req.user.id, {
+    preferences: req.body,
+  });
+  res.status(200).json({ status: "success", data: { preferences: user.preferences } });
+});
+
 export const deleteMe = catchAsync(async (req, res, next) => {
   await userService.softDeleteCurrentUser(req.user.id);
 

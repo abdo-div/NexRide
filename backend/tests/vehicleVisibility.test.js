@@ -219,6 +219,8 @@ test("public availability search keeps fixed visibility despite custom status fi
       operationalStatus: "UNAVAILABLE",
       companyId: pendingCompanyId,
       type: "suv",
+      transmission: "automatic",
+      fuelType: "hybrid",
       minPrice: "50",
     },
   );
@@ -227,6 +229,8 @@ test("public availability search keeps fixed visibility despite custom status fi
   assert.equal(initialFilter.operationalStatus, "AVAILABLE");
   assert.deepEqual(initialFilter.companyId, { $in: [approvedCompanyId] });
   assert.deepEqual(initialFilter.type, { $in: ["SUV"] });
+  assert.equal(initialFilter.transmission, "AUTOMATIC");
+  assert.equal(initialFilter.fuelType, "HYBRID");
   assert.deepEqual(initialFilter.dailyPrice, { $gte: 50 });
 });
 

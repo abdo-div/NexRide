@@ -29,6 +29,7 @@ import { RouteAnnouncer } from "./components/layouts/RouteAnnouncer";
 import { ToastProvider } from "./context/ToastProvider";
 import { SavedVehiclesProvider } from "./context/SavedVehiclesProvider";
 import { VehicleComparisonProvider } from "./context/VehicleComparisonProvider";
+import { CustomerPreferencesProvider } from "./context/CustomerPreferencesProvider";
 import { ComparisonTray } from "./components/vehicles/ComparisonTray";
 
 // Only the landing page is needed for the initial public load. Browsing, auth,
@@ -57,6 +58,7 @@ const MyProfilePage = lazy(() => import("./pages/MyProfilePage"));
 const BookingDetailsPage = lazy(() => import("./pages/BookingDetailsPage"));
 const SavedVehiclesPage = lazy(() => import("./pages/SavedVehiclesPage"));
 const VehicleComparisonPage = lazy(() => import("./pages/VehicleComparisonPage"));
+const CustomerPreferencesPage = lazy(() => import("./pages/CustomerPreferencesPage"));
 const AdminOverviewPage = lazy(() =>
   import("./pages/admin/AdminOverviewPage").then((module) => ({
     default: module.AdminOverviewPage,
@@ -241,6 +243,7 @@ function App() {
             <NetworkStatusBanner />
             <AuthProvider>
             <SavedVehiclesProvider>
+            <CustomerPreferencesProvider>
             <VehicleComparisonProvider>
             <SmoothScroll><Routes>
           <Route element={<PublicShell />}>
@@ -410,6 +413,7 @@ function App() {
               }
             />
             <Route path="/compare" element={<LazyRoute><VehicleComparisonPage /></LazyRoute>} />
+            <Route path="/preferences" element={<ProtectedRoute><LazyRoute><CustomerPreferencesPage /></LazyRoute></ProtectedRoute>} />
             <Route
               path="/my-bookings/:bookingId"
               element={
@@ -471,6 +475,7 @@ function App() {
           </Route>
             </Routes></SmoothScroll>
             </VehicleComparisonProvider>
+            </CustomerPreferencesProvider>
             </SavedVehiclesProvider>
             </AuthProvider>
             </ToastProvider>

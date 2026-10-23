@@ -16,6 +16,7 @@ import {
   PERK_OPTIONS,
   SEGMENTS,
 } from "../data/vehicleData";
+import { useCustomerPreferences } from "../context/useCustomerPreferences";
 
 const SKELETON_KEYS = ["a", "b", "c", "d", "e", "f"];
 
@@ -35,11 +36,12 @@ export const FleetPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { preferences } = useCustomerPreferences();
 
   // Location + dates chosen in the home search console. Passed straight to the
   // backend so availability is evaluated server-side against the booking
   // calendar rather than filtered client-side.
-  const searchLocation = searchParams.get("location") ?? "";
+  const searchLocation = searchParams.get("location") ?? preferences.preferredCity;
   const searchStart = searchParams.get("startDate") ?? "";
   const searchEnd = searchParams.get("endDate") ?? "";
   const companyParam = searchParams.get("company") ?? "";
@@ -48,6 +50,9 @@ export const FleetPage: React.FC = () => {
 
   const { vehicles: dtoVehicles, loading, error, reload } = useVehicles({
     location: searchLocation || undefined,
+    type: !categoryParam && preferences.vehicleTypes.length > 0 ? preferences.vehicleTypes.join(",") : undefined,
+    transmission: preferences.transmission === "ANY" ? undefined : preferences.transmission,
+    fuelType: preferences.fuelType === "ANY" ? undefined : preferences.fuelType,
     startDate: searchStart || undefined,
     endDate: searchEnd || undefined,
   });

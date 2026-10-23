@@ -22,6 +22,7 @@ import {
   openMoamalatLightbox,
   getMoamalatErrorMessage,
 } from "../lib/moamalatLightbox";
+import { useCustomerPreferences } from "../context/useCustomerPreferences";
 
 
 const addDays = (date: Date, days: number): Date => {
@@ -50,6 +51,7 @@ export const CheckoutPage: React.FC = () => {
 const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   const { t, i18n } = useTranslation();
   const { showToast } = useToast();
+  const { preferences } = useCustomerPreferences();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { status, vehicle: dto } = useVehicleDetail(vehicleId, false);
@@ -58,12 +60,12 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   const bookingAttemptKey = useRef(crypto.randomUUID());
 
   const defaultStart = useMemo(() => toISODate(addDays(new Date(), 1)), []);
-  const defaultEnd = useMemo(() => toISODate(addDays(new Date(), 4)), []);
+  const defaultEnd = useMemo(() => toISODate(addDays(new Date(), preferences.defaultRentalDays + 1)), [preferences.defaultRentalDays]);
 
   const startDate = searchParams.get("startDate") ?? defaultStart;
   const endDate = searchParams.get("endDate") ?? defaultEnd;
-  const startTime = searchParams.get("startTime") ?? "10:00";
-  const endTime = searchParams.get("endTime") ?? "10:00";
+  const startTime = searchParams.get("startTime") ?? preferences.pickupTime;
+  const endTime = searchParams.get("endTime") ?? preferences.returnTime;
   const locationParam = searchParams.get("location");
 
   const days = useMemo(() => {
@@ -174,7 +176,23 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   const [selected, setSelected] = useState<Set<string>>(
     () => new Set(baseMeta.addons.filter((a) => a.defaultOn).map((a) => a.id)),
   );
-  const [tab, setTab] = useState<"card" | "cash">("card");
+  const [tab, setTab] = useState<"card" | "cash">(
+    preferences.paymentMethod === "CASH_ON_DELIVERY" ? "cash" : "card",
+  );
+  const paymentChoiceTouched = useRef(false);
+  useEffect(() => {
+    if (!paymentChoiceTouched.current) {
+      void Promise.resolve().then(() => {
+        if (!paymentChoiceTouched.current) {
+          setTab(preferences.paymentMethod === "CASH_ON_DELIVERY" ? "cash" : "card");
+        }
+      });
+    }
+  }, [preferences.paymentMethod]);
+  const selectPaymentTab = (next: "card" | "cash") => {
+    paymentChoiceTouched.current = true;
+    setTab(next);
+  };
   const [phase, setPhase] = useState<"idle" | "processing" | "done">("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [driverValues, setDriverValues] = useState<Record<string, string>>({});
@@ -466,7 +484,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
               </div>
             </>}
             {activeStep === 3 && <>
-              <PaymentSection meta={meta} tab={tab} onTab={setTab} vehicleTitle={vehicle.title} />
+              <PaymentSection meta={meta} tab={tab} onTab={selectPaymentTab} vehicleTitle={vehicle.title} />
               <button type="button" onClick={() => moveToStep(2)} className="inline-flex w-fit items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-100"><ArrowLeft className="h-4 w-4 rtl:rotate-180" />{t("checkout.flow.backOptions")}</button>
             </>}
           </div>

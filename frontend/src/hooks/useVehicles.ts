@@ -19,7 +19,7 @@ export interface VehiclesState {
  * re-runs whenever any search argument changes.
  */
 export const useVehicles = (args: VehicleSearchArgs = {}): VehiclesState => {
-  const { location, type, minPrice, maxPrice, startDate, endDate } = args;
+  const { location, type, transmission, fuelType, minPrice, maxPrice, startDate, endDate } = args;
   const [vehicles, setVehicles] = useState<VehicleDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +35,7 @@ export const useVehicles = (args: VehicleSearchArgs = {}): VehiclesState => {
 
       try {
         const response = await vehicleApi.search(
-          { location, type, minPrice, maxPrice, startDate, endDate },
+          { location, type, transmission, fuelType, minPrice, maxPrice, startDate, endDate },
           controller.signal,
         );
         if (!active) return;
@@ -60,7 +60,7 @@ export const useVehicles = (args: VehicleSearchArgs = {}): VehiclesState => {
       active = false;
       controller.abort();
     };
-  }, [attempt, location, type, minPrice, maxPrice, startDate, endDate]);
+  }, [attempt, location, type, transmission, fuelType, minPrice, maxPrice, startDate, endDate]);
 
   const reload = useCallback(() => setAttempt((n) => n + 1), []);
 
