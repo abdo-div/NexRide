@@ -40,6 +40,7 @@ import { StatusPill } from "../../components/admin/StatusPill";
 import type { BookingDto } from "../../types/booking";
 import type { AdminPaymentDto } from "../../types/admin";
 import type { VehicleDto } from "../../types/vehicle";
+import { DriverDocumentReview } from "../../components/driverDocuments/DriverDocumentReview";
 
 interface TimelineStep {
   id: string;
@@ -551,6 +552,7 @@ export const AdminBookingDetailPage: React.FC = () => {
                     <MapPin className="h-4 w-4 text-[#142B4A]" />
                   </Row>
                 </dl>
+                {customer?._id && <div className="mt-4"><DriverDocumentReview customerId={customer._id} compact /></div>}
               </div>
             </section>
 

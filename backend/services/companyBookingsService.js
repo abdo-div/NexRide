@@ -132,6 +132,7 @@ const mapRow = (doc) => {
         }
       : null,
     customer: {
+      id: customer._id ? String(customer._id) : "",
       initials: initialsOf(customer.name),
       name: customer.name ?? "Customer",
       phone: customer.phoneNumber ?? null,

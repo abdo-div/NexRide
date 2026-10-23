@@ -57,6 +57,7 @@ export interface CompanyVehicleOption {
 }
 
 export interface CompanyBookingRowCustomer {
+  id: string;
   initials: string;
   name: string;
   phone: string | null;

@@ -16,6 +16,7 @@ import { formatLYD } from "../../lib/bookingView";
 import { photoUrl } from "../../lib/vehicleMapper";
 import type { CompanyBookingRow } from "../../types/companyBookings";
 import { useDialog } from "../../context/useDialog";
+import { DriverDocumentReview } from "../driverDocuments/DriverDocumentReview";
 
 interface CompanyBookingInspectDrawerProps {
   row: CompanyBookingRow | null;
@@ -243,6 +244,9 @@ export const CompanyBookingInspectDrawer: React.FC<
               )}
             </div>
           </div>
+
+          {/* Pickup */}
+          <DriverDocumentReview customerId={row.customer.id} compact />
 
           {/* Pickup */}
           <div className="flex items-center justify-between gap-3 rounded-xl border border-[#F1F5F9] bg-[#F8FAFF] px-3 py-2.5">

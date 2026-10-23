@@ -40,6 +40,30 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "default.jpg",
     },
+    driverVerification: {
+      status: {
+        type: String,
+        enum: ["NOT_UPLOADED", "PENDING", "APPROVED", "REJECTED"],
+        default: "NOT_UPLOADED",
+      },
+      licence: {
+        filename: { type: String, select: false },
+        originalName: String,
+        mimeType: String,
+        uploadedAt: Date,
+        expiresAt: Date,
+      },
+      identity: {
+        filename: { type: String, select: false },
+        originalName: String,
+        mimeType: String,
+        uploadedAt: Date,
+        expiresAt: Date,
+      },
+      reviewedAt: Date,
+      reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      rejectionReason: { type: String, trim: true, maxlength: 500 },
+    },
 
     // -------------------------------------------------------------------------
     // Role-Based Access Control (RBAC) & Multi-Tenancy

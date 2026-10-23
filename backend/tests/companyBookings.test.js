@@ -258,6 +258,7 @@ test("the bookings page maps real ledgers into the drawer-ready row shape", asyn
   assert.equal(mapped.payment, "PAID");
   assert.equal(mapped.channel, "delivery");
   assert.deepEqual(mapped.customer, {
+    id: customerA,
     initials: "AA",
     name: "Ahmed Ali",
     phone: "+218 91 382 9910",

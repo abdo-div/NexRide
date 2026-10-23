@@ -34,6 +34,12 @@ import {
   deleteUser,
   uploadUserPhoto,
   resizeUserPhoto,
+  uploadDriverDocuments,
+  getMyDriverDocuments,
+  updateMyDriverDocuments,
+  getCustomerDriverDocuments,
+  reviewCustomerDriverDocuments,
+  downloadDriverDocument,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -274,6 +280,36 @@ router.patch(
  */
 router.delete("/delete-me", deleteMe);
 router.delete("/deleteMe", deleteMe);
+
+router.get(
+  "/me/driver-documents",
+  restrictTo("customer"),
+  getMyDriverDocuments,
+);
+router.patch(
+  "/me/driver-documents",
+  restrictTo("customer"),
+  uploadDriverDocuments,
+  updateMyDriverDocuments,
+);
+
+router.get(
+  "/:id/driver-documents",
+  restrictTo("company", "admin"),
+  validate(idParamSchema()),
+  getCustomerDriverDocuments,
+);
+router.patch(
+  "/:id/driver-documents/review",
+  restrictTo("company", "admin"),
+  validate(idParamSchema()),
+  reviewCustomerDriverDocuments,
+);
+router.get(
+  "/:id/driver-documents/:kind/file",
+  restrictTo("company", "admin"),
+  downloadDriverDocument,
+);
 
 // -----------------------------------------------------------------------------
 // PLATFORM ADMIN & GOVERNANCE ROUTES (Super-Admin Portal)
