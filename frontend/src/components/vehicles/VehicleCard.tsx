@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Heart, Star, Gauge, Armchair, Settings, Fuel, CheckCircle2 } from "lucide-react";
+import { Heart, Star, Gauge, Armchair, Settings, Fuel, CheckCircle2, GitCompareArrows } from "lucide-react";
 import type { Vehicle } from "../../types/vehicle";
 import { VehicleImage } from "../VehicleImage";
 import { companyLogoUrl } from "../../lib/vehicleMapper";
@@ -10,6 +10,7 @@ import { buttonHover, buttonTap, hoverSpring, softHoverSpring } from "../../lib/
 import { useAuth } from "../../context/useAuth";
 import { useSavedVehicles } from "../../context/useSavedVehicles";
 import { useToast } from "../../context/toastContextValue";
+import { useVehicleComparison } from "../../context/useVehicleComparison";
 
 const SPEC_META: {
   key: keyof Vehicle["specs"];
@@ -43,10 +44,12 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
   const { user } = useAuth();
   const { favoriteIds, toggleFavorite } = useSavedVehicles();
   const { showToast } = useToast();
+  const { hasVehicle, toggleVehicle } = useVehicleComparison();
   const navigate = useNavigate();
   const location = useLocation();
   const [saving, setSaving] = useState(false);
   const fav = favoriteIds.has(vehicle.id);
+  const compared = hasVehicle(vehicle.id);
   const reduceMotion = useReducedMotion();
 
   return (
@@ -185,6 +188,20 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
             ))}
           </div>
           <div className="flex items-center gap-3 shrink-0">
+            <button
+              type="button"
+              aria-pressed={compared}
+              onClick={() => {
+                const result = toggleVehicle(vehicle.id);
+                if (result === "limit") {
+                  showToast({ tone: "info", title: t("comparison.limitTitle"), description: t("comparison.limitDescription") });
+                }
+              }}
+              className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-bold transition-colors ${compared ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:text-blue-700"}`}
+            >
+              <GitCompareArrows className="h-4 w-4" />
+              {compared ? t("comparison.added") : t("comparison.add")}
+            </button>
             <motion.div whileHover={reduceMotion ? undefined : buttonHover} whileTap={reduceMotion ? undefined : buttonTap}>
             <Link
               to={`/cars/${vehicle.id}`}

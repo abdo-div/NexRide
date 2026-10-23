@@ -1,18 +1,20 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { Car, Share2, Heart, Download } from "lucide-react";
+import { Car, Share2, Heart, Download, GitCompareArrows } from "lucide-react";
 import { useToast } from "../../context/toastContextValue";
 
 interface Props {
   crumbs: string[];
   saved: boolean;
   onToggleSave: () => void;
+  compared: boolean;
+  onToggleCompare: () => void;
 }
 
 const Separator = () => <span className="text-[#CBD5E1]">/</span>;
 
-export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave }) => {
+export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave, compared, onToggleCompare }) => {
   const { t } = useTranslation();
   const { showToast } = useToast();
   const [copied, setCopied] = React.useState(false);
@@ -71,6 +73,15 @@ export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave
         >
           <Heart className={`w-[18px] h-[18px] ${saved ? "fill-[#142B4A] text-[#142B4A]" : ""}`} />
           {saved ? t("nav.saved") : t("vehicleDetail.save")}
+        </button>
+        <button
+          type="button"
+          onClick={onToggleCompare}
+          aria-pressed={compared}
+          className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-[13px] font-medium shadow-sm transition-colors ${compared ? "border-blue-300 bg-blue-50 text-blue-700" : "border-[#E2E8F0] bg-white text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]"}`}
+        >
+          <GitCompareArrows className="h-[18px] w-[18px]" />
+          {t(compared ? "comparison.added" : "comparison.add")}
         </button>
         <Link
           to="/terms"

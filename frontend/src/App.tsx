@@ -28,6 +28,8 @@ import { BackToTop } from "./components/layouts/BackToTop";
 import { RouteAnnouncer } from "./components/layouts/RouteAnnouncer";
 import { ToastProvider } from "./context/ToastProvider";
 import { SavedVehiclesProvider } from "./context/SavedVehiclesProvider";
+import { VehicleComparisonProvider } from "./context/VehicleComparisonProvider";
+import { ComparisonTray } from "./components/vehicles/ComparisonTray";
 
 // Only the landing page is needed for the initial public load. Browsing, auth,
 // booking, checkout and payment screens are separate chunks so a first-time
@@ -54,6 +56,7 @@ const MyBookingsPage = lazy(() => import("./pages/MyBookingsPage"));
 const MyProfilePage = lazy(() => import("./pages/MyProfilePage"));
 const BookingDetailsPage = lazy(() => import("./pages/BookingDetailsPage"));
 const SavedVehiclesPage = lazy(() => import("./pages/SavedVehiclesPage"));
+const VehicleComparisonPage = lazy(() => import("./pages/VehicleComparisonPage"));
 const AdminOverviewPage = lazy(() =>
   import("./pages/admin/AdminOverviewPage").then((module) => ({
     default: module.AdminOverviewPage,
@@ -218,6 +221,7 @@ function PublicShell() {
         <Outlet />
       </main>
       <Footer />
+      <ComparisonTray />
     </div>
   );
 }
@@ -237,6 +241,7 @@ function App() {
             <NetworkStatusBanner />
             <AuthProvider>
             <SavedVehiclesProvider>
+            <VehicleComparisonProvider>
             <SmoothScroll><Routes>
           <Route element={<PublicShell />}>
             <Route path="/" element={<StaffLandingRoute><HomePage /></StaffLandingRoute>} />
@@ -404,6 +409,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/compare" element={<LazyRoute><VehicleComparisonPage /></LazyRoute>} />
             <Route
               path="/my-bookings/:bookingId"
               element={
@@ -464,6 +470,7 @@ function App() {
             <Route path="*" element={<CompanyDashboardPage />} />
           </Route>
             </Routes></SmoothScroll>
+            </VehicleComparisonProvider>
             </SavedVehiclesProvider>
             </AuthProvider>
             </ToastProvider>

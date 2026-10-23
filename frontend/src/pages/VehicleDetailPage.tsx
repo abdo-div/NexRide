@@ -19,6 +19,7 @@ import { BookingSidebar } from "../components/vehicleDetail/BookingSidebar";
 import { useAuth } from "../context/useAuth";
 import { useSavedVehicles } from "../context/useSavedVehicles";
 import { useToast } from "../context/toastContextValue";
+import { useVehicleComparison } from "../context/useVehicleComparison";
 
 const HeroSkeleton = () => (
   <div className="space-y-6">
@@ -53,6 +54,7 @@ export const VehicleDetailPage: React.FC = () => {
   const { user } = useAuth();
   const { favoriteIds, toggleFavorite, recordView } = useSavedVehicles();
   const { showToast } = useToast();
+  const { hasVehicle, toggleVehicle } = useVehicleComparison();
   const navigate = useNavigate();
   const location = useLocation();
   const [saving, setSaving] = useState(false);
@@ -64,6 +66,7 @@ export const VehicleDetailPage: React.FC = () => {
     [vehicle, similar],
   );
   const saved = Boolean(vehicleId && favoriteIds.has(vehicleId));
+  const compared = Boolean(vehicleId && hasVehicle(vehicleId));
 
   useEffect(() => {
     if (!vehicleId || status !== "ready" || user?.role?.trim() !== "customer") return;
@@ -170,7 +173,17 @@ export const VehicleDetailPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#f1f5f9_0%,#ffffff_34%,#f8fafc_100%)]">
       <div className="mx-auto max-w-[1360px] px-4 pb-20 pt-28 lg:px-8">
-        <DetailBreadcrumbs crumbs={realDetail.crumbs} saved={saved} onToggleSave={handleToggleSave} />
+        <DetailBreadcrumbs
+          crumbs={realDetail.crumbs}
+          saved={saved}
+          onToggleSave={handleToggleSave}
+          compared={compared}
+          onToggleCompare={() => {
+            if (!vehicleId) return;
+            const result = toggleVehicle(vehicleId);
+            if (result === "limit") showToast({ tone: "info", title: t("comparison.limitTitle"), description: t("comparison.limitDescription") });
+          }}
+        />
         <DetailTitleBar detail={realDetail} />
         <DetailGallery detail={realDetail} />
 
