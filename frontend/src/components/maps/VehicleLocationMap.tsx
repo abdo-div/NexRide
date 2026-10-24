@@ -6,6 +6,38 @@ const TRIPOLI: [number, number] = [13.1913, 32.8872];
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN?.trim();
 const MAP_STYLE = "mapbox://styles/mapbox/standard";
 
+const OpenStreetMapFallback: React.FC<{
+  coordinates?: [number, number] | null;
+  label?: string;
+  className: string;
+}> = ({ coordinates, label, className }) => {
+  const [longitude, latitude] = isValidCoordinate(coordinates) ? coordinates : TRIPOLI;
+  const longitudeSpan = 0.025;
+  const latitudeSpan = 0.015;
+  const bounds = [
+    longitude - longitudeSpan,
+    latitude - latitudeSpan,
+    longitude + longitudeSpan,
+    latitude + latitudeSpan,
+  ].join(",");
+  const source = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bounds)}&layer=mapnik&marker=${encodeURIComponent(`${latitude},${longitude}`)}`;
+
+  return (
+    <div className={`relative isolate overflow-hidden rounded-2xl border border-[#D8E2F0] bg-slate-100 shadow-[0_18px_45px_-30px_rgba(15,23,42,0.55)] ${className}`}>
+      <iframe
+        src={source}
+        title={label || "Location map"}
+        className="h-full w-full border-0"
+        loading="lazy"
+        referrerPolicy="strict-origin-when-cross-origin"
+      />
+      <span className="pointer-events-none absolute bottom-2 end-2 rounded-lg bg-white/90 px-2.5 py-1 text-[10px] font-semibold text-slate-600 shadow-sm backdrop-blur">
+        OpenStreetMap
+      </span>
+    </div>
+  );
+};
+
 interface VehicleLocationMapProps {
   coordinates?: [number, number] | null; // GeoJSON and Mapbox order: [longitude, latitude]
   editable?: boolean;
@@ -176,15 +208,8 @@ export const VehicleLocationMap: React.FC<VehicleLocationMapProps> = ({
     });
   }, [coordinates, editable, label]);
 
-  if (!MAPBOX_TOKEN) {
-    return (
-      <div
-        className={`flex items-center justify-center overflow-hidden rounded-2xl border border-amber-200 bg-amber-50 px-6 text-center text-sm font-semibold text-amber-900 ${className}`}
-        role="status"
-      >
-        Mapbox is not configured. Add VITE_MAPBOX_ACCESS_TOKEN to the frontend environment.
-      </div>
-    );
+  if (!MAPBOX_TOKEN || mapError) {
+    return <OpenStreetMapFallback coordinates={coordinates} label={label} className={className} />;
   }
 
   return (
@@ -192,12 +217,6 @@ export const VehicleLocationMap: React.FC<VehicleLocationMapProps> = ({
       className={`vehicle-location-map relative z-0 isolate overflow-hidden rounded-2xl border border-[#D8E2F0] bg-slate-100 shadow-[0_18px_45px_-30px_rgba(15,23,42,0.55)] ${className}`}
     >
       <div ref={containerRef} className="h-full w-full" aria-label={label || "Location map"} />
-
-      {mapError && (
-        <div className="absolute inset-x-4 top-4 z-10 rounded-xl border border-red-200 bg-white/95 px-4 py-3 text-center text-xs font-semibold text-red-700 shadow-lg backdrop-blur">
-          {mapError}
-        </div>
-      )}
 
       {editable && (
         <div className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2 whitespace-nowrap rounded-full border border-white/70 bg-white/95 px-3.5 py-2 text-xs font-bold text-[#0B1C30] shadow-lg backdrop-blur-md">

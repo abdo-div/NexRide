@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import {
-  BrowserRouter,
+  HashRouter,
   Routes,
   Route,
   Outlet,
@@ -233,7 +233,7 @@ function PublicShell() {
 function App() {
   return (
     <MotionConfig reducedMotion="user">
-      <BrowserRouter>
+      <HashRouter>
         <GlobalErrorBoundary>
           <PageMetadata />
           <RouteAnnouncer />
@@ -485,7 +485,7 @@ function App() {
             </ToastProvider>
           </DialogProvider>
         </GlobalErrorBoundary>
-      </BrowserRouter>
+      </HashRouter>
     </MotionConfig>
   );
 }
