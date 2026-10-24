@@ -10,7 +10,7 @@ interface Props {
 
 export const DetailGallery: React.FC<Props> = ({ detail }) => {
   const { t } = useTranslation();
-  const images = detail.gallery;
+  const images = detail.gallery.filter((_, index) => index !== 1);
   const initialIndex = Math.max(0, images.findIndex((image) => image.master));
   const [activeIndex, setActiveIndex] = React.useState(initialIndex);
   const [viewerOpen, setViewerOpen] = React.useState(false);
@@ -32,7 +32,7 @@ export const DetailGallery: React.FC<Props> = ({ detail }) => {
     <section className="mb-12" aria-label={t("vehicleDetail.galleryLabel")}>
       <div className="grid grid-cols-1 gap-3 rounded-[2rem] border border-slate-200/80 bg-white p-2 shadow-[0_28px_80px_-45px_rgba(15,23,42,.55)] md:grid-cols-12 md:gap-2">
       {active && (
-        <button type="button" onClick={() => setViewerOpen(true)} className="relative min-h-[360px] overflow-hidden rounded-[1.5rem] bg-slate-100 text-start group md:col-span-9 md:min-h-[540px]">
+        <button type="button" onClick={() => setViewerOpen(true)} className={`relative min-h-[360px] overflow-hidden rounded-[1.5rem] bg-slate-100 text-start group md:min-h-[540px] ${images.length > 1 ? "md:col-span-9" : "md:col-span-12"}`}>
           <VehicleImage
             src={active.src}
             alt={t(active.alt, { model: detail.vehicle.title })}
@@ -62,6 +62,7 @@ export const DetailGallery: React.FC<Props> = ({ detail }) => {
         </button>
       )}
 
+      {images.length > 1 && (
       <div className="grid grid-cols-3 gap-2 md:col-span-3 md:grid-cols-1">
         {images.slice(0, 4).map((img, index) => (
           <button
@@ -83,6 +84,7 @@ export const DetailGallery: React.FC<Props> = ({ detail }) => {
           </button>
         ))}
       </div>
+      )}
       </div>
 
       {viewerOpen && active && (

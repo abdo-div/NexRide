@@ -79,7 +79,7 @@ export const BookingSidebar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
   const labelCls = "block mb-1 text-[11px] text-[#64748B] font-bold uppercase tracking-wider";
 
   return (
-    <aside className="flex flex-col gap-4 lg:sticky lg:top-24 lg:col-span-4">
+    <aside className="flex flex-col gap-4 lg:col-span-4">
       <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_24px_70px_-38px_rgba(15,23,42,.5)]">
         <div className="flex items-baseline justify-between mb-4">
           <div>
