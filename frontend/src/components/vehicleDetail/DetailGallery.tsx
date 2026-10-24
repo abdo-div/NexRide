@@ -32,11 +32,11 @@ export const DetailGallery: React.FC<Props> = ({ detail }) => {
     <section className="mb-12" aria-label={t("vehicleDetail.galleryLabel")}>
       <div className="grid grid-cols-1 gap-3 rounded-[2rem] border border-slate-200/80 bg-white p-2 shadow-[0_28px_80px_-45px_rgba(15,23,42,.55)] md:grid-cols-12 md:gap-2">
       {active && (
-        <button type="button" onClick={() => setViewerOpen(true)} className={`relative min-h-[360px] overflow-hidden rounded-[1.5rem] bg-slate-100 text-start group md:min-h-[540px] ${images.length > 1 ? "md:col-span-9" : "md:col-span-12"}`}>
+        <button type="button" onClick={() => setViewerOpen(true)} className={`group relative h-[320px] overflow-hidden rounded-[1.5rem] bg-slate-100 text-start sm:h-[400px] lg:h-[480px] ${images.length > 1 ? "md:col-span-9" : "md:col-span-12"}`}>
           <VehicleImage
             src={active.src}
             alt={t(active.alt, { model: detail.vehicle.title })}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+            className="block h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-black/10 pointer-events-none" />
           <div className="absolute top-4 start-4 flex flex-wrap gap-2">
