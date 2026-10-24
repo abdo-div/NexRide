@@ -78,6 +78,23 @@ export const securityCors = cors({
 // Helmet Security Headers
 export const securityHeaders = helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: {
+    directives: {
+      // Mapbox GL loads its style, tiles, fonts and telemetry over HTTPS.
+      connectSrc: [
+        "'self'",
+        "https://api.mapbox.com",
+        "https://events.mapbox.com",
+      ],
+      // Mapbox renders map assets through data/blob URLs and runs its bundled
+      // renderer in a blob-backed worker. Keep every other source restricted
+      // to the same origin by Helmet's default policy.
+      imgSrc: ["'self'", "data:", "blob:"],
+      workerSrc: ["'self'", "blob:"],
+      // The Mapbox Standard style uses WebAssembly for its 3D renderer.
+      scriptSrc: ["'self'", "'wasm-unsafe-eval'"],
+    },
+  },
 });
 // Prevent NoSQL Injection Queries ($gt, $ne, etc.)
 // Express 5 defines req.query as a getter-only prototype property, so the
