@@ -15,18 +15,28 @@ const noTranslate: Translate = (_key, fallback) => fallback;
 // Shown when a vehicle has no uploaded photo. Rendered instead of a remote
 // stock image so a missing photo is never disguised as a real car.
 const PLACEHOLDER_IMAGE = `data:image/svg+xml;utf8,${encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="667" viewBox="0 0 1000 667">' +
-    '<rect width="1000" height="667" fill="#E2E8F0"/>' +
-    '<g fill="none" stroke="#94A3B8" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">' +
-    '<path d="M250 430h500"/><path d="M280 430l40-120h360l40 120"/>' +
-    '<path d="M280 430v50M720 430v50"/></g>' +
-    '<circle cx="330" cy="470" r="34" fill="#94A3B8"/>' +
-    '<circle cx="670" cy="470" r="34" fill="#94A3B8"/>' +
+  '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750">' +
+    '<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#071426"/><stop offset="1" stop-color="#173B68"/></linearGradient><radialGradient id="glow" cx="50%" cy="38%" r="58%"><stop stop-color="#60A5FA" stop-opacity=".18"/><stop offset="1" stop-color="#60A5FA" stop-opacity="0"/></radialGradient></defs>' +
+    '<rect width="1200" height="750" fill="url(#bg)"/><rect width="1200" height="750" fill="url(#glow)"/>' +
+    '<g fill="none" stroke="#93C5FD" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity=".9">' +
+    '<path d="M315 435h570M350 435l52-142h396l52 142"/><path d="M350 435v62M850 435v62"/></g>' +
+    '<circle cx="430" cy="492" r="43" fill="#0B1C30" stroke="#BFDBFE" stroke-width="11"/>' +
+    '<circle cx="770" cy="492" r="43" fill="#0B1C30" stroke="#BFDBFE" stroke-width="11"/>' +
+    '<text x="600" y="625" fill="#DBEAFE" font-family="Arial, sans-serif" font-size="27" font-weight="700" letter-spacing="8" text-anchor="middle">NEXRIDE</text>' +
     "</svg>",
 )}`;
 
-/** Neutral grey artwork used whenever a vehicle has no uploaded photo. */
+/** Branded artwork used whenever a vehicle has no uploaded photo. */
 export const vehiclePlaceholderImage = PLACEHOLDER_IMAGE;
+
+/** Swaps a failed vehicle request for the branded local fallback exactly once. */
+export const applyVehicleImageFallback = (event: {
+  currentTarget: HTMLImageElement;
+}) => {
+  if (event.currentTarget.getAttribute("src") !== vehiclePlaceholderImage) {
+    event.currentTarget.src = vehiclePlaceholderImage;
+  }
+};
 
 /**
  * The fleet sidebar's taxonomy was hand-written for a richer vehicle schema.

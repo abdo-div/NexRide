@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Camera, LayoutGrid } from "lucide-react";
+import { Camera, Expand, X, ChevronLeft, ChevronRight } from "lucide-react";
 import type { VehicleDetail } from "../../types/vehicleDetail";
 import { VehicleImage } from "../VehicleImage";
 
@@ -10,71 +10,92 @@ interface Props {
 
 export const DetailGallery: React.FC<Props> = ({ detail }) => {
   const { t } = useTranslation();
-  const images = detail.gallery;
-  const master = images.find((i) => i.master);
-  const thumbs = images.filter((i) => !i.master);
+  const images = detail.gallery.filter((_, index) => index !== 1);
+  const initialIndex = Math.max(0, images.findIndex((image) => image.master));
+  const [activeIndex, setActiveIndex] = React.useState(initialIndex);
+  const [viewerOpen, setViewerOpen] = React.useState(false);
+  const active = images[activeIndex] ?? images[0];
   const labelFor = (i: (typeof images)[number]) => t(i.label ?? i.alt, { model: detail.vehicle.title });
 
+  React.useEffect(() => {
+    if (!viewerOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setViewerOpen(false);
+      if (event.key === "ArrowRight") setActiveIndex((index) => (index + 1) % images.length);
+      if (event.key === "ArrowLeft") setActiveIndex((index) => (index - 1 + images.length) % images.length);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [images.length, viewerOpen]);
+
   return (
-    <section className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 mb-12">
-      {master && (
-        <div className="relative md:col-span-8 rounded-2xl overflow-hidden group shadow-sm border border-[#E2E8F0] bg-white min-h-[360px] md:min-h-[520px]">
+    <section className="mb-12" aria-label={t("vehicleDetail.galleryLabel")}>
+      <div className="grid grid-cols-1 gap-3 rounded-[2rem] border border-slate-200/80 bg-white p-2 shadow-[0_28px_80px_-45px_rgba(15,23,42,.55)] md:grid-cols-12 md:gap-2">
+      {active && (
+        <button type="button" onClick={() => setViewerOpen(true)} className={`relative min-h-[360px] overflow-hidden rounded-[1.5rem] bg-slate-100 text-start group md:min-h-[540px] ${images.length > 1 ? "md:col-span-9" : "md:col-span-12"}`}>
           <VehicleImage
-            src={master.src}
-            alt={t(master.alt, { model: detail.vehicle.title })}
+            src={active.src}
+            alt={t(active.alt, { model: detail.vehicle.title })}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-black/10 pointer-events-none" />
           <div className="absolute top-4 start-4 flex flex-wrap gap-2">
             <span className="px-3 py-1.5 rounded-xl bg-white/90 backdrop-blur-md text-[#0F172A] text-[11px] font-bold flex items-center gap-1.5 shadow-sm border border-slate-200">
               <Camera className="w-4 h-4 text-[#142B4A]" />
-              {labelFor(master)}
+              {labelFor(active)}
             </span>
           </div>
           <div className="absolute bottom-4 start-4 end-4 flex items-end justify-between">
             <div>
               <span className="block text-[11px] text-blue-300 font-bold uppercase tracking-widest mb-0.5">
-                {t(master.headline ?? "vehicleDetail.showcaseView")}
+                {t(active.headline ?? "vehicleDetail.showcaseView")}
               </span>
               <p className="text-[18px] font-bold text-white">
-                {t(master.alt, { model: detail.vehicle.title })}
+                {t(active.alt, { model: detail.vehicle.title })}
               </p>
             </div>
             <span className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/90 backdrop-blur-md text-[#0F172A] text-[12px] font-semibold shadow-sm">
-              <Camera className="w-4 h-4 text-[#142B4A]" />
-              {t(master.meta ?? "vehicleDetail.galleryMasterView")}
+              <Expand className="w-4 h-4 text-[#142B4A]" />
+              {t("vehicleDetail.openGallery")}
             </span>
           </div>
-        </div>
+        </button>
       )}
 
-      <div className="md:col-span-4 grid grid-cols-2 md:grid-cols-1 gap-3 md:gap-4">
-        {thumbs.slice(0, 3).map((img) => (
-          <div
+      {images.length > 1 && (
+      <div className="grid grid-cols-3 gap-2 md:col-span-3 md:grid-cols-1">
+        {images.slice(0, 4).map((img, index) => (
+          <button
+            type="button"
             key={img.src}
-            className="relative rounded-2xl overflow-hidden group shadow-sm border border-[#E2E8F0] bg-white h-[170px] md:h-[120px]"
+            onClick={() => setActiveIndex(index)}
+            aria-pressed={activeIndex === index}
+            className={`relative h-24 overflow-hidden rounded-2xl border-2 bg-slate-100 text-start transition-all md:h-auto ${activeIndex === index ? "border-[#2563EB] shadow-md" : "border-transparent opacity-80 hover:opacity-100"}`}
           >
             <VehicleImage
               src={img.src}
               alt={t(img.alt, { model: detail.vehicle.title })}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
-            <span className="absolute bottom-2.5 start-3 text-[11px] text-white font-semibold">
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/75 to-transparent" />
+            <span className="absolute bottom-2.5 start-3 hidden text-[11px] font-semibold text-white sm:block">
               {labelFor(img)}
             </span>
-          </div>
+          </button>
         ))}
-        <div className="relative rounded-2xl overflow-hidden group cursor-pointer shadow-sm border border-[#E2E8F0] bg-[#F8FAFC] h-[170px] md:h-[120px] flex items-center justify-center text-center p-3 hover:border-blue-400 transition-colors">
-          <div className="relative z-10 flex flex-col items-center justify-center gap-1">
-            <LayoutGrid className="w-7 h-7 text-[#142B4A] group-hover:scale-110 transition-transform" />
-            <span className="text-[14px] font-bold text-[#0F172A]">
-              {t("vehicleDetail.moreAngles", { count: Math.max(thumbs.length - 3, 1) })}
-            </span>
-            <span className="text-[11px] text-[#64748B]">{t("vehicleDetail.cabinTour")}</span>
-          </div>
-        </div>
       </div>
+      )}
+      </div>
+
+      {viewerOpen && active && (
+        <div role="dialog" aria-modal="true" aria-label={t("vehicleDetail.galleryLabel")} className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/95 p-4 backdrop-blur-md">
+          <button type="button" onClick={() => setViewerOpen(false)} aria-label={t("vehicleDetail.closeGallery")} className="absolute end-5 top-5 z-10 grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20"><X className="h-5 w-5" /></button>
+          <button type="button" onClick={() => setActiveIndex((index) => (index - 1 + images.length) % images.length)} aria-label={t("vehicleDetail.previousImage")} className="absolute start-5 z-10 grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20"><ChevronLeft className="h-6 w-6 rtl:rotate-180" /></button>
+          <VehicleImage src={active.src} alt={t(active.alt, { model: detail.vehicle.title })} className="max-h-[82vh] max-w-[92vw] rounded-2xl object-contain shadow-2xl" />
+          <button type="button" onClick={() => setActiveIndex((index) => (index + 1) % images.length)} aria-label={t("vehicleDetail.nextImage")} className="absolute end-5 z-10 grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20"><ChevronRight className="h-6 w-6 rtl:rotate-180" /></button>
+          <div className="absolute bottom-5 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white">{activeIndex + 1} / {images.length} · {labelFor(active)}</div>
+        </div>
+      )}
     </section>
   );
 };

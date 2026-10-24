@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, UserRound, SlidersHorizontal, CreditCard } from "lucide-react";
 import { getCheckoutMeta, computeCheckoutTotals } from "../data/checkoutData";
 import { useVehicleDetail } from "../hooks/useVehicleDetail";
 import { mapVehicle } from "../lib/vehicleMapper";
@@ -16,11 +16,14 @@ import { PaymentSection } from "../components/checkout/PaymentSection";
 import { BookingSummary } from "../components/checkout/BookingSummary";
 import type { CheckoutMeta } from "../types/checkout";
 import { moamalatApi } from "../lib/moamalatApi";
+import { useToast } from "../context/toastContextValue";
 import {
   loadMoamalatLightbox,
   openMoamalatLightbox,
   getMoamalatErrorMessage,
 } from "../lib/moamalatLightbox";
+import { useCustomerPreferences } from "../context/useCustomerPreferences";
+import { rewardApi } from "../lib/rewardApi";
 
 
 const addDays = (date: Date, days: number): Date => {
@@ -48,17 +51,22 @@ export const CheckoutPage: React.FC = () => {
 
 const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   const { t, i18n } = useTranslation();
+  const { showToast } = useToast();
+  const { preferences } = useCustomerPreferences();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { status, vehicle: dto } = useVehicleDetail(vehicleId, false);
+  // Keep one key for this mounted checkout. A retry after a timeout therefore
+  // retrieves the original reservation instead of attempting a second insert.
+  const bookingAttemptKey = useRef(crypto.randomUUID());
 
   const defaultStart = useMemo(() => toISODate(addDays(new Date(), 1)), []);
-  const defaultEnd = useMemo(() => toISODate(addDays(new Date(), 4)), []);
+  const defaultEnd = useMemo(() => toISODate(addDays(new Date(), preferences.defaultRentalDays + 1)), [preferences.defaultRentalDays]);
 
   const startDate = searchParams.get("startDate") ?? defaultStart;
   const endDate = searchParams.get("endDate") ?? defaultEnd;
-  const startTime = searchParams.get("startTime") ?? "10:00";
-  const endTime = searchParams.get("endTime") ?? "10:00";
+  const startTime = searchParams.get("startTime") ?? preferences.pickupTime;
+  const endTime = searchParams.get("endTime") ?? preferences.returnTime;
   const locationParam = searchParams.get("location");
 
   const days = useMemo(() => {
@@ -169,11 +177,37 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   const [selected, setSelected] = useState<Set<string>>(
     () => new Set(baseMeta.addons.filter((a) => a.defaultOn).map((a) => a.id)),
   );
-  const [tab, setTab] = useState<"card" | "cash">("card");
+  const [tab, setTab] = useState<"card" | "cash">(
+    preferences.paymentMethod === "CASH_ON_DELIVERY" ? "cash" : "card",
+  );
+  const paymentChoiceTouched = useRef(false);
+  useEffect(() => {
+    if (!paymentChoiceTouched.current) {
+      void Promise.resolve().then(() => {
+        if (!paymentChoiceTouched.current) {
+          setTab(preferences.paymentMethod === "CASH_ON_DELIVERY" ? "cash" : "card");
+        }
+      });
+    }
+  }, [preferences.paymentMethod]);
+  const selectPaymentTab = (next: "card" | "cash") => {
+    paymentChoiceTouched.current = true;
+    setTab(next);
+  };
   const [phase, setPhase] = useState<"idle" | "processing" | "done">("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [driverValues, setDriverValues] = useState<Record<string, string>>({});
   const [driverConfirmed, setDriverConfirmed] = useState(false);
+  const [activeStep, setActiveStep] = useState(1);
+  const [promotionCode, setPromotionCode] = useState("");
+  const [appliedPromotion, setAppliedPromotion] = useState<{ code: string; discountAmount: number } | null>(null);
+  const [promotionBusy, setPromotionBusy] = useState(false);
+  const [promotionError, setPromotionError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!submitError) return;
+    showToast({ tone: "error", title: t("toasts.bookingFailed.title"), description: submitError });
+  }, [showToast, submitError, t]);
 
   const driverComplete = useMemo(() => {
     const allFieldsFilled = meta.driverFields.every(
@@ -192,8 +226,25 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
     () => (vehicle ? computeCheckoutTotals(vehicle, meta, selected) : null),
     [vehicle, meta, selected],
   );
+  const displayTotals = useMemo(() => totals ? { ...totals, total: Math.max(0, totals.total - (appliedPromotion?.discountAmount ?? 0)) } : null, [totals, appliedPromotion]);
 
-  const toggle = (id: string) =>
+  const applyPromotion = async () => {
+    if (!promotionCode.trim()) return;
+    setPromotionBusy(true);
+    setPromotionError(null);
+    try {
+      const response = await rewardApi.quote({ code: promotionCode, vehicleId, startDate, endDate, addonIds: Array.from(selected) });
+      setAppliedPromotion({ code: response.data.quote.code, discountAmount: response.data.quote.discountAmount });
+      setPromotionCode(response.data.quote.code);
+    } catch (error) {
+      setAppliedPromotion(null);
+      setPromotionError(error instanceof Error ? error.message : t("checkout.promotion.error"));
+    } finally { setPromotionBusy(false); }
+  };
+
+  const toggle = (id: string) => {
+    setAppliedPromotion(null);
+    setPromotionError(null);
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -203,6 +254,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
       }
       return next;
     });
+  };
 
   const onConfirm = async () => {
     if (!vehicle || !totals || phase !== "idle" || !driverComplete) return;
@@ -211,14 +263,18 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
 
     if (tab === "cash") {
       try {
-        const result = await bookingApi.create({
-          vehicleId,
-          startDate,
-          endDate,
-          pickupLocation: locationParam || undefined,
-          paymentMethod: "CASH_ON_DELIVERY",
-          addonIds: Array.from(selected) as Array<"insurance" | "driver" | "childseat" | "delivery">,
-        });
+        const result = await bookingApi.create(
+          {
+            vehicleId,
+            startDate,
+            endDate,
+            pickupLocation: locationParam || undefined,
+            paymentMethod: "CASH_ON_DELIVERY",
+            addonIds: Array.from(selected) as Array<"insurance" | "driver" | "childseat" | "delivery">,
+            promotionCode: appliedPromotion?.code,
+          },
+          bookingAttemptKey.current,
+        );
         setPhase("done");
         const confirmationQuery = new URLSearchParams({
           booking: result.data.booking._id,
@@ -242,17 +298,41 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
       return;
     }
 
+    let pendingBookingId: string | null = null;
+    const releasePendingBooking = async (bookingId: string) => {
+      try {
+        await moamalatApi.release(bookingId);
+      } catch (releaseError) {
+        // Keep a second authenticated path so a transient release-endpoint
+        // failure cannot leave the vehicle blocked by an unpaid booking.
+        try {
+          await bookingApi.cancel(bookingId, "Moamalat payment was not completed");
+        } catch {
+          throw releaseError;
+        }
+      } finally {
+        // The prior idempotency key points to the now-expired booking. A retry
+        // must create a fresh pending reservation.
+        bookingAttemptKey.current = crypto.randomUUID();
+      }
+    };
+
     try {
       await loadMoamalatLightbox();
-      const result = await bookingApi.create({
-        vehicleId,
-        startDate,
-        endDate,
-        pickupLocation: locationParam || undefined,
-        addonIds: Array.from(selected) as Array<"insurance" | "driver" | "childseat" | "delivery">,
-      });
+      const result = await bookingApi.create(
+        {
+          vehicleId,
+          startDate,
+          endDate,
+          pickupLocation: locationParam || undefined,
+          addonIds: Array.from(selected) as Array<"insurance" | "driver" | "childseat" | "delivery">,
+          promotionCode: appliedPromotion?.code,
+        },
+        bookingAttemptKey.current,
+      );
 
       const booking = result.data.booking;
+      pendingBookingId = booking._id;
       const init = await moamalatApi.initiate(booking._id);
       const params = init.data.gateway.params;
 
@@ -272,6 +352,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
                 { replace: true },
               );
             } else {
+              await releasePendingBooking(booking._id);
               setPhase("idle");
               setSubmitError(
                 verifyRes.data?.reason ||
@@ -281,6 +362,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
               );
             }
           } catch (err) {
+            await releasePendingBooking(booking._id).catch(() => undefined);
             setPhase("idle");
             setSubmitError(
               err instanceof Error ? err.message : "Verification request failed.",
@@ -288,25 +370,32 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
           }
         },
         onError: (gatewayError) => {
-          setPhase("idle");
-          setSubmitError(
-            getMoamalatErrorMessage(gatewayError) ||
-              t("payment.gatewayError", {
-                defaultValue:
-                  "Moamalat payment gateway error. Please try again.",
-              }),
-          );
+          setPhase("processing");
+          void releasePendingBooking(booking._id)
+            .catch(() => undefined)
+            .finally(() => {
+              setPhase("idle");
+              setSubmitError(
+                getMoamalatErrorMessage(gatewayError) ||
+                  t("payment.gatewayError", {
+                    defaultValue:
+                      "Moamalat payment gateway error. Please try again.",
+                  }),
+              );
+            });
         },
         onCancel: () => {
           setSubmitError(null);
           setPhase("processing");
-          void bookingApi
-            .cancel(booking._id)
+          void releasePendingBooking(booking._id)
             .catch(() => undefined)
             .finally(() => setPhase("idle"));
         },
       });
     } catch (err) {
+      if (pendingBookingId) {
+        await releasePendingBooking(pendingBookingId).catch(() => undefined);
+      }
       setPhase("idle");
       setSubmitError(
         err instanceof ApiError && err.status === 409
@@ -319,8 +408,17 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   };
 
   const unavailable = availability === "unavailable";
+  const steps = [
+    { id: 1, label: t("checkout.flow.details"), icon: UserRound },
+    { id: 2, label: t("checkout.flow.options"), icon: SlidersHorizontal },
+    { id: 3, label: t("checkout.flow.payment"), icon: CreditCard },
+  ];
+  const moveToStep = (step: number) => {
+    setActiveStep(step);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
-  if (status === "loading" || !vehicle || !totals) {
+  if (status === "loading" || !vehicle || !totals || !displayTotals) {
     return (
       <div className="bg-[#F8FAFC] min-h-screen">
         <div className="pt-20 flex flex-col items-center justify-center gap-4 min-h-[70vh]">
@@ -356,9 +454,27 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   return (
     <div className="bg-[#F8FAFC] min-h-screen">
       <div className="pt-20">
-        <CheckoutHeader vehicleId={vehicle.id} meta={meta} />
+        <CheckoutHeader vehicleId={vehicle.id} meta={meta} currentStep={activeStep} totalSteps={steps.length} />
       </div>
-      <div className="max-w-[1360px] mx-auto px-4 lg:px-8 py-8 w-full">
+      <div className="mx-auto w-full max-w-[1360px] px-4 py-8 lg:px-8">
+        <nav aria-label={t("checkout.flow.label")} className="mb-8 rounded-3xl border border-slate-200/80 bg-white p-3 shadow-[0_18px_50px_-36px_rgba(15,23,42,.5)]">
+          <ol className="grid grid-cols-3 gap-2">
+            {steps.map((step) => {
+              const Icon = step.icon;
+              const complete = activeStep > step.id;
+              const current = activeStep === step.id;
+              const reachable = step.id < activeStep || (step.id === 2 && driverComplete) || (step.id === 3 && driverComplete && activeStep >= 2);
+              return (
+                <li key={step.id}>
+                  <button type="button" disabled={!reachable && !current} onClick={() => moveToStep(step.id)} aria-current={current ? "step" : undefined} className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-start transition-all sm:px-5 ${current ? "bg-[#142B4A] text-white shadow-lg" : complete ? "bg-emerald-50 text-emerald-800" : "text-slate-400"}`}>
+                    <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${current ? "bg-white/15" : complete ? "bg-emerald-100" : "bg-slate-100"}`}>{complete ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}</span>
+                    <span className="hidden sm:block"><span className="block text-[10px] font-bold uppercase tracking-wider opacity-70">{t("checkout.flow.step", { number: step.id })}</span><span className="text-sm font-bold">{step.label}</span></span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </nav>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-7 flex flex-col gap-6">
             {availability === "checking" && (
@@ -377,24 +493,25 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
                 {availabilityError}
               </div>
             )}
-            <ItinerarySection
-              meta={meta}
-              onChange={() => navigate(`/cars/${vehicleId}?${searchParams.toString()}`)}
-            />
-            <DriverSection
-              meta={meta}
-              values={driverValues}
-              confirmed={driverConfirmed}
-              onFieldChange={updateDriverField}
-              onConfirmedChange={setDriverConfirmed}
-            />
-            <OptionsSection meta={meta} selected={selected} onToggle={toggle} />
-            <PaymentSection
-              meta={meta}
-              tab={tab}
-              onTab={setTab}
-              vehicleTitle={vehicle.title}
-            />
+            {activeStep === 1 && <>
+              <ItinerarySection meta={meta} onChange={() => navigate(`/cars/${vehicleId}?${searchParams.toString()}`)} />
+              <DriverSection meta={meta} values={driverValues} confirmed={driverConfirmed} onFieldChange={updateDriverField} onConfirmedChange={setDriverConfirmed} />
+              <div className="flex flex-col items-end gap-2">
+                <button type="button" disabled={!driverComplete || availability !== "available"} onClick={() => moveToStep(2)} className="premium-button inline-flex min-w-48 items-center justify-center gap-2 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none">{t("checkout.flow.continueOptions")}<ArrowRight className="h-4 w-4 rtl:rotate-180" /></button>
+                {!driverComplete && <p className="text-xs font-semibold text-amber-700">{t("checkout.driver.completionHint")}</p>}
+              </div>
+            </>}
+            {activeStep === 2 && <>
+              <OptionsSection meta={meta} selected={selected} onToggle={toggle} />
+              <div className="flex items-center justify-between gap-3">
+                <button type="button" onClick={() => moveToStep(1)} className="inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-100"><ArrowLeft className="h-4 w-4 rtl:rotate-180" />{t("checkout.flow.back")}</button>
+                <button type="button" onClick={() => moveToStep(3)} className="premium-button inline-flex items-center gap-2">{t("checkout.flow.continuePayment")}<ArrowRight className="h-4 w-4 rtl:rotate-180" /></button>
+              </div>
+            </>}
+            {activeStep === 3 && <>
+              <PaymentSection meta={meta} tab={tab} onTab={selectPaymentTab} vehicleTitle={vehicle.title} />
+              <button type="button" onClick={() => moveToStep(2)} className="inline-flex w-fit items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-100"><ArrowLeft className="h-4 w-4 rtl:rotate-180" />{t("checkout.flow.backOptions")}</button>
+            </>}
           </div>
           {unavailable ? (
             <div className="lg:col-span-5 self-start lg:sticky lg:top-24 w-full">
@@ -427,12 +544,18 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
             <BookingSummary
               vehicle={vehicle}
               meta={meta}
-              totals={totals}
+              totals={displayTotals}
               phase={phase}
               onConfirm={onConfirm}
               tab={tab}
               error={submitError}
-              driverComplete={driverComplete}
+              driverComplete={driverComplete && activeStep === 3}
+              promotionCode={promotionCode}
+              promotionDiscount={appliedPromotion?.discountAmount ?? 0}
+              promotionBusy={promotionBusy}
+              promotionError={promotionError}
+              onPromotionCodeChange={(value) => { setPromotionCode(value); if (value !== appliedPromotion?.code) setAppliedPromotion(null); }}
+              onApplyPromotion={() => void applyPromotion()}
             />
           )}
         </div>

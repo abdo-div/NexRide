@@ -7,6 +7,7 @@ import type {
   CompanyVehicleEditField,
   CompanyVehicleListingStatus,
 } from "./useCompanyVehicleEditForm";
+import { validateVehicleDraft } from "../lib/vehicleFormValidation";
 
 /** The shape of the form returned by this hook (compatible with edit-form card props). */
 export type CompanyVehicleAddForm = ReturnType<typeof useCompanyVehicleAddForm>;
@@ -142,9 +143,12 @@ export const useCompanyVehicleAddForm = (
     setFieldErrors({});
   }, []);
 
-  // Always "dirty" for a new vehicle — nothing to diff against.
-  const dirty = true;
-  const dirtyCount = 0;
+  const changedFields = useMemo(
+    () => Object.keys(draft).filter((key) => draft[key as keyof CompanyVehicleEditDraft] !== EMPTY_DRAFT[key as keyof CompanyVehicleEditDraft]),
+    [draft],
+  );
+  const dirty = changedFields.length > 0 || newImages.length > 0;
+  const dirtyCount = changedFields.length + newImages.length;
 
   /** Preview composite built from the current draft + blank vehicle base. */
   const previewVehicle = useMemo<CompanyVehicleProfile>(() => {
@@ -176,6 +180,14 @@ export const useCompanyVehicleAddForm = (
     async (mode: "save" | "draft") => {
       setSaveError(null);
       setFieldErrors({});
+      if (mode === "save") {
+        const errors = validateVehicleDraft(draft);
+        if (Object.keys(errors).length > 0) {
+          setFieldErrors(errors);
+          setSaveError("company.vehicleValidation.fixErrors");
+          return;
+        }
+      }
       setSaving(true);
 
       try {

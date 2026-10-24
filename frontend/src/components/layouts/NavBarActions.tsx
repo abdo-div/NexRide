@@ -1,30 +1,82 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { LayoutDashboard, LogOut, UserRound, Zap } from "lucide-react";
+import { BellRing, Crown, Heart, LayoutDashboard, LogOut, Settings2, UserRound, Zap } from "lucide-react";
 import { LanguageToggle } from "./LanguageToggle";
 import { useAuth } from "../../context/useAuth";
 import { userPhotoUrl } from "../../lib/customerView";
+import { companySettingsApi } from "../../lib/companySettingsApi";
+import { companyLogoUrl } from "../../lib/vehicleMapper";
+import { CustomerNotificationBell } from "./CustomerNotificationBell";
 
 interface NavBarActionsProps {
   onDark?: boolean;
 }
 
-export const NavBarActions: React.FC<NavBarActionsProps> = () => {
+export const NavBarActions: React.FC<NavBarActionsProps> = ({ onDark = false }) => {
   const { t } = useTranslation();
   const { user, isAuthenticated, signOut } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [companyIdentity, setCompanyIdentity] = useState<{
+    name: string;
+    email: string;
+    logo: string;
+  } | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const isCustomer = user?.role?.trim() === "customer";
-  const avatar = userPhotoUrl(user?.photo);
-  const initials = (user?.name ?? "N")
+  const isCompany = user?.role?.trim() === "company";
+  const displayName =
+    (isCompany ? companyIdentity?.name : null) || user?.name || "NexRide";
+  const displayEmail =
+    (isCompany ? companyIdentity?.email : null) || user?.email || "";
+  const avatar = isCompany
+    ? companyLogoUrl(companyIdentity?.logo) ?? ""
+    : userPhotoUrl(user?.photo);
+  const initials = displayName
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
     .map((part) => part[0])
     .join("")
     .toUpperCase();
+
+  useEffect(() => {
+    if (!isCompany) return;
+
+    const controller = new AbortController();
+    const refreshCompanyIdentity = () => {
+      void companySettingsApi
+        .get(controller.signal)
+        .then((response) => {
+          const profile = response.data?.settings?.profile;
+          if (!profile) return;
+          setCompanyIdentity({
+            name: profile.name,
+            email: profile.email,
+            logo: profile.logo,
+          });
+        })
+        .catch((error: unknown) => {
+          if ((error as { name?: string })?.name !== "AbortError") {
+            console.error("Unable to refresh company navigation identity", error);
+          }
+        });
+    };
+
+    refreshCompanyIdentity();
+    window.addEventListener(
+      "nexride:company-profile-updated",
+      refreshCompanyIdentity,
+    );
+    return () => {
+      controller.abort();
+      window.removeEventListener(
+        "nexride:company-profile-updated",
+        refreshCompanyIdentity,
+      );
+    };
+  }, [isCompany]);
 
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -55,7 +107,11 @@ export const NavBarActions: React.FC<NavBarActionsProps> = () => {
   return (
     <div className="flex items-center gap-2 sm:gap-3 shrink-0">
       {/* Language Toggle */}
-      <LanguageToggle />
+      <LanguageToggle onDark={onDark} />
+
+      {isAuthenticated && isCustomer && (
+        <CustomerNotificationBell onDark={onDark} />
+      )}
 
       {/* Auth / Profile Area */}
       {isAuthenticated ? (
@@ -65,7 +121,7 @@ export const NavBarActions: React.FC<NavBarActionsProps> = () => {
             onClick={() => setIsMenuOpen((open) => !open)}
             aria-expanded={isMenuOpen}
             aria-haspopup="menu"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-slate-700 hover:text-blue-600 hover:bg-slate-100 transition-colors"
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-colors ${onDark ? "text-white hover:bg-white/10" : "text-slate-700 hover:text-blue-600 hover:bg-slate-100"}`}
           >
             <span className="relative grid h-7 w-7 shrink-0 overflow-hidden rounded-full bg-blue-600 text-[10px] font-black text-white ring-2 ring-blue-100">
               {avatar ? (
@@ -79,7 +135,7 @@ export const NavBarActions: React.FC<NavBarActionsProps> = () => {
                 <span className="grid h-full w-full place-items-center">{initials}</span>
               )}
             </span>
-            <span className="max-w-[8rem] truncate">{user?.name}</span>
+            <span className="max-w-[8rem] truncate">{displayName}</span>
           </button>
 
           {isMenuOpen && (
@@ -92,8 +148,8 @@ export const NavBarActions: React.FC<NavBarActionsProps> = () => {
                   {avatar ? <img key={avatar} src={avatar} alt="" className="absolute inset-0 block h-full w-full rounded-full object-cover" /> : <span className="grid h-full w-full place-items-center">{initials}</span>}
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-bold text-slate-900">{user?.name}</p>
-                  <p className="truncate text-[11px] text-slate-500" dir="ltr">{user?.email}</p>
+                  <p className="truncate text-sm font-bold text-slate-900">{displayName}</p>
+                  <p className="truncate text-[11px] text-slate-500" dir="ltr">{displayEmail}</p>
                 </div>
               </div>
               {isCustomer && (
@@ -115,6 +171,42 @@ export const NavBarActions: React.FC<NavBarActionsProps> = () => {
                   >
                     <LayoutDashboard className="w-4 h-4 text-blue-600" />
                     <span>{t("nav.myBookings")}</span>
+                  </Link>
+                  <Link
+                    to="/saved-vehicles"
+                    role="menuitem"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-slate-800 hover:bg-slate-50 hover:text-blue-600 transition-colors"
+                  >
+                    <Heart className="w-4 h-4 text-blue-600" />
+                    <span>{t("nav.saved")}</span>
+                  </Link>
+                  <Link
+                    to="/preferences"
+                    role="menuitem"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-slate-800 hover:bg-slate-50 hover:text-blue-600 transition-colors"
+                  >
+                    <Settings2 className="w-4 h-4 text-blue-600" />
+                    <span>{t("nav.preferences")}</span>
+                  </Link>
+                  <Link
+                    to="/saved-searches"
+                    role="menuitem"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-slate-800 hover:bg-slate-50 hover:text-blue-600 transition-colors"
+                  >
+                    <BellRing className="w-4 h-4 text-blue-600" />
+                    <span>{t("nav.savedSearches")}</span>
+                  </Link>
+                  <Link
+                    to="/rewards"
+                    role="menuitem"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-slate-800 hover:bg-slate-50 hover:text-blue-600 transition-colors"
+                  >
+                    <Crown className="w-4 h-4 text-amber-500" />
+                    <span>{t("nav.rewards")}</span>
                   </Link>
                 </>
               )}
@@ -155,7 +247,7 @@ export const NavBarActions: React.FC<NavBarActionsProps> = () => {
       ) : (
         <Link
           to="/login"
-          className="text-xs sm:text-sm font-bold text-slate-700 hover:text-blue-600 px-2.5 py-1.5 rounded-full hover:bg-slate-100/70 transition-colors"
+          className={`rounded-lg border px-3 py-2 text-xs font-bold transition-colors sm:text-sm ${onDark ? "border-white/25 text-white hover:border-white/50 hover:bg-white/10" : "border-transparent text-slate-700 hover:bg-slate-100/70 hover:text-blue-600"}`}
         >
           {t("nav.signIn")}
         </Link>
@@ -165,7 +257,7 @@ export const NavBarActions: React.FC<NavBarActionsProps> = () => {
       {!isAuthenticated && (
         <Link
           to="/partner/apply"
-          className="hidden xl:inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/35 active:scale-95 transition-all shrink-0"
+          className="hidden shrink-0 items-center gap-1.5 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-blue-500/25 transition-all hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/35 active:scale-95 xl:inline-flex"
         >
           <Zap className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
           <span>{t("nav.listFleet")}</span>

@@ -1,0 +1,16 @@
+import React,{useEffect,useState} from "react";
+import {BadgeCheck,FileText,ShieldAlert} from "lucide-react";
+import {useTranslation} from "react-i18next";
+import {driverDocumentsApi,type DriverVerification} from "../../lib/driverDocumentsApi";
+import {useDialog} from "../../context/useDialog";
+
+export const DriverDocumentReview:React.FC<{customerId:string;compact?:boolean}>=({customerId,compact=false})=>{
+  const {i18n}=useTranslation();const {prompt}=useDialog();const ar=i18n.language.startsWith("ar");
+  const [data,setData]=useState<DriverVerification|null>(null),[busy,setBusy]=useState(false);
+  useEffect(()=>{if(!customerId)return;let active=true;driverDocumentsApi.getCustomer(customerId).then(({data})=>{if(active)setData(data.verification);}).catch(()=>{if(active)setData(null);});return()=>{active=false;};},[customerId]);
+  if(!customerId)return null;
+  const approve=async()=>{setBusy(true);try{const result=await driverDocumentsApi.review(customerId,"APPROVED");setData(result.data.verification);}finally{setBusy(false);}};
+  const reject=async()=>{const reason=await prompt(ar?"اكتب سبب رفض المستندات":"Enter the document rejection reason");if(!reason?.trim())return;setBusy(true);try{const result=await driverDocumentsApi.review(customerId,"REJECTED",reason.trim());setData(result.data.verification);}finally{setBusy(false);}};
+  return <section className={`rounded-xl border border-slate-200 bg-white ${compact?"p-4":"p-5"}`}><div className="flex items-center justify-between gap-3"><h3 className="flex items-center gap-2 text-sm font-extrabold text-slate-900"><ShieldAlert className="size-4 text-blue-600"/>{ar?"مستندات السائق":"Driver documents"}</h3><span className={`rounded-full px-2 py-1 text-[10px] font-black ${data?.status==="APPROVED"?"bg-emerald-50 text-emerald-700":data?.status==="REJECTED"||data?.status==="EXPIRED"?"bg-rose-50 text-rose-700":"bg-amber-50 text-amber-700"}`}>{data?.status??(ar?"جارٍ التحميل":"LOADING")}</span></div>
+  {data?<><div className="mt-3 grid grid-cols-2 gap-2">{(["licence","identity"] as const).map(kind=><button key={kind} disabled={!data[kind].uploaded} onClick={()=>void driverDocumentsApi.openFile(customerId,kind)} className="flex items-center justify-center gap-1.5 rounded-lg bg-slate-50 px-2 py-2 text-xs font-bold text-blue-700 disabled:text-slate-400"><FileText className="size-4"/>{kind==="licence"?(ar?"الرخصة":"Licence"):(ar?"الهوية":"ID / passport")}</button>)}</div>{data.rejectionReason&&<p className="mt-2 text-xs font-semibold text-rose-700">{data.rejectionReason}</p>}<div className="mt-3 grid grid-cols-2 gap-2"><button disabled={busy||!data.licence.uploaded||!data.identity.uploaded} onClick={()=>void approve()} className="flex items-center justify-center gap-1 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white disabled:opacity-40"><BadgeCheck className="size-4"/>{ar?"اعتماد":"Approve"}</button><button disabled={busy||!data.licence.uploaded||!data.identity.uploaded} onClick={()=>void reject()} className="rounded-lg bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 disabled:opacity-40">{ar?"رفض":"Reject"}</button></div></>:<p className="mt-3 text-xs text-slate-500">{ar?"لا توجد مستندات متاحة أو لا تملك صلاحية الوصول.":"No documents available or access is not authorized."}</p>}</section>;
+};

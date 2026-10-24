@@ -40,6 +40,56 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "default.jpg",
     },
+    driverVerification: {
+      status: {
+        type: String,
+        enum: ["NOT_UPLOADED", "PENDING", "APPROVED", "REJECTED"],
+        default: "NOT_UPLOADED",
+      },
+      licence: {
+        filename: { type: String, select: false },
+        originalName: String,
+        mimeType: String,
+        uploadedAt: Date,
+        expiresAt: Date,
+      },
+      identity: {
+        filename: { type: String, select: false },
+        originalName: String,
+        mimeType: String,
+        uploadedAt: Date,
+        expiresAt: Date,
+      },
+      reviewedAt: Date,
+      reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      rejectionReason: { type: String, trim: true, maxlength: 500 },
+    },
+    preferences: {
+      preferredCity: { type: String, trim: true, maxlength: 100, default: "" },
+      vehicleTypes: {
+        type: [String],
+        enum: ["SEDAN", "SUV", "HATCHBACK", "LUXURY", "VAN", "PICKUP"],
+        default: [],
+      },
+      transmission: {
+        type: String,
+        enum: ["ANY", "MANUAL", "AUTOMATIC"],
+        default: "ANY",
+      },
+      fuelType: {
+        type: String,
+        enum: ["ANY", "GASOLINE", "DIESEL", "ELECTRIC", "HYBRID"],
+        default: "ANY",
+      },
+      defaultRentalDays: { type: Number, min: 1, max: 30, default: 3 },
+      pickupTime: { type: String, match: /^([01]\d|2[0-3]):[0-5]\d$/, default: "10:00" },
+      returnTime: { type: String, match: /^([01]\d|2[0-3]):[0-5]\d$/, default: "10:00" },
+      paymentMethod: {
+        type: String,
+        enum: ["CARD", "CASH_ON_DELIVERY"],
+        default: "CARD",
+      },
+    },
 
     // -------------------------------------------------------------------------
     // Role-Based Access Control (RBAC) & Multi-Tenancy

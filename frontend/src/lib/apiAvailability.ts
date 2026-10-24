@@ -1,0 +1,96 @@
+export const API_UNAVAILABLE_EVENT = "nexride:api-unavailable";
+export const API_AVAILABLE_EVENT = "nexride:api-available";
+export const API_REQUEST_TIMEOUT_MS = 15_000;
+
+export class ApiTimeoutError extends Error {
+  constructor() {
+    super("The NexRide API request timed out.");
+    this.name = "ApiTimeoutError";
+  }
+}
+
+let unavailable = false;
+const RETRY_DELAY_MS = 200;
+const TRANSIENT_STATUS_CODES = new Set([502, 503, 504]);
+
+const waitBeforeRetry = () =>
+  new Promise<void>((resolve) => globalThis.setTimeout(resolve, RETRY_DELAY_MS));
+
+export function canRetryRequest(method = "GET") {
+  return method.toUpperCase() === "GET" || method.toUpperCase() === "HEAD";
+}
+
+export function reportApiUnavailable() {
+  if (unavailable) return;
+  unavailable = true;
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(API_UNAVAILABLE_EVENT));
+  }
+}
+
+export function reportApiAvailable() {
+  if (!unavailable) return;
+  unavailable = false;
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(API_AVAILABLE_EVENT));
+  }
+}
+
+async function fetchWithTimeout(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<Response> {
+  const controller = new AbortController();
+  const callerSignal = init?.signal;
+  let timedOut = false;
+  const abortFromCaller = () => controller.abort(callerSignal?.reason);
+
+  if (callerSignal?.aborted) abortFromCaller();
+  else callerSignal?.addEventListener("abort", abortFromCaller, { once: true });
+
+  const timeout = globalThis.setTimeout(() => {
+    timedOut = true;
+    controller.abort(new ApiTimeoutError());
+  }, API_REQUEST_TIMEOUT_MS);
+
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } catch (error) {
+    if (timedOut) throw new ApiTimeoutError();
+    throw error;
+  } finally {
+    globalThis.clearTimeout(timeout);
+    callerSignal?.removeEventListener("abort", abortFromCaller);
+  }
+}
+
+export async function trackedFetch(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<Response> {
+  const retryable = canRetryRequest(init?.method);
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const response = await fetchWithTimeout(input, init);
+      const transientFailure = TRANSIENT_STATUS_CODES.has(response.status);
+      if (retryable && transientFailure && attempt === 0) {
+        await waitBeforeRetry();
+        continue;
+      }
+      if (transientFailure) reportApiUnavailable();
+      else reportApiAvailable();
+      return response;
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") throw error;
+      if (retryable && attempt === 0) {
+        await waitBeforeRetry();
+        continue;
+      }
+      reportApiUnavailable();
+      throw error;
+    }
+  }
+
+  throw new Error("Unreachable API retry state");
+}

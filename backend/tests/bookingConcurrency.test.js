@@ -4,7 +4,11 @@ import mongoose from "mongoose";
 import Booking from "../models/booking_model.js";
 import Payment from "../models/payment_model.js";
 import Vehicle from "../models/vehicle_model.js";
-import { bookingConcurrency, createBooking } from "../controllers/bookingController.js";
+import {
+  bookingConcurrency,
+  createBooking,
+  normalizeIdempotencyKey,
+} from "../controllers/bookingController.js";
 
 const userId = "aaaaaaaaaaaaaaaaaaaaaaaa";
 const vehicleId = "bbbbbbbbbbbbbbbbbbbbbbbb";
@@ -34,6 +38,8 @@ const runBookingRequest = async (t, opts = {}) => {
     claim = true,
     collision = null,
     writeConflict = false,
+    idempotentBooking = null,
+    idempotencyKey = null,
     vehicleOverride = {},
   } = opts;
   const vehicle = {
@@ -103,6 +109,9 @@ const runBookingRequest = async (t, opts = {}) => {
     return { ...vehicle, operationalStatus: "AVAILABLE" };
   });
   t.mock.method(Booking, "findOne", (filter) => {
+    if (filter.idempotencyKey) {
+      return { session: async () => idempotentBooking };
+    }
     captures.collisionQuery = filter;
     return {
       session: async () => {
@@ -128,9 +137,17 @@ const runBookingRequest = async (t, opts = {}) => {
       ...options,
     })),
   );
+  t.mock.method(Payment, "findOne", () => ({
+    session: async () => ({
+      _id: "eeeeeeeeeeeeeeeeeeeeeeee",
+      bookingId: idempotentBooking?._id,
+      paymentMethod: "CASH_ON_DELIVERY",
+    }),
+  }));
 
   const response = await invoke(createBooking, {
     user: { id: userId },
+    headers: idempotencyKey ? { "idempotency-key": idempotencyKey } : {},
     body: {
       vehicleId,
       startDate: "2026-11-01T10:00:00.000Z",
@@ -217,4 +234,45 @@ test("P1-1: a vehicle with an unpublished listing is surfaced as not available, 
   assert.equal(result.session.aborted, true);
   assert.equal(result.captures.claimOptions.length, 0);
   assert.equal(result.captures.bookingCreates, 0);
+});
+
+test("P1-1: booking idempotency keys accept UUIDs and reject unsafe values", () => {
+  assert.equal(
+    normalizeIdempotencyKey("550e8400-e29b-41d4-a716-446655440000"),
+    "550e8400-e29b-41d4-a716-446655440000",
+  );
+  assert.equal(normalizeIdempotencyKey(undefined), null);
+  assert.equal(normalizeIdempotencyKey("short"), undefined);
+  assert.equal(normalizeIdempotencyKey("unsafe key with spaces"), undefined);
+});
+
+test("P1-1: retrying a completed checkout returns its durable booking without claiming the vehicle again", async (t) => {
+  const priorBooking = {
+    _id: "dddddddddddddddddddddddd",
+    customerId: userId,
+    vehicleId,
+    companyId,
+    bookingStatus: "PENDING_PAYMENT",
+  };
+  const result = await runBookingRequest(t, {
+    idempotencyKey: "550e8400-e29b-41d4-a716-446655440000",
+    idempotentBooking: priorBooking,
+  });
+
+  assert.equal(result.response.statusCode, 201);
+  assert.equal(result.response.body.data.booking, priorBooking);
+  assert.equal(result.captures.claimOptions.length, 0);
+  assert.equal(result.captures.bookingCreates, 0);
+  assert.equal(result.session.committed, true);
+});
+
+test("P1-1: bookings have a durable per-customer idempotency index", () => {
+  const index = Booking.schema.indexes().find(
+    ([fields]) => fields.customerId === 1 && fields.idempotencyKey === 1,
+  );
+  assert.ok(index);
+  assert.equal(index[1].unique, true);
+  assert.deepEqual(index[1].partialFilterExpression, {
+    idempotencyKey: { $type: "string" },
+  });
 });

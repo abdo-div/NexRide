@@ -3,6 +3,7 @@ import Booking from "../models/booking_model.js";
 import Vehicle from "../models/vehicle_model.js";
 import Company from "../models/Company_model.js";
 import Payment from "../models/payment_model.js";
+import Refund from "../models/Refund_model.js";
 import MaintenanceEvent from "../models/Maintenance_model.js";
 import AppError from "../utils/appError.js";
 import * as factory from "./serviceFactory.js";
@@ -15,6 +16,9 @@ import {
 import { getPlatformPolicy } from "./platformPolicyService.js";
 import { resolveClientUrl } from "../config/clientUrl.js";
 import { releaseVehicleHold } from "./reservationHold.service.js";
+import { notifyBookingEvent } from "./notificationService.js";
+import { calculatePromotionDiscount } from "./rewardService.js";
+import { calculateBookingExtras, MUNICIPAL_FEE_LYD } from "../utils/bookingPricing.js";
 
 // The search allowlist is deliberately limited to fields stored on the booking
 // document. Populated references (vehicle make/model, customer and partner
@@ -69,6 +73,45 @@ export const listBookings = async (query = {}) => {
 
 export const getAllBookings = factory.getAll(Booking);
 export const getBookingById = factory.getOne(Booking);
+
+export const saveCustomerHandover = async (bookingId, customerId, payload) => {
+  const booking = await Booking.findOne({ _id: bookingId, customerId });
+  if (!booking) throw new AppError("Booking not found", 404);
+
+  const stage = payload.stage;
+  booking.handover ??= {};
+  if (stage === "PICKUP") {
+    if (!["CONFIRMED", "ACTIVE"].includes(booking.bookingStatus)) {
+      throw new AppError("Pickup acknowledgement is not available for this booking", 409);
+    }
+    booking.handover.pickup = {
+      ...booking.handover.pickup?.toObject?.(),
+      licenceReady: true,
+      identityReady: true,
+      vehicleInspected: true,
+      fuelRecorded: true,
+      notes: payload.notes ?? "",
+      customerConfirmedAt: new Date(),
+    };
+  } else {
+    if (booking.bookingStatus !== "ACTIVE") {
+      throw new AppError("Return declaration is available only during an active rental", 409);
+    }
+    booking.handover.return = {
+      ...booking.handover.return?.toObject?.(),
+      personalItemsRemoved: true,
+      fuelRestored: payload.fuelRestored,
+      damageReported: payload.damageReported,
+      fuelLevel: payload.fuelLevel,
+      odometer: payload.odometer ?? null,
+      notes: payload.notes ?? "",
+      customerSubmittedAt: new Date(),
+    };
+  }
+
+  await booking.save({ validateBeforeSave: false });
+  return booking;
+};
 
 /**
  * Sends a transactional email notification when a booking is confirmed
@@ -130,6 +173,105 @@ export const checkAvailability = async (vehicleId, startDate, endDate) => {
 };
 
 /**
+ * Changes an unpaid reservation while preserving the same booking/payment
+ * identities. Paid reservations deliberately remain immutable here: Moamalat
+ * does not currently expose a trusted adjustment/refund API, so changing a
+ * paid total would make the booking ledger disagree with money actually moved.
+ */
+export const modifyUnpaidCustomerBooking = async (
+  bookingId,
+  customerId,
+  changes,
+) => {
+  const session = await mongoose.startSession();
+  let updatedBooking;
+
+  try {
+    await session.withTransaction(async () => {
+      const booking = await Booking.findById(bookingId).session(session);
+      if (!booking) throw new AppError("Booking not found", 404);
+
+      const ownerId = booking.customerId?._id ?? booking.customerId;
+      if (!ownerId || ownerId.toString() !== customerId.toString()) {
+        throw new AppError("You can only modify your own booking.", 403);
+      }
+
+      if (
+        booking.bookingStatus !== "PENDING_PAYMENT" ||
+        booking.paymentStatus !== "UNPAID"
+      ) {
+        throw new AppError(
+          "Paid or confirmed bookings cannot be changed online. Contact support to arrange a safe payment adjustment.",
+          409,
+        );
+      }
+
+      const start = new Date(changes.startDate);
+      const end = new Date(changes.endDate);
+      const vehicleId = booking.vehicleId?._id ?? booking.vehicleId;
+
+      const claimedVehicle = await Vehicle.findOneAndUpdate(
+        {
+          _id: vehicleId,
+          listingStatus: "PUBLISHED",
+          operationalStatus: "AVAILABLE",
+        },
+        { $set: { updatedAt: new Date() } },
+        { session, new: true },
+      );
+      if (!claimedVehicle) {
+        throw new AppError("Vehicle is no longer available for rental.", 409);
+      }
+
+      const collision = await Booking.findOne({
+        _id: { $ne: booking._id },
+        vehicleId,
+        bookingStatus: { $in: DATE_BLOCKING_BOOKING_STATUSES },
+        $or: buildDateOverlapFilter(start, end),
+      }).session(session);
+      if (collision) {
+        throw new AppError("Vehicle is already booked during these dates.", 409);
+      }
+
+      booking.startDate = start;
+      booking.endDate = end;
+      booking.pickupLocation = changes.pickupLocation;
+      booking.pickupMethod = changes.pickupMethod;
+      booking.addonIds = changes.addonIds ?? [];
+      if (booking.promotionCode) {
+        const rentalDays = Math.ceil((end - start) / 86400000);
+        const extras = calculateBookingExtras(booking.addonIds, rentalDays);
+        const subtotal = rentalDays * claimedVehicle.dailyPrice + extras.addonsTotal + MUNICIPAL_FEE_LYD;
+        const promotion = await calculatePromotionDiscount({ code: booking.promotionCode, customerId, subtotal, session });
+        booking.discountAmount = promotion.discountAmount;
+      }
+      booking.paymentSessionExpiresAt = null;
+      await booking.save({ session });
+
+      // Keep an existing cash/Moamalat intent aligned with the authoritative
+      // server-recalculated booking total. Payment's save hook recomputes its
+      // commission split; no client-supplied price is ever accepted.
+      const pendingPayment = await Payment.findOne({
+        bookingId: booking._id,
+        status: "PENDING",
+      }).session(session);
+      if (pendingPayment) {
+        pendingPayment.amount = booking.totalAmount;
+        pendingPayment.merchantReference = undefined;
+        await pendingPayment.save({ session });
+      }
+
+      updatedBooking = booking;
+    });
+  } finally {
+    await session.endSession();
+  }
+
+  void notifyBookingEvent(updatedBooking, "BOOKING_CHANGED").catch(() => {});
+  return updatedBooking;
+};
+
+/**
  * Touching the row inside the transaction provides a write-conflict mutex
  * without overloading operationalStatus with a temporary reservation state.
  */
@@ -171,7 +313,7 @@ export const createCustomerBooking = async (userId, bookingData, user) => {
     endDate,
     pickupLocation,
     pickupMethod,
-    discountAmount,
+    promotionCode,
   } = bookingData;
 
   if (!vehicleId) {
@@ -220,7 +362,10 @@ export const createCustomerBooking = async (userId, bookingData, user) => {
       throw new AppError("Vehicle is not linked to any rental company", 400);
     }
 
-    // Booking model pre-validate hook handles all financial calculations
+    const rentalDays = Math.ceil((end - start) / 86400000);
+    const subtotal = rentalDays * claimed.dailyPrice;
+    const promotion = await calculatePromotionDiscount({ code: promotionCode, customerId: userId, subtotal, session });
+    // Booking model pre-validate hook handles the complete financial calculation.
     const [newBooking] = await Booking.create(
       [
         {
@@ -231,7 +376,8 @@ export const createCustomerBooking = async (userId, bookingData, user) => {
           endDate,
           pickupLocation: pickupLocation || claimed.pickupLocation,
           pickupMethod: pickupMethod || "BRANCH_PICKUP",
-          discountAmount: discountAmount || 0,
+          discountAmount: promotion.discountAmount,
+          promotionCode: promotion.code,
           // dailyRate, totalDays, rentalPrice, totalAmount, commissionAmount,
           // companyShare are all auto-calculated by the booking model's
           // pre-validate hook
@@ -275,7 +421,7 @@ export const createCustomerBooking = async (userId, bookingData, user) => {
  * Customer Self-Service Bookings
  */
 export const fetchCustomerBookings = async (userId) => {
-  return await Booking.find({ customerId: userId });
+  return await Booking.find({ customerId: userId }).sort({ createdAt: -1 });
 };
 
 /**
@@ -323,6 +469,63 @@ export const computeRefundFraction = (
 };
 
 const roundMoney = (value) => Number(Number(value).toFixed(2));
+
+const cancellationPolicy = async () => {
+  const { freeCancellationHours } = await getPlatformPolicy();
+  return {
+    fullRefundHours: freeCancellationHours,
+    partialRefundHours: freeCancellationHours / 2,
+    partialRefundFraction: REFUND_POLICY.partialRefundFraction,
+  };
+};
+
+export const getCancellationQuote = async (bookingId) => {
+  const booking = await Booking.findById(bookingId);
+  if (!booking) throw new AppError("Booking not found", 404);
+
+  const existingRefund = await Refund.findOne({ bookingId: booking._id }).sort({
+    createdAt: -1,
+  });
+  const payment = await Payment.findOne({
+    bookingId: booking._id,
+    status: { $in: ["COMPLETED", "REFUNDED", "PARTIALLY_REFUNDED"] },
+  }).sort({ createdAt: -1 });
+  const policy = await cancellationPolicy();
+  const paidAmount = Number(payment?.amount ?? 0);
+  const fraction = existingRefund
+    ? Number(existingRefund.refundFraction)
+    : computeRefundFraction(booking.startDate, new Date(), policy);
+  const refundableAmount = existingRefund
+    ? Number(existingRefund.amount)
+    : roundMoney(Math.min(paidAmount * fraction, paidAmount));
+
+  return {
+    bookingId: String(booking._id),
+    canCancel: !["CANCELLED", "COMPLETED", "ACTIVE"].includes(booking.bookingStatus),
+    bookingStatus: booking.bookingStatus,
+    currency: payment?.currency ?? "LYD",
+    paidAmount,
+    refundableAmount,
+    cancellationFee: roundMoney(Math.max(paidAmount - refundableAmount, 0)),
+    refundFraction: fraction,
+    refundRequired: refundableAmount > 0,
+    policy: {
+      fullRefundHours: policy.fullRefundHours,
+      partialRefundHours: policy.partialRefundHours,
+    },
+    refund: existingRefund
+      ? {
+          id: String(existingRefund._id),
+          status: existingRefund.status,
+          requestedAt: existingRefund.requestedAt,
+          processingAt: existingRefund.processingAt,
+          completedAt: existingRefund.completedAt,
+          failedAt: existingRefund.failedAt,
+          failureReason: existingRefund.failureReason,
+        }
+      : null,
+  };
+};
 
 /**
  * Non-blocking cancellation notice. Fire-and-forget by design: an email
@@ -384,15 +587,11 @@ export const cancelBookingById = async (bookingId, user, { reason = null } = {})
     booking.cancelledAt = new Date();
     booking.cancellationReason = reason ?? booking.cancellationReason;
 
-    const { freeCancellationHours } = await getPlatformPolicy();
+    const policy = await cancellationPolicy();
     const refundFraction = computeRefundFraction(
       booking.startDate,
       booking.cancelledAt,
-      {
-        fullRefundHours: freeCancellationHours,
-        partialRefundHours: freeCancellationHours / 2,
-        partialRefundFraction: REFUND_POLICY.partialRefundFraction,
-      },
+      policy,
     );
 
     // The latest completed ledger row is the one that was actually collected
@@ -425,6 +624,24 @@ export const cancelBookingById = async (bookingId, user, { reason = null } = {})
             },
           },
           { session, new: true, runValidators: true },
+        );
+
+        await Refund.create(
+          [{
+            bookingId: booking._id,
+            paymentId: paidPayment._id,
+            customerId: booking.customerId?._id ?? booking.customerId,
+            companyId: booking.companyId?._id ?? booking.companyId ?? paidPayment.companyId,
+            amount: refundAmount,
+            feeAmount: roundMoney(paidPayment.amount - refundAmount),
+            paidAmount: paidPayment.amount,
+            currency: paidPayment.currency ?? "LYD",
+            refundFraction,
+            status: "PENDING",
+            reason: reason ?? "Booking cancelled by customer",
+            requestedAt: booking.cancelledAt,
+          }],
+          { session },
         );
 
         booking.paymentStatus =
@@ -481,6 +698,7 @@ export const cancelBookingById = async (bookingId, user, { reason = null } = {})
   }
 
   notifyBookingCancellation(booking, reason ?? "booking cancelled");
+  void notifyBookingEvent(booking, "BOOKING_CANCELLED").catch(() => {});
 
   return booking;
 };
@@ -579,6 +797,7 @@ export const releaseUnpaidBooking = async (
     } catch {
       /* a leftover key self-expires after its TTL */
     }
+    void notifyBookingEvent(booking, "PAYMENT_FAILED").catch(() => {});
   }
 
   return {
@@ -700,6 +919,12 @@ export const updateLifecycleStatus = async (bookingId, status, actorUser = null)
 
     await session.commitTransaction();
     session.endSession();
+    if (target === "CONFIRMED") {
+      void notifyBookingEvent(booking, "BOOKING_CONFIRMED").catch(() => {});
+    }
+    if (target === "CANCELLED") {
+      void notifyBookingEvent(booking, "BOOKING_CANCELLED").catch(() => {});
+    }
     return booking;
   } catch (error) {
     await session.abortTransaction();

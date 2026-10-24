@@ -1,27 +1,33 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { Car, Share2, Heart, Download } from "lucide-react";
+import { Car, Share2, Heart, Download, GitCompareArrows } from "lucide-react";
+import { useToast } from "../../context/toastContextValue";
 
 interface Props {
   crumbs: string[];
   saved: boolean;
   onToggleSave: () => void;
+  compared: boolean;
+  onToggleCompare: () => void;
 }
 
 const Separator = () => <span className="text-[#CBD5E1]">/</span>;
 
-export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave }) => {
+export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave, compared, onToggleCompare }) => {
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const [copied, setCopied] = React.useState(false);
 
   const share = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
+      showToast({ tone: "success", title: t("toasts.linkCopied.title"), description: t("toasts.linkCopied.description") });
       setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);
+      showToast({ tone: "error", title: t("toasts.copyFailed.title"), description: t("toasts.copyFailed.description") });
     }
   };
 
@@ -29,7 +35,7 @@ export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-6">
       <nav className="flex items-center gap-2 text-[#64748B] font-medium text-[13px] overflow-x-auto py-1">
         <Link
-          to="/FleetPage"
+          to="/fleet"
           className="hover:text-[#142B4A] transition-colors flex items-center gap-1 shrink-0"
         >
           <Car className="w-4 h-4" />
@@ -38,7 +44,7 @@ export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave
         {crumbs.slice(1, -1).map((c) => (
           <React.Fragment key={c}>
             <Separator />
-            <Link to="/FleetPage" className="hover:text-[#142B4A] transition-colors shrink-0">
+            <Link to="/fleet" className="hover:text-[#142B4A] transition-colors shrink-0">
               {t(c)}
             </Link>
           </React.Fragment>
@@ -67,6 +73,15 @@ export const DetailBreadcrumbs: React.FC<Props> = ({ crumbs, saved, onToggleSave
         >
           <Heart className={`w-[18px] h-[18px] ${saved ? "fill-[#142B4A] text-[#142B4A]" : ""}`} />
           {saved ? t("nav.saved") : t("vehicleDetail.save")}
+        </button>
+        <button
+          type="button"
+          onClick={onToggleCompare}
+          aria-pressed={compared}
+          className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-[13px] font-medium shadow-sm transition-colors ${compared ? "border-blue-300 bg-blue-50 text-blue-700" : "border-[#E2E8F0] bg-white text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]"}`}
+        >
+          <GitCompareArrows className="h-[18px] w-[18px]" />
+          {t(compared ? "comparison.added" : "comparison.add")}
         </button>
         <Link
           to="/terms"

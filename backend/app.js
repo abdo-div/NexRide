@@ -21,6 +21,11 @@ import vehicleRouter from "./routes/vehicleRoutes.js";
 import viewRouter from "./routes/viewRoutes.js";
 import adminRouter from "./routes/admin.routes.js";
 import newsletterRouter from "./routes/newsletterRoutes.js";
+import notificationRouter from "./routes/notificationRoutes.js";
+import supportTicketRouter from "./routes/supportTicketRoutes.js";
+import customerVehicleActivityRouter from "./routes/customerVehicleActivityRoutes.js";
+import savedSearchRouter from "./routes/savedSearchRoutes.js";
+import rewardRouter from "./routes/rewardRoutes.js";
 import {
   getGatewayConfig,
   createPayment,
@@ -59,7 +64,6 @@ import { resolveTenant } from "./middlewares/tenantMiddleware.js";
 // IDEMPOTENCY
 // ============================================
 
-import { idempotency } from "./middlewares/idempotence.middleware.js";
 
 // ============================================
 // LOGGING
@@ -239,12 +243,6 @@ app.use(
 );
 
 // ============================================
-// 11. IDEMPOTENCY
-// ============================================
-
-app.use("/api/v1/bookings", idempotency(86400));
-
-// ============================================
 // 12. API DOCUMENTATION
 // ============================================
 
@@ -271,6 +269,11 @@ app.use("/api/v1/payments/moamalat", moamalatRouter);
 app.use("/api/v1/payments", paymentRouter);
 app.use("/api/v1/vehicles", vehicleRouter);
 app.use("/api/v1/newsletter", newsletterLimiter, newsletterRouter);
+app.use("/api/v1/notifications", notificationRouter);
+app.use("/api/v1/support-tickets", supportTicketRouter);
+app.use("/api/v1/customer-vehicle-activity", customerVehicleActivityRouter);
+app.use("/api/v1/saved-searches", savedSearchRouter);
+app.use("/api/v1/rewards", rewardRouter);
 
 // Moamalat direct integration routes (manager specification)
 app.get("/api/config", getGatewayConfig);
@@ -283,6 +286,8 @@ app.post(
 );
 app.post(
   "/api/payment/verify",
+  protect,
+  restrictTo("customer"),
   paymentVerificationLimiter,
   validate(verifyPaymentSchema),
   verifyPayment,

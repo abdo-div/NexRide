@@ -6,6 +6,9 @@ import {
   getMyBookings,
   getCompanyBookings,
   cancelBooking,
+  getCancellationQuote,
+  saveCustomerHandover,
+  modifyBooking,
   updateBookingStatus,
   checkVehicleAvailability,
   downloadBookingInvoice,
@@ -16,12 +19,15 @@ import {
   verifyTenantAccess,
 } from "../middlewares/authMiddleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
+import { idempotency } from "../middlewares/idempotence.middleware.js";
 import { idParamSchema } from "../validations/common.validation.js";
 import {
   createBookingSchema,
   checkAvailabilitySchema,
   cancelBookingSchema,
+  modifyBookingSchema,
   updateBookingStatusSchema,
+  customerHandoverSchema,
 } from "../validations/booking.validation.js";
 
 const router = express.Router();
@@ -140,6 +146,9 @@ router.get(
 router.post(
   ["/", "/book"],
   restrictTo("customer"),
+  // Mounted after authentication so Redis entries are scoped to the customer,
+  // never to the shared anonymous namespace.
+  idempotency(86400),
   validate(createBookingSchema),
   createBooking,
 );
@@ -237,6 +246,50 @@ router.get(
   validate(idParamSchema()),
   verifyTenantAccess("Booking"),
   downloadBookingInvoice,
+);
+
+/**
+ * @openapi
+ * /bookings/{id}/modify:
+ *   patch:
+ *     tags: [Bookings]
+ *     summary: Modify an unpaid customer reservation
+ *     description: Rechecks availability and recalculates the price server-side.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Reservation updated
+ *       403:
+ *         description: Tenant access denied
+ *       409:
+ *         description: Date collision or booking already paid
+ */
+router.patch(
+  "/:id/modify",
+  restrictTo("customer"),
+  validate(modifyBookingSchema),
+  verifyTenantAccess("Booking"),
+  modifyBooking,
+);
+
+router.patch(
+  "/:id/handover/:stage",
+  restrictTo("customer"),
+  validate(customerHandoverSchema),
+  verifyTenantAccess("Booking"),
+  saveCustomerHandover,
+);
+
+router.get(
+  "/:id/cancellation-quote",
+  validate(idParamSchema()),
+  verifyTenantAccess("Booking"),
+  getCancellationQuote,
 );
 
 /**

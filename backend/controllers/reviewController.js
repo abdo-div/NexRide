@@ -18,10 +18,8 @@ export const verifyCompletedBooking = catchAsync(async (req, res, next) => {
   const completedBooking = await reviewService.verifyBookingCompletion(
     req.user.id,
     req.body.vehicleId,
+    req.body.bookingId,
   );
-  if (!req.body.bookingId) {
-    req.body.bookingId = completedBooking._id;
-  }
   if (!req.body.companyId) {
     const rawCompId = completedBooking.companyId;
     req.body.companyId = rawCompId?._id || rawCompId;

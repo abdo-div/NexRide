@@ -3,6 +3,12 @@ import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
 import * as userService from "../services/userService.js";
 import { saveUserPhoto } from "../utils/userImages.js";
+import {
+  getDriverVerification,
+  resolveDriverDocumentFile,
+  reviewDriverVerification,
+  saveCustomerDriverDocuments,
+} from "../services/driverDocumentService.js";
 
 // Multer Storage Configuration
 const multerStorage = multer.memoryStorage();
@@ -36,6 +42,47 @@ export const resizeUserPhoto = catchAsync(async (req, res, next) => {
   await saveUserPhoto(req.file.buffer, req.file.filename);
 
   next();
+});
+
+const driverDocumentUpload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: (req, file, cb) => {
+    if (["application/pdf", "image/jpeg", "image/png"].includes(file.mimetype)) cb(null, true);
+    else cb(new AppError("Documents must be PDF, JPG, or PNG files.", 400), false);
+  },
+  limits: { fileSize: 5 * 1024 * 1024, files: 2, fields: 10, parts: 12 },
+});
+
+export const uploadDriverDocuments = driverDocumentUpload.fields([
+  { name: "licence", maxCount: 1 },
+  { name: "identity", maxCount: 1 },
+]);
+
+export const getMyDriverDocuments = catchAsync(async (req, res) => {
+  const verification = await getDriverVerification(req.user.id, req.user);
+  res.status(200).json({ status: "success", data: { verification } });
+});
+
+export const updateMyDriverDocuments = catchAsync(async (req, res) => {
+  const verification = await saveCustomerDriverDocuments(req.user.id, req.files, req.body);
+  res.status(200).json({ status: "success", data: { verification } });
+});
+
+export const getCustomerDriverDocuments = catchAsync(async (req, res) => {
+  const verification = await getDriverVerification(req.params.id, req.user);
+  res.status(200).json({ status: "success", data: { verification } });
+});
+
+export const reviewCustomerDriverDocuments = catchAsync(async (req, res) => {
+  const verification = await reviewDriverVerification(req.params.id, req.user, req.body);
+  res.status(200).json({ status: "success", data: { verification } });
+});
+
+export const downloadDriverDocument = catchAsync(async (req, res) => {
+  const file = await resolveDriverDocumentFile(req.params.id, req.user, req.params.kind);
+  res.type(file.mimeType);
+  res.setHeader("Content-Disposition", `inline; filename*=UTF-8''${encodeURIComponent(file.name)}`);
+  res.sendFile(file.path);
 });
 
 /**
@@ -74,6 +121,18 @@ export const updateMe = catchAsync(async (req, res, next) => {
     status: "success",
     data: { user: updatedUser },
   });
+});
+
+export const getMyPreferences = catchAsync(async (req, res) => {
+  const user = await userService.fetchUserById(req.user.id);
+  res.status(200).json({ status: "success", data: { preferences: user.preferences } });
+});
+
+export const updateMyPreferences = catchAsync(async (req, res) => {
+  const user = await userService.updateCurrentUserProfile(req.user.id, {
+    preferences: req.body,
+  });
+  res.status(200).json({ status: "success", data: { preferences: user.preferences } });
 });
 
 export const deleteMe = catchAsync(async (req, res, next) => {

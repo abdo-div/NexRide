@@ -8,7 +8,7 @@ export const DetailTitleBar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-8">
+    <div className="mb-8 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
       <div>
         <div className="flex flex-wrap items-center gap-2 mb-2">
           {detail.badges.map((b) =>
@@ -31,7 +31,7 @@ export const DetailTitleBar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
           )}
         </div>
 
-        <h1 className="text-[32px] lg:text-[42px] font-extrabold text-[#0F172A] tracking-tight leading-tight">
+        <h1 className="text-[36px] font-black leading-tight tracking-[-0.035em] text-[#0F172A] sm:text-[44px] lg:text-[52px]">
           {detail.vehicle.title}
         </h1>
 
@@ -61,7 +61,7 @@ export const DetailTitleBar: React.FC<{ detail: VehicleDetail }> = ({ detail }) 
         </div>
       </div>
 
-      <div className="flex items-center gap-3 bg-white border border-[#E2E8F0] px-4 py-3 rounded-2xl shadow-sm shrink-0">
+      <div className="flex shrink-0 items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 shadow-sm">
         <div
           className={`w-2.5 h-2.5 rounded-full ${
             detail.liveStatus.color === "amber"

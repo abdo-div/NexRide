@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { ApiError } from "../lib/apiClient";
 import { companyVehicleApi } from "../lib/companyVehicleApi";
 import type { CompanyVehicleProfile } from "../types/companyVehicle";
+import { validateVehicleDraft } from "../lib/vehicleFormValidation";
 
 export type CompanyVehicleListingStatus = "DRAFT" | "PUBLISHED" | "SUSPENDED";
 
@@ -326,6 +327,14 @@ export const useCompanyVehicleEditForm = (
     async (mode: "save" | "draft") => {
       setSaveError(null);
       setFieldErrors({});
+      if (mode === "save") {
+        const errors = validateVehicleDraft(draft);
+        if (Object.keys(errors).length > 0) {
+          setFieldErrors(errors);
+          setSaveError("company.vehicleValidation.fixErrors");
+          return;
+        }
+      }
       setSaving(true);
       try {
         const current = mapCurrent(draft);

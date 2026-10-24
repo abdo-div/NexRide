@@ -16,6 +16,24 @@ const pathOf = (req) => {
   return String(source).split("?")[0];
 };
 
+const REQUEST_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
+
+/**
+ * Keep a well-formed upstream correlation ID or replace it with a UUID.
+ * Returning the chosen value lets clients include it in support reports while
+ * the strict allowlist prevents log injection and unbounded identifiers.
+ */
+export const requestIdFor = (req, res) => {
+  const supplied = req.headers["x-request-id"];
+  const requestId =
+    typeof supplied === "string" && REQUEST_ID_PATTERN.test(supplied)
+      ? supplied
+      : uuidv4();
+
+  res.setHeader("X-Request-Id", requestId);
+  return requestId;
+};
+
 /**
  * Request serializer emitting only operational metadata.
  *
@@ -47,7 +65,7 @@ export const responseSerializer = (res) => ({
 
 export const httpLogger = pinoHttp({
   logger,
-  genReqId: (req) => req.headers["x-request-id"] || uuidv4(),
+  genReqId: requestIdFor,
   // Replace the header-dumping serializers rather than relying on redact alone.
   // The serializers are the primary control; redact is the backstop for
   // anything logged through a custom serializer elsewhere in the codebase.

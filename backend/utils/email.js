@@ -148,6 +148,17 @@ export default class Email {
       return this._getLayout("Booking Confirmation — NexRide", content);
     }
 
+    if (template === "customerNotification") {
+      const { title, message } = extraData;
+      const content = `
+        <h2 style="color:#1a1a2e;margin:0 0 16px;font-size:22px;">${title}</h2>
+        <p style="color:#4a5568;line-height:1.7;margin:0 0 16px;">Hello <strong>${this.firstName}</strong>,</p>
+        <p style="color:#4a5568;line-height:1.7;margin:0 0 24px;">${message}</p>
+        <a href="${this.url}" style="display:inline-block;background:#1769ff;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:15px;">View booking &rarr;</a>
+      `;
+      return this._getLayout(`${title} — NexRide`, content);
+    }
+
     // Default Welcome Template
     const content = `
       <h2 style="color:#1a1a2e;margin:0 0 16px;font-size:22px;">Welcome Aboard 🏎️</h2>
@@ -216,6 +227,10 @@ export default class Email {
       "Your NexRide Booking Was Cancelled",
       bookingData
     );
+  }
+
+  async sendNotification(data) {
+    await this.send("customerNotification", data.title, data);
   }
 }
 

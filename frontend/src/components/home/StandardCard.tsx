@@ -41,16 +41,16 @@ export const StandardCard: React.FC<StandardCardProps> = ({ feature, index = 0 }
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
       whileHover={reduceMotion ? undefined : cardHover}
-      className="premium-card bg-slate-50/70 hover:bg-white rounded-3xl border border-slate-200/80 p-6 flex flex-col justify-between group"
+      className="group flex flex-col justify-between rounded-2xl border border-transparent bg-transparent p-4 transition hover:border-slate-200 hover:bg-white"
     >
       <div>
         {/* Icon Box */}
-        <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 text-[#142b4a] shadow-sm flex items-center justify-center mb-6 group-hover:scale-105 group-hover:bg-[#142b4a] group-hover:border-[#142b4a] group-hover:text-white transition-all duration-300">
+        <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-blue-100 text-[#142b4a] shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:bg-[#142b4a] group-hover:text-white">
           {renderIcon()}
         </div>
 
         {/* Title */}
-        <h3 className="font-black text-lg text-slate-900 tracking-tight mb-3 group-hover:text-blue-600 transition-colors">
+        <h3 className="mb-2 text-sm font-black tracking-tight text-slate-900 transition-colors group-hover:text-blue-600">
           {t(feature.title)}
         </h3>
 

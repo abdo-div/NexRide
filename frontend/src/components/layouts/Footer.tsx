@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Globe, Share2, MessageSquare, Phone } from "lucide-react";
@@ -11,6 +11,9 @@ import {
 import { useAuth } from "../../context/useAuth";
 import { subscribeToNewsletter } from "../../lib/newsletterApi";
 
+const CONTACT_NUMBER = "+218910008820";
+const CONTACT_DISPLAY = "+218 91 000 8820";
+
 export const Footer: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [email, setEmail] = useState("");
@@ -18,19 +21,33 @@ export const Footer: React.FC = () => {
   const { user } = useAuth();
   const isCompany = user?.role?.trim() === "company";
   const lang = (i18n.language in LANGUAGES ? i18n.language : "ar") as LanguageKey;
-  const contactNumber = "+218910008820";
-  const contactUrl = `https://wa.me/${contactNumber.replace(/\D/g, "")}`;
-  const [shareState, setShareState] = useState<"idle" | "copied">("idle");
+  const contactUrl = `https://wa.me/${CONTACT_NUMBER.replace(/\D/g, "")}`;
+  const [shareState, setShareState] = useState<"idle" | "shared" | "copied" | "error">("idle");
+  const shareTimer = useRef<number | undefined>(undefined);
+
+  useEffect(() => () => {
+    if (shareTimer.current) window.clearTimeout(shareTimer.current);
+  }, []);
+
+  const showShareState = (state: Exclude<typeof shareState, "idle">) => {
+    if (shareTimer.current) window.clearTimeout(shareTimer.current);
+    setShareState(state);
+    shareTimer.current = window.setTimeout(() => setShareState("idle"), 2500);
+  };
 
   const handleShare = async () => {
     const shareData = { title: "NexRide", url: window.location.href };
     try {
-      if (navigator.share) await navigator.share(shareData);
-      else await navigator.clipboard.writeText(shareData.url);
-      setShareState("copied");
-      window.setTimeout(() => setShareState("idle"), 2000);
-    } catch {
-      setShareState("idle");
+      if (navigator.share) {
+        await navigator.share(shareData);
+        showShareState("shared");
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        showShareState("copied");
+      }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      showShareState("error");
     }
   };
 
@@ -97,8 +114,8 @@ export const Footer: React.FC = () => {
               <button
                 type="button"
                 onClick={() => void handleShare()}
-                aria-label={lang === "ar" ? "مشاركة نيكس رايد" : "Share NexRide"}
-                title={shareState === "copied" ? (lang === "ar" ? "تم نسخ الرابط" : "Link copied") : (lang === "ar" ? "مشاركة" : "Share")}
+                aria-label={t("footer.share")}
+                title={t("footer.share")}
                 className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
               >
                 <Share2 className="w-3.5 h-3.5" />
@@ -114,6 +131,9 @@ export const Footer: React.FC = () => {
                 <MessageSquare className="w-3.5 h-3.5" />
               </a>
             </div>
+            <p className="sr-only" role="status" aria-live="polite">
+              {shareState === "idle" ? "" : t(`footer.shareStatus.${shareState}`)}
+            </p>
           </div>
 
           {/* Explore Links */}
@@ -176,7 +196,11 @@ export const Footer: React.FC = () => {
               onSubmit={handleSubscribe}
               className="flex items-center gap-2 mb-5"
             >
+              <label htmlFor="footer-newsletter-email" className="sr-only">
+                {t("footer.subscribeEmailLabel")}
+              </label>
               <input
+                id="footer-newsletter-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -210,7 +234,11 @@ export const Footer: React.FC = () => {
             </p>
 
             {/* Emergency Hotline Box */}
-            <div className="bg-[#0b1220] border border-slate-800/80 rounded-xl p-3 flex items-center justify-between">
+            <a
+              href={`tel:${CONTACT_NUMBER}`}
+              aria-label={`${t("footer.callSupport")} ${CONTACT_DISPLAY}`}
+              className="flex items-center justify-between rounded-xl border border-slate-800/80 bg-[#0b1220] p-3 transition hover:border-blue-700/70 hover:bg-[#101a2c] focus-visible:outline-blue-400"
+            >
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-blue-950/80 border border-blue-800/50 flex items-center justify-center text-blue-400">
                   <Phone className="w-3.5 h-3.5" />
@@ -220,7 +248,7 @@ export const Footer: React.FC = () => {
                     {t("footer.emergencyLine")}
                   </span>
                   <span className="text-xs font-black text-white font-mono">
-                    +218 (0) 21 000 8899
+                    <bdi>{CONTACT_DISPLAY}</bdi>
                   </span>
                 </div>
               </div>
@@ -229,7 +257,7 @@ export const Footer: React.FC = () => {
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 {t("footer.active")}
               </span>
-            </div>
+            </a>
           </div>
         </div>
 

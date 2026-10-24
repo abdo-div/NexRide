@@ -10,7 +10,6 @@ const paymentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Booking",
       required: [true, "Payment must be linked to a booking"],
-      index: true,
     },
     customerId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -22,7 +21,6 @@ const paymentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: [true, "Payment must be linked to a company"],
-      index: true,
     },
 
     // -------------------------------------------------------------------------
@@ -217,6 +215,16 @@ paymentSchema.pre("save", async function () {
 });
 
 paymentSchema.index({ bookingId: 1, status: 1 });
+// Covers tenant ledgers, earnings dashboards and newest-first payment pages.
+paymentSchema.index({
+  companyId: 1,
+  status: 1,
+  paidAt: -1,
+  createdAt: -1,
+});
+// Platform payout batches filter these three fields without a tenant prefix.
+paymentSchema.index({ status: 1, payoutStatus: 1, paymentMethod: 1, companyId: 1 });
+paymentSchema.index({ companyId: 1, status: 1, payoutStatus: 1, paymentMethod: 1 });
 
 // Unique only over real gateway strings. `partialFilterExpression` is used
 // instead of `sparse` because sparse still indexes an explicit null, whereas

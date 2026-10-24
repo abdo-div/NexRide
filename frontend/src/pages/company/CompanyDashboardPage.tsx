@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Activity, Download, RefreshCw } from "lucide-react";
 import { useAuth } from "../../context/useAuth";
@@ -14,6 +14,7 @@ import { CompanyFleetStatus } from "../../components/company/CompanyFleetStatus"
 import { CompanyActivityFeed } from "../../components/company/CompanyActivityFeed";
 import { CompanyPerformancePanel } from "../../components/company/CompanyPerformancePanel";
 import type { CompanyDashboardData } from "../../types/companyDashboard";
+import { useToast } from "../../context/toastContextValue";
 
 const csv = (data: CompanyDashboardData): string => {
   const header = [
@@ -43,24 +44,10 @@ const csv = (data: CompanyDashboardData): string => {
 export const CompanyDashboardPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const { showToast } = useToast();
   const { data, period, setPeriod, loading, error, reload } =
     useCompanyDashboard();
   const [payoutBusy, setPayoutBusy] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (toastTimer.current) clearTimeout(toastTimer.current);
-    };
-  }, []);
-
-  const showToast = useCallback((message: string) => {
-    setToast(message);
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(null), 4200);
-  }, []);
-
   const handleExport = useCallback(() => {
     if (data.upcomingBookings.length === 0) return;
     saveBlobAsFile(
@@ -75,16 +62,14 @@ export const CompanyDashboardPage: React.FC = () => {
     try {
       const res = await companyEarningsApi.requestPayout();
       const bank = res.data?.payout?.payout?.bankName;
-      showToast(
-        t("company.header.payoutRequested", {
+      showToast({ tone: "success", title: t("company.header.payoutRequested", {
           bankName: bank ?? "",
           amount: formatLYD(data.kpis.pendingPayout),
-        }),
-      );
+        }) });
     } catch (err) {
       const message =
         err instanceof Error ? err.message : String(err);
-      showToast(t("company.header.payoutError", { message }));
+      showToast({ tone: "error", title: t("company.header.payoutError", { message }) });
     } finally {
       setPayoutBusy(false);
       reload();
@@ -110,7 +95,7 @@ export const CompanyDashboardPage: React.FC = () => {
               {t("company.overview.title")}
             </h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
             <button
               type="button"
               onClick={reload}
@@ -163,7 +148,7 @@ export const CompanyDashboardPage: React.FC = () => {
           <>
             <CompanyDashboardHeader
               data={data}
-              userName={user?.name}
+              userName={data.company?.name || user?.name}
               onExport={handleExport}
               exporting={loading}
               onRequestPayout={() => void handleRequestPayout()}
@@ -174,7 +159,7 @@ export const CompanyDashboardPage: React.FC = () => {
             <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-12">
               {/* Main workflow column */}
               <div className="flex flex-col gap-6 xl:col-span-8">
-                <section className="flex flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]">
+                <section className="flex flex-col gap-5 rounded-3xl border border-slate-200/80 bg-white p-4 shadow-[0_20px_60px_-42px_rgba(15,23,42,.45)] sm:p-6">
                   <div>
                     <div className="flex items-center gap-2">
                       <h2 className="text-lg font-bold text-[#0B1C30]">
@@ -232,15 +217,6 @@ export const CompanyDashboardPage: React.FC = () => {
           </>
         )}
       </div>
-
-      {toast && (
-        <div
-          role="status"
-          className="fixed bottom-6 right-6 z-50 max-w-sm rounded-xl border border-[#F1F5F9] bg-white px-4 py-3 text-sm text-[#0B1C30] shadow-[0_8px_24px_rgba(15,23,42,0.12)]"
-        >
-          {toast}
-        </div>
-      )}
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import { test } from "node:test";
 import mongoose from "mongoose";
 import Booking from "../models/booking_model.js";
@@ -110,11 +111,10 @@ test("checkout signing matches the current Moamalat sandbox format", (t) => {
   );
 });
 
-test("Moamalat create and init are protected and customer-only", async () => {
-  for (const path of ["/create", "/init"]) {
+test("every state-changing Moamalat route is protected and customer-only", async () => {
+  for (const path of ["/create", "/init", "/verify"]) {
     const handlers = routeHandlers(path);
     assert.equal(handlers[0], protect);
-    assert.equal(handlers.length, 5);
 
     const roleError = await new Promise((resolve) =>
       handlers[1]({ user: { role: "company" } }, {}, resolve),
@@ -126,6 +126,51 @@ test("Moamalat create and init are protected and customer-only", async () => {
     protect({ headers: {} }, { locals: {} }, resolve),
   );
   assert.equal(authError.statusCode, 401);
+});
+
+test("the legacy payment verification alias keeps the same authentication guards", () => {
+  const appSource = fs.readFileSync(new URL("../app.js", import.meta.url), "utf8");
+  assert.match(
+    appSource,
+    /app\.post\(\s*["']\/api\/payment\/verify["'],\s*protect,\s*restrictTo\(["']customer["']\)/,
+  );
+});
+
+test("payment verification rejects anonymous and cross-customer requests before contacting the gateway", async (t) => {
+  await assert.rejects(
+    invoke(verifyPayment, { body: { merchantReference } }),
+    { statusCode: 401 },
+  );
+
+  withGatewayConfig(t);
+  const payment = {
+    _id: "444444444444444444444444",
+    bookingId,
+    amount: 88.25,
+    paymentGateway: "MOAMALAT",
+    paymentMethod: "MOAMALAT",
+    status: "PENDING",
+  };
+  t.mock.method(Payment, "findOne", async () => payment);
+  t.mock.method(Booking, "findById", async () => makeBooking());
+  let gatewayCalls = 0;
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => {
+    gatewayCalls += 1;
+    return Response.json({ Transactions: [] });
+  };
+  t.after(() => {
+    globalThis.fetch = originalFetch;
+  });
+
+  await assert.rejects(
+    invoke(verifyPayment, {
+      body: { merchantReference },
+      user: { _id: customerB, id: customerB, role: "customer" },
+    }),
+    { statusCode: 403 },
+  );
+  assert.equal(gatewayCalls, 0);
 });
 
 test("Moamalat initialization schema rejects caller-supplied money and reference", () => {
@@ -210,7 +255,7 @@ test("initialization rejects monetary overrides, paid bookings, and cancelled bo
   );
 });
 
-test("verification without a matching approved Moamalat transaction does not finalize", async (t) => {
+test("verification without a matching transaction releases the unpaid booking", async (t) => {
   withGatewayConfig(t);
   const booking = makeBooking();
   const payment = {
@@ -255,10 +300,12 @@ test("verification without a matching approved Moamalat transaction does not fin
     globalThis.fetch = originalFetch;
   });
 
-  const response = await invoke(verifyPayment, {
-    body: { merchantReference },
-  });
+  const response = await invoke(
+    verifyPayment,
+    customerRequest({ merchantReference }),
+  );
   assert.equal(response.body.verified, false);
+  assert.equal(response.body.retryable, false);
   assert.equal(fetchCount, 1);
   assert.equal(booking.bookingStatus, "EXPIRED");
   assert.equal(booking.paymentStatus, "UNPAID");
@@ -336,18 +383,20 @@ test("verified amount must match the stored booking, and repeated verification i
     globalThis.fetch = originalFetch;
   });
 
-  const first = await invoke(verifyPayment, {
-    body: { merchantReference },
-  });
+  const first = await invoke(
+    verifyPayment,
+    customerRequest({ merchantReference }),
+  );
   assert.equal(first.body.verified, true);
   assert.equal(first.body.data.amount, 10);
   assert.equal(payment.status, "COMPLETED");
   assert.equal(booking.bookingStatus, "PAID");
   assert.equal(booking.paymentStatus, "PAID");
 
-  const repeated = await invoke(verifyPayment, {
-    body: { merchantReference },
-  });
+  const repeated = await invoke(
+    verifyPayment,
+    customerRequest({ merchantReference }),
+  );
   assert.equal(repeated.body.verified, true);
   assert.equal(repeated.body.alreadyProcessed, true);
   assert.equal(fetchCount, 1);

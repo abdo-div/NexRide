@@ -72,6 +72,7 @@ export const securityCors = cors({
     "Idempotency-Key",
     "X-Requested-With",
   ],
+  exposedHeaders: ["X-Request-Id"],
 });
 
 // Helmet Security Headers

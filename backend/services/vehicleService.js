@@ -153,6 +153,12 @@ export const fetchAvailableVehicles = async (queryParams, tenantId = null) => {
       .filter(Boolean);
     if (types.length > 0) filter.type = { $in: types };
   }
+  if (["MANUAL", "AUTOMATIC"].includes(String(queryParams.transmission).toUpperCase())) {
+    filter.transmission = String(queryParams.transmission).toUpperCase();
+  }
+  if (["GASOLINE", "DIESEL", "ELECTRIC", "HYBRID"].includes(String(queryParams.fuelType).toUpperCase())) {
+    filter.fuelType = String(queryParams.fuelType).toUpperCase();
+  }
 
   // Daily-rate bounds
   const minPrice = Number(queryParams.minPrice);

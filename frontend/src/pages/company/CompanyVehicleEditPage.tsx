@@ -17,6 +17,7 @@ import { CompanyVehicleEditLocation } from "../../components/company/CompanyVehi
 import { CompanyVehicleEditPolicies } from "../../components/company/CompanyVehicleEditPolicies";
 import { CompanyVehicleEditPublish } from "../../components/company/CompanyVehicleEditPublish";
 import { CompanyVehicleEditPreview } from "../../components/company/CompanyVehicleEditPreview";
+import { useUnsavedChanges } from "../../hooks/useUnsavedChanges";
 
 /** Anchor-wrapper for the sticky section nav (mirrors the mock's grouped cards). */
 const SectionAnchor: React.FC<{ id: string; children: React.ReactNode }> = ({
@@ -42,6 +43,7 @@ export const CompanyVehicleEditPage: React.FC = () => {
 
   const { vehicle } = data;
   const form = useCompanyVehicleEditForm(vehicle, reload);
+  useUnsavedChanges(form.dirty && !form.saving && !form.saved);
 
   return (
     <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 xl:px-8 xl:py-8">

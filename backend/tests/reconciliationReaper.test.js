@@ -54,10 +54,19 @@ const runReaperSweep = ({ rows, openMaintenance = false } = {}) => {
   const bookingsStub = {
     find: async (query) =>
       rows.filter(
-        (row) =>
-          row.bookingStatus === query.bookingStatus &&
-          row.paymentStatus === query.paymentStatus &&
-          row.createdAt.getTime() < query.createdAt.$lt.getTime(),
+        (row) => {
+          const reservationExpired =
+            row.createdAt.getTime() < query.$or[0].createdAt.$lt.getTime();
+          const paymentSessionExpired =
+            row.paymentSessionExpiresAt instanceof Date &&
+            row.paymentSessionExpiresAt.getTime() <=
+              query.$or[1].paymentSessionExpiresAt.$lte.getTime();
+          return (
+            row.bookingStatus === query.bookingStatus &&
+            row.paymentStatus === query.paymentStatus &&
+            (reservationExpired || paymentSessionExpired)
+          );
+        },
       ),
     findById: (id) => ({
       session: async () =>

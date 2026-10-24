@@ -52,6 +52,8 @@ describe("uploaded media URLs", () => {
 
   it("uses honest fallbacks for absent vehicle and company images", () => {
     expect(photoUrl(undefined)).toBe(vehiclePlaceholderImage);
+    expect(decodeURIComponent(vehiclePlaceholderImage)).toContain("NEXRIDE");
+    expect(decodeURIComponent(vehiclePlaceholderImage)).toContain("#071426");
     expect(companyLogoUrl(undefined)).toBeNull();
     expect(companyLogoUrl("default-company-logo.png")).toBeNull();
   });

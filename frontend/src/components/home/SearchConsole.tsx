@@ -330,7 +330,7 @@ const LocationField: React.FC<LocationFieldProps> = ({
       <button
         type="button"
         onClick={onToggle}
-        className={`group/field flex w-full items-center gap-2.5 px-4 py-3 text-left transition-colors duration-200 lg:min-h-[70px] ${open ? "bg-slate-50" : "hover:bg-slate-50/70"}`}
+        className={`group/field flex w-full items-center gap-2.5 px-4 py-3 text-start transition-colors duration-200 lg:min-h-[70px] ${open ? "bg-slate-50" : "hover:bg-slate-50/70"}`}
       >
         <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg border transition-colors ${open ? "border-[#142b4a] bg-[#142b4a] text-white" : "border-slate-200 bg-slate-50 text-[#142b4a]"}`}>
           <MapPin weight="duotone" className="h-[18px] w-[18px]" />
@@ -550,7 +550,7 @@ export const SearchConsole: React.FC = () => {
       <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg border ${openPicker === "from" ? "border-[#142b4a] bg-[#142b4a] text-white" : "border-slate-200 bg-slate-50 text-[#142b4a]"}`}>
         <Calendar weight="duotone" className="h-[18px] w-[18px]" />
       </span>
-      <div className="flex-1 min-w-0 text-left">
+      <div className="flex-1 min-w-0 text-start">
         <div className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
           {t("home.search.pickupDateTime")}
         </div>
@@ -569,7 +569,7 @@ export const SearchConsole: React.FC = () => {
       <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg border ${openPicker === "to" ? "border-[#142b4a] bg-[#142b4a] text-white" : "border-slate-200 bg-slate-50 text-[#142b4a]"}`}>
         <Calendar weight="duotone" className="h-[18px] w-[18px]" />
       </span>
-      <div className="flex-1 min-w-0 text-left">
+      <div className="flex-1 min-w-0 text-start">
         <div className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
           {t("home.search.returnDateTime")}
         </div>
@@ -584,18 +584,18 @@ export const SearchConsole: React.FC = () => {
   );
 
   return (
-    <div id="search-engine" className="relative z-[60] mt-8 w-full overflow-visible isolate">
+    <div id="search-engine" className="relative z-[60] mt-2 w-full overflow-visible isolate">
       {/* Card */}
-      <div className="overflow-visible rounded-[26px] border border-white/80 bg-white/95 p-1 shadow-[0_30px_80px_-28px_rgba(15,23,42,0.45),0_8px_24px_-12px_rgba(15,23,42,0.18)] ring-1 ring-slate-200/70 backdrop-blur-xl">
+      <div className="overflow-visible rounded-[26px] border border-white/30 bg-white p-1.5 shadow-[0_26px_70px_-24px_rgba(0,0,0,.65)] ring-1 ring-slate-900/5">
         {/* Main row */}
         <form
-          className={`relative grid grid-cols-1 overflow-visible rounded-[22px] bg-slate-200/80 lg:grid-cols-[1.5fr_1fr_1fr_auto] lg:gap-px ${openPicker ? "z-30" : "z-10"}`}
+          className={`relative grid grid-cols-1 overflow-visible rounded-[20px] bg-white lg:grid-cols-[minmax(0,1.5fr)_minmax(220px,1fr)_minmax(220px,1fr)_190px] ${openPicker ? "z-30" : "z-10"}`}
           onSubmit={handleSubmit}
         >
           {/* Pick-up location */}
           <div
             data-search-picker="pickup"
-            className={`relative overflow-visible rounded-t-[22px] bg-white lg:rounded-s-[22px] lg:rounded-tr-none lg:rounded-br-none ${openPicker === "pickup" ? "z-20" : ""}`}
+            className={`relative overflow-visible rounded-t-[20px] bg-white lg:rounded-s-[20px] lg:rounded-tr-none lg:rounded-br-none ${openPicker === "pickup" ? "z-20" : ""}`}
           >
             <LocationField
               label={t("home.search.pickup")}
@@ -612,12 +612,12 @@ export const SearchConsole: React.FC = () => {
           </div>
 
           {/* Pick-up date & time */}
-          <div data-search-picker="from" className={`relative bg-white transition-colors ${openPicker === "from" ? "z-20 bg-slate-50" : ""}`}>
+          <div data-search-picker="from" className={`relative border-t border-slate-200 bg-white transition-colors lg:border-s lg:border-t-0 ${openPicker === "from" ? "z-20 bg-slate-50" : ""}`}>
             <button
               type="button"
               onClick={() => setOpenPicker(openPicker === "from" ? null : "from")}
               aria-expanded={openPicker === "from"}
-              className="flex h-full w-full items-center px-4 py-3 text-left transition-colors hover:bg-slate-50/70 lg:min-h-[70px]"
+              className="flex h-full w-full items-center px-4 py-3 text-start transition-colors hover:bg-slate-50/70 lg:min-h-[70px]"
             >
               {fromValue}
             </button>
@@ -635,12 +635,12 @@ export const SearchConsole: React.FC = () => {
           </div>
 
           {/* Return date & time */}
-          <div data-search-picker="to" className={`relative bg-white transition-colors ${openPicker === "to" ? "z-20 bg-slate-50" : ""}`}>
+          <div data-search-picker="to" className={`relative border-t border-slate-200 bg-white transition-colors lg:border-s lg:border-t-0 ${openPicker === "to" ? "z-20 bg-slate-50" : ""}`}>
             <button
               type="button"
               onClick={() => setOpenPicker(openPicker === "to" ? null : "to")}
               aria-expanded={openPicker === "to"}
-              className="flex h-full w-full items-center px-4 py-3 text-left transition-colors hover:bg-slate-50/70 lg:min-h-[70px]"
+              className="flex h-full w-full items-center px-4 py-3 text-start transition-colors hover:bg-slate-50/70 lg:min-h-[70px]"
             >
               {toValue}
             </button>
@@ -661,10 +661,10 @@ export const SearchConsole: React.FC = () => {
           </div>
 
           {/* Search CTA */}
-          <div className="rounded-b-[22px] bg-white p-2 lg:rounded-e-[22px] lg:rounded-bl-none">
+          <div className="rounded-b-[20px] border-t border-slate-200 bg-white p-2 lg:rounded-e-[20px] lg:rounded-bl-none lg:border-s lg:border-t-0">
             <button
               type="submit"
-              className="premium-button group flex h-full min-h-[54px] w-full items-center justify-center gap-2 rounded-2xl px-7 text-sm font-extrabold tracking-wide"
+              className="group flex h-full min-h-[54px] w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-[#142b4a] px-6 text-sm font-extrabold tracking-wide text-white shadow-[0_10px_24px_-14px_rgba(15,23,42,.75)] transition hover:bg-[#1d3a60]"
             >
               <Search weight="bold" className="w-4 h-4" />
               <span>{t("home.search.search")}</span>
@@ -674,7 +674,7 @@ export const SearchConsole: React.FC = () => {
         </form>
 
         {/* Options row */}
-        <div className="relative z-0 mt-px flex flex-wrap items-center justify-between gap-2 rounded-b-[22px] bg-slate-50/90 px-5 py-3">
+        <div className="relative z-0 mt-px hidden flex-wrap items-center justify-between gap-2 rounded-b-[22px] bg-slate-50/90 px-5 py-3">
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
               type="checkbox"
@@ -718,7 +718,7 @@ export const SearchConsole: React.FC = () => {
       </div>
 
       {/* Popular picks */}
-      <div className={`relative z-0 mt-3 flex flex-wrap items-center gap-2 transition-opacity ${openPicker ? "invisible opacity-0" : "opacity-100"}`}>
+      <div className={`relative z-0 mt-3 hidden flex-wrap items-center gap-2 transition-opacity ${openPicker ? "invisible opacity-0" : "opacity-100"}`}>
         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
           {t("home.search.popular")}
         </span>
@@ -736,7 +736,7 @@ export const SearchConsole: React.FC = () => {
               );
               setOpenPicker(null);
             }}
-            className="rounded-full border border-slate-200/80 bg-white/90 px-3.5 py-1.5 text-[11px] font-bold text-slate-600 shadow-sm backdrop-blur transition-colors hover:border-[#142b4a] hover:text-[#142b4a]"
+            className="rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-[11px] font-bold text-slate-200 shadow-sm backdrop-blur transition-colors hover:border-blue-400/70 hover:bg-blue-500/20 hover:text-white"
           >
             {pick}
           </button>

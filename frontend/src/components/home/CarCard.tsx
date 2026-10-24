@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Heart, GasPump as Fuel, Gauge, UsersThree as Users, MapPin, CheckCircle as CheckCircle2 } from "@phosphor-icons/react";
 import type { Car } from "../../types/car";
+import { VehicleImage } from "../VehicleImage";
 
 interface CarCardProps {
   car: Car;
@@ -36,10 +37,10 @@ export const CarCard: React.FC<CarCardProps> = ({ car }) => {
     <div className="premium-card bg-white rounded-2xl border border-slate-200 overflow-hidden group flex flex-col justify-between">
       {/* Card Header & Image */}
       <div className="relative w-full h-52 bg-slate-100 overflow-hidden">
-        <img
+        <VehicleImage
           src={car.image}
           alt={car.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
         />
 
         <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full border border-slate-200 text-xs font-bold text-slate-800 shadow-xs">

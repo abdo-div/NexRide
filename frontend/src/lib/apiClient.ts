@@ -1,3 +1,5 @@
+import { ApiTimeoutError, trackedFetch } from "./apiAvailability";
+
 export const resolveApiBaseUrl = (configuredUrl?: string): string =>
   (configuredUrl?.trim() || "/api/v1").replace(/\/+$/, "");
 
@@ -68,7 +70,7 @@ export async function request<T>(
 
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
+    response = await trackedFetch(`${API_BASE_URL}${path}`, {
       method,
       headers,
       body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
@@ -78,7 +80,9 @@ export async function request<T>(
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") throw error;
     throw new ApiError(
-      "Unable to reach the NexRide API. Check that the backend is running.",
+      error instanceof ApiTimeoutError
+        ? "The NexRide API took too long to respond. Please try again."
+        : "Unable to reach the NexRide API. Check that the backend is running.",
       0,
     );
   }

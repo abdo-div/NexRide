@@ -11,19 +11,22 @@ const bookingSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: [true, "A booking must belong to a customer"],
-      index: true,
     },
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: [true, "A booking must belong to a rental company"],
-      index: true,
     },
     vehicleId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Vehicle",
       required: [true, "A booking must be linked to a vehicle"],
-      index: true,
+    },
+    idempotencyKey: {
+      type: String,
+      trim: true,
+      maxlength: 128,
+      select: false,
     },
 
     // -------------------------------------------------------------------------
@@ -87,6 +90,7 @@ const bookingSchema = new mongoose.Schema(
       default: 0,
       min: [0, "Discount cannot be negative"],
     },
+    promotionCode: { type: String, trim: true, uppercase: true, maxlength: 32, default: null },
     addonIds: {
       type: [String],
       enum: ["insurance", "driver", "childseat", "delivery"],
@@ -161,6 +165,14 @@ const bookingSchema = new mongoose.Schema(
       default: "UNPAID",
       index: true,
     },
+    // Hard deadline for an online checkout attempt. This is deliberately
+    // separate from the general reservation window: a gateway page that dies
+    // without sending its callback must not leave the vehicle reserved.
+    paymentSessionExpiresAt: {
+      type: Date,
+      default: null,
+      index: true,
+    },
 
     // Cancellation metadata
     cancellationReason: {
@@ -177,6 +189,33 @@ const bookingSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+
+    // Customer declarations complement the company-controlled booking status.
+    // They never start or complete a rental by themselves; they preserve what
+    // the customer acknowledged at pickup and reported before return.
+    handover: {
+      pickup: {
+        customerConfirmedAt: { type: Date, default: null },
+        licenceReady: { type: Boolean, default: false },
+        identityReady: { type: Boolean, default: false },
+        vehicleInspected: { type: Boolean, default: false },
+        fuelRecorded: { type: Boolean, default: false },
+        notes: { type: String, trim: true, maxlength: 1000, default: "" },
+      },
+      return: {
+        customerSubmittedAt: { type: Date, default: null },
+        personalItemsRemoved: { type: Boolean, default: false },
+        fuelRestored: { type: Boolean, default: false },
+        damageReported: { type: Boolean, default: false },
+        fuelLevel: {
+          type: String,
+          enum: ["EMPTY", "QUARTER", "HALF", "THREE_QUARTERS", "FULL", null],
+          default: null,
+        },
+        odometer: { type: Number, min: 0, default: null },
+        notes: { type: String, trim: true, maxlength: 1000, default: "" },
+      },
+    },
   },
   {
     timestamps: true,
@@ -190,15 +229,26 @@ const bookingSchema = new mongoose.Schema(
 // Indexes for Fast Availability Lookup & Tenant Filtering
 // -----------------------------------------------------------------------------
 // Prevents overlap queries from taking up excessive DB CPU
+// Equality fields lead range fields so MongoDB can narrow to one vehicle and
+// the blocking states before scanning the requested calendar window.
 bookingSchema.index({
   vehicleId: 1,
+  bookingStatus: 1,
   startDate: 1,
   endDate: 1,
-  bookingStatus: 1,
 });
-bookingSchema.index({ companyId: 1, bookingStatus: 1 });
+// Tenant dashboards and upcoming/on-road queries scope by company + state,
+// then walk the booking calendar.
+bookingSchema.index({ companyId: 1, bookingStatus: 1, startDate: 1, endDate: 1 });
+bookingSchema.index({ companyId: 1, createdAt: -1 });
 bookingSchema.index({ customerId: 1, createdAt: -1 });
-bookingSchema.index({ vehicleId: 1, startDate: 1, bookingStatus: 1 });
+// Durable retry protection. Redis accelerates replay responses, while this
+// unique index remains authoritative when Redis is unavailable or two copies
+// of the same request arrive before the cache has been written.
+bookingSchema.index(
+  { customerId: 1, idempotencyKey: 1 },
+  { unique: true, partialFilterExpression: { idempotencyKey: { $type: "string" } } },
+);
 
 // -----------------------------------------------------------------------------
 // Hooks & Middleware

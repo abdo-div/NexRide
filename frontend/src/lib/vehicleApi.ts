@@ -30,6 +30,8 @@ export interface ReviewEligibility {
 export interface VehicleSearchArgs {
   location?: string;
   type?: string;
+  transmission?: string;
+  fuelType?: string;
   minPrice?: number;
   maxPrice?: number;
   startDate?: string;
@@ -41,6 +43,8 @@ const buildSearchQuery = (args: VehicleSearchArgs): string => {
   const query = new URLSearchParams();
   if (args.location) query.set("location", args.location);
   if (args.type) query.set("type", args.type);
+  if (args.transmission) query.set("transmission", args.transmission);
+  if (args.fuelType) query.set("fuelType", args.fuelType);
   if (args.minPrice !== undefined) query.set("minPrice", String(args.minPrice));
   if (args.maxPrice !== undefined) query.set("maxPrice", String(args.maxPrice));
   if (args.startDate) query.set("startDate", args.startDate);
@@ -94,12 +98,21 @@ export const vehicleApi = {
       { signal },
     ),
 
-  createReview: (vehicleId: string, rating: number, review: string) =>
+  createReview: (vehicleId: string, bookingId: string, rating: number, review: string) =>
     request<{ status: string; data: { review: VehicleReviewDto } }>(
       `/vehicles/${encodeURIComponent(vehicleId)}/reviews`,
       {
         method: "POST",
-        body: { rating, review },
+        body: { bookingId, rating, review },
       },
     ),
+
+  updateReview: (vehicleId: string, reviewId: string, rating: number, review: string) =>
+    request<{ status: string; data: { review: VehicleReviewDto } }>(
+      `/vehicles/${encodeURIComponent(vehicleId)}/reviews/${encodeURIComponent(reviewId)}`,
+      { method: "PATCH", body: { rating, review } },
+    ),
+
+  deleteReview: (vehicleId: string, reviewId: string) =>
+    request<void>(`/vehicles/${encodeURIComponent(vehicleId)}/reviews/${encodeURIComponent(reviewId)}`, { method: "DELETE" }),
 };

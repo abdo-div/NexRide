@@ -21,6 +21,7 @@ import {
   updateMeSchema,
   adminUpdateUserSchema,
   updateUserStatusSchema,
+  updateCustomerPreferencesSchema,
 } from "../validations/user.validation.js";
 import { idParamSchema } from "../validations/common.validation.js";
 import {
@@ -34,6 +35,14 @@ import {
   deleteUser,
   uploadUserPhoto,
   resizeUserPhoto,
+  uploadDriverDocuments,
+  getMyDriverDocuments,
+  updateMyDriverDocuments,
+  getCustomerDriverDocuments,
+  reviewCustomerDriverDocuments,
+  downloadDriverDocument,
+  getMyPreferences,
+  updateMyPreferences,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -220,6 +229,13 @@ router.patch("/updatePassword", validate(updatePasswordSchema), updatePassword);
  *         description: Not authenticated
  */
 router.get("/me", getMe, getUserById);
+router.get("/me/preferences", restrictTo("customer"), getMyPreferences);
+router.patch(
+  "/me/preferences",
+  restrictTo("customer"),
+  validate(updateCustomerPreferencesSchema),
+  updateMyPreferences,
+);
 
 /**
  * @openapi
@@ -274,6 +290,36 @@ router.patch(
  */
 router.delete("/delete-me", deleteMe);
 router.delete("/deleteMe", deleteMe);
+
+router.get(
+  "/me/driver-documents",
+  restrictTo("customer"),
+  getMyDriverDocuments,
+);
+router.patch(
+  "/me/driver-documents",
+  restrictTo("customer"),
+  uploadDriverDocuments,
+  updateMyDriverDocuments,
+);
+
+router.get(
+  "/:id/driver-documents",
+  restrictTo("company", "admin"),
+  validate(idParamSchema()),
+  getCustomerDriverDocuments,
+);
+router.patch(
+  "/:id/driver-documents/review",
+  restrictTo("company", "admin"),
+  validate(idParamSchema()),
+  reviewCustomerDriverDocuments,
+);
+router.get(
+  "/:id/driver-documents/:kind/file",
+  restrictTo("company", "admin"),
+  downloadDriverDocument,
+);
 
 // -----------------------------------------------------------------------------
 // PLATFORM ADMIN & GOVERNANCE ROUTES (Super-Admin Portal)

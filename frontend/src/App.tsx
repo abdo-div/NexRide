@@ -3,11 +3,11 @@ import {
   BrowserRouter,
   Routes,
   Route,
-  Navigate,
   Outlet,
   useLocation,
 } from "react-router";
 import { LoaderCircle } from "lucide-react";
+import { MotionConfig } from "framer-motion";
 import NavBar from "./components/layouts/NavBar";
 import { Footer } from "./components/layouts/Footer";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
@@ -20,6 +20,17 @@ import { CompanyRoute } from "./components/company/CompanyRoute";
 import { CompanyLayout } from "./components/company/CompanyLayout";
 import { SmoothScroll } from "./components/SmoothScroll";
 import { DialogProvider } from "./context/DialogContext";
+import { NetworkStatusBanner } from "./components/layouts/NetworkStatusBanner";
+import { GlobalErrorBoundary } from "./components/layouts/GlobalErrorBoundary";
+import { PageMetadata } from "./components/layouts/PageMetadata";
+import { SkipToContent } from "./components/layouts/SkipToContent";
+import { BackToTop } from "./components/layouts/BackToTop";
+import { RouteAnnouncer } from "./components/layouts/RouteAnnouncer";
+import { ToastProvider } from "./context/ToastProvider";
+import { SavedVehiclesProvider } from "./context/SavedVehiclesProvider";
+import { VehicleComparisonProvider } from "./context/VehicleComparisonProvider";
+import { CustomerPreferencesProvider } from "./context/CustomerPreferencesProvider";
+import { ComparisonTray } from "./components/vehicles/ComparisonTray";
 
 // Only the landing page is needed for the initial public load. Browsing, auth,
 // booking, checkout and payment screens are separate chunks so a first-time
@@ -41,9 +52,15 @@ const CompanyApplicationStatusPage = lazy(
 );
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 const LegalPage = lazy(() => import("./pages/LegalPage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const MyBookingsPage = lazy(() => import("./pages/MyBookingsPage"));
 const MyProfilePage = lazy(() => import("./pages/MyProfilePage"));
 const BookingDetailsPage = lazy(() => import("./pages/BookingDetailsPage"));
+const SavedVehiclesPage = lazy(() => import("./pages/SavedVehiclesPage"));
+const VehicleComparisonPage = lazy(() => import("./pages/VehicleComparisonPage"));
+const CustomerPreferencesPage = lazy(() => import("./pages/CustomerPreferencesPage"));
+const SavedSearchesPage = lazy(() => import("./pages/SavedSearchesPage"));
+const RewardsPage = lazy(() => import("./pages/RewardsPage"));
 const AdminOverviewPage = lazy(() =>
   import("./pages/admin/AdminOverviewPage").then((module) => ({
     default: module.AdminOverviewPage,
@@ -204,21 +221,33 @@ function PublicShell() {
   return (
     <div className="flex min-h-screen flex-col">
       <NavBar />
-      <main className="flex-1">
+      <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
         <Outlet />
       </main>
       <Footer />
+      <ComparisonTray />
     </div>
   );
 }
 
 function App() {
   return (
-    <BrowserRouter>
-      <DialogProvider>
-        <ScrollToTop />
-        <AuthProvider>
-        <SmoothScroll><Routes>
+    <MotionConfig reducedMotion="user">
+      <BrowserRouter>
+        <GlobalErrorBoundary>
+          <PageMetadata />
+          <RouteAnnouncer />
+          <SkipToContent />
+          <BackToTop />
+          <DialogProvider>
+            <ToastProvider>
+            <ScrollToTop />
+            <NetworkStatusBanner />
+            <AuthProvider>
+            <SavedVehiclesProvider>
+            <CustomerPreferencesProvider>
+            <VehicleComparisonProvider>
+            <SmoothScroll><Routes>
           <Route element={<PublicShell />}>
             <Route path="/" element={<StaffLandingRoute><HomePage /></StaffLandingRoute>} />
             <Route
@@ -376,6 +405,20 @@ function App() {
               }
             />
             <Route
+              path="/saved-vehicles"
+              element={
+                <ProtectedRoute>
+                  <LazyRoute>
+                    <SavedVehiclesPage />
+                  </LazyRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/compare" element={<LazyRoute><VehicleComparisonPage /></LazyRoute>} />
+            <Route path="/preferences" element={<ProtectedRoute><LazyRoute><CustomerPreferencesPage /></LazyRoute></ProtectedRoute>} />
+            <Route path="/saved-searches" element={<ProtectedRoute><LazyRoute><SavedSearchesPage /></LazyRoute></ProtectedRoute>} />
+            <Route path="/rewards" element={<ProtectedRoute><LazyRoute><RewardsPage /></LazyRoute></ProtectedRoute>} />
+            <Route
               path="/my-bookings/:bookingId"
               element={
                 <ProtectedRoute>
@@ -385,7 +428,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<LazyRoute><NotFoundPage /></LazyRoute>} />
           </Route>
 
           <Route
@@ -409,6 +452,7 @@ function App() {
             <Route path="maintenance" element={<AdminMaintenancePage />} />
             <Route path="reports" element={<AdminReportsPage />} />
             <Route path="settings" element={<AdminSettingsPage />} />
+            <Route path="*" element={<AdminOverviewPage />} />
           </Route>
 
           <Route
@@ -431,11 +475,18 @@ function App() {
             <Route path="reviews" element={<CompanyReviewsPage />} />
             <Route path="payouts" element={<CompanyEarningsPage />} />
             <Route path="settings" element={<CompanySettingsPage />} />
+            <Route path="*" element={<CompanyDashboardPage />} />
           </Route>
-        </Routes></SmoothScroll>
-        </AuthProvider>
-      </DialogProvider>
-    </BrowserRouter>
+            </Routes></SmoothScroll>
+            </VehicleComparisonProvider>
+            </CustomerPreferencesProvider>
+            </SavedVehiclesProvider>
+            </AuthProvider>
+            </ToastProvider>
+          </DialogProvider>
+        </GlobalErrorBoundary>
+      </BrowserRouter>
+    </MotionConfig>
   );
 }
 

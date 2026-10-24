@@ -132,6 +132,7 @@ const mapRow = (doc) => {
         }
       : null,
     customer: {
+      id: customer._id ? String(customer._id) : "",
       initials: initialsOf(customer.name),
       name: customer.name ?? "Customer",
       phone: customer.phoneNumber ?? null,
@@ -166,6 +167,16 @@ const mapRow = (doc) => {
       companyShare: doc.companyShare,
       resolvedPayment: paymentState,
       payoutStatus: ledger?.payoutStatus ?? null,
+      handover: {
+        pickupConfirmedAt: doc.handover?.pickup?.customerConfirmedAt ?? null,
+        pickupNotes: doc.handover?.pickup?.notes ?? "",
+        returnSubmittedAt: doc.handover?.return?.customerSubmittedAt ?? null,
+        returnNotes: doc.handover?.return?.notes ?? "",
+        damageReported: Boolean(doc.handover?.return?.damageReported),
+        fuelRestored: Boolean(doc.handover?.return?.fuelRestored),
+        fuelLevel: doc.handover?.return?.fuelLevel ?? null,
+        odometer: doc.handover?.return?.odometer ?? null,
+      },
       checks: [
         {
           key: "gps",
@@ -173,7 +184,10 @@ const mapRow = (doc) => {
         },
         { key: "ready", done: vehicle.operationalStatus === "AVAILABLE" },
         { key: "paid", done: paymentState === "PAID" },
-        { key: "signed", done: false },
+        {
+          key: "signed",
+          done: Boolean(doc.handover?.pickup?.customerConfirmedAt),
+        },
       ],
     },
   };

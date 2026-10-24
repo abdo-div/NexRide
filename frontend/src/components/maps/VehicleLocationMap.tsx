@@ -1,17 +1,13 @@
-import React, { useEffect } from "react";
-import {
-  CircleMarker,
-  MapContainer,
-  Popup,
-  TileLayer,
-  useMap,
-  useMapEvents,
-} from "react-leaflet";
+import React, { useEffect, useRef, useState } from "react";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
-const TRIPOLI: [number, number] = [32.8872, 13.1913];
+const TRIPOLI: [number, number] = [13.1913, 32.8872];
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN?.trim();
+const MAP_STYLE = "mapbox://styles/mapbox/standard";
 
 interface VehicleLocationMapProps {
-  coordinates?: [number, number] | null; // GeoJSON order: [longitude, latitude]
+  coordinates?: [number, number] | null; // GeoJSON and Mapbox order: [longitude, latitude]
   editable?: boolean;
   label?: string;
   onChange?: (longitude: number, latitude: number) => void;
@@ -19,36 +15,20 @@ interface VehicleLocationMapProps {
   pickerHint?: string;
 }
 
-const Recenter: React.FC<{ center: [number, number] }> = ({ center }) => {
-  const map = useMap();
-  useEffect(() => {
-    map.setView(center, map.getZoom(), { animate: false });
-    requestAnimationFrame(() => map.invalidateSize());
-  }, [center, map]);
-  return null;
-};
+const isValidCoordinate = (
+  coordinates?: [number, number] | null,
+): coordinates is [number, number] =>
+  Boolean(
+    coordinates &&
+      Number.isFinite(coordinates[0]) &&
+      Number.isFinite(coordinates[1]) &&
+      coordinates[0] >= -180 &&
+      coordinates[0] <= 180 &&
+      coordinates[1] >= -90 &&
+      coordinates[1] <= 90,
+  );
 
-const CompactAttribution: React.FC = () => {
-  const map = useMap();
-  useEffect(() => {
-    map.attributionControl.setPrefix(false);
-  }, [map]);
-  return null;
-};
-
-const CoordinatePicker: React.FC<{
-  enabled: boolean;
-  onChange?: (longitude: number, latitude: number) => void;
-}> = ({ enabled, onChange }) => {
-  useMapEvents({
-    click(event) {
-      if (enabled) onChange?.(event.latlng.lng, event.latlng.lat);
-    },
-  });
-  return null;
-};
-
-/** OpenStreetMap view shared by the operator coordinate picker and public listing. */
+/** Mapbox view shared by public listings and editable operator location forms. */
 export const VehicleLocationMap: React.FC<VehicleLocationMapProps> = ({
   coordinates,
   editable = false,
@@ -57,43 +37,170 @@ export const VehicleLocationMap: React.FC<VehicleLocationMapProps> = ({
   className = "h-64",
   pickerHint = "Click the map to set the pickup point",
 }) => {
-  const valid =
-    coordinates &&
-    Number.isFinite(coordinates[0]) &&
-    Number.isFinite(coordinates[1]);
-  const center: [number, number] = valid
-    ? [coordinates[1], coordinates[0]]
-    : TRIPOLI;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const markerRef = useRef<mapboxgl.Marker | null>(null);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const onChangeRef = useRef(onChange);
+  const editableRef = useRef(editable);
+  const initialCoordinatesRef = useRef<[number, number]>(
+    isValidCoordinate(coordinates) ? coordinates : TRIPOLI,
+  );
+  const initiallyValidRef = useRef(isValidCoordinate(coordinates));
+  const [mapError, setMapError] = useState<string | null>(null);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
+  useEffect(() => {
+    editableRef.current = editable;
+    const map = mapRef.current;
+    markerRef.current?.setDraggable(editable);
+    if (map) map.getCanvas().style.cursor = editable ? "crosshair" : "grab";
+  }, [editable]);
+
+  useEffect(() => {
+    if (!containerRef.current || !MAPBOX_TOKEN) return;
+
+    const map = new mapboxgl.Map({
+      accessToken: MAPBOX_TOKEN,
+      container: containerRef.current,
+      style: MAP_STYLE,
+      center: initialCoordinatesRef.current,
+      zoom: initiallyValidRef.current ? 15 : 10.5,
+      pitch: editableRef.current ? 0 : 28,
+      bearing: 0,
+      cooperativeGestures: true,
+      attributionControl: false,
+    });
+    mapRef.current = map;
+    map.getCanvas().style.cursor = editableRef.current ? "crosshair" : "grab";
+
+    map.addControl(
+      new mapboxgl.NavigationControl({ showCompass: true, visualizePitch: true }),
+      "top-left",
+    );
+    map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-right");
+
+    const createMarker = (point: [number, number]) => {
+      const marker = new mapboxgl.Marker({
+        color: "#1769ff",
+        draggable: editableRef.current,
+        scale: 0.92,
+      })
+        .setLngLat(point)
+        .addTo(map);
+
+      marker.on("dragend", () => {
+        const next = marker.getLngLat();
+        onChangeRef.current?.(next.lng, next.lat);
+      });
+      markerRef.current = marker;
+      return marker;
+    };
+
+    if (initiallyValidRef.current) createMarker(initialCoordinatesRef.current);
+
+    map.on("click", (event) => {
+      if (!editableRef.current) return;
+      const point: [number, number] = [event.lngLat.lng, event.lngLat.lat];
+      const marker = markerRef.current ?? createMarker(point);
+      marker.setLngLat(point);
+      onChangeRef.current?.(point[0], point[1]);
+    });
+
+    map.on("style.load", () => {
+      const language = document.documentElement.lang.toLowerCase().startsWith("ar")
+        ? "ar"
+        : "en";
+      map.setConfigProperty("basemap", "language", language);
+      map.setConfigProperty("basemap", "lightPreset", "day");
+      map.setConfigProperty("basemap", "show3dObjects", !editableRef.current);
+    });
+
+    map.on("error", (event) => {
+      if (event.error) setMapError("The map could not be loaded. Please try again.");
+    });
+
+    resizeObserverRef.current = new ResizeObserver(() => map.resize());
+    resizeObserverRef.current.observe(containerRef.current);
+
+    return () => {
+      resizeObserverRef.current?.disconnect();
+      resizeObserverRef.current = null;
+      markerRef.current = null;
+      mapRef.current = null;
+      map.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (!isValidCoordinate(coordinates)) {
+      markerRef.current?.remove();
+      markerRef.current = null;
+      return;
+    }
+
+    let marker = markerRef.current;
+    if (!marker) {
+      marker = new mapboxgl.Marker({ color: "#1769ff", draggable: editable, scale: 0.92 })
+        .setLngLat(coordinates)
+        .addTo(map);
+      marker.on("dragend", () => {
+        const next = marker?.getLngLat();
+        if (next) onChangeRef.current?.(next.lng, next.lat);
+      });
+      markerRef.current = marker;
+    } else {
+      marker.setLngLat(coordinates).setDraggable(editable);
+    }
+
+    if (label) {
+      marker.setPopup(
+        new mapboxgl.Popup({ offset: 28, closeButton: false, className: "nexride-map-popup" })
+          .setText(label),
+      );
+    } else {
+      marker.setPopup(null);
+    }
+
+    map.easeTo({
+      center: coordinates,
+      zoom: Math.max(map.getZoom(), 14),
+      duration: 650,
+      essential: true,
+    });
+  }, [coordinates, editable, label]);
+
+  if (!MAPBOX_TOKEN) {
+    return (
+      <div
+        className={`flex items-center justify-center overflow-hidden rounded-2xl border border-amber-200 bg-amber-50 px-6 text-center text-sm font-semibold text-amber-900 ${className}`}
+        role="status"
+      >
+        Mapbox is not configured. Add VITE_MAPBOX_ACCESS_TOKEN to the frontend environment.
+      </div>
+    );
+  }
 
   return (
     <div
-      className={`vehicle-location-map relative z-0 isolate overflow-hidden rounded-2xl border border-[#E2E8F0] ${className}`}
+      className={`vehicle-location-map relative z-0 isolate overflow-hidden rounded-2xl border border-[#D8E2F0] bg-slate-100 shadow-[0_18px_45px_-30px_rgba(15,23,42,0.55)] ${className}`}
     >
-      <MapContainer
-        center={center}
-        zoom={valid ? 15 : 11}
-        scrollWheelZoom
-        className="relative z-0 h-full w-full"
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <Recenter center={center} />
-        <CompactAttribution />
-        <CoordinatePicker enabled={editable} onChange={onChange} />
-        {valid && (
-          <CircleMarker
-            center={center}
-            radius={10}
-            pathOptions={{ color: "#ffffff", weight: 3, fillColor: "#142B4A", fillOpacity: 1 }}
-          >
-            {label && <Popup>{label}</Popup>}
-          </CircleMarker>
-        )}
-      </MapContainer>
+      <div ref={containerRef} className="h-full w-full" aria-label={label || "Location map"} />
+
+      {mapError && (
+        <div className="absolute inset-x-4 top-4 z-10 rounded-xl border border-red-200 bg-white/95 px-4 py-3 text-center text-xs font-semibold text-red-700 shadow-lg backdrop-blur">
+          {mapError}
+        </div>
+      )}
+
       {editable && (
-        <div className="pointer-events-none absolute left-1/2 top-3 z-[500] -translate-x-1/2 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-[#0B1C30] shadow-md">
+        <div className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2 whitespace-nowrap rounded-full border border-white/70 bg-white/95 px-3.5 py-2 text-xs font-bold text-[#0B1C30] shadow-lg backdrop-blur-md">
           {pickerHint}
         </div>
       )}

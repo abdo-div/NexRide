@@ -23,6 +23,8 @@ import {
   MUNICIPAL_FEE_LYD,
 } from "../utils/bookingPricing.js";
 import logger from "../utils/logger.js";
+import { notifyBookingEvent } from "../services/notificationService.js";
+import { calculatePromotionDiscount } from "../services/rewardService.js";
 // Administrative register.
 //
 // The search allowlist lives in the service (`BOOKING_SEARCH_FIELDS`) because the
@@ -109,6 +111,13 @@ export const bookingConcurrency = {
   releaseVehicleHold,
 };
 
+export const normalizeIdempotencyKey = (value) => {
+  if (value === undefined) return null;
+  if (typeof value !== "string") return undefined;
+  const key = value.trim();
+  return /^[A-Za-z0-9._:-]{8,128}$/.test(key) ? key : undefined;
+};
+
 /**
  * Customer booking creation
  */
@@ -119,10 +128,19 @@ export const createBooking = catchAsync(async (req, res, next) => {
     endDate,
     pickupLocation,
     paymentMethod,
+    promotionCode,
     addonIds = [],
   } = req.body;
   const start = new Date(startDate);
   const end = new Date(endDate);
+  const idempotencyKey = normalizeIdempotencyKey(
+    req.headers?.["idempotency-key"],
+  );
+  if (idempotencyKey === undefined) {
+    return next(
+      new AppError("Idempotency-Key must be 8-128 safe characters.", 400),
+    );
+  }
 
   // Redis provides a fast cross-instance checkout hold when available. MongoDB
   // remains the authoritative concurrency boundary: the transaction below
@@ -194,7 +212,23 @@ export const createBooking = catchAsync(async (req, res, next) => {
     // aborting after a successful commit caused checkout to report a failure
     // even though MongoDB had already stored the fully paid booking.
     await session.withTransaction(async () => {
-    // Distinguish a missing/unpublished listing (404) from a vehicle that is
+      // Redis may be absent and its response cache has a small write window.
+      // Persisting the key with the booking makes replay protection durable.
+      if (idempotencyKey) {
+        const existingBooking = await Booking.findOne({
+          customerId: req.user.id,
+          idempotencyKey,
+        }).session(session);
+        if (existingBooking) {
+          booking = existingBooking;
+          payment = await Payment.findOne({
+            bookingId: existingBooking._id,
+          }).session(session);
+          return;
+        }
+      }
+
+      // Distinguish a missing/unpublished listing (404) from a vehicle that is
     // simply not rentable right now (409), so a vehicle in MAINTENANCE
     // surfaces a clear conflict instead of a misleading "not found".
     const vehicle = await Vehicle.findById(vehicleId).session(session);
@@ -246,7 +280,14 @@ export const createBooking = catchAsync(async (req, res, next) => {
     const rentalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
     const rentalPrice = rentalDays * claimed.dailyPrice;
     const extras = calculateBookingExtras(addonIds, rentalDays);
-    const totalAmount = rentalPrice + extras.addonsTotal + MUNICIPAL_FEE_LYD;
+    const subtotal = rentalPrice + extras.addonsTotal + MUNICIPAL_FEE_LYD;
+    const promotion = await calculatePromotionDiscount({
+      code: promotionCode,
+      customerId: req.user.id,
+      subtotal,
+      session,
+    });
+    const totalAmount = subtotal - promotion.discountAmount;
     // The Booking pre-validation hook applies the company's override. These
     // values satisfy required fields until that authoritative snapshot runs.
     const platformPolicy = await getPlatformPolicy();
@@ -260,6 +301,7 @@ export const createBooking = catchAsync(async (req, res, next) => {
           customerId: req.user.id,
           companyId: vehicle.companyId,
           vehicleId,
+          ...(idempotencyKey ? { idempotencyKey } : {}),
           startDate: start,
           endDate: end,
           pickupLocation: pickupLocation || vehicle.pickupLocation,
@@ -270,6 +312,8 @@ export const createBooking = catchAsync(async (req, res, next) => {
           addons: extras.addons,
           addonsTotal: extras.addonsTotal,
           municipalFee: MUNICIPAL_FEE_LYD,
+          discountAmount: promotion.discountAmount,
+          promotionCode: promotion.code,
           totalAmount,
           commissionRate,
           commissionAmount,
@@ -351,6 +395,8 @@ export const createBooking = catchAsync(async (req, res, next) => {
     "Booking created",
   );
 
+  void notifyBookingEvent(booking, "BOOKING_CREATED").catch(() => {});
+
   res.status(201).json({
     status: "success",
     data,
@@ -421,6 +467,33 @@ export const cancelBooking = catchAsync(async (req, res, next) => {
     status: "success",
     data: { booking },
   });
+});
+
+export const getCancellationQuote = catchAsync(async (req, res) => {
+  const quote = await bookingService.getCancellationQuote(req.params.id);
+  res.status(200).json({ status: "success", data: { quote } });
+});
+
+export const modifyBooking = catchAsync(async (req, res) => {
+  const booking = await bookingService.modifyUnpaidCustomerBooking(
+    req.params.id,
+    req.user.id,
+    req.body,
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: { booking },
+  });
+});
+
+export const saveCustomerHandover = catchAsync(async (req, res) => {
+  const booking = await bookingService.saveCustomerHandover(
+    req.params.id,
+    req.user.id,
+    req.body,
+  );
+  res.status(200).json({ status: "success", data: { booking } });
 });
 
 /**

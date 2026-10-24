@@ -22,7 +22,7 @@ import {
 import type { BookingDto } from "../../types/booking";
 import { photoUrl } from "../../lib/vehicleMapper";
 import { bookingApi } from "../../lib/bookingApi";
-import { useDialog } from "../../context/useDialog";
+import { CancellationDialog } from "../bookingDetails/CancellationDialog";
 import {
   formatDate,
   formatLYD,
@@ -61,8 +61,8 @@ export const BookingCard: React.FC<BookingCardProps> = ({
 }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { confirm: confirmDialog } = useDialog();
   const [busy, setBusy] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
 
   const status = booking.bookingStatus;
   const lang = i18n.language;
@@ -75,7 +75,9 @@ export const BookingCard: React.FC<BookingCardProps> = ({
   const currency = t("myBookings.currency");
   const days = rentalDays(booking.startDate, booking.endDate);
   const totalHours = Math.max(days * 24, 24);
-  const invoiceAvailable = booking.paymentStatus === "PAID";
+  const invoiceAvailable = ["PAID", "REFUNDED", "PARTIALLY_REFUNDED"].includes(
+    booking.paymentStatus,
+  );
 
   const isActive = status === "ACTIVE";
   const isUpcoming = status === "CONFIRMED" || status === "PAID";
@@ -103,10 +105,12 @@ export const BookingCard: React.FC<BookingCardProps> = ({
     ? t("myBookings.status.upcoming")
     : t(`myBookings.status.${status}`);
 
-  const paymentLabel = !invoiceAvailable
-    ? t("myBookings.unpaidTag")
-    : booking.paymentStatus === "REFUNDED"
+  const paymentLabel = booking.paymentStatus === "REFUNDED"
     ? t("myBookings.refundedTag")
+    : booking.paymentStatus === "PARTIALLY_REFUNDED"
+    ? t("myBookings.partiallyRefundedTag")
+    : !invoiceAvailable
+    ? t("myBookings.unpaidTag")
     : t("myBookings.paidTag");
 
   const openDetails = () => {
@@ -131,20 +135,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
   };
 
   const requestCancel = async () => {
-    const confirmed = await confirmDialog(
-      `${t("myBookings.cancelConfirmTitle")}\n${t("myBookings.cancelConfirmBody")}`,
-    );
-    if (!confirmed || busy) return;
-    setBusy(true);
-    try {
-      await bookingApi.cancel(booking._id);
-      onCancelled();
-      onToast(t("myBookings.cancelSuccess"));
-    } catch {
-      onToast(t("myBookings.cancelError"));
-    } finally {
-      setBusy(false);
-    }
+    if (!busy) setCancelOpen(true);
   };
 
   const rebook = () => navigate(`/vehicles/${vehicleId}`);
@@ -153,6 +144,18 @@ export const BookingCard: React.FC<BookingCardProps> = ({
   const Icon = isActive ? CircleAlert : isUpcoming ? CalendarClock : CircleCheck;
 
   return (
+    <>
+    {cancelOpen && (
+      <CancellationDialog
+        bookingId={booking._id}
+        onClose={() => setCancelOpen(false)}
+        onCancelled={() => {
+          setCancelOpen(false);
+          onCancelled();
+          onToast(t("myBookings.cancelSuccess"));
+        }}
+      />
+    )}
     <article
       className={`bg-white rounded-2xl border overflow-hidden transition-all ${
         isActive
@@ -444,7 +447,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
                 </div>
                 <button
                   type="button"
-                  onClick={() => onToast(t("myBookings.modifyInfo"))}
+                  onClick={openDetails}
                   className="py-1 text-center text-[11px] font-medium text-[#64748B] hover:text-[#142B4A] transition-colors cursor-pointer"
                 >
                   {t("myBookings.actions.modifyRequest")}
@@ -456,7 +459,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
               <>
                 <button
                   type="button"
-                  onClick={() => onToast(t("myBookings.modifyInfo"))}
+                  onClick={openDetails}
                   className="w-full py-2 px-4 bg-[#0F172A] hover:bg-[#1E293B] text-white text-sm font-bold rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer"
                 >
                   <PencilLine className="w-4 h-4" />
@@ -527,6 +530,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({
         </div>
       </div>
     </article>
+    </>
   );
 };
 

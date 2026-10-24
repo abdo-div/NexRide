@@ -49,4 +49,36 @@ test("production sign-off requires two owners and every evidence class", () => {
   assert.match(signOff, /real low-value payment/);
   assert.match(signOff, /real refund/);
   assert.match(signOff, /GO only when every required row is PASS/);
+  assert.match(signOff, /RELEASE_RUNBOOK\.md/);
+});
+
+test("the release runbook sequences immutable deployment through verified recovery", () => {
+  const runbook = read("docs", "RELEASE_RUNBOOK.md");
+
+  const orderedStages = [
+    "Freeze one immutable candidate",
+    "Verify and deploy the artifact",
+    "Certify the deployed SHA",
+    "Complete human acceptance",
+    "Observe the launch",
+    "Close the release",
+  ];
+  let previous = -1;
+  for (const stage of orderedStages) {
+    const position = runbook.indexOf(stage);
+    assert.ok(position > previous, `${stage} must exist in release order`);
+    previous = position;
+  }
+
+  assert.match(runbook, /full 40-character Git commit SHA/);
+  assert.match(runbook, /nexride-<sha>/);
+  assert.match(runbook, /verify-host\.sh <full-sha>/);
+  assert.match(runbook, /npm run smoke:production/);
+  assert.match(runbook, /real low-value payment/);
+  assert.match(runbook, /English and Arabic, RTL/);
+  assert.match(runbook, /Chrome, Edge, Firefox, and Safari/);
+  assert.match(runbook, /release owner and operations owner/);
+  assert.match(runbook, /rollback\.sh <previous-full-sha>/);
+  assert.match(runbook, /successful only after the selected release passes[\s\S]*readiness/);
+  assert.doesNotMatch(runbook, /SMOKE_(?:CUSTOMER|COMPANY|ADMIN)_PASSWORD=/);
 });

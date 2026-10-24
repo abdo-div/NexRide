@@ -67,7 +67,7 @@ export const AdminPayoutsTable: React.FC<AdminPayoutsTableProps> = ({
       </div>
 
       <div className="w-full overflow-x-auto rounded-2xl border border-slate-100">
-        <table className="w-full border-collapse text-left">
+        <table className="admin-table">
           <thead>
             <tr className="bg-[#F8FAFC] text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
               <th className="rounded-s-2xl px-4 py-3">{t("admin.commissions.table.payoutId")}</th>

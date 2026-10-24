@@ -2,6 +2,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -29,6 +30,8 @@ const messageParts = (message: string, fallbackTitle: string) => {
 export const DialogProvider = ({ children }: { children: ReactNode }) => {
   const { t } = useTranslation();
   const [dialog, setDialog] = useState<DialogRequest | null>(null);
+  const dialogRef = useRef<HTMLElement>(null);
+  const dialogOpen = Boolean(dialog);
 
   const confirm = useCallback(
     (message: string, options: DialogOptions = {}) =>
@@ -77,18 +80,54 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    if (!dialog) return;
+    if (!dialogOpen) return;
     const previousOverflow = document.body.style.overflow;
+    const previouslyFocused =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
     document.body.style.overflow = "hidden";
+
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") dismiss();
+      if (event.key === "Escape") {
+        event.preventDefault();
+        dismiss();
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      const modal = dialogRef.current;
+      if (!modal) return;
+      const focusable = Array.from(
+        modal.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => element.getAttribute("aria-hidden") !== "true");
+      const first = focusable[0];
+      const last = focusable.at(-1);
+
+      if (!first || !last) {
+        event.preventDefault();
+        modal.focus();
+      } else if (
+        event.shiftKey &&
+        (document.activeElement === first || !modal.contains(document.activeElement))
+      ) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
+
     document.addEventListener("keydown", onKeyDown);
     return () => {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
+      previouslyFocused?.focus();
     };
-  }, [dialog, dismiss]);
+  }, [dialogOpen, dismiss]);
 
   const api = useMemo(() => ({ confirm, prompt }), [confirm, prompt]);
   const parts = dialog
@@ -110,10 +149,12 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
           }}
         >
           <section
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="app-dialog-title"
-            aria-describedby="app-dialog-description"
+            aria-describedby={parts.description ? "app-dialog-description" : undefined}
+            tabIndex={-1}
             className="w-full max-w-md overflow-hidden rounded-3xl border border-white/70 bg-white shadow-[0_30px_90px_rgba(2,12,27,0.35)]"
           >
             <div className="flex items-start gap-4 p-6 pb-4">
@@ -152,6 +193,7 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
               <div className="px-6 pb-5">
                 <textarea
                   autoFocus
+                  aria-label={dialog.placeholder ?? t("dialogs.reasonPlaceholder")}
                   rows={4}
                   value={dialog.value}
                   placeholder={dialog.placeholder ?? t("dialogs.reasonPlaceholder")}

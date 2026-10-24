@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Star, ArrowRight } from "lucide-react";
 import type { CompanyProfileVehicle } from "../../types/companyProfile";
+import { VehicleImage } from "../VehicleImage";
 
 interface CompanyProfileVehicleCardProps {
   vehicle: CompanyProfileVehicle;
@@ -28,11 +29,10 @@ export const CompanyProfileVehicleCard: React.FC<
   return (
     <article className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex flex-col overflow-hidden group">
       <div className="relative w-full aspect-[16/10] bg-slate-100 overflow-hidden">
-        <img
+        <VehicleImage
           src={vehicle.image}
           alt={vehicle.title}
-          loading="lazy"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
           <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/90 backdrop-blur-md text-emerald-700 shadow-sm flex items-center gap-1">

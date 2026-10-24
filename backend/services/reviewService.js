@@ -25,8 +25,9 @@ export const fetchReviewById = async (reviewId) => {
 /**
  * Verify completed rental booking before customer leaves a review
  */
-export const verifyBookingCompletion = async (customerId, vehicleId) => {
+export const verifyBookingCompletion = async (customerId, vehicleId, bookingId) => {
   const completedBooking = await Booking.findOne({
+    _id: bookingId,
     customerId,
     vehicleId,
     bookingStatus: "COMPLETED",

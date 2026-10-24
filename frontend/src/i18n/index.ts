@@ -11,7 +11,9 @@ export type LanguageKey = keyof typeof LANGUAGES;
 
 export const DEFAULT_LANGUAGE: LanguageKey = "ar";
 
-const STORAGE_KEY = "nexride-lang";
+// v2 intentionally starts the redesigned experience in Arabic once, while
+// continuing to remember every language choice made from the new header.
+const STORAGE_KEY = "nexride-lang-v2";
 
 type TranslationBundle = { default: Record<string, unknown> };
 

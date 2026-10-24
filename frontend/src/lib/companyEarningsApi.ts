@@ -1,4 +1,5 @@
 import { request, ApiError, API_BASE_URL } from "./apiClient";
+import { trackedFetch } from "./apiAvailability";
 import type {
   CompanyEarningsData,
   CompanyEarningsQuery,
@@ -56,7 +57,7 @@ export const companyEarningsApi = {
    * endpoint streams binary application/pdf, not JSON.
    */
   downloadInvoice: async (paymentId: string): Promise<Blob> => {
-    const response = await fetch(
+    const response = await trackedFetch(
       `${API_BASE_URL}/payments/${encodeURIComponent(paymentId)}/invoice`,
       {
         headers: {

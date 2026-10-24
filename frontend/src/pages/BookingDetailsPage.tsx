@@ -15,20 +15,23 @@ import { FinancialCard } from "../components/bookingDetails/FinancialCard";
 import { ChecklistCard } from "../components/bookingDetails/ChecklistCard";
 import { ConciergeCard } from "../components/bookingDetails/ConciergeCard";
 import { BookingReviewCard } from "../components/bookingDetails/BookingReviewCard";
-import { useDialog } from "../context/useDialog";
+import { BookingModificationDialog } from "../components/bookingDetails/BookingModificationDialog";
+import { CancellationDialog } from "../components/bookingDetails/CancellationDialog";
+import { RefundTimeline } from "../components/bookingDetails/RefundTimeline";
 
 const TOAST_MS = 3000;
 
 export const BookingDetailsPage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
   const { t } = useTranslation();
-  const { confirm: confirmDialog } = useDialog();
 
   const [booking, setBooking] = useState<BookingDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
   const [downloadBusy, setDownloadBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [modifyOpen, setModifyOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
 
   const showToast = useCallback((message: string) => {
     setToast(message);
@@ -108,26 +111,43 @@ export const BookingDetailsPage: React.FC = () => {
   };
 
   const handleModify = () => {
-    showToast(t("bookingDetails.modifyInfo"));
+    if (!booking) return;
+    if (
+      booking.bookingStatus !== "PENDING_PAYMENT" ||
+      booking.paymentStatus !== "UNPAID"
+    ) {
+      showToast(t("bookingModification.paidLocked"));
+      return;
+    }
+    setModifyOpen(true);
   };
 
-  const handleCancel = async () => {
-    if (!booking) return;
-    const confirmed = await confirmDialog(
-      `${t("bookingDetails.cancelConfirmTitle")}\n${t("bookingDetails.cancelConfirmBody")}`,
-    );
-    if (!confirmed) return;
-    try {
-      await bookingApi.cancel(booking._id);
-      setToast(t("bookingDetails.cancelSuccess"));
-      loadBooking();
-    } catch {
-      showToast(t("bookingDetails.cancelError"));
-    }
-  };
+  const handleCancel = () => booking && setCancelOpen(true);
 
   return (
     <div className="bg-[#F8FAFC] min-h-screen">
+      {modifyOpen && booking && (
+        <BookingModificationDialog
+          booking={booking}
+          onClose={() => setModifyOpen(false)}
+          onSaved={(updated) => {
+            setBooking(updated);
+            setModifyOpen(false);
+            showToast(t("bookingModification.success"));
+          }}
+        />
+      )}
+      {cancelOpen && booking && (
+        <CancellationDialog
+          bookingId={booking._id}
+          onClose={() => setCancelOpen(false)}
+          onCancelled={() => {
+            setCancelOpen(false);
+            showToast(t("bookingDetails.cancelSuccess"));
+            loadBooking();
+          }}
+        />
+      )}
       <div className="max-w-[1360px] mx-auto px-4 lg:px-8 pt-24 md:pt-28 pb-8 md:pb-12 flex flex-col gap-6">
         {loading ? (
           <section className="flex flex-col gap-4">
@@ -170,6 +190,10 @@ export const BookingDetailsPage: React.FC = () => {
               }
             />
 
+            {booking.bookingStatus === "CANCELLED" && (
+              <RefundTimeline bookingId={booking._id} />
+            )}
+
             <BookingReviewCard booking={booking} onNotice={showToast} />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
@@ -184,8 +208,8 @@ export const BookingDetailsPage: React.FC = () => {
               <div className="flex flex-col gap-6">
                 <GatePassCard booking={booking} />
                 <FinancialCard booking={booking} />
-                <ChecklistCard />
-                <ConciergeCard />
+                <ChecklistCard booking={booking} onUpdated={setBooking} />
+                <ConciergeCard bookingId={booking._id} />
               </div>
             </div>
           </>

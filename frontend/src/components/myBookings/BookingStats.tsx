@@ -10,7 +10,7 @@ interface BookingStatsProps {
   points: number;
 }
 
-const PAID_PAYMENT_STATUSES: PaymentStatus[] = ["PAID", "REFUNDED"];
+const PAID_PAYMENT_STATUSES: PaymentStatus[] = ["PAID", "REFUNDED", "PARTIALLY_REFUNDED"];
 
 const isPaid = (booking: BookingDto): boolean =>
   PAID_PAYMENT_STATUSES.includes(booking.paymentStatus) ||

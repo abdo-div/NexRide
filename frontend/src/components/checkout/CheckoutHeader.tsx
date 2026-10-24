@@ -7,7 +7,9 @@ import type { CheckoutMeta } from "../../types/checkout";
 export const CheckoutHeader: React.FC<{
   vehicleId: string;
   meta: CheckoutMeta;
-}> = ({ vehicleId, meta }) => {
+  currentStep: number;
+  totalSteps: number;
+}> = ({ vehicleId, meta, currentStep, totalSteps }) => {
   const { t } = useTranslation();
 
   return (
@@ -45,7 +47,7 @@ export const CheckoutHeader: React.FC<{
         </div>
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 text-[#142B4A] text-[12px] font-bold self-start lg:self-auto">
           <span className="w-2 h-2 rounded-full bg-[#142B4A] animate-pulse" />
-          {t(meta.stepLabel)}
+          {t("checkout.flow.progress", { current: currentStep, total: totalSteps })}
         </div>
       </div>
     </div>

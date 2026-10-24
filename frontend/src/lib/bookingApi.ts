@@ -1,5 +1,6 @@
 import { request, API_BASE_URL, ApiError } from "./apiClient";
-import type { BookingDto } from "../types/booking";
+import { trackedFetch } from "./apiAvailability";
+import type { BookingDto, CancellationQuote } from "../types/booking";
 
 export interface AvailabilityResult {
   isAvailable: boolean;
@@ -37,7 +38,35 @@ export interface CreateBookingPayload {
   pickupMethod?: "BRANCH_PICKUP" | "DELIVERY";
   paymentMethod?: "CASH_ON_DELIVERY";
   addonIds?: Array<"insurance" | "driver" | "childseat" | "delivery">;
+  promotionCode?: string;
 }
+
+export interface ModifyBookingPayload {
+  startDate: string;
+  endDate: string;
+  pickupLocation: string;
+  pickupMethod: "BRANCH_PICKUP" | "DELIVERY";
+  addonIds: Array<"insurance" | "driver" | "childseat" | "delivery">;
+}
+
+export type HandoverPayload =
+  | {
+      stage: "PICKUP";
+      licenceReady: true;
+      identityReady: true;
+      vehicleInspected: true;
+      fuelRecorded: true;
+      notes?: string;
+    }
+  | {
+      stage: "RETURN";
+      personalItemsRemoved: true;
+      fuelRestored: boolean;
+      damageReported: boolean;
+      fuelLevel: "EMPTY" | "QUARTER" | "HALF" | "THREE_QUARTERS" | "FULL";
+      odometer?: number | null;
+      notes?: string;
+    };
 
 /**
  * Booking API surface used by the checkout flow. The availability check is
@@ -62,11 +91,14 @@ export const bookingApi = {
     });
   },
 
-  create: (payload: CreateBookingPayload): Promise<BookingResponse> =>
+  create: (
+    payload: CreateBookingPayload,
+    idempotencyKey = crypto.randomUUID(),
+  ): Promise<BookingResponse> =>
     request<BookingResponse>("/bookings", {
       method: "POST",
       body: payload,
-      headers: { "Idempotency-Key": crypto.randomUUID() },
+      headers: { "Idempotency-Key": idempotencyKey },
     }),
 
   get: (id: string, signal?: AbortSignal): Promise<BookingResponse> =>
@@ -92,13 +124,28 @@ export const bookingApi = {
       body: reason ? { reason } : {},
     }),
 
+  cancellationQuote: (id: string, signal?: AbortSignal): Promise<{ status: string; data: { quote: CancellationQuote } }> =>
+    request(`/bookings/${encodeURIComponent(id)}/cancellation-quote`, { signal }),
+
+  modify: (id: string, payload: ModifyBookingPayload): Promise<BookingResponse> =>
+    request<BookingResponse>(`/bookings/${encodeURIComponent(id)}/modify`, {
+      method: "PATCH",
+      body: payload,
+    }),
+
+  saveHandover: (id: string, payload: HandoverPayload): Promise<BookingResponse> =>
+    request<BookingResponse>(
+      `/bookings/${encodeURIComponent(id)}/handover/${payload.stage.toLowerCase()}`,
+      { method: "PATCH", body: payload },
+    ),
+
   /**
    * Downloads the official invoice PDF for a paid booking. Uses a raw fetch
    * (the endpoint streams binary application/pdf, not JSON) and returns the
    * response as a Blob for the caller to save.
    */
   downloadInvoice: async (bookingId: string): Promise<Blob> => {
-    const response = await fetch(
+    const response = await trackedFetch(
       `${API_BASE_URL}/bookings/${encodeURIComponent(bookingId)}/invoice`,
       {
         headers: {

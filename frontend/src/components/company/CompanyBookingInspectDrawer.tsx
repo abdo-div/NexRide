@@ -16,6 +16,7 @@ import { formatLYD } from "../../lib/bookingView";
 import { photoUrl } from "../../lib/vehicleMapper";
 import type { CompanyBookingRow } from "../../types/companyBookings";
 import { useDialog } from "../../context/useDialog";
+import { DriverDocumentReview } from "../driverDocuments/DriverDocumentReview";
 
 interface CompanyBookingInspectDrawerProps {
   row: CompanyBookingRow | null;
@@ -243,6 +244,29 @@ export const CompanyBookingInspectDrawer: React.FC<
               )}
             </div>
           </div>
+
+          {/* Pickup */}
+          <DriverDocumentReview customerId={row.customer.id} compact />
+
+          {detail.handover && (detail.handover.pickupConfirmedAt || detail.handover.returnSubmittedAt) && (
+            <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-3 text-xs text-slate-700">
+              <p className="font-extrabold text-[#142B4A]">{t("handover.cardTitle")}</p>
+              {detail.handover.pickupConfirmedAt && (
+                <div className="mt-2">
+                  <span className="font-bold text-emerald-700">{t("handover.pickup.done")}</span>
+                  {detail.handover.pickupNotes && <p className="mt-1 whitespace-pre-wrap">{detail.handover.pickupNotes}</p>}
+                </div>
+              )}
+              {detail.handover.returnSubmittedAt && (
+                <div className="mt-2 border-t border-blue-100 pt-2">
+                  <span className="font-bold text-emerald-700">{t("handover.return.done")}</span>
+                  <p className="mt-1">{t("handover.return.fuelLevel")}: {detail.handover.fuelLevel ? t(`handover.fuel.${detail.handover.fuelLevel}`) : "—"}{detail.handover.odometer !== null ? ` · ${detail.handover.odometer} km` : ""}</p>
+                  {detail.handover.damageReported && <p className="mt-1 font-bold text-rose-700">{t("handover.return.damageReported")}</p>}
+                  {detail.handover.returnNotes && <p className="mt-1 whitespace-pre-wrap">{detail.handover.returnNotes}</p>}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Pickup */}
           <div className="flex items-center justify-between gap-3 rounded-xl border border-[#F1F5F9] bg-[#F8FAFF] px-3 py-2.5">

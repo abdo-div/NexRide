@@ -38,7 +38,29 @@ export type BookingStatus =
   | "CANCELLED"
   | "EXPIRED";
 
-export type PaymentStatus = "UNPAID" | "PAID" | "REFUNDED";
+export type PaymentStatus = "UNPAID" | "PAID" | "REFUNDED" | "PARTIALLY_REFUNDED";
+
+export interface CancellationQuote {
+  bookingId: string;
+  canCancel: boolean;
+  bookingStatus: BookingStatus;
+  currency: string;
+  paidAmount: number;
+  refundableAmount: number;
+  cancellationFee: number;
+  refundFraction: number;
+  refundRequired: boolean;
+  policy: { fullRefundHours: number; partialRefundHours: number };
+  refund: null | {
+    id: string;
+    status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
+    requestedAt: string;
+    processingAt?: string | null;
+    completedAt?: string | null;
+    failedAt?: string | null;
+    failureReason?: string | null;
+  };
+}
 
 export interface BookingDto {
   _id: string;
@@ -77,4 +99,23 @@ export interface BookingDto {
     | null;
   createdAt: string;
   updatedAt?: string;
+  handover?: {
+    pickup?: {
+      customerConfirmedAt?: string | null;
+      licenceReady?: boolean;
+      identityReady?: boolean;
+      vehicleInspected?: boolean;
+      fuelRecorded?: boolean;
+      notes?: string;
+    };
+    return?: {
+      customerSubmittedAt?: string | null;
+      personalItemsRemoved?: boolean;
+      fuelRestored?: boolean;
+      damageReported?: boolean;
+      fuelLevel?: "EMPTY" | "QUARTER" | "HALF" | "THREE_QUARTERS" | "FULL" | null;
+      odometer?: number | null;
+      notes?: string;
+    };
+  };
 }

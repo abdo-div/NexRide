@@ -4,6 +4,16 @@ import AppError from "../utils/appError.js";
 import Company from "../models/Company_model.js";
 import { saveVehicleImage } from "../utils/vehicleImages.js";
 import * as vehicleService from "../services/vehicleService.js";
+import { notifySavedSearchMatches } from "../services/savedSearchService.js";
+import logger from "../utils/logger.js";
+
+const sendSavedSearchAlerts = async (vehicleId) => {
+  try {
+    await notifySavedSearchMatches(vehicleId);
+  } catch (error) {
+    logger.warn({ err: error.message, vehicleId }, "Saved-search alert delivery failed");
+  }
+};
 
 // Multer Storage Configuration
 const multerStorage = multer.memoryStorage();
@@ -163,6 +173,7 @@ export const createVehicle = catchAsync(async (req, res, next) => {
     req.files,
     companyId,
   );
+  await sendSavedSearchAlerts(vehicle._id);
 
   res.status(201).json({
     status: "success",
@@ -176,6 +187,7 @@ export const updateVehicle = catchAsync(async (req, res, next) => {
     req.body,
     req.tenantId,
   );
+  await sendSavedSearchAlerts(vehicle._id);
 
   res.status(200).json({
     status: "success",
@@ -190,6 +202,7 @@ export const updateVehicleStatus = catchAsync(async (req, res, next) => {
     req.body.status,
     req.tenantId,
   );
+  await sendSavedSearchAlerts(vehicle._id);
 
   res.status(200).json({
     status: "success",

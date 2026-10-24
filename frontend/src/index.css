@@ -4,10 +4,57 @@
 
 :root {
   --app-font: "Manrope", sans-serif;
-  --premium-navy: #142b4a;
-  --premium-navy-hover: #0d2039;
-  --primary-action: linear-gradient(135deg, #0f1f36 0%, var(--premium-navy) 100%);
+  color-scheme: light;
+  --brand-950: #071426;
+  --brand-900: #0b1c30;
+  --brand-800: #142b4a;
+  --brand-700: #1d4f91;
+  --brand-600: #2563eb;
+  --brand-100: #dbeafe;
+  --brand-50: #eff6ff;
+  --surface: #ffffff;
+  --surface-subtle: #f8fafc;
+  --surface-muted: #f1f5f9;
+  --border-subtle: #e2e8f0;
+  --text-strong: #0f172a;
+  --text-muted: #64748b;
+  --premium-navy: var(--brand-800);
+  --premium-navy-hover: var(--brand-900);
+  --primary-action: linear-gradient(135deg, var(--brand-900) 0%, var(--brand-800) 100%);
   --primary-action-shadow: 0 12px 28px -12px rgb(15 23 42 / 65%), inset 0 1px rgb(255 255 255 / 14%);
+  --surface-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 10px 35px rgb(15 23 42 / 5%);
+  --surface-shadow-hover: 0 24px 65px -18px rgb(15 23 42 / 24%), 0 8px 22px rgb(37 99 235 / 8%);
+}
+
+/* Shared operations surfaces keep every admin data screen visually aligned. */
+@layer components {
+  .admin-panel {
+    @apply overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_20px_60px_-42px_rgba(15,23,42,.45)];
+  }
+
+  .admin-table {
+    @apply w-full border-separate border-spacing-0 text-start;
+  }
+
+  .admin-table thead tr {
+    @apply bg-slate-50/90 text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500;
+  }
+
+  .admin-table thead th {
+    @apply border-b border-slate-200 px-4 py-3.5 whitespace-nowrap;
+  }
+
+  .admin-table tbody tr {
+    @apply transition-colors hover:bg-blue-50/40;
+  }
+
+  .admin-table tbody td {
+    @apply border-b border-slate-100 px-4 py-4 align-middle;
+  }
+
+  .admin-table tbody tr:last-child td {
+    @apply border-b-0;
+  }
 }
 
 [dir="rtl"] {
@@ -18,8 +65,8 @@ body {
   font-family: var(--app-font);
   min-width: 0;
   overflow-x: clip;
-  color: #0f172a;
-  background: #f8fafc;
+  color: var(--text-strong);
+  background: var(--surface-subtle);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -67,14 +114,16 @@ svg {
 }
 
 .premium-card {
-  box-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 10px 35px rgb(15 23 42 / 4%);
+  border-color: var(--border-subtle);
+  background: var(--surface);
+  box-shadow: var(--surface-shadow);
   transition: transform 320ms cubic-bezier(.22, 1, .36, 1), border-color 320ms ease, box-shadow 320ms ease;
 }
 
 .premium-card:hover {
   transform: translateY(-4px);
   border-color: rgb(148 163 184 / 55%);
-  box-shadow: 0 24px 65px -18px rgb(15 23 42 / 24%), 0 8px 22px rgb(37 99 235 / 8%);
+  box-shadow: var(--surface-shadow-hover);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -99,60 +148,6 @@ svg {
   transition: transform 240ms cubic-bezier(.22, 1, .36, 1), box-shadow 240ms ease, filter 240ms ease;
 }
 
-/* Keep primary actions consistent across customer, company, and admin views. */
-:is(button, a)[class~="bg-blue-600"],
-:is(button, a)[class~="bg-blue-700"],
-:is(button, a)[class~="bg-[#142B4A]"],
-:is(button, a)[class~="from-blue-600"] {
-  color: white;
-  background: var(--primary-action) !important;
-  border-color: rgb(255 255 255 / 12%);
-  box-shadow: var(--primary-action-shadow);
-  transition: transform 240ms cubic-bezier(.22, 1, .36, 1), box-shadow 240ms ease, filter 240ms ease;
-}
-
-/* One premium accent for interactive icons throughout the application. */
-svg[class*="text-blue-"],
-svg[class*="text-cyan-"],
-svg[class*="text-violet-"],
-svg[class*="text-orange-"],
-svg[class*="text-amber-"],
-svg[class*="text-emerald-"] {
-  color: var(--premium-navy) !important;
-}
-
-:is(button, a)[class~="bg-slate-500"],
-:is(button, a)[class~="bg-blue-600"],
-:is(button, a)[class~="bg-blue-700"],
-:is(button, a)[class~="bg-blue-800"],
-:is(button, a)[class*="from-blue-"] {
-  background: var(--primary-action) !important;
-}
-
-:is(button, a)[class~="bg-slate-500"]:hover,
-:is(button, a)[class~="bg-blue-600"]:hover,
-:is(button, a)[class~="bg-blue-700"]:hover,
-:is(button, a)[class~="bg-blue-800"]:hover,
-:is(button, a)[class*="from-blue-"]:hover {
-  background: var(--premium-navy-hover) !important;
-}
-
-:is(button, a)[class~="bg-blue-600"]:hover,
-:is(button, a)[class~="bg-blue-700"]:hover,
-:is(button, a)[class~="bg-[#142B4A]"]:hover,
-:is(button, a)[class~="from-blue-600"]:hover {
-  background: var(--primary-action) !important;
-  filter: brightness(1.08);
-  box-shadow: 0 18px 36px -14px rgb(15 23 42 / 72%), 0 8px 24px -12px rgb(37 99 235 / 65%), inset 0 1px rgb(255 255 255 / 18%);
-}
-
-:is(button, a)[class~="bg-blue-600"]:active,
-:is(button, a)[class~="bg-blue-700"]:active,
-:is(button, a)[class~="bg-[#142B4A]"]:active,
-:is(button, a)[class~="from-blue-600"]:active {
-  filter: brightness(.96);
-}
-
 :is(button, a):disabled {
   transform: none;
   filter: none;
@@ -167,15 +162,131 @@ svg[class*="text-emerald-"] {
 .premium-button:active {
   filter: brightness(.96);
 }
-/* Keep the legally required map credit compact and visually unobtrusive. */
-.vehicle-location-map .leaflet-control-attribution {
-  background: rgb(255 255 255 / 78%);
-  color: #64748b;
-  font-size: 9px;
-  line-height: 1.2;
-  padding: 2px 4px;
+
+.premium-surface {
+  border: 1px solid var(--border-subtle);
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  box-shadow: var(--surface-shadow);
 }
 
-.vehicle-location-map .leaflet-control-attribution a {
+.premium-field {
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-subtle);
+  color: var(--text-strong);
+  transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.premium-field:focus-within {
+  border-color: color-mix(in srgb, var(--brand-600) 55%, white);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px rgb(37 99 235 / 10%);
+}
+
+.section-kicker {
+  color: var(--brand-600);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.section-title {
+  color: var(--text-strong);
+  font-family: "Syne", "Manrope", var(--app-font);
+  font-weight: 700;
+  letter-spacing: -.035em;
+}
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-muted);
+}
+
+.skeleton-shimmer::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  transform: translateX(-100%);
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgb(255 255 255 / 72%) 48%,
+    transparent 76%
+  );
+  animation: skeleton-sweep 1.65s ease-in-out infinite;
+}
+
+.skeleton-shimmer-dark {
+  background: rgb(30 41 59 / 58%);
+}
+
+.skeleton-shimmer-dark::after {
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgb(148 163 184 / 14%) 48%,
+    transparent 76%
+  );
+}
+
+@keyframes skeleton-sweep {
+  to {
+    transform: translateX(100%);
+  }
+}
+/* Keep Mapbox controls polished while preserving the required attribution. */
+.vehicle-location-map .mapboxgl-ctrl-group {
+  overflow: hidden;
+  border: 1px solid rgb(226 232 240 / 90%);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px -12px rgb(15 23 42 / 45%);
+}
+
+.vehicle-location-map .mapboxgl-ctrl-group button {
+  width: 32px;
+  height: 32px;
+}
+
+.vehicle-location-map .mapboxgl-ctrl-attrib {
+  border-radius: 8px 0 0;
+  background: rgb(255 255 255 / 82%);
+  color: #64748b;
+  font-size: 9px;
+  backdrop-filter: blur(8px);
+}
+
+.vehicle-location-map .mapboxgl-ctrl-attrib a {
   color: #475569;
+}
+
+.vehicle-location-map .mapboxgl-popup-content {
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: #0b1c30;
+  font-family: var(--app-font);
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 14px 35px -18px rgb(15 23 42 / 55%);
+}
+@keyframes nexride-brand-marquee {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+.brand-marquee-track {
+  animation: nexride-brand-marquee 28s linear infinite;
+  will-change: transform;
+}
+
+.brand-marquee:hover .brand-marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-marquee-track {
+    animation: none;
+    transform: none;
+  }
 }

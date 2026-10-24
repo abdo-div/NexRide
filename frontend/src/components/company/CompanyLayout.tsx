@@ -93,10 +93,10 @@ export const CompanyLayout: React.FC = () => {
     : "View website";
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-[linear-gradient(145deg,#f8fafc_0%,#eef4fb_48%,#f8fafc_100%)]">
       {sidebarOpen && <button type="button" aria-label="Close navigation" onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-[1px] lg:hidden" />}
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 start-0 z-50 flex h-full w-[min(18rem,86vw)] select-none flex-col justify-between bg-white shadow-xl transition-transform duration-200 lg:!translate-x-0 lg:w-72 lg:shadow-[0_1px_8px_rgba(0,0,0,0.04)] ${sidebarOpen ? "translate-x-0" : "ltr:-translate-x-full rtl:translate-x-full"}`}>
+      <aside className={`fixed inset-y-0 start-0 z-50 flex h-full w-[min(18rem,86vw)] select-none flex-col justify-between border-e border-slate-200/80 bg-white/95 shadow-xl backdrop-blur-xl transition-transform duration-200 lg:!translate-x-0 lg:w-72 lg:shadow-[8px_0_35px_-30px_rgba(15,23,42,.35)] ${sidebarOpen ? "translate-x-0" : "ltr:-translate-x-full rtl:translate-x-full"}`}>
         <div className="flex h-full flex-col">
           <div className="flex h-16 items-center gap-3 border-b border-slate-200 bg-[#F8FAFC] px-6">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#142B4A] text-sm font-extrabold text-white">
@@ -122,7 +122,7 @@ export const CompanyLayout: React.FC = () => {
                   : location.pathname.startsWith(entry.path);
               const className = `flex items-center gap-3 rounded-xl px-4 py-2 text-sm transition-all ${
                 isActive
-                  ? "bg-[#142B4A] font-semibold text-white shadow-[0_4px_12px_rgba(37,99,235,0.2)]"
+                  ? "bg-gradient-to-r from-[#142B4A] to-[#1E4775] font-semibold text-white shadow-[0_8px_22px_-10px_rgba(20,43,74,.8)]"
                   : entry.enabled
                     ? "font-normal text-[#434655] hover:bg-[#F1F5F9] hover:text-[#0B1C30]"
                     : "cursor-not-allowed text-[#A6ACBE]"
@@ -231,8 +231,20 @@ export const CompanyLayout: React.FC = () => {
         </div>
       </header>
 
+      <nav aria-label={t("company.layout.mobileNavigation")} className="fixed inset-x-3 bottom-3 z-30 grid grid-cols-5 rounded-2xl border border-slate-200/80 bg-white/95 p-1.5 shadow-[0_18px_55px_-20px_rgba(15,23,42,.45)] backdrop-blur-xl lg:hidden">
+        {NAV_ENTRIES.slice(0, 5).map((entry) => {
+          const Icon = entry.icon;
+          const active = entry.path === "/company" ? location.pathname === "/company" : location.pathname.startsWith(entry.path);
+          return <NavLink key={entry.path} to={entry.path} end={entry.path === "/company"} aria-label={t(entry.labelKey)} className={`flex min-w-0 flex-col items-center gap-1 rounded-xl px-1 py-2 text-[9px] font-bold transition-colors ${active ? "bg-[#142B4A] text-white" : "text-slate-500 hover:bg-slate-100"}`}><Icon className="h-4 w-4" /><span className="max-w-full truncate">{t(entry.labelKey)}</span></NavLink>;
+        })}
+      </nav>
+
       {/* Content */}
-      <main className="w-full min-w-0 bg-[#F8FAFC] pb-12 pt-16 lg:ps-72">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="w-full min-w-0 bg-transparent pb-28 pt-16 focus:outline-none lg:ps-72 lg:pb-12"
+      >
         <Outlet />
       </main>
     </div>

@@ -116,6 +116,12 @@ const {
 
 startBookingExpiryReaper();
 
+const {
+  startNotificationReminderWorker,
+  stopNotificationReminderWorker,
+} = await import("./services/notificationService.js");
+startNotificationReminderWorker();
+
 // -----------------------------------------------------------------------------
 // Graceful Shutdown (SIGTERM / SIGINT)
 // -----------------------------------------------------------------------------
@@ -136,6 +142,7 @@ const shutdown = async (signal, exitCode = 0) => {
 
   // Do not start any more scheduled work while existing HTTP requests drain.
   stopBookingExpiryReaper();
+  stopNotificationReminderWorker();
 
   forceExitTimer = setTimeout(() => {
     logger.warn("Graceful shutdown timed out; forcing exit.");

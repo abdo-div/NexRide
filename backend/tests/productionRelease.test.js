@@ -36,6 +36,14 @@ test("deployment verifies artifacts and restores the previous release on failure
   assert.match(deploy, /PRODUCTION_ENV_FILE=\/etc\/nexride\/backend\.env/);
   assert.match(deploy, /chown -R root:nexride "\$incoming"/);
   assert.match(deploy, /chmod -R go-w "\$incoming"/);
+  assert.match(deploy, /wait_for_readiness\(\)/);
+  assert.match(deploy, /systemctl restart nexride && wait_for_readiness 30/);
+  assert.match(deploy, /previous release is healthy and restored/);
+  assert.match(deploy, /automatic rollback both failed readiness/);
+  assert.ok(
+    deploy.match(/systemctl restart nexride && wait_for_readiness 30/g)?.length >= 2,
+    "both the candidate release and automatic rollback must pass readiness",
+  );
 });
 
 test("explicit rollback is allowlisted by full commit SHA and health checked", () => {
@@ -43,7 +51,13 @@ test("explicit rollback is allowlisted by full commit SHA and health checked", (
   assert.match(rollback, /40-character release SHA/);
   assert.match(rollback, /target=\$releases\/\$release_sha/);
   assert.match(rollback, /health\/readiness/);
-  assert.match(rollback, /restored \$previous/);
+  assert.match(rollback, /wait_for_readiness\(\)/);
+  assert.match(rollback, /original release is healthy and restored at \$previous/);
+  assert.match(rollback, /original release both failed readiness/);
+  assert.ok(
+    rollback.match(/systemctl restart nexride && wait_for_readiness 30/g)?.length >= 2,
+    "both the rollback target and restored original must pass readiness",
+  );
 });
 
 test("production smoke certification fails when role credentials are absent", () => {

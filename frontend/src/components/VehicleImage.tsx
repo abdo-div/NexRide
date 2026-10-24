@@ -1,16 +1,21 @@
 import React from "react";
-import { vehiclePlaceholderImage } from "../lib/vehicleMapper";
+import { applyVehicleImageFallback } from "../lib/vehicleMapper";
 
 type Props = React.ImgHTMLAttributes<HTMLImageElement>;
 
-export const VehicleImage: React.FC<Props> = ({ onError, ...props }) => (
+export const VehicleImage: React.FC<Props> = ({
+  onError,
+  loading = "lazy",
+  decoding = "async",
+  ...props
+}) => (
   <img
     {...props}
+    loading={loading}
+    decoding={decoding}
     onError={(event) => {
       onError?.(event);
-      if (event.currentTarget.getAttribute("src") !== vehiclePlaceholderImage) {
-        event.currentTarget.src = vehiclePlaceholderImage;
-      }
+      applyVehicleImageFallback(event);
     }}
   />
 );

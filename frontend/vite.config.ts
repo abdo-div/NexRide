@@ -24,7 +24,11 @@ export default defineConfig({
         manualChunks(id) {
           if (!id.includes("node_modules")) return undefined;
           const moduleId = id.replaceAll("\\\\", "/");
-          if (/\/(?:react-)?leaflet\//.test(moduleId)) return "maps";
+          // Mapbox GL intentionally has no manual vendor chunk. It is used only
+          // behind VehicleLocationMap's dynamic boundary; forcing it into a
+          // named chunk absorbs React dependencies and makes the entry graph
+          // preload maps on pages that never render one.
+          if (/\/mapbox-gl\//.test(moduleId)) return undefined;
           if (/\/(?:lucide-react|@phosphor-icons\/react)\//.test(moduleId)) {
             return "icons";
           }

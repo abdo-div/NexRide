@@ -1,12 +1,16 @@
 import React, { useState } from "react";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Heart, Star, Gauge, Armchair, Settings, Fuel, CheckCircle2 } from "lucide-react";
+import { Heart, Star, Gauge, Armchair, Settings, Fuel, CheckCircle2, GitCompareArrows } from "lucide-react";
 import type { Vehicle } from "../../types/vehicle";
 import { VehicleImage } from "../VehicleImage";
 import { companyLogoUrl } from "../../lib/vehicleMapper";
 import { motion, useReducedMotion } from "framer-motion";
 import { buttonHover, buttonTap, hoverSpring, softHoverSpring } from "../../lib/motion";
+import { useAuth } from "../../context/useAuth";
+import { useSavedVehicles } from "../../context/useSavedVehicles";
+import { useToast } from "../../context/toastContextValue";
+import { useVehicleComparison } from "../../context/useVehicleComparison";
 
 const SPEC_META: {
   key: keyof Vehicle["specs"];
@@ -37,7 +41,15 @@ const SPEC_META: {
 
 export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
   const { t } = useTranslation();
-  const [fav, setFav] = useState(!!vehicle.isFavorite);
+  const { user } = useAuth();
+  const { favoriteIds, toggleFavorite } = useSavedVehicles();
+  const { showToast } = useToast();
+  const { hasVehicle, toggleVehicle } = useVehicleComparison();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [saving, setSaving] = useState(false);
+  const fav = favoriteIds.has(vehicle.id);
+  const compared = hasVehicle(vehicle.id);
   const reduceMotion = useReducedMotion();
 
   return (
@@ -76,10 +88,29 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
         </div>
         <motion.button
           type="button"
-          onClick={() => setFav((f) => !f)}
+          disabled={saving}
+          onClick={async () => {
+            if (user?.role?.trim() !== "customer") {
+              navigate("/login", { state: { from: location.pathname + location.search } });
+              return;
+            }
+            setSaving(true);
+            try {
+              const saved = await toggleFavorite(vehicle.id);
+              showToast({
+                tone: saved ? "success" : "info",
+                title: t(saved ? "toasts.vehicleSaved.title" : "toasts.vehicleRemoved.title"),
+                description: t(saved ? "toasts.vehicleSaved.description" : "toasts.vehicleRemoved.description"),
+              });
+            } catch {
+              showToast({ tone: "error", title: t("savedVehicles.errorTitle"), description: t("savedVehicles.errorDescription") });
+            } finally {
+              setSaving(false);
+            }
+          }}
           aria-label={t("fleet.card.toggleFavorite")}
           aria-pressed={fav}
-          className="absolute top-4 end-4 p-2 rounded-full bg-white/90 backdrop-blur-md text-slate-600 hover:text-red-500 border border-[#E2E8F0] shadow-sm transition-colors"
+          className="absolute top-4 end-4 p-2 rounded-full bg-white/90 backdrop-blur-md text-slate-600 hover:text-red-500 border border-[#E2E8F0] shadow-sm transition-colors disabled:cursor-wait disabled:opacity-60"
           whileHover={reduceMotion ? undefined : { scale: 1.12, rotate: -7 }}
           whileTap={reduceMotion ? undefined : { scale: 0.88 }}
           transition={hoverSpring}
@@ -157,6 +188,20 @@ export const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
             ))}
           </div>
           <div className="flex items-center gap-3 shrink-0">
+            <button
+              type="button"
+              aria-pressed={compared}
+              onClick={() => {
+                const result = toggleVehicle(vehicle.id);
+                if (result === "limit") {
+                  showToast({ tone: "info", title: t("comparison.limitTitle"), description: t("comparison.limitDescription") });
+                }
+              }}
+              className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-bold transition-colors ${compared ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:text-blue-700"}`}
+            >
+              <GitCompareArrows className="h-4 w-4" />
+              {compared ? t("comparison.added") : t("comparison.add")}
+            </button>
             <motion.div whileHover={reduceMotion ? undefined : buttonHover} whileTap={reduceMotion ? undefined : buttonTap}>
             <Link
               to={`/cars/${vehicle.id}`}

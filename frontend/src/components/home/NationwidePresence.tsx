@@ -46,11 +46,16 @@ export const NationwidePresence: React.FC<NationwidePresenceProps> = ({
 
       {/* Region Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          role="status"
+          aria-busy="true"
+          aria-label={t("common.loading", { defaultValue: "Loading locations" })}
+        >
           {[0, 1, 2, 3].map((i) => (
             <div
               key={i}
-              className="rounded-2xl border border-slate-800 h-[220px] bg-slate-800/40 animate-pulse"
+              className="skeleton-shimmer skeleton-shimmer-dark h-[220px] rounded-2xl border border-slate-800"
             />
           ))}
         </div>

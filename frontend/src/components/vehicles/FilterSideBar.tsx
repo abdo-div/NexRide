@@ -68,7 +68,7 @@ const BoxRow: React.FC<{
   onToggle: () => void;
   trailing?: React.ReactNode;
 }> = ({ checked, label, onToggle, trailing }) => (
-  <label className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/80 hover:bg-slate-100 border border-[#E2E8F0] cursor-pointer transition-colors">
+  <label className={`flex cursor-pointer items-center justify-between rounded-xl border p-2.5 transition-all ${checked ? "border-blue-200 bg-blue-50 shadow-sm" : "border-slate-200 bg-slate-50/70 hover:border-slate-300 hover:bg-white"}`}>
     <span className="flex items-center gap-2.5 text-[13px] font-medium text-slate-800">
       <input
         type="checkbox"
@@ -123,11 +123,11 @@ export const FilterSideBar: React.FC<FilterSelection> = ({
   const perkList = perks ?? PERK_OPTIONS.map((p) => ({ ...p, count: 0 }));
 
   return (
-    <aside className={`bg-[#FFFFFF] rounded-2xl p-6 border border-[#E2E8F0] shadow-sm flex flex-col gap-6 ${sticky ? "lg:sticky lg:top-28" : ""}`}>
+    <aside className={`flex flex-col gap-6 rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_20px_60px_-38px_rgba(15,23,42,.45)] ${sticky ? "lg:sticky lg:top-32" : ""}`}>
       {/* Header */}
       <div className="flex items-center justify-between pb-2 border-b border-[#E2E8F0]">
         <div className="flex items-center gap-2">
-          <Filter className="text-[#142B4A] w-5 h-5" />
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#142B4A] text-white"><Filter className="h-4 w-4" /></span>
           <span className="text-lg font-bold text-[#0F172A]">{t("fleet.filters.title")}</span>
         </div>
         <button

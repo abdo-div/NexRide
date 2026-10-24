@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams, useNavigate } from "react-router";
-import { Car, ShieldCheck, ChevronLeft, ChevronRight, AlertTriangle, SlidersHorizontal, X } from "lucide-react";
+import { useSearchParams, useNavigate, useLocation } from "react-router";
+import { Car, ShieldCheck, ChevronLeft, ChevronRight, AlertTriangle, SlidersHorizontal, X, Sparkles, Headphones, BadgeCheck } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVehicles } from "../hooks/useVehicles";
 import { useVehicleFilters } from "../hooks/useVehicleFilters";
@@ -16,12 +16,17 @@ import {
   PERK_OPTIONS,
   SEGMENTS,
 } from "../data/vehicleData";
+import { useCustomerPreferences } from "../context/useCustomerPreferences";
+import { useAuth } from "../context/useAuth";
+import { useToast } from "../context/toastContextValue";
+import { savedSearchApi } from "../lib/savedSearchApi";
+import type { VehicleType } from "../types/vehicle";
 
 const SKELETON_KEYS = ["a", "b", "c", "d", "e", "f"];
 
 const VehicleCardSkeleton: React.FC = () => (
-  <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl overflow-hidden shadow-sm flex flex-col xl:flex-row animate-pulse">
-    <div className="xl:w-2/5 h-64 xl:h-auto bg-slate-200" />
+  <div className="skeleton-shimmer flex flex-col overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-sm xl:flex-row">
+    <div className="h-64 bg-slate-200/80 xl:h-auto xl:w-2/5" />
     <div className="xl:w-3/5 p-6 flex flex-col gap-5">
       <div className="h-3 w-20 rounded bg-slate-200" />
       <div className="h-6 w-2/3 rounded bg-slate-200" />
@@ -35,19 +40,33 @@ export const FleetPage: React.FC = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const routeLocation = useLocation();
+  const { preferences } = useCustomerPreferences();
+  const { user } = useAuth();
+  const { showToast } = useToast();
 
   // Location + dates chosen in the home search console. Passed straight to the
   // backend so availability is evaluated server-side against the booking
   // calendar rather than filtered client-side.
-  const searchLocation = searchParams.get("location") ?? "";
+  const searchLocation = searchParams.get("location") ?? preferences.preferredCity;
   const searchStart = searchParams.get("startDate") ?? "";
   const searchEnd = searchParams.get("endDate") ?? "";
   const companyParam = searchParams.get("company") ?? "";
   const categoryParam = searchParams.get("category") ?? "";
+  const explicitTypes = searchParams.get("type")?.split(",").filter(Boolean) as VehicleType[] | undefined;
+  const categoryType: Record<string, VehicleType> = { sport: "SEDAN", economy: "HATCHBACK", suv: "SUV", luxury: "LUXURY", pickup: "PICKUP" };
+  const searchTypes = explicitTypes?.length ? explicitTypes : categoryParam && categoryType[categoryParam] ? [categoryType[categoryParam]] : preferences.vehicleTypes;
+  const searchTransmission = searchParams.get("transmission") ?? (preferences.transmission === "ANY" ? "" : preferences.transmission);
+  const searchFuelType = searchParams.get("fuelType") ?? (preferences.fuelType === "ANY" ? "" : preferences.fuelType);
+  const searchMaxPrice = searchParams.get("maxPrice");
   const hasSearch = Boolean(searchLocation || searchStart || searchEnd);
 
   const { vehicles: dtoVehicles, loading, error, reload } = useVehicles({
     location: searchLocation || undefined,
+    type: searchTypes.length > 0 ? searchTypes.join(",") : undefined,
+    transmission: searchTransmission || undefined,
+    fuelType: searchFuelType || undefined,
+    maxPrice: searchMaxPrice ? Number(searchMaxPrice) : undefined,
     startDate: searchStart || undefined,
     endDate: searchEnd || undefined,
   });
@@ -72,6 +91,43 @@ export const FleetPage: React.FC = () => {
 
   const [sort, setSort] = useState("recommended");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [saveSearchOpen, setSaveSearchOpen] = useState(false);
+  const [searchName, setSearchName] = useState("");
+  const [searchAlerts, setSearchAlerts] = useState(true);
+  const [savingSearch, setSavingSearch] = useState(false);
+
+  const openSaveSearch = () => {
+    if (user?.role?.trim() !== "customer") {
+      navigate("/login", { state: { from: `${routeLocation.pathname}${routeLocation.search}` } });
+      return;
+    }
+    setSearchName(t("savedSearches.defaultName", { location: searchLocation || t("savedSearches.allLocations") }));
+    setSaveSearchOpen(true);
+  };
+
+  const saveCurrentSearch = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSavingSearch(true);
+    try {
+      await savedSearchApi.create({
+        name: searchName.trim(),
+        alertsEnabled: searchAlerts,
+        criteria: {
+          location: searchLocation,
+          type: searchTypes,
+          transmission: searchTransmission as "" | "MANUAL" | "AUTOMATIC",
+          fuelType: searchFuelType as "" | "GASOLINE" | "DIESEL" | "ELECTRIC" | "HYBRID",
+          maxPrice: filters.maxPrice < filters.priceMax ? filters.maxPrice : (searchMaxPrice ? Number(searchMaxPrice) : null),
+          startDate: searchStart || null,
+          endDate: searchEnd || null,
+        },
+      });
+      setSaveSearchOpen(false);
+      showToast({ tone: "success", title: t("savedSearches.savedTitle"), description: t("savedSearches.savedDescription") });
+    } catch (error) {
+      showToast({ tone: "error", title: t("savedSearches.errorTitle"), description: error instanceof Error ? error.message : t("savedSearches.errorDescription") });
+    } finally { setSavingSearch(false); }
+  };
 
   // A single sidebar location selection is pushed back into the URL `location`
   // param so the search API applies real booking availability server-side. The
@@ -103,16 +159,16 @@ export const FleetPage: React.FC = () => {
       : filteredVehicles;
     const scoped = companyScoped.filter((vehicle) => {
       switch (categoryParam) {
+        case "sport":
+          return vehicle.vehicleType === "SEDAN";
         case "economy":
-          return ["SEDAN", "HATCHBACK"].includes(vehicle.vehicleType);
-        case "executive-suv":
+          return vehicle.vehicleType === "HATCHBACK";
+        case "suv":
           return vehicle.vehicleType === "SUV";
-        case "ultra-luxury":
+        case "luxury":
           return vehicle.vehicleType === "LUXURY";
-        case "desert-4x4":
+        case "pickup":
           return vehicle.vehicleType === "PICKUP";
-        case "electric-hybrid":
-          return ["ELECTRIC", "HYBRID"].includes(vehicle.fuelType);
         default:
           return true;
       }
@@ -170,11 +226,11 @@ export const FleetPage: React.FC = () => {
 
   if (categoryParam) {
     const categoryKey: Record<string, string> = {
+      sport: "data.categories.sport.title",
+      luxury: "data.categories.luxury.title",
+      pickup: "data.categories.pickup.title",
       economy: "data.categories.economy.title",
-      "executive-suv": "data.categories.executiveSuv.title",
-      "ultra-luxury": "data.categories.ultraLuxury.title",
-      "desert-4x4": "data.categories.desert4x4.title",
-      "electric-hybrid": "data.categories.electricHybrid.title",
+      suv: "data.categories.suv.title",
     };
     tokenRows.push({
       label: t(categoryKey[categoryParam] ?? "fleet.params.allCategories"),
@@ -253,23 +309,29 @@ export const FleetPage: React.FC = () => {
   });
 
   return (
-    <div className="bg-[#F8FAFC] min-h-screen">
+    <div className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_45%,#f8fafc_100%)]">
       {/* Page header */}
-      <div className="bg-slate-900">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-28 pb-8">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-1.5">
+      <div className="relative overflow-hidden bg-[#071426]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_15%,rgba(59,130,246,.24),transparent_35%),radial-gradient(circle_at_85%_70%,rgba(249,115,22,.14),transparent_30%)]" />
+        <div className="absolute -end-24 top-8 h-72 w-72 rounded-full border border-white/10" />
+        <div className="relative mx-auto max-w-7xl px-6 pb-10 pt-32 lg:px-8 lg:pb-14">
+          <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+            <div className="max-w-2xl">
+              <p className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-blue-300">
+                <Sparkles className="h-3.5 w-3.5" />
                 {t("fleet.breadcrumb")}
               </p>
-              <h1 className="text-3xl lg:text-4xl font-bold text-white">{t("fleet.title")}</h1>
-              <p className="mt-2 text-sm text-slate-400 max-w-xl">{t("fleet.subtitle")}</p>
+              <h1 className="text-4xl font-black tracking-[-0.035em] text-white sm:text-5xl lg:text-6xl">{t("fleet.title")}</h1>
+              <p className="mt-4 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">{t("fleet.subtitle")}</p>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 text-white text-xs font-semibold">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              {t("fleet.verifiedMatch", {
-                count: companyParam ? vehicles.length : filteredVehicles.length,
-              })}
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              <div className="col-span-2 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[.07] px-4 py-3 text-white backdrop-blur-xl sm:col-span-3">
+                <ShieldCheck className="h-5 w-5 text-emerald-400" />
+                <span className="text-xs font-semibold">{t("fleet.verifiedMatch", { count: companyParam ? vehicles.length : filteredVehicles.length })}</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[.05] px-3 py-2.5 text-[11px] font-semibold text-slate-200"><BadgeCheck className="h-4 w-4 text-blue-300" />{t("fleet.hero.verified")}</div>
+              <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[.05] px-3 py-2.5 text-[11px] font-semibold text-slate-200"><Headphones className="h-4 w-4 text-orange-300" />{t("fleet.hero.support")}</div>
+              <div className="hidden items-center gap-2 rounded-2xl border border-white/10 bg-white/[.05] px-3 py-2.5 text-[11px] font-semibold text-slate-200 sm:flex"><Car className="h-4 w-4 text-emerald-300" />{t("fleet.hero.ready")}</div>
             </div>
           </div>
         </div>
@@ -330,6 +392,7 @@ export const FleetPage: React.FC = () => {
           filters.setSegment(segId);
         }}
         segmentCounts={segmentCounts}
+        onSaveSearch={openSaveSearch}
         onOpenFilters={() => {
           if (window.matchMedia("(max-width: 1023px)").matches) {
             setMobileFiltersOpen(true);
@@ -342,7 +405,7 @@ export const FleetPage: React.FC = () => {
         }}
       />
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+      <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Sidebar */}
           <div id="fleet-filter-panel" className="hidden scroll-mt-24 lg:block lg:col-span-4 xl:col-span-3">
@@ -374,10 +437,10 @@ export const FleetPage: React.FC = () => {
           {/* Results */}
           <div className="lg:col-span-8 xl:col-span-9 flex flex-col gap-6 min-w-0">
             {/* Results bar */}
-            <div className="bg-[#FFFFFF] p-5 rounded-2xl border border-[#E2E8F0] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="premium-card flex flex-col justify-between gap-5 p-5 md:flex-row md:items-center md:p-6">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-3">
-                  <h2 className="text-2xl font-bold text-[#0F172A]">
+                  <h2 className="text-2xl font-black tracking-tight text-[#0F172A]">
                     {t("fleet.results.title")}
                   </h2>
                   <span className="px-2.5 py-0.5 rounded-full bg-slate-50 border border-slate-200 text-[10px] font-bold text-[#142B4A]">
@@ -407,10 +470,12 @@ export const FleetPage: React.FC = () => {
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                   {t("fleet.results.sortBy")}
                 </span>
+                <label className="sr-only" htmlFor="fleet-sort">{t("fleet.results.sortBy")}</label>
                 <select
+                  id="fleet-sort"
                   value={sort}
                   onChange={(e) => setSort(e.target.value)}
-                  className="bg-slate-50 border border-[#E2E8F0] text-slate-800 text-xs font-semibold px-3.5 py-2 rounded-xl focus:outline-none focus:ring-1 focus:ring-slate-500 cursor-pointer"
+                  className="premium-field min-w-44 cursor-pointer px-3.5 py-2.5 text-xs font-semibold text-slate-800"
                 >
                   <option value="recommended">{t("fleet.sort.recommended")}</option>
                   <option value="price-desc">{t("fleet.sort.priceDesc")}</option>
@@ -426,13 +491,13 @@ export const FleetPage: React.FC = () => {
                 {tokenRows.map((t) => (
                   <div
                     key={t.label}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#E2E8F0] text-slate-700 text-xs shadow-sm"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-[#142B4A]"
                   >
                     <span>{t.label}</span>
                     <button
                       type="button"
                       onClick={t.onRemove}
-                      className="text-slate-400 hover:text-[#142B4A]"
+                      className="grid h-5 w-5 place-items-center rounded-full text-slate-400 hover:bg-white hover:text-[#142B4A]"
                     >
                       ✕
                     </button>
@@ -633,6 +698,16 @@ export const FleetPage: React.FC = () => {
       </div>
 
       <AnimatePresence>
+        {saveSearchOpen && (
+          <motion.div className="fixed inset-0 z-[80] grid place-items-center bg-slate-950/55 p-4 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSaveSearchOpen(false)}>
+            <motion.form onSubmit={saveCurrentSearch} role="dialog" aria-modal="true" aria-labelledby="save-search-title" initial={{ opacity: 0, y: 18, scale: .98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12, scale: .98 }} onClick={(event) => event.stopPropagation()} className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+              <div className="flex items-start justify-between gap-4"><div><h2 id="save-search-title" className="text-xl font-black text-slate-950">{t("savedSearches.dialogTitle")}</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("savedSearches.dialogDescription")}</p></div><button type="button" onClick={() => setSaveSearchOpen(false)} aria-label={t("common.close")} className="rounded-full bg-slate-100 p-2 text-slate-600"><X className="h-4 w-4" /></button></div>
+              <label className="mt-5 block text-sm font-bold text-slate-700">{t("savedSearches.name")}<input required maxLength={80} value={searchName} onChange={(event) => setSearchName(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" /></label>
+              <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50 p-4"><input type="checkbox" checked={searchAlerts} onChange={(event) => setSearchAlerts(event.target.checked)} className="mt-1 h-4 w-4 accent-blue-600" /><span><strong className="block text-sm text-slate-900">{t("savedSearches.alertLabel")}</strong><span className="mt-1 block text-xs leading-5 text-slate-600">{t("savedSearches.alertHint")}</span></span></label>
+              <div className="mt-6 flex gap-3"><button type="button" onClick={() => setSaveSearchOpen(false)} className="flex-1 rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700">{t("common.cancel")}</button><button disabled={savingSearch || !searchName.trim()} type="submit" className="flex-1 rounded-xl bg-blue-600 px-4 py-3 text-sm font-black text-white disabled:opacity-60">{savingSearch ? t("savedSearches.saving") : t("savedSearches.save")}</button></div>
+            </motion.form>
+          </motion.div>
+        )}
         {mobileFiltersOpen && (
           <motion.div
             className="fixed inset-0 z-[70] flex items-end bg-slate-950/45 p-0 backdrop-blur-sm lg:hidden"

@@ -3,6 +3,11 @@
     "ar": "العربية",
     "en": "English"
   },
+  "accessibility": {
+    "skipToContent": "Skip to main content",
+    "backToTop": "Back to top",
+    "pageChanged": "Navigated to {{title}}"
+  },
   "dialogs": {
     "confirmTitle": "Please confirm",
     "inputTitle": "Additional details",
@@ -12,7 +17,51 @@
     "close": "Close dialog",
     "reasonPlaceholder": "Add a reason or note…"
   },
+  "networkStatus": {
+    "offlineTitle": "You're offline",
+    "offlineBody": "Live availability and booking actions may be temporarily unavailable.",
+    "restoredTitle": "Connection restored",
+    "restoredBody": "Live availability and booking services are back online.",
+    "serviceUnavailableTitle": "NexRide services are temporarily unavailable",
+    "serviceUnavailableBody": "We couldn't reach the server. Your current page is safe—please try again shortly.",
+    "serviceRestoredTitle": "NexRide services restored",
+    "serviceRestoredBody": "Live availability and booking services are responding again.",
+    "dismiss": "Dismiss connection notice"
+  },
+  "globalError": {
+    "eyebrow": "Something went wrong",
+    "title": "We hit an unexpected roadblock",
+    "description": "Your data is safe. Refresh the page to try again, or return home and continue browsing.",
+    "retry": "Try again",
+    "home": "Return home"
+  },
+  "notFound": {
+    "eyebrow": "Route not found",
+    "title": "This road doesn’t lead anywhere",
+    "description": "The page may have moved or the address may be incorrect. Explore available cars or return to the NexRide homepage.",
+    "browseCars": "Browse available cars",
+    "home": "Return home"
+  },
+  "seo": {
+    "home": { "title": "Premium Car Rental in Libya | NexRide", "description": "Book trusted rental cars from verified fleet partners across Libya with NexRide." },
+    "fleet": { "title": "Browse Rental Cars in Libya | NexRide", "description": "Compare available rental cars, transparent pricing, and trusted operators across Libya." },
+    "companies": { "title": "Verified Car Rental Companies | NexRide", "description": "Discover verified car rental companies and professional fleet partners operating across Libya." },
+    "company": { "title": "Rental Company Profile | NexRide", "description": "Explore this verified NexRide partner, its available vehicles, services, and customer information." },
+    "vehicle": { "title": "Rental Vehicle Details | NexRide", "description": "Review vehicle features, availability, pricing, and book securely through NexRide." },
+    "partner": { "title": "List Your Fleet with NexRide", "description": "Join NexRide as a fleet partner and grow your car rental business across Libya." },
+    "terms": { "title": "Terms and Conditions | NexRide", "description": "Read the terms and conditions governing use of the NexRide car rental platform." },
+    "privacy": { "title": "Privacy Policy | NexRide", "description": "Learn how NexRide collects, protects, and uses your personal information." },
+    "cancellation": { "title": "Cancellation Policy | NexRide", "description": "Understand NexRide booking cancellation, refund, and amendment policies." },
+    "booking": { "title": "Secure Booking | NexRide", "description": "Complete and manage your secure NexRide vehicle booking." },
+    "account": { "title": "Your NexRide Account", "description": "Access and manage your NexRide account." },
+    "dashboard": { "title": "NexRide Dashboard", "description": "Secure NexRide operations dashboard." },
+    "notFound": { "title": "Page Not Found | NexRide", "description": "The page you requested could not be found. Browse available rental cars on NexRide." }
+  },
   "nav": {
+    "mainNavigation": "Main navigation",
+    "mobileNavigation": "Mobile navigation",
+    "openMenu": "Open navigation menu",
+    "closeMenu": "Close navigation menu",
     "home": "Home",
     "browseCars": "Browse Cars",
     "howItWorks": "How It Works",
@@ -22,10 +71,132 @@
     "signIn": "Sign In",
     "listFleet": "List Your Fleet",
     "saved": "Saved",
+    "preferences": "Rental preferences",
+    "savedSearches": "Saved searches",
+    "rewards": "Rewards & offers",
     "myBookings": "My Bookings",
     "adminPanel": "Admin Panel",
     "companyDashboard": "Operator Dashboard",
     "libya": "LIBYA"
+  },
+  "savedVehicles": {
+    "eyebrow": "Your shortlist",
+    "title": "Saved and recently viewed vehicles",
+    "description": "Keep your favourite vehicles in one place and quickly return to cars you recently explored.",
+    "favorites": "Favourite vehicles",
+    "favoritesDescription": "Your saved choices stay synced to your NexRide account on every device.",
+    "recent": "Recently viewed",
+    "recentDescription": "The latest available vehicles you opened, ordered by your most recent visit.",
+    "empty": "There are no vehicles in this section yet.",
+    "browse": "Browse available cars",
+    "errorTitle": "Could not update saved vehicles",
+    "errorDescription": "Please try again in a moment."
+  },
+  "comparison": {
+    "eyebrow": "Choose with confidence",
+    "title": "Compare vehicles side by side",
+    "description": "Review current prices, specifications, locations and rental companies before choosing your ride.",
+    "trayLabel": "Vehicle comparison selection",
+    "selected_one": "{{count}} vehicle selected",
+    "selected_other": "{{count}} vehicles selected",
+    "add": "Compare",
+    "added": "Added",
+    "addAnother": "Add one more vehicle",
+    "compareNow": "Compare now",
+    "clear": "Clear comparison",
+    "limitTitle": "Comparison list is full",
+    "limitDescription": "You can compare up to three vehicles. Remove one before adding another.",
+    "back": "Back to available cars",
+    "loadError": "We could not load the latest vehicle details.",
+    "emptyTitle": "No vehicles selected",
+    "emptyDescription": "Add two or three vehicles from the fleet to compare them here.",
+    "browse": "Browse available cars",
+    "vehicle": "Vehicle",
+    "remove": "Remove {{vehicle}} from comparison",
+    "viewVehicle": "View and reserve",
+    "dailyPrice": "Daily price",
+    "type": "Vehicle type",
+    "year": "Model year",
+    "transmission": "Transmission",
+    "fuel": "Fuel type",
+    "seats": "Seats",
+    "doors": "Doors",
+    "city": "City",
+    "pickup": "Pickup location",
+    "rating": "Customer rating",
+    "operator": "Rental company"
+  },
+  "preferences": {
+    "eyebrow": "Personalise your journey",
+    "title": "Rental preferences",
+    "description": "Save your usual choices once. NexRide will use them as defaults whenever you have not made an explicit selection.",
+    "vehicleTitle": "Preferred vehicle types",
+    "vehicleDescription": "Choose any number, or leave all unselected to browse the full fleet.",
+    "locationTitle": "Preferred pickup area",
+    "city": "City or area",
+    "cityPlaceholder": "For example: Tripoli",
+    "specTitle": "Vehicle specifications",
+    "transmission": "Transmission",
+    "fuel": "Fuel type",
+    "any": "Any",
+    "scheduleTitle": "Default rental schedule",
+    "days": "Rental days",
+    "pickupTime": "Pickup time",
+    "returnTime": "Return time",
+    "paymentTitle": "Preferred payment",
+    "payment": { "CARD": "Online card", "CASH_ON_DELIVERY": "Cash on pickup" },
+    "save": "Save preferences",
+    "saving": "Saving...",
+    "savedTitle": "Preferences saved",
+    "savedDescription": "Your defaults are now available on every device.",
+    "errorTitle": "Could not save preferences",
+    "errorDescription": "Please check the values and try again."
+  },
+  "savedSearches": {
+    "eyebrow": "Never miss the right car",
+    "title": "Saved searches and alerts",
+    "description": "Return to your usual searches in one click and receive a notification when a newly available vehicle matches your criteria.",
+    "saveCurrent": "Save search",
+    "defaultName": "{{location}} rental search",
+    "allLocations": "All locations",
+    "dialogTitle": "Save this search",
+    "dialogDescription": "Keep these filters in your account and optionally turn on matching-vehicle alerts.",
+    "name": "Search name",
+    "alertLabel": "Notify me about matching vehicles",
+    "alertHint": "NexRide will send one deduplicated account notification for each newly published match.",
+    "save": "Save search",
+    "saving": "Saving...",
+    "savedTitle": "Search saved",
+    "savedDescription": "You can rerun it or manage alerts from your account menu.",
+    "alertsOn": "Alerts on",
+    "alertsOff": "Alerts off",
+    "enable": "Enable alerts",
+    "disable": "Disable alerts",
+    "run": "Run search",
+    "delete": "Delete {{name}}",
+    "price": "Up to {{price}} LYD/day",
+    "allVehicles": "All available vehicles",
+    "emptyTitle": "No saved searches yet",
+    "emptyDescription": "Choose filters in the fleet and save the search to return to it later.",
+    "browse": "Browse the fleet",
+    "errorTitle": "Saved search could not be updated",
+    "errorDescription": "Please try again in a moment."
+  },
+  "rewards": {
+    "eyebrow": "NexRide loyalty",
+    "title": "Rewards and offers",
+    "description": "Earn one point for every 10 LYD paid and unlock higher loyalty tiers as you travel.",
+    "points": "loyalty points",
+    "tiers": { "EXPLORER": "Explorer", "SILVER": "Silver", "GOLD": "Gold" },
+    "nextTier": "{{points}} more points to reach {{tier}}",
+    "topTier": "You have reached our highest loyalty tier.",
+    "paidTrips": "Eligible paid trips",
+    "eligibleSpend": "Eligible paid value",
+    "offers": "Available offers",
+    "percentOff": "{{percent}}% off",
+    "offerTerms": "Minimum {{minimum}} LYD. Maximum discount {{maximum}} LYD.",
+    "findCar": "Find your next car",
+    "error": "We could not load your rewards right now."
   },
   "companies": {
     "breadcrumbHome": "Home",
@@ -58,6 +229,8 @@
     "noVehiclesDesc": "No vehicles currently available for instant booking.",
     "emptyTitle": "No Rental Companies Found",
     "emptyDesc": "We could not find any verified car rental companies matching your current keyword or city filter. Try clearing filters or selecting another location.",
+    "noMatchesTitle": "No companies match these filters",
+    "noMatchesDesc": "Try another company name or clear the city filter to see every verified operator.",
     "resetFilters": "Reset All Filters",
     "errorTitle": "Unable to Load Marketplace Operators",
     "errorDesc": "We could not load the operator directory. No reservation data was lost. Check your connection and try again.",
@@ -195,6 +368,7 @@
     "paidTag": "Paid in full",
     "unpaidTag": "Payment pending",
     "refundedTag": "Refunded",
+    "partiallyRefundedTag": "Partially refunded",
     "securityNote": "Full protection & insurance, driver included",
     "paymentChannel": "Moamalat secured",
     "provider": "Provider: {{name}}",
@@ -239,16 +413,20 @@
     "emptyTitle": "No bookings found",
     "emptyBody": "When you reserve your first vehicle, it will appear here.",
     "emptyCta": "Browse the Fleet",
+    "filterEmptyTitle": "No bookings match these filters",
+    "filterEmptyBody": "Try another reference, status, or pickup location.",
+    "resetFilters": "Clear booking filters",
     "cancelConfirmTitle": "Cancel booking",
     "cancelConfirmBody": "Cancel this reservation without fees? Refunds follow the standard policy.",
     "cancelSuccess": "Booking cancelled successfully",
     "cancelError": "Unable to cancel this booking",
     "retry": "Try again",
     "loadError": "Could not load your bookings. Please try again.",
+    "loadErrorTitle": "We couldn't load your bookings",
     "invoiceUnavailable": "The invoice becomes available once the booking is fully paid.",
     "downloadError": "Could not download the document right now.",
     "gpsInfo": "Live GPS tracking becomes available when your rental turns active.",
-    "modifyInfo": "A VIP concierge agent will reach out shortly to adjust your trip.",
+    "modifyInfo": "Open the booking details to change an unpaid reservation.",
     "currency": "LYD",
     "vipAvailability": "Available 24/7 all week",
     "vipTitle": "Need a hand with your trip?",
@@ -256,6 +434,139 @@
     "callConcierge": "Call Concierge",
     "whatsappCta": "Instant VIP WhatsApp Chat",
     "vipPhone": "+218 21 444-6397"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAll": "Mark all read",
+    "loading": "Loading notifications…",
+    "empty": "You have no notifications yet."
+  },
+  "bookingModification": {
+    "title": "Modify reservation",
+    "unpaidNote": "Availability and the final price will be recalculated securely before payment.",
+    "paidLocked": "This booking is already paid. Contact support to change it without risking your payment.",
+    "pickupDate": "Pickup date and time",
+    "returnDate": "Return date and time",
+    "location": "Pickup location",
+    "method": "Pickup method",
+    "branchPickup": "Pick up at branch",
+    "delivery": "Deliver the vehicle",
+    "addons": "Extras",
+    "addon": {
+      "insurance": "Insurance",
+      "driver": "Driver",
+      "childseat": "Child seat",
+      "delivery": "Delivery"
+    },
+    "close": "Close",
+    "cancel": "Keep current details",
+    "save": "Check availability and save",
+    "saving": "Checking…",
+    "success": "Reservation updated and price recalculated.",
+    "genericError": "We could not update this reservation. Please try again."
+  },
+  "cancellation": {
+    "title": "Review cancellation",
+    "subtitle": "Check the exact refund before cancelling your booking.",
+    "paid": "Amount paid",
+    "fee": "Cancellation fee",
+    "refund": "Refundable amount",
+    "policy": "Full refund applies at least {{full}} hours before pickup; a partial refund applies from {{partial}} hours.",
+    "reason": "Reason (optional)",
+    "reasonPlaceholder": "Tell us why you are cancelling",
+    "processing": "Your refund request will be recorded immediately. Card refunds normally appear within 5–10 business days after processing.",
+    "noRefund": "This cancellation is outside the refundable window. The booking will be cancelled with no refund.",
+    "keep": "Keep booking",
+    "confirm": "Confirm cancellation",
+    "cancelling": "Cancelling…",
+    "close": "Close",
+    "error": "We could not load or complete the cancellation. Please try again."
+  },
+  "refundTimeline": {
+    "title": "Refund progress",
+    "requested": "Requested",
+    "processing": "Processing",
+    "completed": "Returned",
+    "estimate": "Your refund is queued. Card refunds normally appear within 5–10 business days after processing.",
+    "done": "The refund has been completed.",
+    "failed": "The refund needs attention. Please contact support with your booking code."
+  },
+  "bookingSupport": {
+    "title": "Support for this booking",
+    "subtitle": "Your booking reference is attached automatically, so the team has the right context.",
+    "close": "Close",
+    "new": "New request",
+    "category": "Issue category",
+    "subject": "Subject",
+    "message": "How can we help?",
+    "reply": "Reply",
+    "urgent": "Urgent: pickup is within 24 hours or the vehicle is currently unsafe",
+    "create": "Create request",
+    "send": "Send reply",
+    "closeRequest": "Close request",
+    "you": "You",
+    "team": "NexRide support",
+    "error": "The support request could not be updated. Please try again.",
+    "firstResponse": "The team will reply here and notify you when a response arrives.",
+    "categories": {
+      "BOOKING_CHANGE": "Change my booking",
+      "PAYMENT": "Payment problem",
+      "PICKUP_RETURN": "Pickup or return",
+      "VEHICLE": "Vehicle issue",
+      "REFUND": "Refund",
+      "OTHER": "Other"
+    },
+    "status": {
+      "OPEN": "Open",
+      "WAITING_FOR_CUSTOMER": "Waiting for you",
+      "IN_PROGRESS": "In progress",
+      "RESOLVED": "Resolved",
+      "CLOSED": "Closed"
+    }
+  },
+  "handover": {
+    "cardTitle": "Pickup & return check-in",
+    "notReady": "Check-in becomes available after the company confirms your paid booking.",
+    "close": "Close",
+    "notes": "Notes for the rental company",
+    "notesPlaceholder": "Add any useful condition or handover details",
+    "confirm": "Save declaration",
+    "saving": "Saving…",
+    "error": "We could not save this declaration. Please try again.",
+    "pickup": {
+      "title": "Pickup acknowledgement",
+      "shortTitle": "Pickup check-in",
+      "subtitle": "Confirm these items after checking the vehicle with the rental agent.",
+      "pending": "Available when the vehicle is ready for handover",
+      "done": "Customer pickup acknowledgement saved",
+      "action": "Complete pickup check-in",
+      "licenceReady": "I have my valid original driving licence.",
+      "identityReady": "I have my passport or national ID.",
+      "vehicleInspected": "I inspected the vehicle condition with the agent.",
+      "fuelRecorded": "The starting fuel level and mileage were shown to me."
+    },
+    "return": {
+      "title": "Return declaration",
+      "shortTitle": "Return check-out",
+      "subtitle": "Record the vehicle condition before handing the keys to the rental agent.",
+      "pending": "Available while your rental is active",
+      "done": "Customer return declaration saved",
+      "action": "Complete return check-out",
+      "personalItemsRemoved": "I removed all personal belongings from the vehicle.",
+      "fuelLevel": "Current fuel level",
+      "odometer": "Odometer (km, optional)",
+      "fuelRestored": "Fuel restored according to the rental policy",
+      "damageReported": "I need to report new damage or a vehicle issue",
+      "damagePlaceholder": "Describe the location and nature of the damage or issue",
+      "describeDamage": "Describe the reported damage so the rental agent can inspect it."
+    },
+    "fuel": {
+      "EMPTY": "Empty",
+      "QUARTER": "Quarter",
+      "HALF": "Half",
+      "THREE_QUARTERS": "Three quarters",
+      "FULL": "Full"
+    }
   },
   "bookingDetails": {
     "breadcrumbHome": "Home",
@@ -398,6 +709,7 @@
       "name": "NexRide Tripoli Concierge Team",
       "role": "Executive Mitiga station coordinators",
       "body": "Available at the VIP lounge to ensure a smooth trip and handle official & logistics formalities.",
+      "openRequest": "Open booking support request",
       "call": "Direct call",
       "whatsapp": "WhatsApp"
     },
@@ -415,10 +727,17 @@
       "submit": "Publish verified review",
       "saving": "Publishing…",
       "success": "Thank you—your verified review is now live.",
+      "updateSuccess": "Your verified review has been updated.",
       "submitted": "Review published",
       "visible": "This review now appears on the vehicle and company pages.",
       "companyReply": "Reply from the rental company",
       "awaitingCompanyReply": "The rental company has not replied to your review yet.",
+      "edit": "Edit review",
+      "saveChanges": "Save changes",
+      "delete": "Delete review",
+      "deleteConfirm": "Delete this review? It will disappear from the vehicle and company pages.",
+      "deleteSuccess": "Your review has been deleted.",
+      "deleteError": "The review could not be deleted. Please try again.",
       "validation": "Choose a star rating and write at least 10 characters.",
       "error": "The review could not be published. Please try again.",
       "loadError": "The review status could not be loaded.",
@@ -428,7 +747,7 @@
   "footer": {
     "brandName": "NexRide Luxury Mobility",
     "hqTag": "Tripoli HQ",
-    "brandDesc": "Libya's premier executive transport and bespoke chauffeur service. Providing unmatched reliability, prestige fleets, and white-glove automotive solutions across Tripoli and international travel hubs.",
+    "brandDesc": "Libya's trusted car rental marketplace, connecting drivers with verified local fleets, transparent pricing, and dependable support.",
     "fullyInsuredFleet": "Fully Insured Fleet",
     "operations247": "24/7 Operations",
     "explore": "EXPLORE",
@@ -451,14 +770,22 @@
     "vipNewsletter": "VIP CONCIERGE & ALERTS",
     "vipDesc": "Stay updated on VIP arrivals, luxury catalog drops, and airport fleet allocations.",
     "subscribePlaceholder": "Enter your business email",
+    "subscribeEmailLabel": "Email address for VIP updates",
     "subscribe": "Subscribe",
     "subscribing": "Subscribing…",
     "subscribeSuccess": "You're on the VIP list. Watch your inbox.",
     "subscribeError": "Subscription failed. Please try again shortly.",
     "emergencyLine": "24/7 Libyan Emergency Line",
+    "callSupport": "Call NexRide support at",
     "active": "Active",
+    "share": "Share NexRide",
+    "shareStatus": {
+      "shared": "NexRide was shared successfully.",
+      "copied": "NexRide link copied to your clipboard.",
+      "error": "The link could not be shared. Please try again."
+    },
     "rights": "© 2026 NexRide Libya Mobility Technologies",
-    "systemsOperational": "All Systems Operational",
+    "systemsOperational": "Support available",
     "currency": "LYD (د.ل)",
     "legal": {
       "label": "Legal documents",
@@ -472,7 +799,11 @@
     "heading": "READY TO HIT THE ROAD?",
     "subtitle": "Join thousands of executives, travelers, and local drivers renting with complete peace of mind.",
     "exploreVehicles": "Explore All Vehicles",
-    "contactConcierge": "Contact VIP Concierge"
+    "contactConcierge": "Contact VIP Concierge",
+    "partnerBadge": "Grow with NexRide",
+    "partnerHeading": "Ready to Become a NexRide Partner?",
+    "partnerSubtitle": "Join our trusted rental-company network, reach new customers, and manage vehicles, bookings, and payments from one platform.",
+    "becomePartner": "Apply for Partnership"
   },
   "auth": {
     "breadcrumb": {
@@ -622,6 +953,22 @@
       "bestPrices": "Best Prices",
       "marketCompetitive": "Market Competitive"
     },
+    "brandStrip": {
+      "title": "Browse by Brand",
+      "subtitle": "Choose from the world's most trusted automotive names."
+    },
+    "trust": {
+      "supportTitle": "24/7 Support",
+      "supportDetail": "We are here whenever you need us.",
+      "fleetTitle": "Premium Fleet",
+      "fleetDetail": "Top brands and well-maintained vehicles."
+    },
+    "specialOffer": {
+      "eyebrow": "Special Offer",
+      "title": "Better Rides. Lower Prices.",
+      "subtitle": "Discover our best offers on premium cars and make your next journey more comfortable and affordable.",
+      "cta": "Explore Deals"
+    },
     "featured": {
       "eyebrow": "Explore Collection",
       "title": "Featured Rental Vehicles",
@@ -769,10 +1116,30 @@
       "saveCar": "Save car"
     },
     "categories": {
+      "sport": {
+        "badge": "Performance Ready",
+        "title": "SPORT",
+        "description": "Responsive coupes and sedans made for an engaging drive."
+      },
+      "luxury": {
+        "badge": "Premium Comfort",
+        "title": "LUXURY",
+        "description": "Refined premium vehicles for executive and special journeys."
+      },
+      "pickup": {
+        "badge": "Work & Adventure",
+        "title": "PICKUP",
+        "description": "Dependable pickups with the capability for work and travel."
+      },
       "economy": {
         "badge": "5.8L / 100km",
         "title": "ECONOMY",
         "description": "Kia Cerato, Hyundai Elantra, Toyota Corolla for city transit."
+      },
+      "suv": {
+        "badge": "Space & Versatility",
+        "title": "SUV",
+        "description": "Practical crossovers and SUVs for family trips and daily driving."
       },
       "executiveSuv": {
         "badge": "Full 4WD Equipped",
@@ -918,6 +1285,11 @@
     "title": "Our Fleet",
     "subtitle": "Real-time availability confirmed with telemetry synchronization across every NexRide pick-up hub.",
     "verifiedMatch": "Verified vehicles matching your filters: {{count}}",
+    "hero": {
+      "verified": "Verified partners",
+      "support": "24/7 support",
+      "ready": "Road-ready fleet"
+    },
     "params": {
       "location": "Location",
       "schedule": "Schedule",
@@ -1002,6 +1374,7 @@
       "learnMore": "Learn More"
     },
     "commandBar": {
+      "browseBy": "Browse by",
       "all": "All ({{count}})",
       "segment": "{{label}} ({{count}})"
     },
@@ -1060,6 +1433,11 @@
     }
   },
   "vehicleDetail": {
+    "galleryLabel": "Vehicle photo gallery",
+    "openGallery": "Open gallery",
+    "closeGallery": "Close gallery",
+    "previousImage": "Previous image",
+    "nextImage": "Next image",
     "unavailable": {
       "title": "Details not available yet",
       "desc": "This vehicle came from the live fleet, but its detail page is not connected to the API yet. Head back to the fleet to keep browsing.",
@@ -1323,7 +1701,36 @@
       "backToFleet": "Back to Fleet"
     }
   },
+  "toasts": {
+    "linkCopied": { "title": "Link copied", "description": "The vehicle link is ready to share." },
+    "copyFailed": { "title": "Could not copy link", "description": "Copy the address from your browser and try again." },
+    "vehicleSaved": { "title": "Vehicle saved", "description": "You can return to this vehicle from your saved list." },
+    "vehicleRemoved": { "title": "Removed from saved", "description": "This vehicle is no longer in your saved list." },
+    "bookingFailed": { "title": "Booking could not be completed" }
+  },
   "checkout": {
+    "promotion": {
+      "label": "Promotion code",
+      "placeholder": "Enter code",
+      "apply": "Apply",
+      "applying": "Checking...",
+      "discount": "Promotion discount",
+      "applied": "Code applied — you save {{amount}} LYD.",
+      "error": "This promotion could not be applied."
+    },
+    "flow": {
+      "label": "Booking progress",
+      "progress": "Step {{current}} of {{total}}",
+      "step": "Step {{number}}",
+      "details": "Trip & driver",
+      "options": "Options",
+      "payment": "Payment",
+      "continueOptions": "Continue to options",
+      "continuePayment": "Review payment",
+      "back": "Back to details",
+      "backOptions": "Back to options",
+      "paymentHint": "Complete the previous steps to unlock secure payment."
+    },
     "loading": "Loading vehicle & availability…",
     "pickupFallback": "Pickup location to be confirmed with the operator",
     "availability": {
@@ -2046,7 +2453,16 @@
     "needFixes": "Please review the highlighted fields (Step {{n}}) and try again."
   },
   "company": {
+    "vehicleValidation": {
+      "required": "This field is required.",
+      "year": "Enter a valid vehicle year.",
+      "positive": "Enter a value greater than zero.",
+      "price": "Price must be greater than zero.",
+      "vin": "VIN must contain exactly 17 valid characters.",
+      "fixErrors": "Review the highlighted fields before publishing."
+    },
     "layout": {
+      "mobileNavigation": "Company operations navigation",
       "operationsSubtitle": "Partner Ops",
       "certifiedStatus": "Certified Partner",
       "certifiedBadge": "LFB Escrow Suite",

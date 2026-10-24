@@ -4,6 +4,7 @@ import { objectId } from "./common.validation.js";
 export const createReviewSchema = z.object({
   params: z.object({ vehicleId: objectId }),
   body: z.object({
+    bookingId: objectId,
     rating: z.coerce
       .number()
       .int()
@@ -14,9 +15,7 @@ export const createReviewSchema = z.object({
       .trim()
       .min(1, "Review text cannot be empty")
       .max(1000, "Review text cannot exceed 1000 characters"),
-    // Optional: injected server-side from nested params when omitted
-    vehicleId: objectId.optional(),
-  }),
+  }).strict(),
 });
 
 export const updateReviewSchema = z.object({
@@ -24,7 +23,7 @@ export const updateReviewSchema = z.object({
   body: z.object({
     rating: z.coerce.number().int().min(1).max(5).optional(),
     review: z.string().trim().min(1).max(1000).optional(),
-  }),
+  }).strict().refine((value) => Object.keys(value).length > 0, "At least one review field is required"),
 });
 
 export const companyResponseSchema = z.object({

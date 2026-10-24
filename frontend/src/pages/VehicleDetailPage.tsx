@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { Link, useParams } from "react-router";
+import React, { useEffect, useMemo, useState } from "react";
+import { Link, useLocation, useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Car, ArrowLeft, AlertTriangle, RefreshCw } from "lucide-react";
 import { buildVehicleDetail } from "../lib/vehicleDetailMapper";
@@ -16,6 +16,10 @@ import { OperatorProfile } from "../components/vehicleDetail/OperatorProfile";
 import { CustomerReviews } from "../components/vehicleDetail/CustomerReviews";
 import { SimilarVehicles } from "../components/vehicleDetail/SimilarVehicles";
 import { BookingSidebar } from "../components/vehicleDetail/BookingSidebar";
+import { useAuth } from "../context/useAuth";
+import { useSavedVehicles } from "../context/useSavedVehicles";
+import { useToast } from "../context/toastContextValue";
+import { useVehicleComparison } from "../context/useVehicleComparison";
 
 const HeroSkeleton = () => (
   <div className="space-y-6">
@@ -47,7 +51,13 @@ const MainSkeleton = () => (
 export const VehicleDetailPage: React.FC = () => {
   const { vehicleId } = useParams<{ vehicleId: string }>();
   const { t } = useTranslation();
-  const [saved, setSaved] = useState(true);
+  const { user } = useAuth();
+  const { favoriteIds, toggleFavorite, recordView } = useSavedVehicles();
+  const { showToast } = useToast();
+  const { hasVehicle, toggleVehicle } = useVehicleComparison();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [saving, setSaving] = useState(false);
 
   const { status, vehicle, similar, error, reload } = useVehicleDetail(vehicleId, false);
 
@@ -55,6 +65,36 @@ export const VehicleDetailPage: React.FC = () => {
     () => (vehicle ? buildVehicleDetail(vehicle, similar) : null),
     [vehicle, similar],
   );
+  const saved = Boolean(vehicleId && favoriteIds.has(vehicleId));
+  const compared = Boolean(vehicleId && hasVehicle(vehicleId));
+
+  useEffect(() => {
+    if (!vehicleId || status !== "ready" || user?.role?.trim() !== "customer") return;
+    void recordView(vehicleId).catch((error) =>
+      console.error("Unable to record recently viewed vehicle", error),
+    );
+  }, [recordView, status, user?.role, vehicleId]);
+
+  const handleToggleSave = async () => {
+    if (!vehicleId || saving) return;
+    if (user?.role?.trim() !== "customer") {
+      navigate("/login", { state: { from: location.pathname } });
+      return;
+    }
+    setSaving(true);
+    try {
+      const next = await toggleFavorite(vehicleId);
+      showToast({
+        tone: next ? "success" : "info",
+        title: t(next ? "toasts.vehicleSaved.title" : "toasts.vehicleRemoved.title"),
+        description: t(next ? "toasts.vehicleSaved.description" : "toasts.vehicleRemoved.description"),
+      });
+    } catch {
+      showToast({ tone: "error", title: t("savedVehicles.errorTitle"), description: t("savedVehicles.errorDescription") });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (status === "loading") {
     return (
@@ -131,13 +171,23 @@ export const VehicleDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-[#F8FAFC] min-h-screen">
-      <div className="max-w-[1360px] mx-auto px-4 lg:px-8 pt-24 pb-20">
-        <DetailBreadcrumbs crumbs={realDetail.crumbs} saved={saved} onToggleSave={() => setSaved((s) => !s)} />
+    <div className="min-h-screen bg-[linear-gradient(180deg,#f1f5f9_0%,#ffffff_34%,#f8fafc_100%)]">
+      <div className="mx-auto max-w-[1360px] px-4 pb-20 pt-28 lg:px-8">
+        <DetailBreadcrumbs
+          crumbs={realDetail.crumbs}
+          saved={saved}
+          onToggleSave={handleToggleSave}
+          compared={compared}
+          onToggleCompare={() => {
+            if (!vehicleId) return;
+            const result = toggleVehicle(vehicleId);
+            if (result === "limit") showToast({ tone: "info", title: t("comparison.limitTitle"), description: t("comparison.limitDescription") });
+          }}
+        />
         <DetailTitleBar detail={realDetail} />
         <DetailGallery detail={realDetail} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
           <div className="lg:col-span-8 flex flex-col gap-8">
             <MetricHighlights metrics={realDetail.metrics} />
             <VehicleDescription detail={realDetail} />

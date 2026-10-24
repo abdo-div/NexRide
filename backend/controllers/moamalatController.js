@@ -41,6 +41,31 @@ export function validateAmount(raw) {
   return { ok: true, value: num };
 }
 
+const TERMINAL_PAYMENT_FAILURES = new Set([
+  "DECLINED",
+  "FAILED",
+  "REJECTED",
+  "CANCELLED",
+  "CANCELED",
+  // Verification is only requested after the LightBox reports completion.
+  // At that point NOT_FOUND is a failed attempt, not an in-progress checkout.
+  // Keeping it pending is what left vehicles reserved after Moamalat displayed
+  // its misleading "Order Not Found" error page.
+  "NOT_FOUND",
+]);
+
+const PAYMENT_SESSION_TTL_MS = 3 * 60 * 1000;
+
+/**
+ * A terminal gateway decision after the LightBox completion callback retires
+ * the unpaid reservation. Transport and signature errors remain retryable,
+ * because they do not prove that the card transaction failed.
+ */
+export const shouldReleaseAfterVerification = (result) =>
+  TERMINAL_PAYMENT_FAILURES.has(
+    String(result?.status ?? "").trim().toUpperCase(),
+  );
+
 /**
  * LightBox script & config endpoint.
  * Serves both /api/config and /api/v1/payments/moamalat/config.
@@ -140,7 +165,10 @@ export const diagnose = catchAsync(async (req, res) => {
 
     if (req.query.pay === "1") {
       const card = {
-        number: String(req.query.cardNumber || "6395043835180860"),
+        // The formerly documented ...0860 sandbox card currently returns
+        // issuer response 61 (limit exceeded). Keep diagnostics on a verified
+        // working Moamalat sandbox card so /diagnose?pay=1 remains useful.
+        number: String(req.query.cardNumber || "6395043165725698"),
         expiration: String(req.query.exp || "0127"),
         cvv: String(req.query.cvv || "123"),
         nameOnCard: "DIAGNOSTIC TEST",
@@ -220,6 +248,13 @@ export const createPayment = catchAsync(async (req, res, next) => {
   const merchantReference = generateBookingRef(booking._id);
   const params = buildCheckoutParams(booking, merchantReference);
 
+  // The gateway occasionally renders an error page without invoking any
+  // browser callback. Persist a server-enforced deadline so the background
+  // reaper releases this unpaid reservation even if the tab crashes, reloads,
+  // or is running an old frontend bundle.
+  booking.paymentSessionExpiresAt = new Date(Date.now() + PAYMENT_SESSION_TTL_MS);
+  await booking.save({ validateBeforeSave: false });
+
   let paymentDoc = await Payment.findOne({
     bookingId: booking._id,
     paymentGateway: "MOAMALAT",
@@ -276,6 +311,11 @@ export const initiatePayment = createPayment;
  * Serves POST /api/payment/verify and POST /api/v1/payments/moamalat/verify.
  */
 export const verifyPayment = catchAsync(async (req, res, next) => {
+  const customerId = req.user?._id || req.user?.id;
+  if (!customerId) {
+    throw new AppError("You must be logged in to verify a payment.", 401);
+  }
+
   if (!isMoamalatConfigured()) {
     return res.status(500).json({
       verified: false,
@@ -311,6 +351,14 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
   const booking = await Booking.findById(bookingId);
   if (!booking) {
     throw new AppError("No booking found for this payment.", 404);
+  }
+
+  const bookingCustomerId = booking.customerId?._id ?? booking.customerId;
+  if (
+    !bookingCustomerId ||
+    bookingCustomerId.toString() !== customerId.toString()
+  ) {
+    throw new AppError("You can only verify payment for your own booking.", 403);
   }
 
   const paymentBookingId = paymentDoc.bookingId?._id ?? paymentDoc.bookingId;
@@ -375,19 +423,11 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
     throw new AppError("This booking is not eligible for payment verification.", 409);
   }
 
-  let result;
-  try {
-    result = await verifyTransaction({
-      merchantReference: String(merchantReference),
-      expectedAmount: gatewayAmountForBooking(booking.totalAmount),
-      systemReference,
-    });
-  } catch (error) {
-    await releaseUnpaidBooking(booking._id, {
-      reason: "Payment verification could not be completed.",
-    }).catch(() => undefined);
-    throw error;
-  }
+  const result = await verifyTransaction({
+    merchantReference: String(merchantReference),
+    expectedAmount: gatewayAmountForBooking(booking.totalAmount),
+    systemReference,
+  });
 
   if (!result.verified) {
     logger.warn(
@@ -401,28 +441,31 @@ export const verifyPayment = catchAsync(async (req, res, next) => {
       "Payment verification rejected",
     );
 
-    // Any result other than verified payment releases the reservation. The
-    // customer explicitly has no rental until Moamalat confirms the charge.
-    await releaseUnpaidBooking(booking._id, {
-      reason: "Moamalat did not verify the payment.",
-    }).catch((err) => {
-      logger.warn(
-        {
-          event: "payment_release_failed",
-          bookingId: booking._id,
-          err: err.message,
-        },
-        "Could not release booking after an unverified payment",
-      );
-    });
+    const terminalFailure = shouldReleaseAfterVerification(result);
+    if (terminalFailure) {
+      await releaseUnpaidBooking(booking._id, {
+        reason: `Moamalat payment ${String(result.status).toLowerCase()}.`,
+      }).catch((err) => {
+        logger.warn(
+          {
+            event: "payment_release_failed",
+            bookingId: booking._id,
+            err: err.message,
+          },
+          "Could not release booking after a terminal payment failure",
+        );
+      });
+    }
 
     return res.status(200).json({
       verified: false,
+      retryable: !terminalFailure,
       reason: result.reason || "Transaction details did not match.",
       status: result.status || null,
       gatewayAmount: result.gatewayAmount || null,
       data: {
         verified: false,
+        retryable: !terminalFailure,
         reason: result.reason || "Transaction details did not match.",
         status: result.status || null,
         gatewayAmount: result.gatewayAmount || null,

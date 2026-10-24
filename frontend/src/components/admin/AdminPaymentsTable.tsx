@@ -77,7 +77,7 @@ export const AdminPaymentsTable: React.FC<AdminPaymentsTableProps> = ({
   return (
     <div>
       <div className="w-full overflow-x-auto">
-        <table className="w-full border-collapse text-left">
+        <table className="admin-table">
           <thead>
             <tr className="bg-[#F8FAFC] text-[11px] font-bold uppercase tracking-wider text-[#565E74]">
               <th className="rounded-s-2xl px-4 py-3">{t("admin.payments.table.transaction")}</th>
