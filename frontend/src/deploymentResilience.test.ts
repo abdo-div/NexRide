@@ -37,5 +37,7 @@ describe("static deployment resilience", () => {
     expect(paymentPage).toContain("OTP: 111111");
     expect(paymentPage).toContain("handleSimulatedPayment");
     expect(paymentPage).toContain("moamalatApi.simulate");
+    expect(paymentPage).toContain('activeGatewayEnv === "test"');
+    expect(paymentPage).toContain("await completeTestPayment()");
   });
 });
