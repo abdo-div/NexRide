@@ -337,6 +337,41 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
       const params = init.data.gateway.params;
 
       openMoamalatLightbox(params, {
+        demoAction:
+          init.data.gateway.env === "test"
+            ? {
+                label: t("payment.completeDemoPayment", {
+                  defaultValue: "Complete demo payment",
+                }),
+                onClick: async () => {
+                  setPhase("processing");
+                  try {
+                    const simulated = await moamalatApi.simulate(booking._id);
+                    if (!simulated.verified || !simulated.simulated) {
+                      throw new Error(
+                        t("payment.simulationFailed", {
+                          defaultValue: "The test payment could not be completed.",
+                        }),
+                      );
+                    }
+                    setPhase("done");
+                    navigate(
+                      `/booking-confirmed/${vehicle.id}?booking=${booking._id}&paid=true&ref=${params.MerchantReference}`,
+                      { replace: true },
+                    );
+                  } catch (error) {
+                    setPhase("idle");
+                    setSubmitError(
+                      error instanceof Error
+                        ? error.message
+                        : t("payment.simulationFailed", {
+                            defaultValue: "The test payment could not be completed.",
+                          }),
+                    );
+                  }
+                },
+              }
+            : undefined,
         onComplete: async (response) => {
           setPhase("processing");
           try {
