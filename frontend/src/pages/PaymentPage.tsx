@@ -15,6 +15,7 @@ import type { BookingDto } from "../types/booking";
 import { moamalatApi } from "../lib/moamalatApi";
 import { useDialog } from "../context/useDialog";
 import {
+  getMoamalatErrorMessage,
   loadMoamalatLightbox,
   openMoamalatLightbox,
 } from "../lib/moamalatLightbox";
@@ -56,6 +57,7 @@ const PaymentPage: React.FC = () => {
   const [booking, setBooking] = useState<BookingDto | null>(null);
   const [status, setStatus] = useState<PaymentStatus>("loading");
   const [error, setError] = useState<string | null>(null);
+  const [gatewayEnv, setGatewayEnv] = useState<string | null>(null);
 
   useEffect(() => {
     if (!bookingId) return;
@@ -88,6 +90,10 @@ const PaymentPage: React.FC = () => {
 
   useEffect(() => {
     if (!booking || booking.paymentStatus === "PAID") return;
+    void moamalatApi
+      .getConfig()
+      .then((config) => setGatewayEnv(config.data?.env ?? config.env ?? null))
+      .catch(() => setGatewayEnv(null));
     void loadMoamalatLightbox().catch(() => undefined);
   }, [booking]);
 
@@ -124,6 +130,17 @@ const PaymentPage: React.FC = () => {
     }
   };
 
+  const showRetryableGatewayError = (message?: string | null) => {
+    setStatus("gatewayError");
+    setError(
+      message ||
+        t("payment.gatewayNotApproved", {
+          defaultValue:
+            "Moamalat did not approve the transaction. Your reservation is still available; try again with the sandbox card shown below.",
+        }),
+    );
+  };
+
   const handleVerified = async (
     merchantReference: string,
     response?: LightboxCompleteResponse,
@@ -140,11 +157,13 @@ const PaymentPage: React.FC = () => {
       });
       if (result.verified || result.data?.verified) {
         goToConfirmation();
+      } else if (result.retryable || result.data?.retryable) {
+        showRetryableGatewayError(result.reason ?? result.data?.reason);
       } else {
         await releaseFailedPayment();
       }
-    } catch {
-      await releaseFailedPayment();
+    } catch (err) {
+      showRetryableGatewayError(err instanceof Error ? err.message : null);
     }
   };
 
@@ -163,11 +182,12 @@ const PaymentPage: React.FC = () => {
         onComplete: (response) => {
           handleVerified(init.data.payment.merchantReference, response);
         },
-        onError: () => {
-          void releaseFailedPayment();
+        onError: (gatewayError) => {
+          showRetryableGatewayError(getMoamalatErrorMessage(gatewayError));
         },
         onCancel: () => {
-          void releaseFailedPayment();
+          setStatus("ready");
+          setError(null);
         },
       });
     } catch (err) {
@@ -175,7 +195,7 @@ const PaymentPage: React.FC = () => {
         navigate(freshCheckoutUrl(booking), { replace: true });
         return;
       }
-      await releaseFailedPayment();
+      showRetryableGatewayError(err instanceof Error ? err.message : null);
     }
   };
 
@@ -339,6 +359,29 @@ const PaymentPage: React.FC = () => {
                     </dd>
                   </div>
                 </dl>
+
+                {gatewayEnv === "test" && (
+                  <div className="rounded-xl border border-amber-300 bg-amber-50 p-5 text-start">
+                    <p className="text-[14px] font-bold text-amber-900">
+                      {t("payment.sandboxTitle")}
+                    </p>
+                    <p className="mt-1 text-[12px] leading-relaxed text-amber-800">
+                      {t("payment.sandboxDesc")}
+                    </p>
+                    <div
+                      dir="ltr"
+                      className="mt-3 grid grid-cols-1 gap-2 rounded-lg border border-amber-200 bg-white p-3 font-mono text-[12px] text-slate-800 sm:grid-cols-3"
+                    >
+                      <span className="sm:col-span-3">6395 0431 6572 5698</span>
+                      <span>{t("payment.sandboxExpiry")}: 01/27</span>
+                      <span>CVV: 123</span>
+                      <span>{t("payment.sandboxName")}: TEST USER</span>
+                    </div>
+                    <p className="mt-2 text-[11px] leading-relaxed text-amber-700">
+                      {t("payment.sandboxAmount")}
+                    </p>
+                  </div>
+                )}
 
                 {(status === "failed" || status === "gatewayError") && (
                   <div className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-5">

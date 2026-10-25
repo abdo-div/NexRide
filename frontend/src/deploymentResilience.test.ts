@@ -26,4 +26,13 @@ describe("static deployment resilience", () => {
     expect(source).toContain("editable={editable}");
     expect(source).toContain("onChange={onChange}");
   });
+
+  it("keeps a booking retryable after temporary Moamalat gateway failures", () => {
+    const paymentPage = readSource("./pages/PaymentPage.tsx");
+    expect(paymentPage).toContain("showRetryableGatewayError");
+    expect(paymentPage).toContain("getMoamalatErrorMessage(gatewayError)");
+    expect(paymentPage).toContain('setStatus("ready")');
+    expect(paymentPage).toContain('gatewayEnv === "test"');
+    expect(paymentPage).toContain("6395 0431 6572 5698");
+  });
 });

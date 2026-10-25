@@ -5,8 +5,9 @@ let lightboxPromise: Promise<LightboxApi> | null = null;
 let scriptPromise: Promise<void> | null = null;
 const LIGHTBOX_LOAD_TIMEOUT_MS = 12_000;
 // Some Moamalat error pages (notably the sandbox's "Order Not Found" screen)
-// do not post an errorCallback to the merchant page. Never let such a broken
-// iframe reserve a vehicle forever: fail closed after a bounded checkout.
+// do not post an errorCallback to the merchant page. Return control to NexRide
+// after a bounded checkout; the server-side hold deadline still protects fleet
+// availability without turning a temporary issuer outage into an instant cancel.
 const LIGHTBOX_SESSION_TIMEOUT_MS = 3 * 60_000;
 
 export const getLightboxApi = (): LightboxApi | null =>
@@ -187,7 +188,7 @@ export const openMoamalatLightbox = (
     settle(() =>
       callbacks.onError?.({
         message:
-          "Moamalat did not complete the payment. The reservation was released.",
+          "Moamalat did not complete the payment. Your reservation is still available for another attempt.",
       }),
     );
   }, LIGHTBOX_SESSION_TIMEOUT_MS);

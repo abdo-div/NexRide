@@ -32,6 +32,7 @@ export interface InitiateResponse {
 
 export interface VerifyResult {
   verified: boolean;
+  retryable?: boolean;
   merchantReference: string;
   systemReference?: string;
   networkReference?: string;
@@ -45,6 +46,8 @@ export interface VerifyResult {
 export interface VerifyResponse {
   status?: string;
   verified?: boolean;
+  retryable?: boolean;
+  reason?: string;
   merchantReference?: string;
   systemReference?: string;
   networkReference?: string;
