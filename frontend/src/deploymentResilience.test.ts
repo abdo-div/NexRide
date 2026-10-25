@@ -34,5 +34,6 @@ describe("static deployment resilience", () => {
     expect(paymentPage).toContain('setStatus("ready")');
     expect(paymentPage).toContain('gatewayEnv === "test"');
     expect(paymentPage).toContain("6395 0431 6572 5698");
+    expect(paymentPage).toContain("OTP: 111111");
   });
 });

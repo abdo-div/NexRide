@@ -374,7 +374,7 @@ const PaymentPage: React.FC = () => {
                     >
                       <span className="sm:col-span-3">6395 0431 6572 5698</span>
                       <span>{t("payment.sandboxExpiry")}: 01/27</span>
-                      <span>CVV: 123</span>
+                      <span>OTP: 111111</span>
                       <span>{t("payment.sandboxName")}: TEST USER</span>
                     </div>
                     <p className="mt-2 text-[11px] leading-relaxed text-amber-700">
