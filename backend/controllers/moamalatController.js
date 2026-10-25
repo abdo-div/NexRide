@@ -307,6 +307,96 @@ export const createPayment = catchAsync(async (req, res, next) => {
 export const initiatePayment = createPayment;
 
 /**
+ * Completes a presentation-only payment when the external Moamalat sandbox is
+ * unavailable. This route is impossible to use with production gateway mode,
+ * requires an authenticated customer, and only accepts that customer's own
+ * still-unpaid booking. The ledger row is permanently marked `isSimulated` so
+ * it can never be mistaken for captured funds during reporting or settlement.
+ */
+export const simulateTestPayment = catchAsync(async (req, res) => {
+  if (moamalatConfig.env !== "test") {
+    throw new AppError("Test payment simulation is not available.", 404);
+  }
+
+  const booking = await Booking.findById(req.body?.bookingId);
+  if (!booking) throw new AppError("No booking found with that ID", 404);
+
+  const customerId = req.user?._id || req.user?.id;
+  const bookingCustomerId = booking.customerId?._id ?? booking.customerId;
+  if (!customerId || bookingCustomerId?.toString() !== customerId.toString()) {
+    throw new AppError("You can only simulate payment for your own booking.", 403);
+  }
+  if (
+    booking.bookingStatus !== "PENDING_PAYMENT" ||
+    booking.paymentStatus !== "UNPAID"
+  ) {
+    throw new AppError("This booking is not eligible for a test payment.", 409);
+  }
+
+  let payment = await Payment.findOne({
+    bookingId: booking._id,
+    paymentGateway: "MOAMALAT",
+    status: "PENDING",
+  });
+  const merchantReference = `SIM-${String(booking._id).slice(-10)}-${Date.now().toString(36)}`;
+
+  if (!payment) {
+    payment = await Payment.create({
+      bookingId: booking._id,
+      customerId: bookingCustomerId,
+      companyId: booking.companyId?._id ?? booking.companyId,
+      amount: Number(booking.totalAmount),
+      paymentMethod: "MOAMALAT",
+      paymentGateway: "MOAMALAT",
+      status: "PENDING",
+      merchantReference,
+      isSimulated: true,
+    });
+  } else {
+    payment.amount = Number(booking.totalAmount);
+    payment.merchantReference = merchantReference;
+    payment.isSimulated = true;
+    await payment.save();
+  }
+
+  const systemReference = `SIM-${Date.now()}-${String(booking._id).slice(-6)}`;
+  await finalizeVerifiedPayment({
+    bookingId: booking._id,
+    paymentId: payment._id,
+    systemReference,
+    networkReference: "SANDBOX-SIMULATION",
+  });
+
+  logger.warn(
+    {
+      event: "sandbox_payment_simulated",
+      bookingId: booking._id,
+      paymentId: payment._id,
+      customerId,
+    },
+    "Moamalat test payment simulated because the external sandbox is unavailable",
+  );
+
+  return res.status(200).json({
+    status: "success",
+    verified: true,
+    simulated: true,
+    data: {
+      verified: true,
+      simulated: true,
+      merchantReference,
+      systemReference,
+      booking: {
+        id: booking._id,
+        bookingStatus: "PAID",
+        paymentStatus: "PAID",
+        vehicleId: booking.vehicleId,
+      },
+    },
+  });
+});
+
+/**
  * Verifies a payment against Moamalat's FilterTransactions endpoint.
  * Serves POST /api/payment/verify and POST /api/v1/payments/moamalat/verify.
  */

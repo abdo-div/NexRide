@@ -79,6 +79,12 @@ const paymentSchema = new mongoose.Schema(
       type: String,
       default: "LOCAL", // e.g., "MOAMALAT" or "LOCAL"
     },
+    // Explicit audit marker for presentation/test-environment payments that
+    // do not represent a capture by the external banking network.
+    isSimulated: {
+      type: Boolean,
+      default: false,
+    },
     /**
      * Merchant reference handed to the payment gateway for the current attempt.
      * Kept on the ledger record so the verify step can map a gateway callback

@@ -64,6 +64,13 @@ export interface ReleaseResponse {
   };
 }
 
+export interface SimulatedPaymentResponse {
+  status: string;
+  verified: true;
+  simulated: true;
+  data: VerifyResult & { simulated: true };
+}
+
 /**
  * Moamalat gateway API surface.
  */
@@ -83,6 +90,13 @@ export const moamalatApi = {
 
   initiate: (bookingId: string): Promise<InitiateResponse> =>
     request("/payments/moamalat/init", {
+      method: "POST",
+      body: { bookingId },
+      headers: { "Idempotency-Key": crypto.randomUUID() },
+    }),
+
+  simulate: (bookingId: string): Promise<SimulatedPaymentResponse> =>
+    request("/payments/moamalat/simulate", {
       method: "POST",
       body: { bookingId },
       headers: { "Idempotency-Key": crypto.randomUUID() },

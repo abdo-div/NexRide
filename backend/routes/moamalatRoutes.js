@@ -4,6 +4,7 @@ import {
   diagnose,
   createPayment,
   initiatePayment,
+  simulateTestPayment,
   verifyPayment,
   releasePayment,
 } from "../controllers/moamalatController.js";
@@ -79,6 +80,17 @@ router.post(
   idempotency(86400),
   validate(initiatePaymentSchema),
   initiatePayment,
+);
+
+// Presentation-only fallback. The controller returns 404 unless the deployed
+// gateway is explicitly in test mode; production Moamalat can never use it.
+router.post(
+  "/simulate",
+  protect,
+  restrictTo("customer"),
+  idempotency(86400),
+  validate(initiatePaymentSchema),
+  simulateTestPayment,
 );
 
 // Verification route

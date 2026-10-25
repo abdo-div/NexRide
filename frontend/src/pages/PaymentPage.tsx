@@ -199,6 +199,26 @@ const PaymentPage: React.FC = () => {
     }
   };
 
+  const handleSimulatedPayment = async () => {
+    if (!booking || gatewayEnv !== "test") return;
+    setError(null);
+    setStatus("verifying");
+    try {
+      const result = await moamalatApi.simulate(booking._id);
+      if (result.verified && result.simulated) {
+        goToConfirmation();
+        return;
+      }
+      showRetryableGatewayError(
+        t("payment.simulationFailed", {
+          defaultValue: "The test payment could not be completed.",
+        }),
+      );
+    } catch (err) {
+      showRetryableGatewayError(err instanceof Error ? err.message : null);
+    }
+  };
+
   const [cancelling, setCancelling] = useState(false);
 
   const handleCancelReservation = async () => {
@@ -379,6 +399,18 @@ const PaymentPage: React.FC = () => {
                     </div>
                     <p className="mt-2 text-[11px] leading-relaxed text-amber-700">
                       {t("payment.sandboxAmount")}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleSimulatedPayment}
+                      disabled={status === "verifying" || status === "preparing"}
+                      className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-900 px-5 py-3 text-[13px] font-bold text-white transition-colors hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <ShieldCheck className="h-4 w-4" />
+                      {t("payment.simulatePayment")}
+                    </button>
+                    <p className="mt-2 text-center text-[10px] font-semibold text-amber-800">
+                      {t("payment.simulatePaymentNote")}
                     </p>
                   </div>
                 )}
