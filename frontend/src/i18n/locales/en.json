@@ -2056,6 +2056,7 @@
     "sandboxName": "Name",
     "sandboxAmount": "No real funds are charged. If Moamalat displays CUBEEX Technical Error, its sandbox is unavailable; retry later or choose cash payment.",
     "simulatePayment": "Complete test payment for presentation",
+    "completeDemoPayment": "Complete demo payment",
     "simulatePaymentNote": "TEST ONLY — records a clearly marked simulated payment; no bank charge occurs.",
     "simulationFailed": "The test payment could not be completed.",
     "notFoundTitle": "Booking not found",

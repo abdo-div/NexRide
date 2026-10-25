@@ -2060,6 +2060,7 @@
     "sandboxName": "الاسم",
     "sandboxAmount": "لن تُخصم أموال حقيقية. إذا عرضت معاملات خطأ CUBEEX Technical Error فبيئة الاختبار غير متاحة؛ حاول لاحقاً أو اختر الدفع النقدي.",
     "simulatePayment": "إكمال دفعة تجريبية للعرض",
+    "completeDemoPayment": "إكمال الدفعة التجريبية",
     "simulatePaymentNote": "للاختبار فقط — تُسجّل الدفعة بوضوح كمحاكاة ولن يحدث أي خصم مصرفي.",
     "simulationFailed": "تعذّر إكمال الدفعة التجريبية.",
     "notFoundTitle": "الحجز غير موجود",

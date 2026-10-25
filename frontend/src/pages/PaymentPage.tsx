@@ -199,6 +199,15 @@ const PaymentPage: React.FC = () => {
         console.debug("[Moamalat] LightBox params:", init.data.gateway.params);
       }
       openMoamalatLightbox(init.data.gateway.params, {
+        demoAction:
+          gatewayEnv === "test"
+            ? {
+                label: t("payment.completeDemoPayment", {
+                  defaultValue: "Complete demo payment",
+                }),
+                onClick: completeTestPayment,
+              }
+            : undefined,
         onComplete: (response) => {
           handleVerified(init.data.payment.merchantReference, response);
         },

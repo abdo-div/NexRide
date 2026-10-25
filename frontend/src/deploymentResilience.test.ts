@@ -38,5 +38,9 @@ describe("static deployment resilience", () => {
     expect(paymentPage).toContain("handleSimulatedPayment");
     expect(paymentPage).toContain("moamalatApi.simulate");
     expect(paymentPage).toContain("openMoamalatLightbox");
+    expect(paymentPage).toContain("completeDemoPayment");
+    const lightbox = readSource("./lib/moamalatLightbox.ts");
+    expect(lightbox).toContain("data-nexride-demo-payment");
+    expect(lightbox).toContain("z-index:1000000");
   });
 });

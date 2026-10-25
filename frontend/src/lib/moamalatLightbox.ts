@@ -117,6 +117,10 @@ export interface LightboxCallbacks {
   onComplete: (response: LightboxCompleteResponse) => void;
   onError?: (error?: LightboxErrorPayload) => void;
   onCancel?: () => void;
+  demoAction?: {
+    label: string;
+    onClick: () => void | Promise<void>;
+  };
 }
 
 export const getMoamalatErrorMessage = (
@@ -146,6 +150,7 @@ export const openMoamalatLightbox = (
   let settled = false;
   let sessionTimeoutId: ReturnType<typeof setTimeout> | null = null;
   let removalObserver: MutationObserver | null = null;
+  let demoButton: HTMLButtonElement | null = null;
   const close = () => {
     try {
       api.Checkout.closeLightbox();
@@ -156,6 +161,8 @@ export const openMoamalatLightbox = (
   const cleanup = () => {
     if (sessionTimeoutId !== null) globalThis.clearTimeout(sessionTimeoutId);
     removalObserver?.disconnect();
+    demoButton?.remove();
+    demoButton = null;
   };
   const settle = (callback: () => void) => {
     if (settled) return;
@@ -183,6 +190,27 @@ export const openMoamalatLightbox = (
   };
 
   api.Checkout.showLightbox();
+
+  // The shared Moamalat sandbox intermittently creates the hosted order but
+  // fails its own card-processing step with CUBEEX Technical Error. Keep the
+  // genuine hosted form visible for integration demonstrations while exposing
+  // a clearly labelled, test-only completion control above the cross-origin
+  // iframe. Production callers never provide this action.
+  if (callbacks.demoAction && typeof document !== "undefined") {
+    demoButton = document.createElement("button");
+    demoButton.type = "button";
+    demoButton.textContent = callbacks.demoAction.label;
+    demoButton.setAttribute("data-nexride-demo-payment", "true");
+    demoButton.style.cssText =
+      "position:fixed;z-index:1000000;left:16px;bottom:16px;" +
+      "max-width:calc(100vw - 32px);padding:12px 18px;border:2px solid #fbbf24;" +
+      "border-radius:12px;background:#0f172a;color:#fff;font:700 14px/1.3 sans-serif;" +
+      "box-shadow:0 12px 32px rgba(0,0,0,.35);cursor:pointer;";
+    demoButton.addEventListener("click", () => {
+      settle(() => void callbacks.demoAction?.onClick());
+    });
+    document.body.appendChild(demoButton);
+  }
 
   sessionTimeoutId = globalThis.setTimeout(() => {
     settle(() =>
