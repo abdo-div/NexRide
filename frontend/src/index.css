@@ -270,6 +270,64 @@ svg {
   font-weight: 700;
   box-shadow: 0 14px 35px -18px rgb(15 23 42 / 55%);
 }
+
+/* Keep the OpenStreetMap/Leaflet fallback consistent with the Mapbox surface. */
+.vehicle-location-map .leaflet-control-zoom {
+  overflow: hidden;
+  border: 1px solid rgb(226 232 240 / 90%);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px -12px rgb(15 23 42 / 45%);
+}
+
+.vehicle-location-map .leaflet-control-zoom a {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  color: #0b1c30;
+  font-family: var(--app-font);
+  line-height: 34px;
+}
+
+.vehicle-location-map .leaflet-control-attribution {
+  border-radius: 8px 0 0;
+  background: rgb(255 255 255 / 82%);
+  color: #64748b;
+  font-size: 9px;
+  backdrop-filter: blur(8px);
+}
+
+.vehicle-location-map .leaflet-control-attribution a {
+  color: #475569;
+}
+
+.nexride-osm-marker-icon {
+  border: 0;
+  background: transparent;
+}
+
+.nexride-osm-marker {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  width: 26px;
+  height: 26px;
+  transform: rotate(-45deg);
+  border: 3px solid #fff;
+  border-radius: 50% 50% 50% 0;
+  background: #1769ff;
+  box-shadow: 0 5px 14px rgb(15 23 42 / 38%);
+}
+
+.nexride-osm-marker::after {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #fff;
+  content: "";
+}
 @keyframes nexride-brand-marquee {
   from { transform: translateX(-50%); }
   to { transform: translateX(0); }

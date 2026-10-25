@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
+import L from "leaflet";
 import "mapbox-gl/dist/mapbox-gl.css";
+import "leaflet/dist/leaflet.css";
 
 const TRIPOLI: [number, number] = [13.1913, 32.8872];
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN?.trim();
@@ -14,105 +16,142 @@ const OpenStreetMapFallback: React.FC<{
   className: string;
   pickerHint: string;
 }> = ({ coordinates, editable, label, onChange, className, pickerHint }) => {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const [zoomStep, setZoomStep] = useState(0);
-  const [aspectRatio, setAspectRatio] = useState(16 / 9);
-  const [longitude, latitude] = isValidCoordinate(coordinates) ? coordinates : TRIPOLI;
-  const zoomFactor = 2 ** zoomStep;
-  const latitudeSpan = 0.015 / zoomFactor;
-  // Match the requested OSM bounding box to the rendered container. Otherwise
-  // OSM expands one axis to preserve Web Mercator proportions and click-to-
-  // coordinate conversion becomes inaccurate on wide application forms.
-  const longitudeSpan =
-    (latitudeSpan * aspectRatio) / Math.max(0.2, Math.cos((latitude * Math.PI) / 180));
-  const bounds: [number, number, number, number] = [
-    longitude - longitudeSpan,
-    latitude - latitudeSpan,
-    longitude + longitudeSpan,
-    latitude + latitudeSpan,
-  ];
-  const marker = isValidCoordinate(coordinates)
-    ? `&marker=${encodeURIComponent(`${latitude},${longitude}`)}`
-    : "";
-  const source = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bounds.join(","))}&layer=mapnik${marker}`;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
+  const onChangeRef = useRef(onChange);
+  const editableRef = useRef(editable);
+  const labelRef = useRef(label);
+  const initialCoordinatesRef = useRef<[number, number]>(
+    isValidCoordinate(coordinates) ? coordinates : TRIPOLI,
+  );
+  const initiallyValidRef = useRef(isValidCoordinate(coordinates));
 
   useEffect(() => {
-    const wrapper = wrapperRef.current;
-    if (!wrapper) return;
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
-    const updateAspectRatio = () => {
-      const rect = wrapper.getBoundingClientRect();
-      if (rect.width > 0 && rect.height > 0) setAspectRatio(rect.width / rect.height);
+  useEffect(() => {
+    labelRef.current = label;
+    const markerElement = markerRef.current?.getElement();
+    if (markerElement) markerElement.setAttribute("title", label || "Selected location");
+  }, [label]);
+
+  useEffect(() => {
+    editableRef.current = editable;
+    const marker = markerRef.current;
+    if (marker) {
+      if (editable) marker.dragging?.enable();
+      else marker.dragging?.disable();
+    }
+    const map = mapRef.current;
+    if (map) map.getContainer().style.cursor = editable ? "crosshair" : "grab";
+  }, [editable]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const initialPoint = initialCoordinatesRef.current;
+    const map = L.map(container, {
+      center: [initialPoint[1], initialPoint[0]],
+      zoom: initiallyValidRef.current ? 15 : 12,
+      zoomControl: true,
+      attributionControl: true,
+      scrollWheelZoom: true,
+      dragging: true,
+      touchZoom: true,
+    });
+    mapRef.current = map;
+    map.getContainer().style.cursor = editableRef.current ? "crosshair" : "grab";
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    }).addTo(map);
+
+    const createMarker = (longitude: number, latitude: number) => {
+      const marker = L.marker([latitude, longitude], {
+        draggable: editableRef.current,
+        icon: L.divIcon({
+          className: "nexride-osm-marker-icon",
+          html: '<span class="nexride-osm-marker" aria-hidden="true"></span>',
+          iconSize: [34, 42],
+          iconAnchor: [17, 40],
+        }),
+        title: labelRef.current || "Selected location",
+      }).addTo(map);
+      marker.on("dragend", () => {
+        const next = marker.getLatLng();
+        onChangeRef.current?.(next.lng, next.lat);
+      });
+      markerRef.current = marker;
+      return marker;
     };
-    updateAspectRatio();
-    const observer = new ResizeObserver(updateAspectRatio);
-    observer.observe(wrapper);
-    return () => observer.disconnect();
+
+    if (initiallyValidRef.current) createMarker(initialPoint[0], initialPoint[1]);
+
+    map.on("click", (event) => {
+      if (!editableRef.current) return;
+      const marker =
+        markerRef.current ?? createMarker(event.latlng.lng, event.latlng.lat);
+      marker.setLatLng(event.latlng);
+      onChangeRef.current?.(event.latlng.lng, event.latlng.lat);
+    });
+
+    const observer = new ResizeObserver(() => map.invalidateSize({ pan: false }));
+    observer.observe(container);
+
+    return () => {
+      observer.disconnect();
+      markerRef.current = null;
+      mapRef.current = null;
+      map.remove();
+    };
   }, []);
 
-  const choosePoint = (clientX: number, clientY: number, element: HTMLElement) => {
-    if (!editable || !onChange) return;
-    const rect = element.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
 
-    const horizontalRatio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
-    const verticalRatio = Math.min(1, Math.max(0, (clientY - rect.top) / rect.height));
-    const [west, south, east, north] = bounds;
-    onChange(west + horizontalRatio * (east - west), north - verticalRatio * (north - south));
-  };
+    if (!isValidCoordinate(coordinates)) {
+      markerRef.current?.remove();
+      markerRef.current = null;
+      return;
+    }
+
+    if (markerRef.current) {
+      markerRef.current.setLatLng([coordinates[1], coordinates[0]]);
+      return;
+    }
+
+    const marker = L.marker([coordinates[1], coordinates[0]], {
+      draggable: editable,
+      icon: L.divIcon({
+        className: "nexride-osm-marker-icon",
+        html: '<span class="nexride-osm-marker" aria-hidden="true"></span>',
+        iconSize: [34, 42],
+        iconAnchor: [17, 40],
+      }),
+      title: label || "Selected location",
+    }).addTo(map);
+    marker.on("dragend", () => {
+      const next = marker.getLatLng();
+      onChangeRef.current?.(next.lng, next.lat);
+    });
+    markerRef.current = marker;
+  }, [coordinates, editable, label]);
 
   return (
     <div
-      ref={wrapperRef}
-      className={`relative isolate overflow-hidden rounded-2xl border border-[#D8E2F0] bg-slate-100 shadow-[0_18px_45px_-30px_rgba(15,23,42,0.55)] ${className}`}
+      className={`vehicle-location-map relative isolate overflow-hidden rounded-2xl border border-[#D8E2F0] bg-slate-100 shadow-[0_18px_45px_-30px_rgba(15,23,42,0.55)] ${className}`}
     >
-      <iframe
-        src={source}
-        title={label || "Location map"}
-        className="h-full w-full border-0"
-        loading="lazy"
-        referrerPolicy="strict-origin-when-cross-origin"
-      />
+      <div ref={containerRef} className="h-full w-full" aria-label={label || "Location map"} />
       {editable && (
-        <>
-          <button
-            type="button"
-            className="absolute inset-0 z-10 cursor-crosshair bg-transparent"
-            aria-label={pickerHint}
-            onClick={(event) => choosePoint(event.clientX, event.clientY, event.currentTarget)}
-          >
-            <span className="sr-only">{pickerHint}</span>
-          </button>
-
-          <div className="pointer-events-none absolute left-1/2 top-3 z-20 -translate-x-1/2 whitespace-nowrap rounded-full border border-white/70 bg-white/95 px-3.5 py-2 text-xs font-bold text-[#0B1C30] shadow-lg backdrop-blur-md">
-            {pickerHint}
-          </div>
-
-          <div className="absolute end-3 top-3 z-30 flex flex-col overflow-hidden rounded-lg border border-slate-300 bg-white shadow-md">
-            <button
-              type="button"
-              aria-label="Zoom in"
-              className="grid h-9 w-9 place-items-center text-xl font-bold text-slate-700 hover:bg-slate-100 disabled:text-slate-300"
-              disabled={zoomStep >= 4}
-              onClick={() => setZoomStep((current) => Math.min(4, current + 1))}
-            >
-              +
-            </button>
-            <button
-              type="button"
-              aria-label="Zoom out"
-              className="grid h-9 w-9 place-items-center border-t border-slate-200 text-xl font-bold text-slate-700 hover:bg-slate-100 disabled:text-slate-300"
-              disabled={zoomStep <= -2}
-              onClick={() => setZoomStep((current) => Math.max(-2, current - 1))}
-            >
-              −
-            </button>
-          </div>
-        </>
+        <div className="pointer-events-none absolute left-1/2 top-3 z-[500] -translate-x-1/2 whitespace-nowrap rounded-full border border-white/70 bg-white/95 px-3.5 py-2 text-xs font-bold text-[#0B1C30] shadow-lg backdrop-blur-md">
+          {pickerHint}
+        </div>
       )}
-      <span className="pointer-events-none absolute bottom-2 end-2 rounded-lg bg-white/90 px-2.5 py-1 text-[10px] font-semibold text-slate-600 shadow-sm backdrop-blur">
-        OpenStreetMap
-      </span>
     </div>
   );
 };

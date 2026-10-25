@@ -14,14 +14,15 @@ describe("static deployment resilience", () => {
     const source = readSource("./components/maps/VehicleLocationMap.tsx");
     expect(source).toContain("OpenStreetMapFallback");
     expect(source).toContain("!MAPBOX_TOKEN || mapError");
-    expect(source).toContain("https://www.openstreetmap.org/export/embed.html");
+    expect(source).toContain("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
   });
 
   it("keeps the location picker editable on the OpenStreetMap fallback", () => {
     const source = readSource("./components/maps/VehicleLocationMap.tsx");
-    expect(source).toContain("choosePoint");
-    expect(source).toContain("onClick={(event) => choosePoint");
-    expect(source).toContain("onChange(west + horizontalRatio");
+    expect(source).toContain('map.on("click"');
+    expect(source).toContain('marker.on("dragend"');
+    expect(source).toContain("scrollWheelZoom: true");
+    expect(source).toContain("dragging: true");
     expect(source).toContain("editable={editable}");
     expect(source).toContain("onChange={onChange}");
   });
