@@ -78,15 +78,8 @@ const moamalatDateParts = (date) => {
  */
 export const amountToUnits = (amountLyd) => Math.round(amountLyd * 1000);
 
-/**
- * Moamalat's shared test merchant only approves its published cards for a
- * fixed 10 LYD transaction. Live merchants must always charge the booking's
- * full amount.
- */
-export const gatewayAmountForBooking = (bookingAmount) =>
-  moamalatConfig.env === "test"
-    ? moamalatConfig.testAmount
-    : Number(bookingAmount);
+/** The amount sent to and verified with Moamalat must match the booking. */
+export const gatewayAmountForBooking = (bookingAmount) => Number(bookingAmount);
 
 /** YYYYMMDDHHmm — required by the LightBox script used by this project. */
 export const formatTrxDateTime = (date = new Date()) => {

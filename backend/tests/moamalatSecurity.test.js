@@ -191,7 +191,7 @@ test("Moamalat initialization schema rejects caller-supplied money and reference
   );
 });
 
-test("sandbox initialization signs the fixed approved test amount", async (t) => {
+test("sandbox initialization signs the booking's actual amount", async (t) => {
   withGatewayConfig(t);
   const booking = makeBooking();
   t.mock.method(Booking, "findById", async () => booking);
@@ -206,7 +206,7 @@ test("sandbox initialization signs the fixed approved test amount", async (t) =>
 
   const response = await invoke(createPayment, customerRequest({ bookingId }));
   assert.equal(response.statusCode, 200);
-  assert.equal(response.body.AmountTrxn, "10000");
+  assert.equal(response.body.AmountTrxn, "88250");
   assert.equal(response.body.data.payment.amount, booking.totalAmount);
   assert.equal(response.body.data.payment.bookingId, bookingId);
   assert.ok(response.body.SecureHash);
@@ -370,7 +370,7 @@ test("verified amount must match the stored booking, and repeated verification i
           DateTransactions: [
             {
               MerchantReference: requestBody.MerchantReference,
-              AmountTrxn: "10000",
+              AmountTrxn: "88250",
               Status: "Approved",
               TransactionId: "gateway-txn-1",
             },
@@ -388,7 +388,7 @@ test("verified amount must match the stored booking, and repeated verification i
     customerRequest({ merchantReference }),
   );
   assert.equal(first.body.verified, true);
-  assert.equal(first.body.data.amount, 10);
+  assert.equal(first.body.data.amount, booking.totalAmount);
   assert.equal(payment.status, "COMPLETED");
   assert.equal(booking.bookingStatus, "PAID");
   assert.equal(booking.paymentStatus, "PAID");

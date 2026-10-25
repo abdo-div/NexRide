@@ -51,11 +51,6 @@ export const moamalatConfig = {
   get timeZone() {
     return process.env.MOAMALAT_TIME_ZONE || "Africa/Tripoli";
   },
-  /** Fixed amount accepted by Moamalat's shared sandbox cards (LYD). */
-  get testAmount() {
-    const amount = Number(process.env.MOAMALAT_TEST_AMOUNT || 10);
-    return Number.isFinite(amount) && amount > 0 ? amount : 10;
-  },
   get lightBoxUrl() {
     return LIGHTBOX_URLS[this.env] || LIGHTBOX_URLS.test;
   },

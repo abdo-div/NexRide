@@ -192,22 +192,6 @@ const PaymentPage: React.FC = () => {
     setError(null);
     setStatus("preparing");
     try {
-      // Moamalat's shared sandbox currently accepts order creation but fails
-      // every card submission with CUBEEX "Order not found". In test mode the
-      // primary payment action therefore uses the audited server-side simulator
-      // instead of opening a checkout that cannot succeed. Production mode
-      // continues through the real hosted lightbox below.
-      let activeGatewayEnv = gatewayEnv;
-      if (!activeGatewayEnv) {
-        const config = await moamalatApi.getConfig();
-        activeGatewayEnv = config.data?.env ?? config.env ?? null;
-        setGatewayEnv(activeGatewayEnv);
-      }
-      if (activeGatewayEnv === "test") {
-        await completeTestPayment();
-        return;
-      }
-
       await loadMoamalatLightbox();
       const init = await moamalatApi.initiate(booking._id);
       if (import.meta.env.DEV) {
