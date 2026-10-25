@@ -8,22 +8,64 @@ const MAP_STYLE = "mapbox://styles/mapbox/standard";
 
 const OpenStreetMapFallback: React.FC<{
   coordinates?: [number, number] | null;
+  editable: boolean;
   label?: string;
+  onChange?: (longitude: number, latitude: number) => void;
   className: string;
-}> = ({ coordinates, label, className }) => {
+  pickerHint: string;
+}> = ({ coordinates, editable, label, onChange, className, pickerHint }) => {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [zoomStep, setZoomStep] = useState(0);
+  const [aspectRatio, setAspectRatio] = useState(16 / 9);
   const [longitude, latitude] = isValidCoordinate(coordinates) ? coordinates : TRIPOLI;
-  const longitudeSpan = 0.025;
-  const latitudeSpan = 0.015;
-  const bounds = [
+  const zoomFactor = 2 ** zoomStep;
+  const latitudeSpan = 0.015 / zoomFactor;
+  // Match the requested OSM bounding box to the rendered container. Otherwise
+  // OSM expands one axis to preserve Web Mercator proportions and click-to-
+  // coordinate conversion becomes inaccurate on wide application forms.
+  const longitudeSpan =
+    (latitudeSpan * aspectRatio) / Math.max(0.2, Math.cos((latitude * Math.PI) / 180));
+  const bounds: [number, number, number, number] = [
     longitude - longitudeSpan,
     latitude - latitudeSpan,
     longitude + longitudeSpan,
     latitude + latitudeSpan,
-  ].join(",");
-  const source = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bounds)}&layer=mapnik&marker=${encodeURIComponent(`${latitude},${longitude}`)}`;
+  ];
+  const marker = isValidCoordinate(coordinates)
+    ? `&marker=${encodeURIComponent(`${latitude},${longitude}`)}`
+    : "";
+  const source = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bounds.join(","))}&layer=mapnik${marker}`;
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+
+    const updateAspectRatio = () => {
+      const rect = wrapper.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) setAspectRatio(rect.width / rect.height);
+    };
+    updateAspectRatio();
+    const observer = new ResizeObserver(updateAspectRatio);
+    observer.observe(wrapper);
+    return () => observer.disconnect();
+  }, []);
+
+  const choosePoint = (clientX: number, clientY: number, element: HTMLElement) => {
+    if (!editable || !onChange) return;
+    const rect = element.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
+    const horizontalRatio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    const verticalRatio = Math.min(1, Math.max(0, (clientY - rect.top) / rect.height));
+    const [west, south, east, north] = bounds;
+    onChange(west + horizontalRatio * (east - west), north - verticalRatio * (north - south));
+  };
 
   return (
-    <div className={`relative isolate overflow-hidden rounded-2xl border border-[#D8E2F0] bg-slate-100 shadow-[0_18px_45px_-30px_rgba(15,23,42,0.55)] ${className}`}>
+    <div
+      ref={wrapperRef}
+      className={`relative isolate overflow-hidden rounded-2xl border border-[#D8E2F0] bg-slate-100 shadow-[0_18px_45px_-30px_rgba(15,23,42,0.55)] ${className}`}
+    >
       <iframe
         src={source}
         title={label || "Location map"}
@@ -31,6 +73,43 @@ const OpenStreetMapFallback: React.FC<{
         loading="lazy"
         referrerPolicy="strict-origin-when-cross-origin"
       />
+      {editable && (
+        <>
+          <button
+            type="button"
+            className="absolute inset-0 z-10 cursor-crosshair bg-transparent"
+            aria-label={pickerHint}
+            onClick={(event) => choosePoint(event.clientX, event.clientY, event.currentTarget)}
+          >
+            <span className="sr-only">{pickerHint}</span>
+          </button>
+
+          <div className="pointer-events-none absolute left-1/2 top-3 z-20 -translate-x-1/2 whitespace-nowrap rounded-full border border-white/70 bg-white/95 px-3.5 py-2 text-xs font-bold text-[#0B1C30] shadow-lg backdrop-blur-md">
+            {pickerHint}
+          </div>
+
+          <div className="absolute end-3 top-3 z-30 flex flex-col overflow-hidden rounded-lg border border-slate-300 bg-white shadow-md">
+            <button
+              type="button"
+              aria-label="Zoom in"
+              className="grid h-9 w-9 place-items-center text-xl font-bold text-slate-700 hover:bg-slate-100 disabled:text-slate-300"
+              disabled={zoomStep >= 4}
+              onClick={() => setZoomStep((current) => Math.min(4, current + 1))}
+            >
+              +
+            </button>
+            <button
+              type="button"
+              aria-label="Zoom out"
+              className="grid h-9 w-9 place-items-center border-t border-slate-200 text-xl font-bold text-slate-700 hover:bg-slate-100 disabled:text-slate-300"
+              disabled={zoomStep <= -2}
+              onClick={() => setZoomStep((current) => Math.max(-2, current - 1))}
+            >
+              −
+            </button>
+          </div>
+        </>
+      )}
       <span className="pointer-events-none absolute bottom-2 end-2 rounded-lg bg-white/90 px-2.5 py-1 text-[10px] font-semibold text-slate-600 shadow-sm backdrop-blur">
         OpenStreetMap
       </span>
@@ -209,7 +288,16 @@ export const VehicleLocationMap: React.FC<VehicleLocationMapProps> = ({
   }, [coordinates, editable, label]);
 
   if (!MAPBOX_TOKEN || mapError) {
-    return <OpenStreetMapFallback coordinates={coordinates} label={label} className={className} />;
+    return (
+      <OpenStreetMapFallback
+        coordinates={coordinates}
+        editable={editable}
+        label={label}
+        onChange={onChange}
+        className={className}
+        pickerHint={pickerHint}
+      />
+    );
   }
 
   return (
