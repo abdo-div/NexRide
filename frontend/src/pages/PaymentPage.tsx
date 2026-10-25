@@ -200,7 +200,7 @@ const PaymentPage: React.FC = () => {
       }
       openMoamalatLightbox(init.data.gateway.params, {
         demoAction:
-          gatewayEnv === "test"
+          init.data.gateway.env === "test"
             ? {
                 label: t("payment.completeDemoPayment", {
                   defaultValue: "Complete demo payment",
