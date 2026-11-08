@@ -238,7 +238,17 @@ const PaymentPage: React.FC = () => {
           bookingId: booking._id,
           vehicleId: vehicleIdOf(booking),
         });
-        await openMpgsCheckout(init.data.sessionId);
+        await openMpgsCheckout(init.data.sessionId, (gatewayError) => {
+          const details = gatewayError as {
+            error?: { explanation?: string };
+            explanation?: string;
+          };
+          showRetryableGatewayError(
+            details.error?.explanation ||
+              details.explanation ||
+              "Mastercard could not open the hosted checkout page.",
+          );
+        });
         return;
       }
       await loadMoamalatLightbox();

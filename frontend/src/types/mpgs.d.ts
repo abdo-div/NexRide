@@ -10,4 +10,5 @@ interface MpgsCheckoutApi {
 
 interface Window {
   Checkout?: MpgsCheckoutApi;
+  nexrideMpgsError?: (error: unknown) => void;
 }

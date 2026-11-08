@@ -1,6 +1,13 @@
 import { mpgsApi } from "./mpgsApi";
 
 let scriptPromise: Promise<MpgsCheckoutApi> | null = null;
+const MPGS_ERROR_EVENT = "nexride:mpgs-error";
+
+const installMpgsErrorBridge = () => {
+  window.nexrideMpgsError = (error: unknown) => {
+    window.dispatchEvent(new CustomEvent(MPGS_ERROR_EVENT, { detail: error }));
+  };
+};
 
 const assertSafeScriptUrl = (value: string): string => {
   const url = new URL(value, window.location.origin);
@@ -18,6 +25,8 @@ const assertSafeScriptUrl = (value: string): string => {
 export const loadMpgsCheckout = async (): Promise<MpgsCheckoutApi> => {
   if (window.Checkout) return window.Checkout;
   if (scriptPromise) return scriptPromise;
+
+  installMpgsErrorBridge();
 
   scriptPromise = mpgsApi
     .getConfig()
@@ -43,6 +52,7 @@ export const loadMpgsCheckout = async (): Promise<MpgsCheckoutApi> => {
           { once: true },
         );
         if (!existing) {
+          script.setAttribute("data-error", "nexrideMpgsError");
           script.src = src;
           script.async = true;
           script.setAttribute("data-mpgs-checkout", "true");
@@ -59,9 +69,19 @@ export const loadMpgsCheckout = async (): Promise<MpgsCheckoutApi> => {
   return scriptPromise;
 };
 
-export const openMpgsCheckout = async (sessionId: string): Promise<void> => {
+export const openMpgsCheckout = async (
+  sessionId: string,
+  onError?: (error: unknown) => void,
+): Promise<void> => {
   if (!sessionId.trim()) throw new Error("MPGS session ID is required");
   const checkout = await loadMpgsCheckout();
+  if (onError) {
+    window.addEventListener(
+      MPGS_ERROR_EVENT,
+      (event) => onError((event as CustomEvent<unknown>).detail),
+      { once: true },
+    );
+  }
   checkout.configure({ session: { id: sessionId } });
   checkout.showPaymentPage();
 };
