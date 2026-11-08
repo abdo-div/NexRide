@@ -43,6 +43,17 @@ const configuredOrigins = [
   .filter(Boolean);
 const allowedOrigins = new Set(configuredOrigins);
 
+const safeMpgsOrigin = (() => {
+  try {
+    const url = new URL(process.env.MPGS_BASE_URL || "");
+    return url.protocol === "https:" && !url.username && !url.password
+      ? url.origin
+      : null;
+  } catch {
+    return null;
+  }
+})();
+
 /**
  * FRONTEND_DOMAIN accepts a comma-separated list so staging/prod origins can be
  * whitelisted without touching code. Values are normalized to URL origins and
@@ -85,6 +96,7 @@ export const securityHeaders = helmet({
         "'self'",
         "https://api.mapbox.com",
         "https://events.mapbox.com",
+        ...(safeMpgsOrigin ? [safeMpgsOrigin] : []),
       ],
       // Mapbox renders map assets through data/blob URLs and runs its bundled
       // renderer in a blob-backed worker. Keep every other source restricted
@@ -92,7 +104,12 @@ export const securityHeaders = helmet({
       imgSrc: ["'self'", "data:", "blob:"],
       workerSrc: ["'self'", "blob:"],
       // The Mapbox Standard style uses WebAssembly for its 3D renderer.
-      scriptSrc: ["'self'", "'wasm-unsafe-eval'"],
+      scriptSrc: [
+        "'self'",
+        "'wasm-unsafe-eval'",
+        ...(safeMpgsOrigin ? [safeMpgsOrigin] : []),
+      ],
+      frameSrc: ["'self'", ...(safeMpgsOrigin ? [safeMpgsOrigin] : [])],
     },
   },
 });

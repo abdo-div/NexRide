@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
   ArrowLeft,
@@ -19,6 +19,15 @@ import {
   loadMoamalatLightbox,
   openMoamalatLightbox,
 } from "../lib/moamalatLightbox";
+import { mpgsApi } from "../lib/mpgsApi";
+import {
+  loadMpgsCheckout,
+  openMpgsCheckout,
+  rememberMpgsAttempt,
+} from "../lib/mpgsCheckout";
+import { mpgsSimulatorApi } from "../lib/mpgsSimulatorApi";
+
+type CardProvider = "moamalat" | "mpgs" | "mpgs-simulator";
 
 type PaymentStatus =
   | "loading"
@@ -52,12 +61,20 @@ const PaymentPage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { confirm: confirmDialog } = useDialog();
 
   const [booking, setBooking] = useState<BookingDto | null>(null);
   const [status, setStatus] = useState<PaymentStatus>("loading");
   const [error, setError] = useState<string | null>(null);
   const [gatewayEnv, setGatewayEnv] = useState<string | null>(null);
+  const [provider, setProvider] = useState<CardProvider>(
+    !import.meta.env.PROD && searchParams.get("provider")?.toLowerCase() === "mpgs-simulator"
+      ? "mpgs-simulator"
+      : searchParams.get("provider")?.toLowerCase() === "mpgs"
+        ? "mpgs"
+        : "moamalat",
+  );
 
   useEffect(() => {
     if (!bookingId) return;
@@ -90,12 +107,20 @@ const PaymentPage: React.FC = () => {
 
   useEffect(() => {
     if (!booking || booking.paymentStatus === "PAID") return;
-    void moamalatApi
-      .getConfig()
-      .then((config) => setGatewayEnv(config.data?.env ?? config.env ?? null))
-      .catch(() => setGatewayEnv(null));
-    void loadMoamalatLightbox().catch(() => undefined);
-  }, [booking]);
+    if (provider === "moamalat") {
+      void moamalatApi
+        .getConfig()
+        .then((config) => setGatewayEnv(config.data?.env ?? config.env ?? null))
+        .catch(() => setGatewayEnv(null));
+      void loadMoamalatLightbox().catch(() => undefined);
+    } else if (provider === "mpgs") {
+      void mpgsApi
+        .getConfig()
+        .then((config) => setGatewayEnv(config.data.environment))
+        .catch(() => setGatewayEnv(null));
+      void loadMpgsCheckout().catch(() => undefined);
+    }
+  }, [booking, provider]);
 
   const fmtDate = (iso: string) => {
     const parsed = new Date(iso.includes("T") ? iso : `${iso}T00:00:00`);
@@ -192,6 +217,30 @@ const PaymentPage: React.FC = () => {
     setError(null);
     setStatus("preparing");
     try {
+      if (provider === "mpgs-simulator") {
+        const init = await mpgsSimulatorApi.initiate(booking._id);
+        const params = new URLSearchParams({
+          orderId: init.data.orderId,
+          sessionId: init.data.sessionId,
+          bookingId: booking._id,
+          vehicleId: vehicleIdOf(booking),
+          amount: init.data.amount,
+          currency: init.data.currency,
+          merchant: "NexRide",
+        });
+        navigate(`/payment/mpgs/simulator?${params.toString()}`);
+        return;
+      }
+      if (provider === "mpgs") {
+        const init = await mpgsApi.initiate(booking._id);
+        rememberMpgsAttempt({
+          orderId: init.data.orderId,
+          bookingId: booking._id,
+          vehicleId: vehicleIdOf(booking),
+        });
+        await openMpgsCheckout(init.data.sessionId);
+        return;
+      }
       await loadMoamalatLightbox();
       const init = await moamalatApi.initiate(booking._id);
       if (import.meta.env.DEV) {
@@ -394,7 +443,33 @@ const PaymentPage: React.FC = () => {
                   </div>
                 </dl>
 
-                {gatewayEnv === "test" && (
+                <fieldset className="rounded-2xl border border-slate-200 p-4">
+                  <legend className="px-2 text-xs font-black uppercase tracking-wider text-slate-500">
+                    Card payment provider
+                  </legend>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    {([
+                      ["moamalat", "Moamalat", "Local secure LightBox"],
+                      ["mpgs", "Mastercard MPGS", "Mastercard Hosted Checkout"],
+                      ["mpgs-simulator", "MPGS Simulator", "Local demo · no credentials or money"],
+                    ] as const).filter(([value]) => !import.meta.env.PROD || value !== "mpgs-simulator").map(([value, label, description]) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => { setProvider(value); setError(null); setStatus("ready"); }}
+                        className={`rounded-xl border p-4 text-start transition ${provider === value ? "border-[#142B4A] bg-blue-50 ring-1 ring-[#142B4A]" : "border-slate-200 hover:border-slate-400"}`}
+                      >
+                        <span className="block text-sm font-black text-slate-900">{label}</span>
+                        <span className="mt-1 block text-xs text-slate-600">{description}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-3 text-xs leading-relaxed text-slate-500">
+                    Card details are entered only on the selected provider's secure checkout page. NexRide never receives your full card number or CVV.
+                  </p>
+                </fieldset>
+
+                {provider === "moamalat" && gatewayEnv === "test" && (
                   <div className="rounded-xl border border-amber-300 bg-amber-50 p-5 text-start">
                     <p className="text-[14px] font-bold text-amber-900">
                       {t("payment.sandboxTitle")}
@@ -484,7 +559,11 @@ const PaymentPage: React.FC = () => {
                       className="w-full py-4 rounded-xl bg-[#0F172A] hover:bg-slate-800 text-white text-[15px] font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <ShieldCheck className="w-5 h-5" />
-                      {t("payment.payButton")}
+                      {provider === "mpgs"
+                        ? "Continue to Mastercard MPGS"
+                        : provider === "mpgs-simulator"
+                          ? "Continue to MPGS Simulator"
+                          : t("payment.payButton")}
                     </button>
                     <button
                       type="button"

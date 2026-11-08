@@ -62,7 +62,7 @@ const paymentSchema = new mongoose.Schema(
       type: String,
       required: [true, "Payment method is required"],
       enum: {
-        values: ["CASH_ON_DELIVERY", "LOCAL_CARD", "MOAMALAT", "WALLET"],
+        values: ["CASH_ON_DELIVERY", "LOCAL_CARD", "MOAMALAT", "MPGS", "WALLET"],
         message: "Invalid payment method",
       },
     },
@@ -96,6 +96,20 @@ const paymentSchema = new mongoose.Schema(
       type: String,
       trim: true,
       maxlength: 40,
+    },
+    gatewaySessionId: {
+      type: String,
+      trim: true,
+      maxlength: 256,
+    },
+    gatewaySuccessIndicator: {
+      type: String,
+      trim: true,
+      maxlength: 256,
+    },
+    gatewayOperation: {
+      type: String,
+      enum: ["PURCHASE", "AUTHORIZE"],
     },
 
     // -------------------------------------------------------------------------

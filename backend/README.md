@@ -2,13 +2,21 @@
 
 The NexRide backend is an Express API for the vehicle-rental marketplace and its operations dashboard. It provides authentication, vehicle and company management, bookings, payments, maintenance, payout and reporting workflows. It also serves the legacy Pug views and static files in `backend/views` and `backend/public`.
 
+## Mastercard MPGS
+
+The reusable gateway implementation is in [`payments/`](payments/README.md).
+NexRide-specific persistence and reconciliation adapters remain outside that
+portable folder. Follow the
+[`MPGS sandbox runbook`](../docs/MPGS_SANDBOX_RUNBOOK.md) for credential setup,
+test transactions, evidence collection, and the eventual production switch.
+
 ## Stack
 
 - Node.js 24 and Express 5
 - MongoDB with Mongoose
 - Redis with ioredis and BullMQ for cache, idempotency, reservation coordination, and queued email
 - JWT authentication, role-based authorization, request validation with Zod
-- Moamalat payment gateway integration
+- Moamalat and Mastercard MPGS payment gateway integrations
 
 ## Prerequisites
 

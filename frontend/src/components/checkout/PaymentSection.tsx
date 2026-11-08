@@ -8,6 +8,8 @@ interface Props {
   meta: CheckoutMeta;
   tab: "card" | "cash";
   onTab: (tab: "card" | "cash") => void;
+  cardProvider: "moamalat" | "mpgs" | "mpgs-simulator";
+  onCardProvider: (provider: "moamalat" | "mpgs" | "mpgs-simulator") => void;
   vehicleTitle: string;
 }
 
@@ -15,6 +17,8 @@ export const PaymentSection: React.FC<Props> = ({
   meta,
   tab,
   onTab,
+  cardProvider,
+  onCardProvider,
   vehicleTitle,
 }) => {
   const { t } = useTranslation();
@@ -64,6 +68,18 @@ export const PaymentSection: React.FC<Props> = ({
 
       {tab === "card" ? (
         <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {([
+              ["moamalat", "Moamalat", "Local LightBox"],
+              ["mpgs", "Mastercard MPGS", "Hosted Checkout"],
+              ["mpgs-simulator", "MPGS Simulator", "Local demo · no real money"],
+            ] as const).filter(([value]) => !import.meta.env.PROD || value !== "mpgs-simulator").map(([value, label, description]) => (
+              <button key={value} type="button" onClick={() => onCardProvider(value)} className={`rounded-xl border p-3 text-start transition ${cardProvider === value ? "border-[#142B4A] bg-blue-50 ring-1 ring-[#142B4A]" : "border-slate-200 hover:border-slate-400"}`}>
+                <span className="block text-[13px] font-black text-slate-900">{label}</span>
+                <span className="mt-0.5 block text-[11px] text-slate-500">{description}</span>
+              </button>
+            ))}
+          </div>
           <div className="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC]">
             <span className="text-[11px] text-[#64748B] uppercase font-bold">
               {t(payment.railLabel)}
@@ -89,7 +105,11 @@ export const PaymentSection: React.FC<Props> = ({
                   M
                 </span>
                 <span className="text-[13px] font-bold text-[#0F172A]">
-                  Moamalat LightBox (معاملات)
+                  {cardProvider === "mpgs"
+                    ? "Mastercard MPGS Hosted Checkout"
+                    : cardProvider === "mpgs-simulator"
+                      ? "MPGS Local Simulator"
+                      : "Moamalat LightBox (معاملات)"}
                 </span>
               </div>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-[#142B4A]">
@@ -97,12 +117,14 @@ export const PaymentSection: React.FC<Props> = ({
               </span>
             </div>
             <p className="text-[12px] text-[#475569] leading-relaxed">
-              After clicking <strong>Pay</strong>, a secure Moamalat popup will open where you can safely enter your card details. No card information is collected or stored on this page.
+              After clicking <strong>Pay</strong>, the selected provider's secure checkout will open. No card information is collected or stored on this page.
             </p>
             <div className="flex items-center gap-2">
               <Lock className="w-[13px] h-[13px] text-[#142B4A] shrink-0" />
               <span className="text-[11px] text-[#64748B] font-semibold">
-                Your card details are entered directly in the Moamalat secure popup — encrypted end-to-end.
+                {cardProvider === "mpgs-simulator"
+                  ? "Simulation only: no card details are requested and no money moves."
+                  : <>Your card details are entered directly with {cardProvider === "mpgs" ? "Mastercard MPGS" : "Moamalat"}.</>}
               </span>
             </div>
           </div>

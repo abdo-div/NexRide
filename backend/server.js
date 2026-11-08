@@ -117,6 +117,12 @@ const {
 startBookingExpiryReaper();
 
 const {
+  startMpgsReconciliation,
+  stopMpgsReconciliation,
+} = await import("./services/mpgsReconciliation.service.js");
+startMpgsReconciliation();
+
+const {
   startNotificationReminderWorker,
   stopNotificationReminderWorker,
 } = await import("./services/notificationService.js");
@@ -142,6 +148,7 @@ const shutdown = async (signal, exitCode = 0) => {
 
   // Do not start any more scheduled work while existing HTTP requests drain.
   stopBookingExpiryReaper();
+  stopMpgsReconciliation();
   stopNotificationReminderWorker();
 
   forceExitTimer = setTimeout(() => {
