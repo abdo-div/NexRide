@@ -50,6 +50,10 @@ export class MpgsProvider extends PaymentProvider {
         operation: checkout.operation,
         merchant: { name: checkout.merchantName },
         returnUrl: checkout.returnUrl,
+        // Checkout.js otherwise derives a default from the current browser URL.
+        // Hash-router URLs produce an invalid `.../on-timeout` URI, so always
+        // persist a validated absolute URL in the gateway session.
+        timeoutUrl: checkout.cancelUrl || checkout.returnUrl,
       },
       order: {
         id: checkout.orderId,

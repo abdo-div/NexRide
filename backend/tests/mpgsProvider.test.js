@@ -59,6 +59,7 @@ test("creates a normalized Hosted Checkout session", async () => {
       operation: "PURCHASE",
       merchant: { name: "Digital Group" },
       returnUrl: "https://shop.example.com/payment/return",
+      timeoutUrl: "https://shop.example.com/payment/cancel",
       cancelUrl: "https://shop.example.com/payment/cancel",
     },
     order: {
@@ -122,6 +123,10 @@ test("allows localhost HTTP return URLs for development", async () => {
 
   assert.equal(
     client.calls[0].body.interaction.returnUrl,
+    "http://localhost:5173/payment/return",
+  );
+  assert.equal(
+    client.calls[0].body.interaction.timeoutUrl,
     "http://localhost:5173/payment/return",
   );
 });
