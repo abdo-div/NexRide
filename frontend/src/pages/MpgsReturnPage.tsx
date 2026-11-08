@@ -63,7 +63,9 @@ const MpgsReturnPage: React.FC = () => {
   }, [navigate, orderId, remembered?.bookingId, remembered?.vehicleId, resultIndicator]);
 
   useEffect(() => {
-    if (!cancelled) void verify();
+    if (cancelled) return;
+    const verificationTask = window.setTimeout(() => void verify(), 0);
+    return () => window.clearTimeout(verificationTask);
   }, [cancelled, verify]);
 
   const icon = state === "success"

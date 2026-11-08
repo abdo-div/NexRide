@@ -119,7 +119,7 @@ const PaymentPage: React.FC = () => {
         .then((config) => setGatewayEnv(config.data.environment))
         .catch(() => setGatewayEnv(null));
       void loadMpgsCheckout().catch(() => undefined);
-    } else setGatewayEnv("simulator");
+    }
   }, [booking, provider]);
 
   const fmtDate = (iso: string) => {
