@@ -228,6 +228,47 @@ const validateMoamalat = (env, problems) => {
   }
 };
 
+export const validateOptionalMpgs = (env, problems) => {
+  const names = [
+    "MPGS_BASE_URL",
+    "MPGS_MERCHANT_ID",
+    "MPGS_API_PASSWORD",
+    "MPGS_API_VERSION",
+    "MPGS_CURRENCY",
+  ];
+  if (!names.some((name) => configured(env, name))) return;
+
+  for (const name of names) {
+    if (!configured(env, name)) problems.push(`${name} is required when MPGS is enabled.`);
+    else if (PLACEHOLDER_PATTERN.test(valueOf(env, name))) {
+      problems.push(`${name} still contains a placeholder value.`);
+    }
+  }
+  try {
+    const url = new URL(valueOf(env, "MPGS_BASE_URL"));
+    if (url.protocol !== "https:" || url.username || url.password) {
+      problems.push("MPGS_BASE_URL must be a credential-free HTTPS URL.");
+    }
+  } catch {
+    problems.push("MPGS_BASE_URL must be a valid HTTPS URL.");
+  }
+  if (!/^\d+$/.test(valueOf(env, "MPGS_API_VERSION"))) {
+    problems.push("MPGS_API_VERSION must be a positive integer.");
+  }
+  if (!/^[A-Z]{3}$/.test(valueOf(env, "MPGS_CURRENCY").toUpperCase())) {
+    problems.push("MPGS_CURRENCY must be a three-letter ISO currency code.");
+  }
+  if (
+    configured(env, "MPGS_OPERATION") &&
+    !["PURCHASE", "AUTHORIZE"].includes(valueOf(env, "MPGS_OPERATION").toUpperCase())
+  ) {
+    problems.push("MPGS_OPERATION must be PURCHASE or AUTHORIZE.");
+  }
+  if (/^TEST/i.test(valueOf(env, "MPGS_MERCHANT_ID"))) {
+    problems.push("MPGS_MERCHANT_ID must not be a test merchant in production.");
+  }
+};
+
 /**
  * Validate deployment-only requirements without returning or logging secrets.
  * All problems are reported together so an operator can fix the VPS config in
@@ -306,6 +347,7 @@ export const validateProductionEnv = (env = process.env) => {
 
   validateSmtp(env, problems);
   validateMoamalat(env, problems);
+  validateOptionalMpgs(env, problems);
 
   if (problems.length > 0) {
     throw new Error(

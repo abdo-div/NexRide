@@ -23,6 +23,21 @@ const refundSchema = new mongoose.Schema(
     completedAt: { type: Date, default: null },
     failedAt: { type: Date, default: null },
     failureReason: { type: String, trim: true, default: null },
+    provider: { type: String, trim: true, uppercase: true, default: null },
+    gatewayOrderId: { type: String, trim: true, maxlength: 40, default: null },
+    gatewayRefundTransactionId: {
+      type: String,
+      trim: true,
+      maxlength: 40,
+      default: null,
+    },
+    gatewayTargetTransactionId: {
+      type: String,
+      trim: true,
+      maxlength: 40,
+      default: null,
+    },
+    gatewayCode: { type: String, trim: true, maxlength: 100, default: null },
   },
   {
     timestamps: true,
@@ -31,5 +46,12 @@ const refundSchema = new mongoose.Schema(
 );
 
 refundSchema.index({ bookingId: 1, createdAt: -1 });
+refundSchema.index(
+  { gatewayRefundTransactionId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { gatewayRefundTransactionId: { $type: "string" } },
+  },
+);
 
 export default mongoose.models.Refund || mongoose.model("Refund", refundSchema);

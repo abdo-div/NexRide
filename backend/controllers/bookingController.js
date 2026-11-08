@@ -463,9 +463,37 @@ export const cancelBooking = catchAsync(async (req, res, next) => {
     { reason: req.body?.reason ?? null },
   );
 
+  let gatewayRefund = null;
+  try {
+    const { processPendingMpgsRefundByBooking } = await import(
+      "../services/mpgsRefund.service.js"
+    );
+    const processedRefund = await processPendingMpgsRefundByBooking(booking._id, {
+      customerId: req.user.id ?? req.user._id,
+    });
+    gatewayRefund = {
+      skipped: processedRefund.skipped ?? false,
+      reason: processedRefund.reason ?? null,
+      outcome: processedRefund.outcome ?? null,
+      refunded:
+        processedRefund.refunded ?? processedRefund.alreadyProcessed ?? false,
+      refundId: processedRefund.refund?._id ?? null,
+      status: processedRefund.refund?.status ?? null,
+    };
+  } catch (error) {
+    // Cancellation is already committed. A temporary gateway failure remains
+    // on the Refund record for an idempotent retry and must not resurrect the
+    // booking or misreport the cancellation itself as failed.
+    gatewayRefund = {
+      outcome: "FAILED",
+      retryable: true,
+      message: error instanceof Error ? error.message : "Refund processing failed",
+    };
+  }
+
   res.status(200).json({
     status: "success",
-    data: { booking },
+    data: { booking, gatewayRefund },
   });
 });
 

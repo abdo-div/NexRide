@@ -45,6 +45,8 @@ const BookingConfirmationPage = lazy(() =>
   import("./pages/BookingConfirmationPage"),
 );
 const PaymentPage = lazy(() => import("./pages/PaymentPage"));
+const MpgsReturnPage = lazy(() => import("./pages/MpgsReturnPage"));
+const MpgsSimulatorCheckoutPage = lazy(() => import("./pages/MpgsSimulatorCheckoutPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
 const PartnerApplyPage = lazy(() => import("./pages/partner/PartnerApplyPage"));
 const CompanyApplicationStatusPage = lazy(
@@ -248,6 +250,18 @@ function App() {
             <CustomerPreferencesProvider>
             <VehicleComparisonProvider>
             <SmoothScroll><Routes>
+          {!import.meta.env.PROD && (
+            <Route
+              path="/payment/mpgs/simulator"
+              element={
+                <ProtectedRoute>
+                  <LazyRoute>
+                    <MpgsSimulatorCheckoutPage />
+                  </LazyRoute>
+                </ProtectedRoute>
+              }
+            />
+          )}
           <Route element={<PublicShell />}>
             <Route path="/" element={<StaffLandingRoute><HomePage /></StaffLandingRoute>} />
             <Route
@@ -304,6 +318,26 @@ function App() {
                 <ProtectedRoute>
                   <LazyRoute>
                     <CheckoutPage />
+                  </LazyRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/payment/mpgs/return"
+              element={
+                <ProtectedRoute>
+                  <LazyRoute>
+                    <MpgsReturnPage />
+                  </LazyRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/payment/mpgs/cancel"
+              element={
+                <ProtectedRoute>
+                  <LazyRoute>
+                    <MpgsReturnPage />
                   </LazyRoute>
                 </ProtectedRoute>
               }

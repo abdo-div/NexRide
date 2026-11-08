@@ -25,12 +25,18 @@ export const REDACT_PATHS = [
   // pino matches these paths relative to the object being logged, so both the
   // bare `body` form and the nested `req.body` form are listed.
   "body.password",
+  "body.apiPassword",
+  "body.MPGS_API_PASSWORD",
   "body.token",
   "body.jwt",
   "body.otp",
   "req.body.password",
   "req.body.token",
+  "req.body.apiPassword",
+  "req.body.MPGS_API_PASSWORD",
   "password",
+  "apiPassword",
+  "MPGS_API_PASSWORD",
   "token",
   "jwt",
 ];

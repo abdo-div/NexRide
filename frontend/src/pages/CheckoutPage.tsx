@@ -180,6 +180,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
   const [tab, setTab] = useState<"card" | "cash">(
     preferences.paymentMethod === "CASH_ON_DELIVERY" ? "cash" : "card",
   );
+  const [cardProvider, setCardProvider] = useState<"moamalat" | "mpgs" | "mpgs-simulator">("moamalat");
   const paymentChoiceTouched = useRef(false);
   useEffect(() => {
     if (!paymentChoiceTouched.current) {
@@ -285,6 +286,33 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
           `/booking-confirmed/${vehicle.id}?${confirmationQuery.toString()}`,
           { replace: true },
         );
+      } catch (err) {
+        setPhase("idle");
+        setSubmitError(
+          err instanceof ApiError && err.status === 409
+            ? t("checkout.submitError.conflict")
+            : err instanceof Error
+              ? err.message
+              : t("checkout.submitError.generic"),
+        );
+      }
+      return;
+    }
+
+    if (cardProvider === "mpgs" || cardProvider === "mpgs-simulator") {
+      try {
+        const result = await bookingApi.create(
+          {
+            vehicleId,
+            startDate,
+            endDate,
+            pickupLocation: locationParam || undefined,
+            addonIds: Array.from(selected) as Array<"insurance" | "driver" | "childseat" | "delivery">,
+            promotionCode: appliedPromotion?.code,
+          },
+          bookingAttemptKey.current,
+        );
+        navigate(`/payment/${result.data.booking._id}?provider=${cardProvider}`);
       } catch (err) {
         setPhase("idle");
         setSubmitError(
@@ -544,7 +572,7 @@ const RealCheckout: React.FC<{ vehicleId: string }> = ({ vehicleId }) => {
               </div>
             </>}
             {activeStep === 3 && <>
-              <PaymentSection meta={meta} tab={tab} onTab={selectPaymentTab} vehicleTitle={vehicle.title} />
+              <PaymentSection meta={meta} tab={tab} onTab={selectPaymentTab} cardProvider={cardProvider} onCardProvider={setCardProvider} vehicleTitle={vehicle.title} />
               <button type="button" onClick={() => moveToStep(2)} className="inline-flex w-fit items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-100"><ArrowLeft className="h-4 w-4 rtl:rotate-180" />{t("checkout.flow.backOptions")}</button>
             </>}
           </div>
