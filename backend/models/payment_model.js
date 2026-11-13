@@ -62,7 +62,7 @@ const paymentSchema = new mongoose.Schema(
       type: String,
       required: [true, "Payment method is required"],
       enum: {
-        values: ["CASH_ON_DELIVERY", "LOCAL_CARD", "MOAMALAT", "MPGS", "WALLET"],
+        values: ["CASH_ON_DELIVERY", "LOCAL_CARD", "MOAMALAT", "MPGS", "PAYFLOW", "WALLET"],
         message: "Invalid payment method",
       },
     },
@@ -110,6 +110,21 @@ const paymentSchema = new mongoose.Schema(
     gatewayOperation: {
       type: String,
       enum: ["PURCHASE", "AUTHORIZE"],
+    },
+    aggregatorPaymentId: {
+      type: String,
+      trim: true,
+    },
+    aggregatorCheckoutUrl: {
+      type: String,
+      trim: true,
+      select: false,
+    },
+    aggregatorCheckoutExpiresAt: Date,
+    aggregatorEventIds: {
+      type: [String],
+      default: [],
+      select: false,
     },
 
     // -------------------------------------------------------------------------
@@ -262,6 +277,13 @@ paymentSchema.index(
   {
     unique: true,
     partialFilterExpression: { merchantReference: { $type: "string" } },
+  },
+);
+paymentSchema.index(
+  { aggregatorPaymentId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { aggregatorPaymentId: { $type: "string" } },
   },
 );
 

@@ -26,8 +26,9 @@ import {
   rememberMpgsAttempt,
 } from "../lib/mpgsCheckout";
 import { mpgsSimulatorApi } from "../lib/mpgsSimulatorApi";
+import { paymentAggregatorApi } from "../lib/paymentAggregatorApi";
 
-type CardProvider = "moamalat" | "mpgs" | "mpgs-simulator";
+type CardProvider = "aggregator" | "moamalat" | "mpgs" | "mpgs-simulator";
 
 type PaymentStatus =
   | "loading"
@@ -71,9 +72,7 @@ const PaymentPage: React.FC = () => {
   const [provider, setProvider] = useState<CardProvider>(
     !import.meta.env.PROD && searchParams.get("provider")?.toLowerCase() === "mpgs-simulator"
       ? "mpgs-simulator"
-      : searchParams.get("provider")?.toLowerCase() === "mpgs"
-        ? "mpgs"
-        : "moamalat",
+      : "aggregator",
   );
 
   useEffect(() => {
@@ -217,6 +216,11 @@ const PaymentPage: React.FC = () => {
     setError(null);
     setStatus("preparing");
     try {
+      if (provider === "aggregator") {
+        const init = await paymentAggregatorApi.initiate(booking._id);
+        window.location.assign(init.data.checkoutUrl);
+        return;
+      }
       if (provider === "mpgs-simulator") {
         const init = await mpgsSimulatorApi.initiate(booking._id);
         const params = new URLSearchParams({
@@ -459,8 +463,7 @@ const PaymentPage: React.FC = () => {
                   </legend>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {([
-                      ["moamalat", "Moamalat", "Local secure LightBox"],
-                      ["mpgs", "Mastercard MPGS", "Mastercard Hosted Checkout"],
+                      ["aggregator", "Secure card payment", "Choose MPGS or Moamalat on PayFlow checkout"],
                       ["mpgs-simulator", "MPGS Simulator", "Local demo · no credentials or money"],
                     ] as const).filter(([value]) => !import.meta.env.PROD || value !== "mpgs-simulator").map(([value, label, description]) => (
                       <button
@@ -573,7 +576,7 @@ const PaymentPage: React.FC = () => {
                         ? "Continue to Mastercard MPGS"
                         : provider === "mpgs-simulator"
                           ? "Continue to MPGS Simulator"
-                          : t("payment.payButton")}
+                          : "Continue to secure checkout"}
                     </button>
                     <button
                       type="button"

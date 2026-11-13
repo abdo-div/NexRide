@@ -18,6 +18,7 @@ import companyRouter from "./routes/companyRoutes.js";
 import paymentRouter from "./routes/paymentRoutes.js";
 import moamalatRouter from "./routes/moamalatRoutes.js";
 import mpgsRouter from "./routes/mpgsRoutes.js";
+import paymentAggregatorRouter from "./routes/paymentAggregatorRoutes.js";
 import vehicleRouter from "./routes/vehicleRoutes.js";
 import viewRouter from "./routes/viewRoutes.js";
 import adminRouter from "./routes/admin.routes.js";
@@ -211,7 +212,14 @@ if (hasFrontendBuild) {
 // 7. BODY PARSING
 // ============================================
 
-app.use(express.json({ limit: "10kb" }));
+app.use(express.json({
+  limit: "10kb",
+  verify: (req, _res, buffer) => {
+    if (req.originalUrl?.startsWith("/api/v1/payments/aggregator/webhook")) {
+      req.rawBody = Buffer.from(buffer);
+    }
+  },
+}));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
 
@@ -225,7 +233,10 @@ app.use(sanitizeNoSQL);
 // 9. API RATE LIMITING + TENANT RESOLUTION
 // ============================================
 
-app.use("/api/v1", apiLimiter, resolveTenant);
+app.use("/api/v1", apiLimiter, (req, res, next) => {
+  if (req.path === "/payments/aggregator/webhook") return next();
+  return resolveTenant(req, res, next);
+});
 
 // ============================================
 // 10. AUTH RATE LIMITING
@@ -268,6 +279,7 @@ app.use("/api/v1/bookings", bookingRouter);
 app.use("/api/v1/companies", companyRouter);
 app.use("/api/v1/payments/moamalat", moamalatRouter);
 app.use("/api/v1/payments/mpgs", mpgsRouter);
+app.use("/api/v1/payments/aggregator", paymentAggregatorRouter);
 app.use("/api/v1/payments", paymentRouter);
 app.use("/api/v1/vehicles", vehicleRouter);
 app.use("/api/v1/newsletter", newsletterLimiter, newsletterRouter);
